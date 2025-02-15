@@ -37,4 +37,4 @@ jobs:
       with:
         name: FOGLTOGLES
         path: | 
-          build/*.so
+          b/*.so
