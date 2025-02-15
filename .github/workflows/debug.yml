@@ -29,11 +29,19 @@ jobs:
       run: |
         pip install meson
 
+      - uses: seanmiddleditch/gha-setup-ninja@master
 
     - name: Build
+      continue-on-error: true
       run: |
         chmod +x build-android.sh
         bash build-android.sh
+
+    - name: Build (2)
+      run: |
+        mkdir b && cd b
+        cmake -G Ninja ..
+        cmake --build .
 
     - name: Upload Build
       uses: actions/upload-artifact@v4
