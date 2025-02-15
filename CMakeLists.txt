@@ -31,6 +31,7 @@ find_library(GLES3_DEP GLESv3 REQUIRED)
 set(DEPENDENCIES
 	${GLES2_DEP}
 	${GLES3_DEP}
+	c++_static
 )
 
 target_link_libraries(
