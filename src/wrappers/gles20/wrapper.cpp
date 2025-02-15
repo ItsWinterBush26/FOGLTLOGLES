@@ -6,7 +6,7 @@
 WRAPV(glClearColor,
 	(GLfloat r, GLfloat g, GLfloat b, GLfloat a),
 	(r, g, b, a))
-WRAPV(glClear, (GLbitfield m), (m));
+WRAPV(glClear, (GLbitfield m), (m))
 WRAPV(glViewport,
 	(GLint x, GLint y, GLsizei w, GLsizei h),
 	(x, y, w, h))
