@@ -7,6 +7,15 @@ on:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        include:
+          - name: 64-bit
+            arch-double: arm64-v8a
+
+          - name: 32-bit
+            arch-double: armeabi-v7a
+    
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -27,7 +36,7 @@ jobs:
         mkdir b && cd b
         cmake -G Ninja .. \
           -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
-          -DANDROID_ABI=armeabi-v7a \
+          -DANDROID_ABI=${{ matrix.arch-double }} \
           -DANDROID_PLATFORM=android-21 \
           -DCMAKE_BUILD_TYPE=Release
         cmake --build .
@@ -35,6 +44,6 @@ jobs:
     - name: Upload Build
       uses: actions/upload-artifact@v4
       with:
-        name: FOGLTOGLES
+        name: FOGLTOGLES - ${{ matrix.name }}
         path: | 
           b/*.so
