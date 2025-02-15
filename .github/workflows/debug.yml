@@ -19,31 +19,10 @@ jobs:
         ccache_options: |
           compression=false
 
-    - name: Install Python 3.13
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.13'
-        # cache: 'pip'
-
-    - name: Install Meson
-      run: |
-        pip install meson
-
     - name: Install Ninja
       uses: seanmiddleditch/gha-setup-ninja@master
 
-      #- name: Setup Android SDK
-      #uses: android-actions/setup-android@v3
-      #with:
-      #  packages: 'cmake;3.10.2.4988404'
-
     - name: Build
-      continue-on-error: true
-      run: |
-        chmod +x build-android.sh
-        bash build-android.sh
-
-    - name: Build (2)
       run: |
         mkdir b && cd b
         cmake -G Ninja .. \
