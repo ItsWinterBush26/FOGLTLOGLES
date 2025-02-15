@@ -1,5 +1,4 @@
 #pragma once
-#include "base/base.h"
 #include "extensions.h"
 
 #include <GLES2/gl2ext.h>
@@ -44,7 +43,7 @@
 #define GL_RED_EXT 0x1903
 #endif
 
-PUBLIC EXTERN inline GLenum get_es_internalformat(GLenum gl_iform) {
+inline GLenum get_es_internalformat(GLenum gl_iform) {
 	switch (gl_iform) {
         case GL_RGBA8:
         case GL_RGBA:
@@ -68,8 +67,4 @@ PUBLIC EXTERN inline GLenum get_es_internalformat(GLenum gl_iform) {
         default:
             return GL_RGBA;
     }
-}
-
-
-
-
+};

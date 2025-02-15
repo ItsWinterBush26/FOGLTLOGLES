@@ -1,5 +1,5 @@
-#include "base/base.h"
-#include "utils/convertion.h"
+#include "translations/base/base.h"
+#include "utils/conversion.h"
 
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
