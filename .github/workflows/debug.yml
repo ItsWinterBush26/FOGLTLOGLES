@@ -32,6 +32,11 @@ jobs:
     - name: Install Ninja
       uses: seanmiddleditch/gha-setup-ninja@master
 
+      #- name: Setup Android SDK
+      #uses: android-actions/setup-android@v3
+      #with:
+      #  packages: 'cmake;3.10.2.4988404'
+
     - name: Build
       continue-on-error: true
       run: |
@@ -41,7 +46,11 @@ jobs:
     - name: Build (2)
       run: |
         mkdir b && cd b
-        cmake -G Ninja ..
+        cmake -G Ninja .. \
+          -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
+          -DANDROID_ABI=armeabi-v7a \
+          -DANDROID_PLATFORM=android-21 \
+          -DCMAKE_BUILD_TYPE=Release
         cmake --build .
 
     - name: Upload Build

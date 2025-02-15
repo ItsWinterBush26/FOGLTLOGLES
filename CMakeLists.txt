@@ -21,9 +21,9 @@ target_include_directories(FOGLTOGLES PRIVATE
 )
 
 find_package(Threads REQUIRED)
-find_library(GLESv3_LIB GLESv3)
-find_library(GLESv2_LIB GLESv2)
-find_library(EGL_LIB EGL)
+find_library(GLESv3_LIB GLESv3 REQUIRED)
+find_library(GLESv2_LIB GLESv2 REQUIRED)
+find_library(EGL_LIB EGL REQUIRED)
 find_library(ANDROID_LIB android)
 find_library(LOG_LIB log)
 find_library(C_LIB c)
