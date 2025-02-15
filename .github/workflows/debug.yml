@@ -29,7 +29,8 @@ jobs:
       run: |
         pip install meson
 
-      - uses: seanmiddleditch/gha-setup-ninja@master
+    - name: Install Ninja
+      uses: seanmiddleditch/gha-setup-ninja@master
 
     - name: Build
       continue-on-error: true
