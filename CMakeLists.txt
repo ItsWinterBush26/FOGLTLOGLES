@@ -4,12 +4,11 @@ project(FOGLTOGLES VERSION 0.0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-file(GLOB SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
-file(GLOB GLES20_FILES "${CMAKE_CURRENT_SOURCE_DIR}/translations/gles20/*.cpp")
-file(GLOB GLES30_FILES "${CMAKE_CURRENT_SOURCE_DIR}/translations/gles30/*.cpp")
+file(GLOB HEADER_FILES "utils/*.h")
+file(GLOB GLES20_FILES "translations/gles20/*.cpp")
+file(GLOB GLES30_FILES "translations/gles30/*.cpp")
 
 set(SOURCES
-    ${SRC_FILES}
     ${GLES20_FILES}
     ${GLES30_FILES}
 )
@@ -17,9 +16,9 @@ set(SOURCES
 add_library(FOGLTOGLES SHARED ${SOURCES})
 
 target_include_directories(FOGLTOGLES PRIVATE
-    "${CMAKE_CURRENT_SOURCE_DIR}/src"
-    "${CMAKE_CURRENT_SOURCE_DIR}/translations"
-    "${CMAKE_CURRENT_SOURCE_DIR}/utils"
+    "src"
+    "translations"
+    "utils"
 )
 
 find_package(Threads REQUIRED)
