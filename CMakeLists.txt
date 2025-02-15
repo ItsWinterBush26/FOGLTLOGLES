@@ -6,13 +6,12 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 file(GLOB_RECURSE SOURCES
-	"translations/gles*/*.cpp"
+	"src/wrappers/gles*/*.cpp"
 )
 
-set(HEADER_DIRS "translations" "utils")
+set(HEADER_DIRS "include")
 file(GLOB_RECURSE HEADERS
-	"translations/base/base.h"
-	"utils/*.h"
+	"include/*/*.h"
 )
 
 set(DEPENDENCIES
