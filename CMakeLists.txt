@@ -4,7 +4,16 @@ project(FOGLTOGLES VERSION 0.0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++")
+
+find_library(GLES2_DEP GLESv2 REQUIRED)
+find_library(GLES3_DEP GLESv3 REQUIRED)
+
+set(DEPENDENCIES
+	Threads::Threads
+	${GLES2_DEP}
+	${GLES3_DEP}
+	c++_static
+)
 
 file(GLOB_RECURSE SOURCES
 	"src/wrappers/gles*/*.cpp"
@@ -23,15 +32,6 @@ target_include_directories(
 	${PROJECT_NAME}
 	PUBLIC
 	${HEADER_DIRS}
-)
-
-find_library(GLES2_DEP GLESv2 REQUIRED)
-find_library(GLES3_DEP GLESv3 REQUIRED)
-
-set(DEPENDENCIES
-	${GLES2_DEP}
-	${GLES3_DEP}
-	c++_static
 )
 
 target_link_libraries(
