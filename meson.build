@@ -16,13 +16,8 @@ sources = {
     'src/layer.cpp'
   ],
   'gles20': [
-    'translations/gles20/glclear.cpp',
-    'translations/gles20/glclearcolor.cpp',
-    'translations/gles20/glcleardepth.cpp',
-    'translations/gles20/gldisable.cpp',
-    'translations/gles20/glenable.cpp',
-    'translations/gles20/glscissor.cpp',
-    'translations/gles20/glviewport.cpp'
+    'translations/gles20/direct.cpp',
+    'translations/gles20/emulated.cpp',
   ],
   'gles30': [
     'translations/gles30/glclientwaitsync.cpp',
@@ -32,7 +27,7 @@ sources = {
   ]
 }
 
-include_dirs = ['src', 'translations']
+include_dirs = ['src', 'translations', 'utils']
 src_files = [
   sources['main'] + sources['gles20'] + sources['gles30']
 ]
@@ -62,9 +57,7 @@ normal_deps = [
   cc.find_library('android', dirs: lib_dirs),
   cc.find_library('log', dirs: lib_dirs),
   cc.find_library('c', dirs: lib_dirs),
-  cc.find_library('dl', dirs: lib_dirs),
-  cc.find_library('m', dirs: lib_dirs),
-  cc.find_library('c++_static', dirs: lib_dirs, static: true)
+  cc.find_library('c++_static', dirs: lib_dirs, static: true),
 ]
 
 deps = normal_deps
