@@ -45,6 +45,6 @@ meson setup "$BUILD_DIR" \
     -Dandroid_arch="$ANDROID_ARCH" \
     "${EXTRA_ARGS[@]}"
 
-ninja -C "$BUILD_DIR"
+ninja -C "$BUILD_DIR" -j$(nproc)
 
 echo "Build completed successfully for Android ($ANDROID_ARCH)"

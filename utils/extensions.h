@@ -1,14 +1,18 @@
 #pragma once
 
 #include <GLES2/gl2.h>
+#include <atomic>
 #include <unordered_set>
 #include <string>
 
+static inline std::atomic_bool initialized = ATOMIC_VAR_INIT(false);
+
 class ESExtensions {
 public:
-    // Initialize the extension list (call once after OpenGL ES context is created)
     static void init() {
-        const char* extStr = (const char*)glGetString(GL_EXTENSIONS);
+    	if (initialized.load()) return;
+
+        const char* extStr = (const char*) glGetString(GL_EXTENSIONS);
         if (!extStr) return;
 
         std::string extList(extStr);
@@ -18,12 +22,12 @@ public:
             extensions.insert(extList.substr(start, end - start));
             start = end + 1;
         }
-        if (start < extList.size()) {
-            extensions.insert(extList.substr(start)); // Last extension
-        }
+
+        if (start < extList.size()) extensions.insert(extList.substr(start)); 
+        
+        initialized.store(true);
     }
 
-    // Fast extension check
     static inline bool isSupported(const char* extension) {
         return extensions.find(extension) != extensions.end();
     }
@@ -32,6 +36,5 @@ private:
     static std::unordered_set<std::string> extensions;
 };
 
-// Definition of the static variable
 std::unordered_set<std::string> ESExtensions::extensions;
 
