@@ -1,0 +1,43 @@
+name: C/C++ CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+
+    - name: Install CCache
+      uses: Chocobo1/setup-ccache-action@v1
+      with:
+        ccache_options: |
+          compression=false
+
+    - name: Install Python 3.13
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+        # cache: 'pip'
+
+    - name: Install Meson
+      run: |
+        pip install meson
+
+
+    - name: Build
+      run: |
+        chmod +x build-android.sh
+        bash build-android.sh
+
+    - name: Upload Build
+      uses: actions/upload-artifact@v4
+      with:
+        name: FOGLTOGLES
+        path: | 
+          build/*.so
