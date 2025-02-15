@@ -7,12 +7,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_library(GLES2_DEP GLESv2 REQUIRED)
 find_library(GLES3_DEP GLESv3 REQUIRED)
+find_library(CXX_STATIC_DEP c++_static REQUIRED)
 
 set(DEPENDENCIES
-	Threads::Threads
 	${GLES2_DEP}
 	${GLES3_DEP}
-	c++_static
+	${CXX_STATIC_DEP}
 )
 
 file(GLOB_RECURSE SOURCES
@@ -24,8 +24,9 @@ file(GLOB_RECURSE HEADERS
 	"include/*/*.h"
 )
 
-message("Sources : ${SOURCES}")
-message("Headers : ${HEADERS}")
+message("Sources      : ${SOURCES}")
+message("Headers      : ${HEADERS}")
+message("Dependencies : ${DEPENDENCIES}")
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
 
 target_include_directories(
