@@ -9,7 +9,7 @@ file(GLOB_RECURSE SOURCES
 	"translations/gles*/*.cpp"
 )
 
-set(HEADER_DIRS "translations" "utils")
+set(HEADER_DIRS "translations/base" "utils")
 file(GLOB_RECURSE HEADERS
 	"translations/base/base.h"
 	"utils/*.h"
