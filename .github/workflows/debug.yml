@@ -1,0 +1,32 @@
+name: C/C++ CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+
+    - name: Install CCache
+      uses: Chocobo1/setup-ccache-action@v1
+      with:
+        ccache_options: |
+          compression=false
+
+    - name: Build
+      run: |
+        chmod +x build_android.sh
+        bash build_android.sh
+
+    - name: Upload Build
+      uses: actions/upload-artifact@v4
+      with:
+        name: FOGLTOGLES
+        path: | 
+          build/*.so
