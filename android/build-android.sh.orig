@@ -3,7 +3,7 @@ set -e
 
 BUILD_TYPE="android"
 NDK_ROOT="${ANDROID_NDK_ROOT:-}"
-ANDROID_ARCH="armeabi-v7a"
+ANDROID_ARCH="arm"
 BUILD_DIR="build"
 EXTRA_ARGS=()
 
@@ -28,20 +28,21 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# if [[ -z "$NDK_ROOT" ]]; then
-#     echo "Error: NDK root not specified. Use --ndk-root or set ANDROID_NDK_ROOT"
-#     exit 1
-# fi
+if [[ -z "$NDK_ROOT" ]]; then
+    echo "Error: NDK root not specified. Use --ndk-root or set ANDROID_NDK_ROOT"
+    exit 1
+fi
 
-# if [[ ! -d "$NDK_ROOT" ]]; then
-#     echo "Error: NDK root directory does not exist: $NDK_ROOT"
-#     exit 1
-# fi
+if [[ ! -d "$NDK_ROOT" ]]; then
+    echo "Error: NDK root directory does not exist: $NDK_ROOT"
+    exit 1
+fi
 
 mkdir -p "$BUILD_DIR"
 
 meson setup "$BUILD_DIR" \
-	--cross-file "android/$ANDROID_ARCH.ini"
+    -Dndk_root="$NDK_ROOT" \
+    -Dandroid_arch="$ANDROID_ARCH" \
     "${EXTRA_ARGS[@]}"
 
 ninja -C "$BUILD_DIR" -j$(nproc)
