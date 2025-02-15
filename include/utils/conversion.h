@@ -1,5 +1,6 @@
 #pragma once
 #include "extensions.h"
+#include "gltypes.h"
 
 #include <GLES2/gl2ext.h>
 
@@ -44,7 +45,7 @@
 #endif
 
 inline GLenum get_es_internalformat(GLenum gl_iform) {
-	switch (gl_iform) {
+    switch (gl_iform) {
         case GL_RGBA8:
         case GL_RGBA:
             return GL_RGBA;
@@ -66,5 +67,5 @@ inline GLenum get_es_internalformat(GLenum gl_iform) {
             return ESExtensions::isSupported("GL_EXT_sRGB") ? GL_SRGB8 : GL_RGB;
         default:
             return GL_RGBA;
-    }
+  }
 };

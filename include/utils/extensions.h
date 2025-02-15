@@ -35,6 +35,3 @@ public:
 private:
     static std::unordered_set<std::string> extensions;
 };
-
-std::unordered_set<std::string> ESExtensions::extensions;
-
