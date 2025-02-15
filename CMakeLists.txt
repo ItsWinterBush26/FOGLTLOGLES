@@ -14,10 +14,6 @@ file(GLOB_RECURSE HEADERS
 	"include/*/*.h"
 )
 
-set(DEPENDENCIES
-	
-)
-
 message("Sources : ${SOURCES}")
 message("Headers : ${HEADERS}")
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
@@ -27,6 +23,15 @@ target_include_directories(
 	PUBLIC
 	${HEADER_DIRS}
 )
+
+find_library(GLES2_DEP GLESv2 REQUIRED)
+find_library(GLES3_DEP GLESv3 REQUIRED)
+
+set(DEPENDENCIES
+	${GLES2_DEP}
+	${GLES3_DEP}
+)
+
 
 target_link_libraries(
 	${PROJECT_NAME}
