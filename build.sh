@@ -10,7 +10,7 @@ export ANDROID_NDK="$ANDROID_NDK_ROOT"
 cmake -G Ninja .. \
     -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK/build/cmake/android.toolchain.cmake" \
     -DANDROID_ABI=armeabi-v7a \
-    -DANDROID_PLATFORM=android-21 \
+    -DANDROID_PLATFORM=24 \
     -DCMAKE_BUILD_TYPE=Release
 
 cmake --build .

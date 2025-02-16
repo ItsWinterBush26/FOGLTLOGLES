@@ -1,3 +1,4 @@
 [submodule "deps/shaderc"]
 	path = deps/shaderc
 	url = https://github.com/google/shaderc
+	fetch-depth = 1

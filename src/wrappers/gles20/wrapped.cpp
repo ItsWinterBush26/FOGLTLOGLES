@@ -29,7 +29,7 @@ WRAPV(glDeleteBuffers, (GLsizei n, const GLuint *buf), (n, buf))
 // Textures
 WRAPV(glGenTextures, (GLsizei n, GLuint *tex), (n, tex))
 WRAPV(glBindTexture, (GLenum target, GLuint tex), (target, tex))
-// glTexImage2D is in 'emulated.cpp'
+// glTexImage2D is in 'translation.cpp'
 WRAPV(glTexSubImage2D,
 	(GLenum target, GLint l, GLint xoff, GLint yoff, GLsizei w, GLsizei h, GLenum form, GLenum type, const void *px),
 	(target, l, xoff, yoff, w, h, form, type, px))
