@@ -1,7 +1,5 @@
 #pragma once
 
-#include <algorithm>
-
 typedef unsigned short ushort;
 typedef unsigned int uint;
 typedef unsigned char ubyte;
@@ -12,11 +10,12 @@ static inline float clampf(const float f, const float min, const float max) {
 }
 
 static inline uint float_to_uint(const float x) {
-    return *(uint*) &x;
+    // return *(uint*) &x;
+    return static_cast<uint>(x);
 }
 
 static inline float uint_to_float(const uint x) {
-    return *(float*) &x;
+    return static_cast<float>(x);
 }
 
 static inline float half_to_float(const ushort x) { // IEEE-754 16-bit floating-point format (without infinity): 1-5-10, exp-15, +-131008.0, +-6.1035156E-5, +-5.9604645E-8, 3.311 digits

@@ -5,6 +5,7 @@
 
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
+#include <vector>
 
 DEFINE(void, glClearDepth, (GLdouble d)) {
     glClearDepthf(static_cast<GLfloat>(d));
@@ -184,7 +185,7 @@ OVERRIDEV(glTexImage2D, (
     size_t pixelCount = static_cast<size_t>(width) * height;
     // CASE: Color texture conversion to GL_UNSIGNED_BYTE.
     if (destType == GL_UNSIGNED_BYTE) {
-        std::vector<unsigned char> buffer(pixelCount * channels);
+        std::vector<ubyte> buffer(pixelCount * channels);
         if (type == GL_FLOAT) {
             const float* src = static_cast<const float*>(data);
             if (swapChannels && channels >= 3) {
@@ -269,7 +270,7 @@ OVERRIDEV(glTexImage2D, (
     }
     // CASE: Depth texture conversion to GL_UNSIGNED_SHORT.
     else if (destType == GL_UNSIGNED_SHORT) {
-        std::vector<unsigned short> buffer(pixelCount);
+        std::vector<ushort> buffer(pixelCount);
         if (type == GL_FLOAT) {
             const float* src = static_cast<const float*>(data);
             for (size_t i = 0; i < pixelCount; ++i) {
