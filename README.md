@@ -1,2 +1,2 @@
-# FOGLTOGLES
-Fast OpenGL Translation (to) OpenGL ES
+# FOGLTLOGLES
+Fast OpenGL Translation Layer (to) OpenGL ES
