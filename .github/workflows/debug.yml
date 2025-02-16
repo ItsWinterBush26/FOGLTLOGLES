@@ -34,7 +34,7 @@ jobs:
 
     - name: Build
       run: |
-        ./utils/git-sync-deps
+        ./deps/shaderc/utils/git-sync-deps
         mkdir b && cd b
         cmake -G Ninja .. \
           -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
