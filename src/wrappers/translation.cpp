@@ -1,7 +1,7 @@
 #include "wrappers/base.h"
 #include "utils/extensions.h"
 #include "utils/convertions.h"
-#include "utils/gltypes.h"
+#include "gl/types.h"
 
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>

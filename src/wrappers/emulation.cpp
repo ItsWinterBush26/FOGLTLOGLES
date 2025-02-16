@@ -1,4 +1,3 @@
-#include "shaderc/shaderc.h"
 #include "spirv_glsl.hpp"
 #include "wrappers/base.h"
 

@@ -1,20 +1,26 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(FOGLTOGLES VERSION 0.0.1 LANGUAGES CXX)
+project(FOGLTOGLES VERSION 0.0.1 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ######## DEPENDENCIES ########
+set(ANDROID ON)
 set(SHADERC_SKIP_EXAMPLES ON)
 set(SHADERC_SKIP_TESTS ON)
-add_subdirectory(deps/shaderc)
-
+set(SPIRV_SKIP_TESTS ON)
 set(SPIRV_CROSS_ENABLE_TESTS OFF)
 set(SPIRV_CROSS_ENABLE_HLSL OFF)
 set(SPIRV_CROSS_ENABLE_MSL OFF)
 set(SPIRV_CROSS_CLI OFF)
+set(SPIRV_CROSS_ENABLE_C_API OFF)
+set(GLSLANG_TESTS OFF)
+set(ENABLE_HLSL OFF)
+
+add_subdirectory(deps/shaderc) 
 add_subdirectory(deps/spirv-cross)
 
 ######## MAIN PROJECT ########
@@ -51,9 +57,8 @@ set(DEPENDENCIES
 
 	# Static SHADERC
 	shaderc
-	shaderc_util
 
-	# Minimal SPIRV-Cross?
+	# Minimal SPIRV-Cross
 	spirv-cross-core
 	spirv-cross-glsl
 )
