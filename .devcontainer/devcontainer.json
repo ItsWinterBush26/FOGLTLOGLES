@@ -2,7 +2,7 @@
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
   "features": {
     "ghcr.io/nordcominc/devcontainer-features/android-sdk:1": {
-      "extra_packages": "ndk-bundle cmake;3.10.2.4988404",
+      "extra_packages": "ndk;27.2.12479018 cmake;3.10.2.4988404",
       "platform": "24",
       "build_tools": "24.0.0"
     },
