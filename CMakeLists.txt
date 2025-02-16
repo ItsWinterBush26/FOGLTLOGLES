@@ -11,6 +11,10 @@ set(SHADERC_SKIP_EXAMPLES ON)
 set(SHADERC_SKIP_TESTS ON)
 add_subdirectory(deps/shaderc)
 
+set(SPIRV_CROSS_ENABLE_TESTS OFF)
+set(SPIRV_CROSS_ENABLE_HLSL OFF)
+set(SPIRV_CROSS_ENABLE_MSL OFF)
+set(SPIRV_CROSS_CLI OFF)
 add_subdirectory(deps/spirv-cross)
 
 ######## MAIN PROJECT ########
@@ -37,15 +41,21 @@ target_include_directories(
 find_library(ANDROID_DEP android REQUIRED)
 find_library(GLES2_DEP GLESv2 REQUIRED)
 find_library(GLES3_DEP GLESv3 REQUIRED)
-# find_library(SHADERC_DEP shaderc_static REQUIRED)
 find_library(CXX_STATIC_DEP c++_static REQUIRED)
 
 set(DEPENDENCIES
     ${ANDROID_DEP}
 	${GLES2_DEP}
 	${GLES3_DEP}
-# 	${SHADERC_DEP}
 	${CXX_STATIC_DEP}
+
+	# Static SHADERC
+	shaderc
+	shaderc_util
+
+	# Minimal SPIRV-Cross?
+	spirv-cross-core
+	spirv-cross-glsl
 )
 
 target_link_libraries(
