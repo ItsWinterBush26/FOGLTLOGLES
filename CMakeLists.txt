@@ -8,7 +8,6 @@ set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ######## DEPENDENCIES ########
-set(ANDROID ON)
 set(SHADERC_SKIP_EXAMPLES ON)
 set(SHADERC_SKIP_TESTS ON)
 set(SPIRV_SKIP_TESTS ON)
@@ -43,6 +42,13 @@ target_include_directories(
 	${HEADER_DIRS}
 )
 
+######## EXTRA ########
+if(CMAKE_BUILD_TYPE MATCHES Release)
+  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+	COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${PROJECT_NAME}>
+	COMMENT "Stripping symbols from ${PROJECT_NAME}")
+endif()
+
 ######## DEPENDENCIES ########
 find_library(ANDROID_DEP android REQUIRED)
 find_library(GLES2_DEP GLESv2 REQUIRED)
@@ -55,8 +61,8 @@ set(DEPENDENCIES
 	${GLES3_DEP}
 	${CXX_STATIC_DEP}
 
-	# Shared ShaderC
-	shaderc_shared
+	# Static ShaderC
+	shaderc
 
 	# Minimal static SPIRV-Cross
 	spirv-cross-core

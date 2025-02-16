@@ -40,13 +40,16 @@ mkdir build
 cd build
 
 echo "Building for '$1'"
+export NDK_CCACHE="$(which nproc)"
+export ANDROID_CCACHE="$NDK_CCACHE"
 cmake -G Ninja .. \
     -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake" \
     -DANDROID_ABI=$1 \
     -DANDROID_PLATFORM=24 \
-    -DANDROID_CCACHE="$(which ccache)" \
+    -DANDROID_CCACHE="$NDK_CCACHE" \
+    -DNDK_CCACHE="$NDK_CCACHE" \
     -DCMAKE_BUILD_TYPE=Release
 
-cmake --build .
+cmake --build . -j$(nproc)
 
 cd $OLD
