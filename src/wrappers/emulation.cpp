@@ -7,8 +7,12 @@
 #include <string>
 
 inline shaderc_shader_kind get_kind_from_shader(GLuint shader) {
-    // TODO: impl
-    return shaderc_glsl_compute_shader;
+    switch (shader) {
+        case GL_VERTEX_SHADER: return shaderc_glsl_vertex_shader;
+        /* case GL_COMPUTE_SHADER:
+            return std::string(glGetString(GL_VERSION)) == std::string("3.2") ? shaderc_glsl_geometry_shader : shaderc_glsl_miss_shader; */
+        default: return shaderc_glsl_fragment_shader;
+    }
 }
 
 // idk
@@ -17,9 +21,10 @@ OVERRIDEV(glShaderSource, (GLuint shader, GLsizei count, const GLchar *const *so
     shaderc::CompileOptions spirvOptions;
     spirvOptions.SetOptimizationLevel(shaderc_optimization_level_performance);
 
+    shaderc_shader_kind shaderKind = get_kind_from_shader(shader);
     shaderc::SpvCompilationResult result = spirvCompiler.CompileGlslToSpv(
-        std::string(*source), get_kind_from_shader(shader),
-        "kkk", spirvOptions
+        std::string(*source), shaderKind,
+        "0ejeif9v", spirvOptions
     );
 
     std::vector<uint32_t> spirvShader = { result.cbegin(), result.cend() };

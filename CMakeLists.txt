@@ -19,7 +19,7 @@ add_subdirectory(deps/spirv-cross)
 
 ######## MAIN PROJECT ########
 file(GLOB_RECURSE SOURCES
-	"src/wrappers/gles*/*.cpp"
+	"src/*/*.cpp"
 )
 
 set(HEADER_DIRS "include")
