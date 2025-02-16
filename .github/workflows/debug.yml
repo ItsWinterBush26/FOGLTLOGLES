@@ -40,7 +40,8 @@ jobs:
           -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
           -DANDROID_ABI=${{ matrix.arch-double }} \
           -DANDROID_PLATFORM=android-26 \
-          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_BUILD_TYPE=Release \
+          -DANDROID_CCACHE=/usr/lib/ccache
         cmake --build .
 
     - name: Upload Build
