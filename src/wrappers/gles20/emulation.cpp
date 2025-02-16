@@ -1,13 +1,13 @@
 #include "wrappers/base.h"
-#include "utils/conversion.h"
 #include "utils/extensions.h"
+#include "utils/gltypes.h"
 
+#include <GLES2/gl2.h>
 #include <vector>
 #include <cstdint>
 #include <algorithm>
 #include <cstring>
-
-#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
 
 // Helper: Clamp a float between 0 and 1 and convert to unsigned byte.
 inline unsigned char floatToUByte(float val) {
@@ -48,7 +48,14 @@ float halfToFloat(uint16_t h) {
 }
 
 // Textures
-OVERRIDEV(glTexImage2D, (GLenum target, GLint l, GLint iform, GLsizei w, GLsizei h, GLint b, GLenum form, GLenum type, const void* p)) {
+OVERRIDEV(glTexImage2D, (
+    GLenum target,
+    GLint level,
+    GLint internalFormat,
+    GLsizei width, GLsizei height,
+    GLint border, GLenum format,
+    GLenum type, const void* data)
+) {
     bool conversionNeeded = false;
     bool swapChannels = false; // For BGRA/BGR conversion.
     GLenum destInternalFormat;
@@ -60,7 +67,7 @@ OVERRIDEV(glTexImage2D, (GLenum target, GLint l, GLint iform, GLsizei w, GLsizei
     // For each case, if the appropriate extension is supported,
     // we can pass through the original type; otherwise, we convert.
     switch (internalFormat) {
-        case GL_RGBA32F:
+        case GL_RGBA32F_EXT:
             channels = 4;
             destInternalFormat = GL_RGBA;
             destFormat = GL_RGBA;
@@ -72,19 +79,19 @@ OVERRIDEV(glTexImage2D, (GLenum target, GLint l, GLint iform, GLsizei w, GLsizei
                 conversionNeeded = true;
             }
             break;
-        case GL_RGBA16F:
+        case GL_RGBA16F_EXT:
             channels = 4;
             destInternalFormat = GL_RGBA;
             destFormat = GL_RGBA;
             if (ESExtensions::isSupported("GL_OES_texture_half_float") && type == GL_HALF_FLOAT) {
-                destType = GL_HALF_FLOAT;
+                destType = GL_HALF_FLOAT_OES;
                 conversionNeeded = false;
             } else {
                 destType = GL_UNSIGNED_BYTE;
                 conversionNeeded = true;
             }
             break;
-        case GL_RGB32F:
+        case GL_RGB32F_EXT:
             channels = 3;
             destInternalFormat = GL_RGB;
             destFormat = GL_RGB;
@@ -96,19 +103,19 @@ OVERRIDEV(glTexImage2D, (GLenum target, GLint l, GLint iform, GLsizei w, GLsizei
                 conversionNeeded = true;
             }
             break;
-        case GL_RGB16F:
+        case GL_RGB16F_EXT:
             channels = 3;
             destInternalFormat = GL_RGB;
             destFormat = GL_RGB;
             if (ESExtensions::isSupported("GL_OES_texture_half_float") && type == GL_HALF_FLOAT) {
-                destType = GL_HALF_FLOAT;
+                destType = GL_HALF_FLOAT_OES;
                 conversionNeeded = false;
             } else {
                 destType = GL_UNSIGNED_BYTE;
                 conversionNeeded = true;
             }
             break;
-        case GL_R32F:
+        case GL_R32F_EXT:
             channels = 1;
             destInternalFormat = GL_LUMINANCE;
             destFormat = GL_LUMINANCE;
@@ -120,19 +127,19 @@ OVERRIDEV(glTexImage2D, (GLenum target, GLint l, GLint iform, GLsizei w, GLsizei
                 conversionNeeded = true;
             }
             break;
-        case GL_R16F:
+        case GL_R16F_EXT:
             channels = 1;
             destInternalFormat = GL_LUMINANCE;
             destFormat = GL_LUMINANCE;
             if (ESExtensions::isSupported("GL_OES_texture_half_float") && type == GL_HALF_FLOAT) {
-                destType = GL_HALF_FLOAT;
+                destType = GL_HALF_FLOAT_OES;
                 conversionNeeded = false;
             } else {
                 destType = GL_UNSIGNED_BYTE;
                 conversionNeeded = true;
             }
             break;
-        case GL_RG32F:
+        case GL_RG32F_EXT:
             channels = 2;
             destInternalFormat = GL_LUMINANCE_ALPHA;
             destFormat = GL_LUMINANCE_ALPHA;
@@ -144,12 +151,12 @@ OVERRIDEV(glTexImage2D, (GLenum target, GLint l, GLint iform, GLsizei w, GLsizei
                 conversionNeeded = true;
             }
             break;
-        case GL_RG16F:
+        case GL_RG16F_EXT:
             channels = 2;
             destInternalFormat = GL_LUMINANCE_ALPHA;
             destFormat = GL_LUMINANCE_ALPHA;
             if (ESExtensions::isSupported("GL_OES_texture_half_float") && type == GL_HALF_FLOAT) {
-                destType = GL_HALF_FLOAT;
+                destType = GL_HALF_FLOAT_OES;
                 conversionNeeded = false;
             } else {
                 destType = GL_UNSIGNED_BYTE;
@@ -157,8 +164,8 @@ OVERRIDEV(glTexImage2D, (GLenum target, GLint l, GLint iform, GLsizei w, GLsizei
             }
             break;
         // For depth textures, if GL_OES_depth_texture is supported and the type is acceptable, pass through.
-        case GL_DEPTH_COMPONENT32:
-        case GL_DEPTH_COMPONENT24:
+        case GL_DEPTH_COMPONENT32_OES:
+        case GL_DEPTH_COMPONENT24_OES:
             channels = 1;
             if (ESExtensions::isSupported("GL_OES_depth_texture") &&
                 (type == GL_UNSIGNED_SHORT || type == GL_UNSIGNED_INT)) {
@@ -178,7 +185,7 @@ OVERRIDEV(glTexImage2D, (GLenum target, GLint l, GLint iform, GLsizei w, GLsizei
             destInternalFormat = internalFormat;
             destFormat = format;
             destType = type;
-            if (format == GL_RGBA || format == GL_BGRA)
+            if (format == GL_RGBA || format == GL_BGRA_EXT)
                 channels = 4;
             else if (format == GL_RGB || format == GL_BGR)
                 channels = 3;
@@ -192,7 +199,7 @@ OVERRIDEV(glTexImage2D, (GLenum target, GLint l, GLint iform, GLsizei w, GLsizei
 
     // Check for BGRA/BGR source formats.
     // If GL_EXT_texture_format_BGRA8888 is supported, BGRA can be passed through directly.
-    if ((format == GL_BGRA) && !ESExtensions::isSupported("GL_EXT_texture_format_BGRA8888")) {
+    if ((format == GL_BGRA_EXT) && !ESExtensions::isSupported("GL_EXT_texture_format_BGRA8888")) {
         swapChannels = true;
         conversionNeeded = true;
         destFormat = GL_RGBA;
