@@ -41,7 +41,7 @@ jobs:
           -DANDROID_ABI=${{ matrix.arch-double }} \
           -DANDROID_PLATFORM=android-26 \
           -DCMAKE_BUILD_TYPE=Release \
-          -DANDROID_CCACHE=/usr/lib/ccache
+          -DANDROID_CCACHE=/usr/bin/ccache
         cmake --build .
 
     - name: Upload Build
