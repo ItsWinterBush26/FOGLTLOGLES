@@ -18,7 +18,7 @@ set(SPIRV_CROSS_ENABLE_MSL OFF)
 set(SPIRV_CROSS_CLI OFF)
 set(SPIRV_CROSS_ENABLE_C_API OFF)
 set(GLSLANG_TESTS OFF)
-set(ENABLE_HLSL OFF)
+## set(ENABLE_HLSL OFF) ## fails on libshaderc_util
 
 add_subdirectory(deps/shaderc) 
 add_subdirectory(deps/spirv-cross)
