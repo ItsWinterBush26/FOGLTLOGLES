@@ -52,6 +52,6 @@ cmake -G Ninja .. \
     -DNDK_CCACHE="$NDK_CCACHE" \
     -DCMAKE_BUILD_TYPE=Release
 
-cmake --build . -- -j$(nproc)
+cmake --build -j$(nproc) .
 
 cd "$OLD"
