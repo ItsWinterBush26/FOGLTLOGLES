@@ -42,7 +42,7 @@ mkdir build
 cd build
 
 echo "Building for '$1'"
-export NDK_CCACHE="$(which nproc)"
+export NDK_CCACHE="$(which ccache)"
 export ANDROID_CCACHE="$NDK_CCACHE"
 cmake -G Ninja .. \
     -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake" \
