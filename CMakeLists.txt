@@ -9,6 +9,8 @@ set(SHADERC_SKIP_EXAMPLES ON)
 set(SHADERC_SKIP_TESTS ON)
 add_subdirectory(deps/shaderc)
 
+add_subdirectory(deps/spirv-cross)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
