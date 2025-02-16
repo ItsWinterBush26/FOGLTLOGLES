@@ -55,10 +55,10 @@ set(DEPENDENCIES
 	${GLES3_DEP}
 	${CXX_STATIC_DEP}
 
-	# Static SHADERC
-	shaderc
+	# Shared ShaderC
+	shaderc_shared
 
-	# Minimal SPIRV-Cross
+	# Minimal static SPIRV-Cross
 	spirv-cross-core
 	spirv-cross-glsl
 )
