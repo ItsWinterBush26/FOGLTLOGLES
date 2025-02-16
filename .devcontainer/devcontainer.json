@@ -10,6 +10,7 @@
       "version": "21.0.5",
       "jdkDistro": "graal"
     },
-    "ghcr.io/devcontainers-extra/features/cmake:1": { }
+    "ghcr.io/devcontainers-extra/features/cmake:1": { },
+    "ghcr.io/devcontainers-extra/features/ccache-asdf:2": { }
   }
 }
