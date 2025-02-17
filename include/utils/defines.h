@@ -18,12 +18,12 @@ PUBLIC_API void func params {               \
 
 #define REDIRECT(type, name, target, params, args)  \
 PUBLIC_API type name params {                       \
-	return ##target args;                           \
+	return target args;                           \
 }
 
 #define REDIRECTV(name, target, params, args)  \
 PUBLIC_API void name params {                  \
-	##target args;                             \
+	target args;                             \
 }
 
 #define OVERRIDE(type, func, ...)           \

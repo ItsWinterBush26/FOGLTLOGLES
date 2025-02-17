@@ -2,7 +2,13 @@
 
 #include <string>
 
-typedef void (*GL2ESFunction)(void);
+typedef void (*FunctionPtr)(void);
 
-void registerGlFunctions(std::string, GL2ESFunction);
-GL2ESFunction getGlFunctionAddress(std::string);
+#ifndef TO_FUNCTIONPTR
+#define TO_FUNCTIONPTR(func) reinterpret_cast<FunctionPtr>(func)
+#endif
+
+void registerFunction(std::string, FunctionPtr);
+FunctionPtr getFunctionAddress(std::string);
+
+void init();
