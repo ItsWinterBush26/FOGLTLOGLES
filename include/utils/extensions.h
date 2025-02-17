@@ -2,6 +2,7 @@
 
 #include <GLES2/gl2.h>
 #include <atomic>
+#include <stdexcept>
 #include <unordered_set>
 #include <string>
 
@@ -29,6 +30,7 @@ public:
     }
 
     static inline bool isSupported(const char* extension) {
+        if (!initialized.load()) throw std::runtime_error("Extensions are not yet initialized!");
         return extensions.find(extension) != extensions.end();
     }
 

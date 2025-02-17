@@ -1,4 +1,4 @@
-#include "wrappers/base.h"
+#include "utils/defines.h"
 #include "utils/extensions.h"
 #include "utils/convertions.h"
 #include "gl/types.h"
@@ -7,7 +7,7 @@
 #include <GLES2/gl2ext.h>
 #include <vector>
 
-DEFINE(void, glClearDepth, (GLdouble d)) {
+DEFINE_API(void, glClearDepth, (GLdouble d)) {
     glClearDepthf(static_cast<GLfloat>(d));
 }
 
@@ -18,8 +18,8 @@ OVERRIDEV(glTexImage2D, (
     GLint internalFormat,
     GLsizei width, GLsizei height,
     GLint border, GLenum format,
-    GLenum type, const void* data)
-) {
+    GLenum type, const void* data
+)) {
     bool conversionNeeded = false;
     bool swapChannels = false; // For BGRA/BGR conversion.
     GLenum destInternalFormat;

@@ -1,4 +1,4 @@
-#include "wrappers/base.h"
+#include "utils/defines.h"
 
 #include <GLES2/gl2.h>
 

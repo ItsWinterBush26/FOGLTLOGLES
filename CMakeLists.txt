@@ -24,11 +24,13 @@ add_subdirectory(deps/spirv-cross)
 
 ######## MAIN PROJECT ########
 file(GLOB_RECURSE SOURCES
+	"src/*.cpp"
 	"src/*/*.cpp"
 )
 
 set(HEADER_DIRS "include")
 file(GLOB_RECURSE HEADERS
+	"include/*.h"
 	"include/*/*.h"
 )
 
@@ -51,14 +53,19 @@ endif()
 
 ######## DEPENDENCIES ########
 find_library(ANDROID_DEP android REQUIRED)
+find_library(EGL_DEP EGL REQUIRED)
 find_library(GLES2_DEP GLESv2 REQUIRED)
 find_library(GLES3_DEP GLESv3 REQUIRED)
+find_library(LOG_DEP log REQUIRED)
 find_library(CXX_STATIC_DEP c++_static REQUIRED)
 
 set(DEPENDENCIES
     ${ANDROID_DEP}
+	${EGL_DEP}
 	${GLES2_DEP}
 	${GLES3_DEP}
+	${LOG_DEP}
+
 	${CXX_STATIC_DEP}
 
 	# Static ShaderC
