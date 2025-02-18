@@ -11,4 +11,8 @@ typedef void (*FunctionPtr)(void);
 void registerFunction(std::string, FunctionPtr);
 FunctionPtr getFunctionAddress(std::string);
 
+#ifndef REGISTER
+#define REGISTER(func) registerFunction(#func, TO_FUNCTIONPTR(func))
+#endif
+
 void init();

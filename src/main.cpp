@@ -11,6 +11,7 @@ void registerFunction(std::string name, FunctionPtr function) {
         LOGI("Overriding %s", name.c_str());
     }
 
+    LOGI("Registering %s", name.c_str());
     registeredFunctions.insert(std::make_pair(name, function));
 }
 
@@ -21,6 +22,7 @@ FunctionPtr getFunctionAddress(std::string name) {
         return it->second;
     }
 
+    LOGW("Function named %s not found", name.c_str());
     return nullptr;
 }
 

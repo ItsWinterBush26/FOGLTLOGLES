@@ -1,4 +1,4 @@
-#include <egl/egl.h>
+#include "EGL/egl.h"
 #include "main.h"
 #include "utils/defines.h"
 #include "utils/log.h"
@@ -8,19 +8,6 @@
 
 std::atomic_bool eglFunctionsInit = ATOMIC_VAR_INIT(false);
 std::once_flag eglInitFlag;
-
-constexpr unsigned int str2int(const char* str, int h = 0) {
-    return !str[h] ? 5381 : (str2int(str, h+1) * 33) ^ str[h];
-}
-
-__eglMustCastToProperFunctionPointerType OV_eglGetProcAddress(const char* pn);
-
-void eglInit() {
-    LOGI("Initializing EGL overrides");
-
-    registerFunction("eglCreateContext", TO_FUNCTIONPTR(eglCreateContext));
-    registerFunction("eglGetProcAddress", TO_FUNCTIONPTR(OV_eglGetProcAddress));
-}
 
 OVERRIDE(
     EGLContext,
@@ -33,8 +20,38 @@ OVERRIDE(
     // return ctx;
 }
 
+
+__eglMustCastToProperFunctionPointerType OV_eglGetProcAddress(const char* pn);
+
+void eglInit() {
+    LOGI("Initializing EGL overrides...");
+
+    REGISTER(eglBindAPI);
+    REGISTER(eglChooseConfig);
+    REGISTER(eglCreateContext);
+    REGISTER(eglCreatePbufferSurface);
+    REGISTER(eglCreateWindowSurface);
+    REGISTER(eglDestroyContext);
+    REGISTER(eglDestroySurface);
+    REGISTER(eglGetConfigAttrib);
+    REGISTER(eglGetCurrentContext);
+    REGISTER(eglGetDisplay);
+    REGISTER(eglGetError);
+    REGISTER(eglInitialize);
+    REGISTER(eglMakeCurrent);
+    REGISTER(eglSwapBuffers);
+    REGISTER(eglReleaseThread);
+    REGISTER(eglSwapInterval);
+    REGISTER(eglTerminate);
+    REGISTER(eglGetCurrentSurface);
+
+    // just in case
+    registerFunction("eglGetProcAddress", TO_FUNCTIONPTR(OV_eglGetProcAddress));
+    LOGI("Done initializing!");
+}
+
 __eglMustCastToProperFunctionPointerType OV_eglGetProcAddress(const char *procname) {
-    std::call_once(eglInitFlag, eglInit /* reinterpret_cast<__eglMustCastToProperFunctionPointerType>(eglInit) */);
+    std::call_once(eglInitFlag, eglInit);
     LOGI("What could LWJGL be asking bruh??? procname: %s", procname);
 
     return getFunctionAddress(std::string(procname));
