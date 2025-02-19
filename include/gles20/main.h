@@ -1,10 +1,13 @@
 #pragma once
 
 #include "wrappers/base.h"
+#include <memory>
 
-class GLES20Wrapper : BaseWrapper {
-public:
-    void init();
-};
-
-static inline GLES20Wrapper gles20Wrapper;
+namespace GLES20 {
+    class GLES20Wrapper : BaseWrapper {
+        public:
+            void init();
+    };
+    
+    const inline std::shared_ptr<GLES20Wrapper> wrapper = std::make_shared<GLES20Wrapper>();
+}

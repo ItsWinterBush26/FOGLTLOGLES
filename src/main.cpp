@@ -30,5 +30,5 @@ FunctionPtr getFunctionAddress(std::string name) {
 
 void init() {
     LOGI("hi");
-    gles20Wrapper.init();
+    GLES20::wrapper->init();
 }
