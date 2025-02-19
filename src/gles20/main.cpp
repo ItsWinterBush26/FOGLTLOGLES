@@ -4,6 +4,7 @@
 #include "utils/extensions.h"
 
 #include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
 
 void GLES20::GLES20Wrapper::init() {
     GLES20::initTranslations();
