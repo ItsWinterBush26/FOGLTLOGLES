@@ -31,6 +31,6 @@ FunctionPtr getFunctionAddress(std::string name) {
 
 void init() {
     LOGI("hi");
-    ESExtensions::init();
+    // ESExtensions::init();//ohmd
     GLES20::wrapper->init();
 }
