@@ -11,11 +11,15 @@ OVERRIDE(
     EGLContext,
     eglCreateContext,
     (EGLDisplay dpy, EGLConfig config, EGLContext share_context, const EGLint *attrib_list)) {
-    /* EGLContext ctx = */
-    LOGI("This where we init right?");
-    init();
-    return original_eglCreateContext(dpy, config, share_context, attrib_list);
-    // return ctx;
+    EGLContext ctx = original_eglCreateContext(dpy, config, share_context, attrib_list);
+    if (ctx == EGL_NO_CONTEXT) {
+        LOGE("Failed to create EGL context. EGL error: %i", eglGetError());
+    } else {
+        LOGI("This where we init right?");
+        init();
+    }
+    
+    return ctx;
 }
 
 
@@ -42,6 +46,7 @@ void eglInit() {
     REGISTER(eglSwapInterval);
     REGISTER(eglTerminate);
     REGISTER(eglGetCurrentSurface);
+    REGISTER(eglQuerySurface);
 
     // just in case
     registerFunction("eglGetProcAddress", TO_FUNCTIONPTR(OV_eglGetProcAddress));
