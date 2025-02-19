@@ -1,6 +1,8 @@
 #include "main.h"
+#include "gles20/main.h"
 #include "utils/log.h"
 
+#include <string>
 #include <unordered_map>
 #include <utility>
 
@@ -28,4 +30,5 @@ FunctionPtr getFunctionAddress(std::string name) {
 
 void init() {
     LOGI("hi");
+    gles20Wrapper.init();
 }

@@ -3,11 +3,9 @@
 #include "utils/defines.h"
 #include "utils/log.h"
 
-#include <atomic>
 #include <mutex>
 
-std::atomic_bool eglFunctionsInit = ATOMIC_VAR_INIT(false);
-std::once_flag eglInitFlag;
+static std::once_flag eglInitFlag;
 
 OVERRIDE(
     EGLContext,
