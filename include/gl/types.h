@@ -1,5 +1,7 @@
 #pragma once
 
+typedef double GLdouble;
+
 // Desktop GL Types
 
 #ifndef GL_BGR
