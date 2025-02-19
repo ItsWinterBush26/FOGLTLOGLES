@@ -34,9 +34,6 @@ file(GLOB_RECURSE HEADERS
 	"include/*/*.h"
 )
 
-message("Sources      : ${SOURCES}")
-message("Headers      : ${HEADERS}")
-message("Dependencies : ${DEPENDENCIES}")
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
 target_include_directories(
 	${PROJECT_NAME}
@@ -77,6 +74,9 @@ set(DEPENDENCIES
 )
 
 target_link_libraries(
-	${PROJECT_NAME}
-	${DEPENDENCIES}
+	${PROJECT_NAME} PRIVATE ${DEPENDENCIES}
 )
+
+message("Sources      : ${SOURCES}")
+message("Headers      : ${HEADERS}")
+message("Dependencies : ${DEPENDENCIES}")
