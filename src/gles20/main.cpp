@@ -4,7 +4,8 @@
 #include "utils/extensions.h"
 
 #include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
+
+void initMappableFunctions();
 
 void GLES20::GLES20Wrapper::init() {
     GLES20::initTranslations();
@@ -116,6 +117,7 @@ void initMappableFunctions() {
 	REGISTER(glStencilOp);
 	REGISTER(glStencilMask);
 
+	/* Ugh ChatGPT
 	// Functions that require extensions
 	if (ESExtensions::isSupported("GL_EXT_instanced_arrays")) {
 		REGISTER(glVertexAttribDivisorANGLE);
@@ -156,4 +158,5 @@ void initMappableFunctions() {
 	if (ESExtensions::isSupported("GL_EXT_shader_framebuffer_fetch")) {
 		REGISTER(glFramebufferFetchBarrierEXT);
 	}
+	*/
 }
