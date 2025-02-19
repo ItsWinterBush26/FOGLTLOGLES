@@ -1,5 +1,6 @@
 #include "main.h"
 #include "gles20/main.h"
+#include "utils/extensions.h"
 #include "utils/log.h"
 
 #include <string>
@@ -30,5 +31,6 @@ FunctionPtr getFunctionAddress(std::string name) {
 
 void init() {
     LOGI("hi");
+    ESExtensions::init();
     GLES20::wrapper->init();
 }
