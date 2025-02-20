@@ -1,6 +1,5 @@
 #include "main.h"
 #include "gles20/main.h"
-#include "utils/extensions.h"
 #include "utils/log.h"
 
 #include <string>

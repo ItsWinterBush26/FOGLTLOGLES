@@ -12,9 +12,6 @@ EGLContext OV_eglCreateContext(EGLDisplay dpy, EGLConfig config, EGLContext shar
     if (ctx == EGL_NO_CONTEXT) {
         LOGE("Failed to create EGL context. EGL error: %i", eglGetError());
         exit(1);
-    } else {
-        LOGI("This where we init right?");
-        init();
     }
     
     return ctx;

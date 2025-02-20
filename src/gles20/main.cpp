@@ -1,7 +1,6 @@
 #include "gles20/main.h"
 #include "gles20/translation.h"
 #include "main.h"
-#include "utils/extensions.h"
 
 #include <GLES2/gl2.h>
 
