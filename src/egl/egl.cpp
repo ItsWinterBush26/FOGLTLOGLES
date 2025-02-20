@@ -9,12 +9,8 @@ static std::once_flag eglInitFlag;
 
 void eglInit();
 
-OVERRIDE(
-    EGLContext,
-    eglCreateContext,
-    (EGLDisplay dpy, EGLConfig config, EGLContext share_context, const EGLint *attrib_list)
-) {
-    EGLContext ctx = original_eglCreateContext(dpy, config, share_context, attrib_list);
+EGLContext OV_eglCreateContext(EGLDisplay dpy, EGLConfig config, EGLContext share_context, const EGLint *attrib_list) {
+    EGLContext ctx = eglCreateContext(dpy, config, share_context, attrib_list);
     if (ctx == EGL_NO_CONTEXT) {
         LOGE("Failed to create EGL context. EGL error: %i", eglGetError());
         exit(1);
@@ -26,15 +22,11 @@ OVERRIDE(
     return ctx;
 }
 
-OVERRIDE(
-    EGLBoolean,
-    eglInitialize,
-    (EGLDisplay dpy, EGLint* maj, EGLint* min)
-) {
+EGLBoolean OV_eglInitialize(EGLDisplay dpy, EGLint* maj, EGLint* min) {
     LOGI("eglInitialize!");
     eglInit();
     init();
-    return original_eglInitialize(dpy, maj, min);
+    return eglInitialize(dpy, maj, min);
 }
 
 __eglMustCastToProperFunctionPointerType OV_eglGetProcAddress(const char* pn);
@@ -44,7 +36,7 @@ void eglInit() {
 
     REGISTER(eglBindAPI);
     REGISTER(eglChooseConfig);
-    REGISTER(eglCreateContext);
+    // REGISTER(eglCreateContext);
     REGISTER(eglCreatePbufferSurface);
     REGISTER(eglCreateWindowSurface);
     REGISTER(eglDestroyContext);
@@ -53,7 +45,7 @@ void eglInit() {
     REGISTER(eglGetCurrentContext);
     REGISTER(eglGetDisplay);
     REGISTER(eglGetError);
-    REGISTER(eglInitialize);
+    // REGISTER(eglInitialize);
     REGISTER(eglMakeCurrent);
     REGISTER(eglSwapBuffers);
     REGISTER(eglReleaseThread);
@@ -62,8 +54,13 @@ void eglInit() {
     REGISTER(eglGetCurrentSurface);
     REGISTER(eglQuerySurface);
 
-    // just in case
-    registerFunction("eglGetProcAddress", TO_FUNCTIONPTR(OV_eglGetProcAddress));
+    REGISTEROV(eglCreateContext);
+    REGISTEROV(eglInitialize);
+    REGISTEROV(eglGetProcAddress);
+
+    // registerFunction("eglCreateContext", TO_FUNCTIONPTR(OV_eglCreateContext));
+    // registerFunction("eglInitialize", TO_FUNCTIONPTR(OV_eglInitialize));
+    // registerFunction("eglGetProcAddress", TO_FUNCTIONPTR(OV_eglGetProcAddress));
     LOGI("Done initializing!");
 }
 

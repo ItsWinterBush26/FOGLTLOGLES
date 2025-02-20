@@ -15,4 +15,8 @@ FunctionPtr getFunctionAddress(std::string);
 #define REGISTER(func) registerFunction(#func, TO_FUNCTIONPTR(func))
 #endif
 
+#ifndef REGISTEROV
+#define REGISTEROV(func) registerFunction(#func, TO_FUNCTIONPTR(OV_##func));
+#endif
+
 void init();
