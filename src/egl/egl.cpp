@@ -62,6 +62,7 @@ void eglInit() {
 }
 
 __eglMustCastToProperFunctionPointerType OV_eglGetProcAddress(const char *procname) {
+    std::call_once(eglInitFlag, eglInit);
     LOGI("What could LWJGL be asking bruh??? procname: %s", procname);
     return getFunctionAddress(std::string(procname));
 }
@@ -73,5 +74,3 @@ REDIRECT(
     (const char* pn),
     (pn)
 )
-
-static int const doEGLInit = (eglInit(), 0);

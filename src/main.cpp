@@ -16,7 +16,7 @@ void registerFunction(std::string name, FunctionPtr function) {
         LOGI("Registering %s", name.c_str());
     }
     
-    registeredFunctions.insert(std::make_pair(name, function));
+    registeredFunctions[name] = function;
 }
 
 FunctionPtr getFunctionAddress(std::string name) {
