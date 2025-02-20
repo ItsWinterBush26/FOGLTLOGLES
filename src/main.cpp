@@ -2,6 +2,7 @@
 #include "gles20/main.h"
 #include "utils/log.h"
 
+#include <GLES2/gl2.h>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -32,5 +33,6 @@ FunctionPtr getFunctionAddress(std::string name) {
 void init() {
     LOGI("hi");
     // ESExtensions::init();//ohmd
+    LOGI("%s", (const char*) glGetString(GL_EXTENSIONS));
     GLES20::wrapper->init();
 }
