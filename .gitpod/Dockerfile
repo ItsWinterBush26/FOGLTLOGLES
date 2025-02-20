@@ -12,9 +12,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     ccache \
     build-essential \
-    ninja-build \
-    openjdk-21-jdk \
-    gitpod-cli \
+    ninja-build
     && rm -rf /var/lib/apt/lists/*
 
 # Add Kitware's APT repository and install latest CMake
