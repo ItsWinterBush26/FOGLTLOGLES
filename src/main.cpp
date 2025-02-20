@@ -12,9 +12,10 @@ std::unordered_map<std::string, FunctionPtr> registeredFunctions;
 void registerFunction(std::string name, FunctionPtr function) {
     if (registeredFunctions.find(name) != registeredFunctions.end()) {
         LOGI("Overriding %s", name.c_str());
+    } else {
+        LOGI("Registering %s", name.c_str());
     }
-
-    LOGI("Registering %s", name.c_str());
+    
     registeredFunctions.insert(std::make_pair(name, function));
 }
 
