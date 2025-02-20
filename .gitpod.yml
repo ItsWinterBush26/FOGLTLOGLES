@@ -1,1 +1,2 @@
-image: .gitpod/Dockerfile
+image:
+  file: .gitpod/Dockerfile
