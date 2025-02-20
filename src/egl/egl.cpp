@@ -17,6 +17,7 @@ OVERRIDE(
     EGLContext ctx = original_eglCreateContext(dpy, config, share_context, attrib_list);
     if (ctx == EGL_NO_CONTEXT) {
         LOGE("Failed to create EGL context. EGL error: %i", eglGetError());
+        exit(1);
     } else {
         LOGI("This where we init right?");
         init();
