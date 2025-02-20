@@ -1,10 +1,10 @@
+FROM ubuntu:24.04
+
 ENV HOME_PATH="/home/gitpod"
 ENV SDKMAN_DIR="$HOME_PATH/.sdkman"
 ENV ANDROID_SDK_ROOT="/opt/android-sdk"
 ENV ANDROID_NDK_HOME="$ANDROID_SDK_ROOT/ndk/28.0.13004108"
 ENV PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_NDK_HOME:$HOME_PATH/.sdkman/candidates/java/current/bin:$PATH"
-
-FROM ubuntu:24.04
 
 # Set noninteractive mode for apt
 ENV DEBIAN_FRONTEND=noninteractive
