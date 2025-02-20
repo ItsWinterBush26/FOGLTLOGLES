@@ -12,5 +12,5 @@
     },
     "ghcr.io/devcontainers-extra/features/cmake:1": { }
   },
-  "postStartCommand": "sudo apt update && sudo apt install ccache ninja-build -y"
+  "postStartCommand": "sudo apt update && sudo apt install clang ccache ninja-build -y"
 }
