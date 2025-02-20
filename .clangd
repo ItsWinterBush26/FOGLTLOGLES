@@ -1,2 +1,7 @@
 CompileFlags:
   CompilationDatabase: "build"
+  Add:
+    -DCMAKE_C_COMPILER_LAUNCHER=ccache
+    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+  

@@ -7,10 +7,13 @@
 
 static std::once_flag eglInitFlag;
 
+void eglInit();
+
 OVERRIDE(
     EGLContext,
     eglCreateContext,
-    (EGLDisplay dpy, EGLConfig config, EGLContext share_context, const EGLint *attrib_list)) {
+    (EGLDisplay dpy, EGLConfig config, EGLContext share_context, const EGLint *attrib_list)
+) {
     EGLContext ctx = original_eglCreateContext(dpy, config, share_context, attrib_list);
     if (ctx == EGL_NO_CONTEXT) {
         LOGE("Failed to create EGL context. EGL error: %i", eglGetError());
@@ -22,6 +25,16 @@ OVERRIDE(
     return ctx;
 }
 
+OVERRIDE(
+    EGLBoolean,
+    eglInitialize,
+    (EGLDisplay dpy, EGLint* maj, EGLint* min)
+) {
+    LOGI("eglInitialize!");
+    eglInit();
+    init();
+    return original_eglInitialize(dpy, maj, min);
+}
 
 __eglMustCastToProperFunctionPointerType OV_eglGetProcAddress(const char* pn);
 
@@ -54,7 +67,6 @@ void eglInit() {
 }
 
 __eglMustCastToProperFunctionPointerType OV_eglGetProcAddress(const char *procname) {
-    std::call_once(eglInitFlag, eglInit);
     LOGI("What could LWJGL be asking bruh??? procname: %s", procname);
 
     return getFunctionAddress(std::string(procname));
