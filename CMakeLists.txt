@@ -54,6 +54,7 @@ find_library(EGL_DEP EGL REQUIRED)
 find_library(GLES2_DEP GLESv2 REQUIRED)
 find_library(GLES3_DEP GLESv3 REQUIRED)
 find_library(LOG_DEP log REQUIRED)
+find_library(DL_DEP dl REQUIRED)
 find_library(CXX_STATIC_DEP c++_static REQUIRED)
 
 set(DEPENDENCIES
@@ -62,6 +63,7 @@ set(DEPENDENCIES
 	${GLES2_DEP}
 	${GLES3_DEP}
 	${LOG_DEP}
+        ${DL_DEP}
 
 	${CXX_STATIC_DEP}
 
