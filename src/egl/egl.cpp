@@ -7,8 +7,6 @@
 
 static std::once_flag eglInitFlag;
 
-void eglInit();
-
 EGLContext OV_eglCreateContext(EGLDisplay dpy, EGLConfig config, EGLContext share_context, const EGLint *attrib_list) {
     EGLContext ctx = eglCreateContext(dpy, config, share_context, attrib_list);
     if (ctx == EGL_NO_CONTEXT) {
@@ -24,7 +22,6 @@ EGLContext OV_eglCreateContext(EGLDisplay dpy, EGLConfig config, EGLContext shar
 
 EGLBoolean OV_eglInitialize(EGLDisplay dpy, EGLint* maj, EGLint* min) {
     LOGI("eglInitialize!");
-    eglInit();
     init();
     return eglInitialize(dpy, maj, min);
 }
@@ -66,7 +63,6 @@ void eglInit() {
 
 __eglMustCastToProperFunctionPointerType OV_eglGetProcAddress(const char *procname) {
     LOGI("What could LWJGL be asking bruh??? procname: %s", procname);
-
     return getFunctionAddress(std::string(procname));
 }
 
@@ -77,3 +73,5 @@ REDIRECT(
     (const char* pn),
     (pn)
 )
+
+static int const doEGLInit = (eglInit(), 0);
