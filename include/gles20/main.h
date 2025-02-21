@@ -1,6 +1,7 @@
 #pragma once
 
 #include "wrappers/base.h"
+
 #include <memory>
 
 namespace GLES20 {
