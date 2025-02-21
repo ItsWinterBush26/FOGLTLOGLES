@@ -4,7 +4,6 @@
 
 #include <GLES2/gl2.h>
 
-
 void glClearDepth(double d) {
     glClearDepthf(static_cast<float>(d));
 }
