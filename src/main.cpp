@@ -9,7 +9,7 @@
 
 std::unordered_map<std::string, FunctionPtr> registeredFunctions;
 
-void registerFunction(std::string name, FunctionPtr function) {
+void FOGLTLOGLES::registerFunction(std::string name, FunctionPtr function) {
     if (registeredFunctions.find(name) != registeredFunctions.end()) {
         LOGI("Overriding %s", name.c_str());
     } else {
@@ -19,10 +19,9 @@ void registerFunction(std::string name, FunctionPtr function) {
     registeredFunctions[name] = function;
 }
 
-FunctionPtr getFunctionAddress(std::string name) {
+FunctionPtr FOGLTLOGLES::getFunctionAddress(std::string name) {
     if (auto it = registeredFunctions.find(name);
         it != registeredFunctions.end()) {
-        // LOGI("Function found named %s", name.c_str());
         return it->second;
     }
 
@@ -30,9 +29,6 @@ FunctionPtr getFunctionAddress(std::string name) {
     return nullptr;
 }
 
-void init() {
-    LOGI("hi");
-    // ESExtensions::init();//ohmd
-    LOGI("%s", (const char*) glGetString(GL_EXTENSIONS));
+void FOGLTLOGLES::init() {
     GLES20::wrapper->init();
 }

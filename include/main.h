@@ -1,22 +1,19 @@
 #pragma once
 
+#include "utils/types.h"
 #include <string>
 
-typedef void (*FunctionPtr)(void);
+namespace FOGLTLOGLES {
+    void registerFunction(std::string, FunctionPtr);
+    FunctionPtr getFunctionAddress(std::string);
 
-#ifndef TO_FUNCTIONPTR
-#define TO_FUNCTIONPTR(func) reinterpret_cast<FunctionPtr>(func)
-#endif
-
-void registerFunction(std::string, FunctionPtr);
-FunctionPtr getFunctionAddress(std::string);
+    void init();
+}
 
 #ifndef REGISTER
-#define REGISTER(func) registerFunction(#func, TO_FUNCTIONPTR(func))
+#define REGISTER(func) FOGLTLOGLES::registerFunction(#func, reinterpret_cast<FunctionPtr>(func))
 #endif
 
 #ifndef REGISTEROV
-#define REGISTEROV(func) registerFunction(#func, TO_FUNCTIONPTR(OV_##func));
+#define REGISTEROV(func) FOGLTLOGLES::registerFunction(#func, reinterpret_cast<FunctionPtr>(OV_##func));
 #endif
-
-void init();

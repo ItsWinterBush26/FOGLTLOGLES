@@ -1,6 +1,6 @@
 #pragma once
 
-#include "main.h"
-#include "utils/api.h"
+#include "utils/types.h"
+#include "utils/defines.h"
 
 PUBLIC_API FunctionPtr glXGetProcAddress(char const* pn);

@@ -1,7 +1,6 @@
 #include "gl/gl.h"
-#include "utils/log.h"
+#include "main.h"
 
 FunctionPtr glXGetProcAddress(const char* pn) {
-    LOGI("LWJGL asking for %s", pn);
-    return getFunctionAddress(pn);
+    return FOGLTLOGLES::getFunctionAddress(pn);
 }

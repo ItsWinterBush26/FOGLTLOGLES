@@ -1,36 +1,28 @@
 #include "EGL/egl.h"
+#include "egl/egl.h"
 #include "main.h"
-#include "utils/defines.h"
 #include "utils/log.h"
+#include "utils/types.h"
 
-#include <mutex>
-
-static std::once_flag eglInitFlag;
-
-FunctionPtr OV_eglGetProcAddress(const char*);
+FunctionPtr eglGetProcAddress(const char *procname) {
+    return FOGLTLOGLES::getFunctionAddress(std::string(procname));
+}
 
 EGLContext OV_eglCreateContext(EGLDisplay dpy, EGLConfig config, EGLContext share_context, const EGLint *attrib_list) {
-    EGLContext ctx = eglCreateContext(dpy, config, share_context, attrib_list);
-    if (ctx == EGL_NO_CONTEXT) {
-        LOGE("Failed to create EGL context. EGL error: %i", eglGetError());
-        exit(1);
-    }
-    
-    return ctx;
+    return eglCreateContext(dpy, config, share_context, attrib_list);
 }
 
 EGLBoolean OV_eglInitialize(EGLDisplay dpy, EGLint* maj, EGLint* min) {
-    LOGI("eglInitialize!");
-    init();
+    FOGLTLOGLES::init();
     return eglInitialize(dpy, maj, min);
 }
 
-void eglInit() {
+__attribute__((constructor(1000)))
+static inline void eglInit() {
     LOGI("Initializing EGL functions...");
 
     REGISTER(eglBindAPI);
     REGISTER(eglChooseConfig);
-    // REGISTER(eglCreateContext);
     REGISTER(eglCreatePbufferSurface);
     REGISTER(eglCreateWindowSurface);
     REGISTER(eglDestroyContext);
@@ -39,7 +31,6 @@ void eglInit() {
     REGISTER(eglGetCurrentContext);
     REGISTER(eglGetDisplay);
     REGISTER(eglGetError);
-    // REGISTER(eglInitialize);
     REGISTER(eglMakeCurrent);
     REGISTER(eglSwapBuffers);
     REGISTER(eglReleaseThread);
@@ -47,26 +38,9 @@ void eglInit() {
     REGISTER(eglTerminate);
     REGISTER(eglGetCurrentSurface);
     REGISTER(eglQuerySurface);
+    REGISTER(eglGetProcAddress);
 
     REGISTEROV(eglCreateContext);
     REGISTEROV(eglInitialize);
-    REGISTEROV(eglGetProcAddress);
-
-    // registerFunction("eglCreateContext", TO_FUNCTIONPTR(OV_eglCreateContext));
-    // registerFunction("eglInitialize", TO_FUNCTIONPTR(OV_eglInitialize));
-    // registerFunction("eglGetProcAddress", TO_FUNCTIONPTR(OV_eglGetProcAddress));
     LOGI("Done initializing!");
 }
-
-FunctionPtr OV_eglGetProcAddress(const char *procname) {
-    std::call_once(eglInitFlag, eglInit);
-    return getFunctionAddress(std::string(procname));
-}
-
-REDIRECT(
-    FunctionPtr,
-    eglGetProcAddress,
-    OV_eglGetProcAddress,
-    (const char* pn),
-    (pn)
-)
