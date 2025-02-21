@@ -24,22 +24,20 @@ namespace ESUtils {
 
     static void init() {
         if (extensionSetInitialized.load()) return;
-
-        {
-            str versionStr = reinterpret_cast<str>(glGetString(GL_VERSION));
-            if (!versionStr) {
-                throw std::runtime_error("Failed to get OpenGL ES version, is the context not initialized or what?");
-            }
-
-            int major = 0, minor = 0;
-            if (sscanf(versionStr, "OpenGL ES %d.%d", &major, &minor) == 2) {
-                version = std::make_pair(major, minor);
-            }
-
-            LOGI("Got version %i.%i", version.first, version.second);
+        
+        str versionStr = reinterpret_cast<str>(glGetString(GL_VERSION));
+        if (!versionStr) {
+            throw std::runtime_error("Failed to get OpenGL ES version, is the context not initialized or what?");
         }
 
-        switch (version.first) {
+        int major = 0, minor = 0;
+        if (sscanf(versionStr, "OpenGL ES %d.%d", &major, &minor) == 2) {
+            version = std::make_pair(major, minor);
+        }
+
+        LOGI("Got version %i.%i", major, minor);
+
+        switch (major) {
             case 1:
                 throw std::runtime_error("OpenGL ES 1.x is NOT supported");
             case 2:
