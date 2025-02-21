@@ -17,7 +17,7 @@ void FOGLTLOGLES::registerFunction(str name, FunctionPtr function) {
         LOGI("Registering %s", name);
     }
     
-    registeredFunctions.insert_or_assign(name, function);
+    registeredFunctions[name] = function;
 }
 
 FunctionPtr FOGLTLOGLES::getFunctionAddress(str name) {
@@ -34,6 +34,6 @@ void FOGLTLOGLES::init() {
     ESUtils::init();
     LOGI("FOGLTLOGLES launched on ES %i.%i", ESUtils::version.first, ESUtils::version.second);
 
-    GLES20::wrapper->init();
-    GLES30::wrapper->init();
+    if (ESUtils::version.first == 2) GLES20::wrapper->init();
+    if (ESUtils::version.first == 3) GLES30::wrapper->init();
 }
