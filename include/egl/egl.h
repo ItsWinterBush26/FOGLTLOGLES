@@ -31,7 +31,7 @@
 
 #pragma once
 
-#include "utils/api.h"
+#include "main.h"
 
 #include <EGL/eglplatform.h>
 
@@ -47,11 +47,6 @@ PUBLIC_API EGLBoolean eglDestroyContext(EGLDisplay dpy, EGLContext ctx);
 PUBLIC_API EGLBoolean eglMakeCurrent(EGLDisplay dpy, EGLSurface draw, EGLSurface read, EGLContext ctx);
 */
 
-typedef void (*__eglMustCastToProperFunctionPointerType)(void);
+void eglInit();
 
-PUBLIC_API __eglMustCastToProperFunctionPointerType eglGetProcAddress(const char *procname);
-
-
-
-
-
+FunctionPtr OV_eglGetProcAddress(const char*);

@@ -7,6 +7,8 @@
 
 static std::once_flag eglInitFlag;
 
+FunctionPtr OV_eglGetProcAddress(const char*);
+
 EGLContext OV_eglCreateContext(EGLDisplay dpy, EGLConfig config, EGLContext share_context, const EGLint *attrib_list) {
     EGLContext ctx = eglCreateContext(dpy, config, share_context, attrib_list);
     if (ctx == EGL_NO_CONTEXT) {
@@ -23,10 +25,8 @@ EGLBoolean OV_eglInitialize(EGLDisplay dpy, EGLint* maj, EGLint* min) {
     return eglInitialize(dpy, maj, min);
 }
 
-__eglMustCastToProperFunctionPointerType OV_eglGetProcAddress(const char* pn);
-
 void eglInit() {
-    LOGI("Initializing EGL overrides...");
+    LOGI("Initializing EGL functions...");
 
     REGISTER(eglBindAPI);
     REGISTER(eglChooseConfig);
@@ -58,14 +58,13 @@ void eglInit() {
     LOGI("Done initializing!");
 }
 
-__eglMustCastToProperFunctionPointerType OV_eglGetProcAddress(const char *procname) {
+FunctionPtr OV_eglGetProcAddress(const char *procname) {
     std::call_once(eglInitFlag, eglInit);
-    LOGI("What could LWJGL be asking bruh??? procname: %s", procname);
     return getFunctionAddress(std::string(procname));
 }
 
 REDIRECT(
-    __eglMustCastToProperFunctionPointerType,
+    FunctionPtr,
     eglGetProcAddress,
     OV_eglGetProcAddress,
     (const char* pn),

@@ -22,7 +22,7 @@ void registerFunction(std::string name, FunctionPtr function) {
 FunctionPtr getFunctionAddress(std::string name) {
     if (auto it = registeredFunctions.find(name);
         it != registeredFunctions.end()) {
-        LOGI("Function found named %s", name.c_str());
+        // LOGI("Function found named %s", name.c_str());
         return it->second;
     }
 
