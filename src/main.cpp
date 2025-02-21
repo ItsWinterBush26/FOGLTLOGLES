@@ -42,6 +42,6 @@ void FOGLTLOGLES::init() {
 }
 
 __attribute__((constructor(1000)))
-static void inline init() {
+void init() {
     eglInit();
 }
