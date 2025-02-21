@@ -5,7 +5,9 @@
 #include "utils/log.h"
 
 #include <GLES2/gl2.h>
+#include <chrono>
 #include <string>
+#include <thread>
 #include <unordered_map>
 #include <utility>
 
@@ -19,6 +21,7 @@ void FOGLTLOGLES::registerFunction(std::string name, FunctionPtr function) {
     }
     
     registeredFunctions[name] = function;
+    std::this_thread::sleep_for(std::chrono::nanoseconds(500));
 }
 
 FunctionPtr FOGLTLOGLES::getFunctionAddress(std::string name) {
