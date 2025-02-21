@@ -1,4 +1,5 @@
 #include "main.h"
+#include "egl/egl.h"
 #include "gles20/main.h"
 #include "gles30/main.h"
 #include "utils/log.h"
@@ -8,7 +9,7 @@
 #include <unordered_map>
 #include <utility>
 
-std::unordered_map<std::string, FunctionPtr> registeredFunctions;
+static std::unordered_map<std::string, FunctionPtr> registeredFunctions;
 
 void FOGLTLOGLES::registerFunction(std::string name, FunctionPtr function) {
     if (registeredFunctions.find(name) != registeredFunctions.end()) {
@@ -38,4 +39,9 @@ void FOGLTLOGLES::init() {
     GLES30::wrapper->init();
 
     LOGI("Extensions: %s", reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS)));
+}
+
+__attribute__((constructor(1000)))
+static void inline init() {
+    eglInit();
 }

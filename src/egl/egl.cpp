@@ -17,8 +17,7 @@ EGLBoolean OV_eglInitialize(EGLDisplay dpy, EGLint* maj, EGLint* min) {
     return eglInitialize(dpy, maj, min);
 }
 
-__attribute__((constructor(1000)))
-static inline void eglInit() {
+void eglInit() {
     LOGI("Initializing EGL functions...");
 
     REGISTER(eglBindAPI);

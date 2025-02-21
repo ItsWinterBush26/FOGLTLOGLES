@@ -5,4 +5,4 @@
 
 PUBLIC_API FunctionPtr eglGetProcAddress(const char*);
 
-static inline void eglInit();
+void eglInit();
