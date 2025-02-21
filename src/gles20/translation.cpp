@@ -9,7 +9,7 @@
 void glClearDepth(double d);
 void OV_glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels);
 void OV_glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint* params);
-void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* string, const GLint* length),
+void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* string, const GLint* length);
 
 static GLint maxTextureSize = 0;
 
