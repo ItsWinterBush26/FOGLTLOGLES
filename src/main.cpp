@@ -1,13 +1,10 @@
 #include "main.h"
-#include "egl/egl.h"
 #include "gles20/main.h"
 #include "gles30/main.h"
 #include "utils/log.h"
 
 #include <GLES2/gl2.h>
-#include <chrono>
 #include <string>
-#include <thread>
 #include <unordered_map>
 #include <utility>
 
