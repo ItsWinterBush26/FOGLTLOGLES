@@ -1,11 +1,10 @@
 #pragma once
 
 #include "utils/types.h"
-#include <string>
 
 namespace FOGLTLOGLES {
-    void registerFunction(std::string, FunctionPtr);
-    FunctionPtr getFunctionAddress(std::string);
+    void registerFunction(str, FunctionPtr);
+    FunctionPtr getFunctionAddress(str);
 
     void init();
 }

@@ -7,9 +7,9 @@
 
 static std::once_flag eglInitFlag;
 
-FunctionPtr eglGetProcAddress(const char *procname) {
+FunctionPtr eglGetProcAddress(str procname) {
     std::call_once(eglInitFlag, eglInit);
-    return FOGLTLOGLES::getFunctionAddress(std::string(procname));
+    return FOGLTLOGLES::getFunctionAddress(procname);
 }
 
 EGLContext OV_eglCreateContext(EGLDisplay dpy, EGLConfig config, EGLContext share_context, const EGLint *attrib_list) {

@@ -4,29 +4,28 @@
 #include "utils/log.h"
 
 #include <GLES2/gl2.h>
-#include <string>
 #include <unordered_map>
 #include <utility>
 
-static std::unordered_map<std::string, FunctionPtr> registeredFunctions;
+static std::unordered_map<str, FunctionPtr> registeredFunctions(256);
 
-void FOGLTLOGLES::registerFunction(std::string name, FunctionPtr function) {
+void FOGLTLOGLES::registerFunction(str name, FunctionPtr function) {
     if (registeredFunctions.find(name) != registeredFunctions.end()) {
-        LOGI("Overriding %s", name.c_str());
+        LOGI("Overriding %s", name);
     } else {
-        LOGI("Registering %s", name.c_str());
+        LOGI("Registering %s", name);
     }
     
-    registeredFunctions[name] = function;
+    registeredFunctions.insert_or_assign(name, function);
 }
 
-FunctionPtr FOGLTLOGLES::getFunctionAddress(std::string name) {
+FunctionPtr FOGLTLOGLES::getFunctionAddress(str name) {
     if (auto it = registeredFunctions.find(name);
         it != registeredFunctions.end()) {
         return it->second;
     }
 
-    LOGW("Function named %s not found", name.c_str());
+    LOGW("Function named %s not found", name);
     return nullptr;
 }
 
