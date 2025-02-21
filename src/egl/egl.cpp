@@ -12,13 +12,10 @@ FunctionPtr eglGetProcAddress(str procname) {
     return FOGLTLOGLES::getFunctionAddress(procname);
 }
 
-EGLContext OV_eglCreateContext(EGLDisplay dpy, EGLConfig config, EGLContext share_context, const EGLint *attrib_list) {
-    return eglCreateContext(dpy, config, share_context, attrib_list);
-}
-
-EGLBoolean OV_eglInitialize(EGLDisplay dpy, EGLint* maj, EGLint* min) {
+EGLBoolean OV_eglMakeCurrent(EGLDisplay dpy, EGLSurface draw, EGLSurface read, EGLContext ctx) {
+    EGLBoolean result = eglMakeCurrent(dpy, draw, read, ctx);
     FOGLTLOGLES::init();
-    return eglInitialize(dpy, maj, min);
+    return result;
 }
 
 void eglInit() {
@@ -26,6 +23,7 @@ void eglInit() {
 
     REGISTER(eglBindAPI);
     REGISTER(eglChooseConfig);
+    REGISTER(eglCreateContext);
     REGISTER(eglCreatePbufferSurface);
     REGISTER(eglCreateWindowSurface);
     REGISTER(eglDestroyContext);
@@ -34,17 +32,15 @@ void eglInit() {
     REGISTER(eglGetCurrentContext);
     REGISTER(eglGetDisplay);
     REGISTER(eglGetError);
-    REGISTER(eglMakeCurrent);
+    REGISTER(eglGetProcAddress);
+    REGISTER(eglInitialize);
+    REGISTEROV(eglMakeCurrent);
     REGISTER(eglSwapBuffers);
     REGISTER(eglReleaseThread);
     REGISTER(eglSwapInterval);
     REGISTER(eglTerminate);
     REGISTER(eglGetCurrentSurface);
     REGISTER(eglQuerySurface);
-    REGISTER(eglGetProcAddress);
-
-    REGISTEROV(eglCreateContext);
-    REGISTEROV(eglInitialize);
     
     LOGI("Done initializing!");
 }

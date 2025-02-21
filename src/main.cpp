@@ -1,4 +1,5 @@
 #include "main.h"
+#include "es/utils.h"
 #include "gles20/main.h"
 #include "gles30/main.h"
 #include "utils/log.h"
@@ -30,11 +31,9 @@ FunctionPtr FOGLTLOGLES::getFunctionAddress(str name) {
 }
 
 void FOGLTLOGLES::init() {
-    const GLubyte* glesVersion = glGetString(GL_VERSION);
-    LOGI("FOGLTLOGLES launched on %s", glesVersion);
+    ESUtils::init();
+    LOGI("FOGLTLOGLES launched on ES %i.%i", ESUtils::version.first, ESUtils::version.second);
 
     GLES20::wrapper->init();
     GLES30::wrapper->init();
-
-    LOGI("Extensions: %s", reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS)));
 }
