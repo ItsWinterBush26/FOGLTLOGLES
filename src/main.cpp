@@ -8,25 +8,25 @@
 #include <unordered_map>
 #include <utility>
 
-static std::unordered_map<str, FunctionPtr> registeredFunctions(256);
+static std::unordered_map<std::string, FunctionPtr> registeredFunctions(256);
 
-void FOGLTLOGLES::registerFunction(str name, FunctionPtr function) {
+void FOGLTLOGLES::registerFunction(std::string name, FunctionPtr function) {
     if (registeredFunctions.find(name) != registeredFunctions.end()) {
-        LOGI("Overriding %s", name);
+        LOGI("Overriding %s", name.c_str());
     } else {
-        LOGI("Registering %s", name);
+        LOGI("Registering %s", name.c_str());
     }
     
     registeredFunctions[name] = function;
 }
 
-FunctionPtr FOGLTLOGLES::getFunctionAddress(str name) {
+FunctionPtr FOGLTLOGLES::getFunctionAddress(std::string name) {
     if (auto it = registeredFunctions.find(name);
         it != registeredFunctions.end()) {
         return it->second;
     }
 
-    LOGW("Function named %s not found", name);
+    LOGW("Function named %s not found", name.c_str());
     return nullptr;
 }
 
