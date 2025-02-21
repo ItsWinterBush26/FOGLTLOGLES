@@ -35,8 +35,6 @@ namespace ESUtils {
             version = std::make_pair(major, minor);
         }
 
-        LOGI("Got version %i.%i", major, minor);
-
         switch (major) {
             case 1:
                 throw std::runtime_error("OpenGL ES 1.x is NOT supported");

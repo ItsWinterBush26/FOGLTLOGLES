@@ -6,6 +6,7 @@
 #include <mutex>
 
 static std::once_flag eglInitFlag;
+static std::once_flag rendererInitFlag;
 
 FunctionPtr eglGetProcAddress(str procname) {
     std::call_once(eglInitFlag, eglInit);
@@ -14,7 +15,7 @@ FunctionPtr eglGetProcAddress(str procname) {
 
 EGLBoolean OV_eglMakeCurrent(EGLDisplay dpy, EGLSurface draw, EGLSurface read, EGLContext ctx) {
     EGLBoolean result = eglMakeCurrent(dpy, draw, read, ctx);
-    FOGLTLOGLES::init();
+    std::call_once(rendererInitFlag, FOGLTLOGLES::init);
     return result;
 }
 
