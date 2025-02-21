@@ -5,6 +5,6 @@
 #include <GLES2/gl2.h>
 
 void GLES20::GLES20Wrapper::init() {
-    GLES20::initTranslations();
-    GLES20::initMappableFunctions();
+    GLES20::registerMappableFunctions();
+    GLES20::registerTranslatedFunctions();
 }

@@ -3,28 +3,28 @@
 
 #include <GLES2/gl2.h>
 
-void glClearDepth(double d) {
-    glClearDepthf(static_cast<float>(d));
+void registerExtraFunctions() {
+	REGISTER(glBlendFunc);
+	REGISTER(glBlendEquation);
+	// glClearDepth in translation.cpp 
+	REGISTER(glClearStencil);
+	REGISTER(glDepthFunc);
+	REGISTER(glDepthMask);
+	REGISTER(glDepthRangef);
+	REGISTER(glStencilFunc);
+	REGISTER(glStencilOp);
+	REGISTER(glStencilMask);
 }
 
-void GLES20::initMappableFunctions() {
-	REGISTER(glClearColor);
-	REGISTER(glClear);
-	REGISTER(glViewport);
-	REGISTER(glScissor);
-	REGISTER(glEnable);
-	REGISTER(glDisable);
-	REGISTER(glGetString);
-    REGISTER(glClearDepth);
-    
-	// Buffer operations
+void registerBufferFunctions() {
 	REGISTER(glGenBuffers);
 	REGISTER(glBindBuffer);
 	REGISTER(glBufferData);
 	REGISTER(glBufferSubData);
 	REGISTER(glDeleteBuffers);
+}
 
-	// Textures
+void registerTextureFunctions() {
 	REGISTER(glGenTextures);
 	REGISTER(glBindTexture);
 	REGISTER(glTexImage2D);
@@ -33,8 +33,9 @@ void GLES20::initMappableFunctions() {
 	REGISTER(glTexParameterf);
 	REGISTER(glActiveTexture);
 	REGISTER(glDeleteTextures);
+}
 
-	// Framebuffer & Renderbuffer
+void registerBufferExtFunctions() {
 	REGISTER(glGenFramebuffers);
 	REGISTER(glBindFramebuffer);
 	REGISTER(glFramebufferTexture2D);
@@ -46,8 +47,9 @@ void GLES20::initMappableFunctions() {
 	REGISTER(glRenderbufferStorage);
 	REGISTER(glFramebufferRenderbuffer);
 	REGISTER(glDeleteRenderbuffers);
+}
 
-	// Shader & Program Management
+void registerShaderFunctions() {
 	REGISTER(glCreateShader);
 	REGISTER(glShaderSource);
 	REGISTER(glCompileShader);
@@ -62,8 +64,9 @@ void GLES20::initMappableFunctions() {
 	REGISTER(glDeleteProgram);
 	REGISTER(glGetProgramiv);
 	REGISTER(glGetProgramInfoLog);
+}
 
-	// Vertex Attributes
+void registerVertexAttribFunctions() {
 	REGISTER(glEnableVertexAttribArray);
 	REGISTER(glDisableVertexAttribArray);
 	REGISTER(glVertexAttribPointer);
@@ -71,8 +74,9 @@ void GLES20::initMappableFunctions() {
 	REGISTER(glVertexAttrib2f);
 	REGISTER(glVertexAttrib3f);
 	REGISTER(glVertexAttrib4f);
+}
 
-	// Uniforms
+void registerUniformFunctions() {
 	REGISTER(glGetUniformLocation);
 	REGISTER(glUniform1f);
 	REGISTER(glUniform2f);
@@ -83,14 +87,16 @@ void GLES20::initMappableFunctions() {
 	REGISTER(glUniform3i);
 	REGISTER(glUniform4i);
 	REGISTER(glUniformMatrix4fv);
+}
 
-	// Drawing
+void registerDrawingFunctions() {
 	REGISTER(glDrawArrays);
 	REGISTER(glDrawElements);
 	REGISTER(glFinish);
 	REGISTER(glFlush);
+}
 
-	// State Queries
+void registerStateQueriesFunctions() {
 	REGISTER(glGetIntegerv);
 	REGISTER(glGetFloatv);
 	REGISTER(glGetBooleanv);
@@ -100,16 +106,24 @@ void GLES20::initMappableFunctions() {
 	REGISTER(glIsBuffer);
 	REGISTER(glIsFramebuffer);
 	REGISTER(glIsRenderbuffer);
+}
 
-	// Additional OpenGL ES 2.0 functions
-	REGISTER(glBlendFunc);
-	REGISTER(glBlendEquation);
-	REGISTER(glClearDepthf);
-	REGISTER(glClearStencil);
-	REGISTER(glDepthFunc);
-	REGISTER(glDepthMask);
-	REGISTER(glDepthRangef);
-	REGISTER(glStencilFunc);
-	REGISTER(glStencilOp);
-	REGISTER(glStencilMask);
+void GLES20::registerMappableFunctions() {
+	REGISTER(glClearColor);
+	REGISTER(glClear);
+	REGISTER(glViewport);
+	REGISTER(glScissor);
+	REGISTER(glEnable);
+	REGISTER(glDisable);
+	REGISTER(glGetString);
+	
+	registerExtraFunctions();
+	registerBufferFunctions();
+	registerTextureFunctions();
+	registerBufferExtFunctions();
+	registerShaderFunctions();
+	registerDrawingFunctions();
+	registerVertexAttribFunctions();
+	registerUniformFunctions();
+	registerStateQueriesFunctions();
 }
