@@ -3,8 +3,12 @@
 #include "main.h"
 #include "utils/log.h"
 #include "utils/types.h"
+#include <mutex>
+
+static std::once_flag eglInitFlag;
 
 FunctionPtr eglGetProcAddress(const char *procname) {
+    std::call_once(eglInitFlag, eglInit);
     return FOGLTLOGLES::getFunctionAddress(std::string(procname));
 }
 
@@ -41,5 +45,6 @@ void eglInit() {
 
     REGISTEROV(eglCreateContext);
     REGISTEROV(eglInitialize);
+    
     LOGI("Done initializing!");
 }

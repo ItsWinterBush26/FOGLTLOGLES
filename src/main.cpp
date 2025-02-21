@@ -21,7 +21,6 @@ void FOGLTLOGLES::registerFunction(std::string name, FunctionPtr function) {
     }
     
     registeredFunctions[name] = function;
-    std::this_thread::sleep_for(std::chrono::nanoseconds(500));
 }
 
 FunctionPtr FOGLTLOGLES::getFunctionAddress(std::string name) {
@@ -42,9 +41,4 @@ void FOGLTLOGLES::init() {
     GLES30::wrapper->init();
 
     LOGI("Extensions: %s", reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS)));
-}
-
-__attribute__((constructor(1000)))
-void init() {
-    eglInit();
 }
