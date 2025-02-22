@@ -34,6 +34,6 @@ void FOGLTLOGLES::init() {
     ESUtils::init();
     LOGI("FOGLTLOGLES launched on ES %i.%i", ESUtils::version.first, ESUtils::version.second);
 
-    if (ESUtils::version.first == 2) GLES20::wrapper->init();
-    if (ESUtils::version.first == 3) GLES30::wrapper->init();
+    if (ESUtils::version.first >= 2) GLES20::wrapper->init();
+    if (ESUtils::version.first >= 3) GLES30::wrapper->init();
 }
