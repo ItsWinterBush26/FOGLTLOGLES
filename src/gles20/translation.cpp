@@ -1,18 +1,13 @@
 #include "gles20/translation.h"
+#include "es/proxy.h"
 #include "main.h"
-#include "gles20/proxy.h"
-#include "shaderc/env.h"
-#include "shaderc/shaderc.h"
+#include "shaderc/shaderc.hpp"
 #include "spirv_glsl.hpp"
 #include "utils/log.h"
-#include "shaderc/shaderc.hpp"
-
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
-#include <stdexcept>
-#include <string>
 
 void glClearDepth(double d);
+
+void glBindFragDataLocationEXT(GLuint program, GLuint colorNumber, const GLchar* name);
 void OV_glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels);
 void OV_glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint* params);
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* string, const GLint* length);
@@ -27,6 +22,8 @@ void GLES20::registerTranslatedFunctions() {
     REGISTEROV(glTexImage2D);
     REGISTEROV(glGetTexLevelParameteriv);
     REGISTEROV(glShaderSource);
+    
+    FOGLTLOGLES::registerFunction("glBindFragDataLocation", TO_FUNCPTR(glBindFragDataLocationEXT));
 }
 
 void glClearDepth(double d) {
@@ -47,11 +44,9 @@ void OV_glTexImage2D(
         proxyWidth = (( width << level ) > maxTextureSize) ? 0 : width;
         proxyHeight = (( height << level ) > maxTextureSize) ? 0 : height;
         proxyInternalFormat = internalFormat;
-
-        return;
+    } else {
+        glTexImage2D(target, level, internalFormat, width, height, border, format, type, pixels);
     }
-
-    glTexImage2D(target, level, internalFormat, width, height, border, format, type, pixels);
 }
 
 void OV_glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint* params) {
