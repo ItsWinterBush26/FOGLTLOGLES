@@ -7,6 +7,8 @@
 #include <GLES2/gl2.h>
 #include <cstdlib>
 
+// TODO: texture.cpp shader.cpp separation
+
 void glClearDepth(double d);
 void OV_glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels);
 void OV_glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint* params);
