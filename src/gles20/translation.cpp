@@ -6,8 +6,6 @@
 #include "utils/log.h"
 
 void glClearDepth(double d);
-
-void glBindFragDataLocationEXT(GLuint program, GLuint colorNumber, const GLchar* name);
 void OV_glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels);
 void OV_glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint* params);
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* string, const GLint* length);
@@ -22,8 +20,6 @@ void GLES20::registerTranslatedFunctions() {
     REGISTEROV(glTexImage2D);
     REGISTEROV(glGetTexLevelParameteriv);
     REGISTEROV(glShaderSource);
-    
-    FOGLTLOGLES::registerFunction("glBindFragDataLocation", TO_FUNCPTR(glBindFragDataLocationEXT));
 }
 
 void glClearDepth(double d) {
