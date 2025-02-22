@@ -1,10 +1,17 @@
 #include "gles20/translation.h"
+#include "gl/glext.h"
 #include "main.h"
 #include "gles20/proxy.h"
+#include "shaderc/env.h"
+#include "shaderc/shaderc.h"
+#include "spirv_glsl.hpp"
 #include "utils/log.h"
+#include "shaderc/shaderc.hpp"
 
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
+#include <stdexcept>
+#include <string>
 
 void glClearDepth(double d);
 void OV_glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels);
@@ -65,6 +72,57 @@ void OV_glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint
     }
 }
 
-void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* string, const GLint* length) {
-    
+void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* sources, const GLint* length) {
+    if (!count || !sources) return;
+
+    shaderc::Compiler spirvCompiler;
+    shaderc::CompileOptions spirvOptions;
+    spirvOptions.SetSourceLanguage(shaderc_source_language_glsl);
+    spirvOptions.SetOptimizationLevel(shaderc_optimization_level_performance);
+    spirvOptions.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_1);
+
+    shaderc_shader_kind kind;
+    GLint shaderType;
+    glGetShaderiv(shader, GL_SHADER_TYPE, &shaderType);
+
+    switch (shaderType) {
+        case GL_FRAGMENT_SHADER:
+            kind = shaderc_fragment_shader;
+        break;
+        case GL_VERTEX_SHADER:
+            kind = shaderc_vertex_shader;
+        break;
+        default:
+            LOGI("%u", shader);
+            throw std::runtime_error("Received an unsupported shader type!");
+        /* GL_COMPUTE_SHADER is in GLES3 */
+    }
+
+    std::string fullSource;
+    for (GLsizei i = 0; i < count; i++) {
+         if (sources[i]) {
+            if (length && length[i] > 0) {
+                  fullSource.append(sources[i], length[i]);
+            } else {
+                fullSource.append(sources[i]);
+            }
+        }
+    }
+
+    shaderc::SpvCompilationResult bytecode = spirvCompiler.CompileGlslToSpv(
+        fullSource, kind, 
+        "shader", spirvOptions
+    );
+
+    spirv_cross::CompilerGLSL esslCompiler({ bytecode.cbegin(), bytecode.cend() });
+    spirv_cross::CompilerGLSL::Options esslOptions;
+    esslOptions.version = 200;
+    esslOptions.es = true;
+    esslOptions.force_flattened_io_blocks = true;
+    esslCompiler.set_common_options(esslOptions);
+
+    std::string esslShader = esslCompiler.compile();
+    const GLchar* newSource = esslShader.c_str();
+
+    glShaderSource(shader, 1, &newSource, nullptr);
 }
