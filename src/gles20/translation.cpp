@@ -27,6 +27,7 @@ void GLES20::registerTranslatedFunctions() {
     REGISTER(glClearDepth);
     REGISTEROV(glTexImage2D);
     REGISTEROV(glGetTexLevelParameteriv);
+    REGISTEROV(glShaderSource)
 }
 
 void glClearDepth(double d) {
