@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 3.10)
 
 project(FOGLTOGLES VERSION 0.0.1 LANGUAGES C CXX)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ######## DEPENDENCIES ########
@@ -58,13 +55,12 @@ find_library(DL_DEP dl REQUIRED)
 find_library(CXX_STATIC_DEP c++_static REQUIRED)
 
 set(DEPENDENCIES
-    ${ANDROID_DEP}
+	${ANDROID_DEP}
 	${EGL_DEP}
 	${GLES2_DEP}
 	${GLES3_DEP}
 	${LOG_DEP}
-        ${DL_DEP}
-
+    ${DL_DEP}
 	${CXX_STATIC_DEP}
 
 	# Static ShaderC

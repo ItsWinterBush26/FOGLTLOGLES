@@ -4,6 +4,8 @@
 #include "shaderc/shaderc.hpp"
 #include "spirv_glsl.hpp"
 #include "utils/log.h"
+#include <GLES2/gl2.h>
+#include <cstdlib>
 
 void glClearDepth(double d);
 void OV_glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels);
@@ -72,11 +74,11 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* source
     spirvOptions.SetSourceLanguage(shaderc_source_language_glsl);
     spirvOptions.SetOptimizationLevel(shaderc_optimization_level_performance);
     spirvOptions.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_1);
-
-    shaderc_shader_kind kind;
+    
     GLint shaderType;
     glGetShaderiv(shader, GL_SHADER_TYPE, &shaderType);
 
+    shaderc_shader_kind kind;
     switch (shaderType) {
         case GL_FRAGMENT_SHADER:
             kind = shaderc_fragment_shader;
@@ -108,13 +110,17 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* source
 
     spirv_cross::CompilerGLSL esslCompiler({ bytecode.cbegin(), bytecode.cend() });
     spirv_cross::CompilerGLSL::Options esslOptions;
-    esslOptions.version = 200;
+    esslOptions.version = atoi(reinterpret_cast<str>(glGetString(GL_SHADING_LANGUAGE_VERSION)));
     esslOptions.es = true;
     esslOptions.force_flattened_io_blocks = true;
     esslCompiler.set_common_options(esslOptions);
+
+    LOGI("Got ESSL version: %i", esslOptions.version);
 
     std::string esslShader = esslCompiler.compile();
     const GLchar* newSource = esslShader.c_str();
 
     glShaderSource(shader, 1, &newSource, nullptr);
+
+    LOGI("Success compile!");
 }
