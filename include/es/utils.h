@@ -34,6 +34,7 @@ namespace ESUtils {
         if (sscanf(versionStr, "OpenGL ES %d.%d", &major, &minor) == 2) {
             version = std::make_pair(major, minor);
         }
+        LOGI("%s", versionStr);
 
         switch (major) {
             case 1:

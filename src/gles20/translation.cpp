@@ -74,6 +74,7 @@ void OV_glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint
 
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* sources, const GLint* length) {
     if (!count || !sources) return;
+    LOGI("glShaderSource(%d, %d, %p, %p)", shader, count, sources, length);
 
     shaderc::Compiler spirvCompiler;
     shaderc::CompileOptions spirvOptions;
