@@ -108,7 +108,7 @@ void registerStateQueriesFunctions() {
 	REGISTER(glIsRenderbuffer);
 }
 
-void glBindFragDataLocationEXT(GLuint program, GLuint colorNumber, const GLchar* name);
+// void glBindFragDataLocationEXT(GLuint program, GLuint colorNumber, const GLchar* name);
 
 void GLES20::registerMappableFunctions() {
 	REGISTER(glClearColor);
@@ -129,6 +129,5 @@ void GLES20::registerMappableFunctions() {
 	registerUniformFunctions();
 	registerStateQueriesFunctions();
 
-	REGISTERREDIR("glBindFragDataLocation", glBindFragDataLocationEXT);
-
+	// REGISTERREDIR("glBindFragDataLocation", glBindFragDataLocationEXT);
 }

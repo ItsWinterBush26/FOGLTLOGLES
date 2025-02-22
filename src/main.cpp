@@ -4,9 +4,7 @@
 #include "gles30/main.h"
 #include "utils/log.h"
 
-#include <GLES2/gl2.h>
 #include <unordered_map>
-#include <utility>
 
 static std::unordered_map<std::string, FunctionPtr> registeredFunctions(256);
 
@@ -27,7 +25,7 @@ FunctionPtr FOGLTLOGLES::getFunctionAddress(std::string name) {
         return it->second;
     }
 
-    // LOGW("Function named %s not found", name.c_str());
+    LOGW("Function named %s not found", name.c_str());
     return nullptr;
 }
 
