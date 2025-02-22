@@ -4,13 +4,11 @@
 #include "utils/log.h"
 
 #include <atomic>
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
 #include <GLES3/gl3.h>
 #include <sstream>
 #include <stdexcept>
+#include <tuple>
 #include <unordered_set>
-#include <utility>
 
 static std::atomic_bool extensionSetInitialized = ATOMIC_VAR_INIT(false);
 
@@ -19,8 +17,12 @@ void initExtensionsES3();
 
 namespace ESUtils {
     static std::pair<int, int> version = std::make_pair(0, 0); // major, minor
+    
     static std::unordered_set<str> extensions;
     static int extensionCount;
+
+    static bool isAngle = false;
+    static std::tuple<int, int, int> angleVersion = std::make_tuple(0, 0, 0);
 
     static void init() {
         if (extensionSetInitialized.load()) return;
@@ -34,6 +36,13 @@ namespace ESUtils {
         if (sscanf(versionStr, "OpenGL ES %d.%d", &major, &minor) == 2) {
             version = std::make_pair(major, minor);
         }
+
+        int angleMajor = 0, angleMinor = 0, anglePatch = 0; // ts just made up
+        if (sscanf(versionStr, "(ANGLE %d.%d.%d", &angleMajor, &angleMinor, &anglePatch) == 3) {
+            isAngle = true;
+            angleVersion = std::make_tuple(angleMajor, angleMinor, anglePatch);
+        }
+
         LOGI("%s", versionStr);
 
         switch (major) {
