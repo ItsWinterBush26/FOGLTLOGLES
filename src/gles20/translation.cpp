@@ -75,8 +75,8 @@ void OV_glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint
 }
 
 void replaceShaderVersion(std::string& shaderSource, const std::string& newVersion) {
-    std::regex versionRegex(R"(#version\s+\d+(\s+\w+)?)");
-    shaderSource = std::regex_replace(shaderSource, versionRegex, "#version " + newVersion);
+    std::regex versionRegex(R"(#version\s+\d+(\s+\w+)?\b)");  // Ensures full match
+    shaderSource = std::regex_replace(shaderSource, versionRegex, "#version " + newVersion + "\n");
 }
 
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* sources, const GLint* length) {
