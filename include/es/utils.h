@@ -1,6 +1,5 @@
 #pragma once
 
-#include "shaderc/shaderc.h"
 #include "utils/log.h"
 #include "utils/types.h"
 
@@ -16,6 +15,7 @@ void initExtensionsES3();
 
 namespace ESUtils {
     static std::pair<int, int> version = std::make_pair(0, 0); // major, minor
+    static int shadingVersion = 0; // (major * 100) + (minor * 10)
     
     static std::unordered_set<str> extensions;
     static int extensionCount;
@@ -32,17 +32,17 @@ namespace ESUtils {
         }
 
         int major = 0, minor = 0;
-        if (sscanf(versionStr, "OpenGL ES %d.%d", &major, &minor) == 2) {
-            version = std::make_pair(major, minor);
+        if (sscanf(versionStr, "OpenGL ES %d.%d", &major, &minor) != 2) {
+            throw std::runtime_error("Failed to get OpenGL ES version, is the context not initialized or what?");
         }
-
+        version = std::make_pair(major, minor);
+        shadingVersion = (major * 100) + (minor * 10); // 3 -> 300, 2 -> 20 = 320 = 3.2
+        
         int angleMajor = 0, angleMinor = 0, anglePatch = 0; // ts just made up
         if (sscanf(versionStr, "(ANGLE %d.%d.%d", &angleMajor, &angleMinor, &anglePatch) == 3) {
             isAngle = true;
             angleVersion = std::make_tuple(angleMajor, angleMinor, anglePatch);
         }
-
-        LOGI("%s", versionStr);
 
         switch (major) {
             case 1:
@@ -63,26 +63,6 @@ namespace ESUtils {
             ESUtils::init();
         }
         return extensions.find(name) != extensions.end();
-    }
-
-    static inline shaderc_shader_kind getKindFromShader(GLuint& shader) {
-        GLint shaderType;
-        glGetShaderiv(shader, GL_SHADER_TYPE, &shaderType);
-        
-        switch (shaderType) {
-            case GL_FRAGMENT_SHADER:
-                return shaderc_fragment_shader;
-            case GL_VERTEX_SHADER:
-                return shaderc_vertex_shader;
-            case GL_COMPUTE_SHADER:
-                if (version.first == 3 && version.second >= 1) return shaderc_compute_shader;
-                throw std::runtime_error("You need OpenGL ES 3.1 or newer for compute shaders!");
-            
-            default:
-                LOGI("%u", shader);
-                throw std::runtime_error("Received an unsupported shader type!");
-
-        }
     }
 }
 
