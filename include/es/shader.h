@@ -61,9 +61,10 @@ namespace ESUtils {
         LOGI("Detected shader GLSL version is %i", glslVersion);
         if (glslVersion < 330) {
             glslVersion = 330;
-            LOGI("Seems like we need to upgrade to GLSL 330...");
+            LOGI("Seems like we need to upgrade to GLSL 330... Kidding.");
 
-            upgradeTo330(kind, fullSource);
+            // upgradeTo330(kind, fullSource);
+            replaceShaderVersion(fullSource, 330);
 
             LOGI("New shader GLSL version is %i", glslVersion);
         }
