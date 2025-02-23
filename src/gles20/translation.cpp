@@ -5,6 +5,7 @@
 #include "spirv_glsl.hpp"
 #include "utils/log.h"
 #include <GLES2/gl2.h>
+#include <GLES3/gl3.h>
 #include <cstdlib>
 
 // TODO: texture.cpp shader.cpp separation
@@ -17,8 +18,8 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* string
 static GLint maxTextureSize = 0;
 
 void GLES20::registerTranslatedFunctions() {
-    LOGI("Hi from translation.cpp!");
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+    LOGI("GL_MAX_TEXTURE_SIZE is %i", maxTextureSize);
 
     REGISTER(glClearDepth);
     REGISTEROV(glTexImage2D);
@@ -40,7 +41,9 @@ void OV_glTexImage2D(
     GLint border, GLenum format,
     GLenum type, const void* pixels
 ) {
+    LOGI("glTexImage2D: internalformat=%i border=%i format=%i type=%u", internalFormat, border, format, type);
     if (isProxyTexture(target)) {
+        LOGI("yes its a proxy tex");
         proxyWidth = (( width << level ) > maxTextureSize) ? 0 : width;
         proxyHeight = (( height << level ) > maxTextureSize) ? 0 : height;
         proxyInternalFormat = internalFormat;

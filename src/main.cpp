@@ -25,7 +25,7 @@ FunctionPtr FOGLTLOGLES::getFunctionAddress(std::string name) {
         return it->second;
     }
 
-    LOGW("Function named %s not found", name.c_str());
+    // LOGW("Function named %s not found", name.c_str());
     return nullptr;
 }
 

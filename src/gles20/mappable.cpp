@@ -11,7 +11,6 @@ void GLES20::registerMappableFunctions() {
     REGISTER(glVertexAttribPointer);
     REGISTER(glEnableVertexAttribArray);
     REGISTER(glCreateShader);
-    REGISTER(glShaderSource);
     REGISTER(glCompileShader);
     REGISTER(glGetShaderiv);
     REGISTER(glCreateProgram);
@@ -21,7 +20,6 @@ void GLES20::registerMappableFunctions() {
     REGISTER(glGenTextures);
     REGISTER(glActiveTexture);
     REGISTER(glBindTexture);
-    REGISTER(glTexImage2D);
     REGISTER(glTexParameteri);
     REGISTER(glGenerateMipmap);
     REGISTER(glDrawArrays);
