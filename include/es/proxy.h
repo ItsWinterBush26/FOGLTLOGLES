@@ -15,7 +15,7 @@ static inline bool isProxyTexture(GLenum target) {
     }
 }
 
-static GLint inline nlevel(GLint size, GLint level) {
+static inline GLint nlevel(GLint size, GLint level) {
     // size > 0
     if (size) {
         size >>= level;

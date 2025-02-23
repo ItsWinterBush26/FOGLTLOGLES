@@ -1,5 +1,6 @@
 #include "gles20/translation.h"
 #include "es/proxy.h"
+#include "es/texture.h"
 #include "main.h"
 #include "shaderc/shaderc.hpp"
 #include "spirv_glsl.hpp"
@@ -48,6 +49,7 @@ void OV_glTexImage2D(
         proxyHeight = (( height << level ) > maxTextureSize) ? 0 : height;
         proxyInternalFormat = internalFormat;
     } else {
+        selectProperTexType(internalFormat, type);
         glTexImage2D(target, level, internalFormat, width, height, border, format, type, pixels);
     }
 }
