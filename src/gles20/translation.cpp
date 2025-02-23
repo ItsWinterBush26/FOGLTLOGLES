@@ -14,8 +14,9 @@
 // TODO: texture.cpp shader.cpp separation
 
 void glClearDepth(double d);
+
 void OV_glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels);
-void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat params);
+void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param);
 void OV_glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint* params);
 
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* string, const GLint* length);
@@ -39,6 +40,11 @@ void glClearDepth(double d) {
 
 GLint proxyWidth, proxyHeight, proxyInternalFormat;
 
+void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param) {
+    LOGI("glTexParameterf: target=%u pname=%u params=%f", target, pname, params);
+    glTexParameterf(target, pname, param);
+}
+
 void OV_glTexImage2D(
     GLenum target,
     GLint level,
@@ -60,6 +66,8 @@ void OV_glTexImage2D(
 }
 
 void OV_glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint* params) {
+    LOGI("glGetTexLevelParameteriv: target=%u level=%i pname=%u", target, level, pname);
+    
     if (isProxyTexture(target)) {
         switch (pname) {
             case GL_TEXTURE_WIDTH:
