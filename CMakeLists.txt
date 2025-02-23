@@ -32,6 +32,13 @@ file(GLOB_RECURSE HEADERS
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
+set_target_properties(
+	${PROJECT_NAME}
+	PROPERTIES
+	CXX_VISIBILITY_PRESET hidden
+	C_VISIBILITY_PRESET hidden
+)
+
 target_include_directories(
 	${PROJECT_NAME}
 	PUBLIC
