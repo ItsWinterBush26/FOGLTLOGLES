@@ -3,6 +3,7 @@
 #include "es/texture.h"
 #include "main.h"
 #include "shaderc/shaderc.hpp"
+#include "shaderc/status.h"
 #include "spirv_glsl.hpp"
 #include "utils/log.h"
 #include <GLES2/gl2.h>
@@ -115,14 +116,22 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* source
         "shader", spirvOptions
     );
 
+    if (bytecode.GetCompilationStatus() != shaderc_compilation_status_success) {
+        std::string errorMessage = bytecode.GetErrorMessage();
+        // LOGE("SPIR-V compilation failed: %s", errorMessage.c_str());
+        throw std::runtime_error("Shader compilation error: " + errorMessage);
+    }
+
     spirv_cross::CompilerGLSL esslCompiler({ bytecode.cbegin(), bytecode.cend() });
     spirv_cross::CompilerGLSL::Options esslOptions;
-    esslOptions.version = atoi(reinterpret_cast<str>(glGetString(GL_SHADING_LANGUAGE_VERSION)));
+    int esslVersion = atoi(reinterpret_cast<str>(glGetString(GL_SHADING_LANGUAGE_VERSION)));
+    
+    esslOptions.version = 320;
     esslOptions.es = true;
     esslOptions.force_flattened_io_blocks = true;
     esslCompiler.set_common_options(esslOptions);
 
-    LOGI("Got ESSL version: %i", esslOptions.version);
+    LOGI("Got ESSL version: %i", esslVersion);
 
     std::string esslShader = esslCompiler.compile();
     const GLchar* newSource = esslShader.c_str();
