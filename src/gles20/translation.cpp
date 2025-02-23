@@ -2,6 +2,7 @@
 #include "es/proxy.h"
 #include "es/texture.h"
 #include "main.h"
+#include "shaderc/env.h"
 #include "shaderc/shaderc.hpp"
 #include "shaderc/status.h"
 #include "spirv_glsl.hpp"
@@ -79,9 +80,14 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* source
 
     shaderc::Compiler spirvCompiler;
     shaderc::CompileOptions spirvOptions;
+    // spirvOptions.SetAutoMapLocations(true);  // fixes SPIR-V requires location for user input/output
+    // spirvOptions.SetAutoBindUniforms(true);
+    // spirvOptions.SetAutoSampledTextures(true);
+
     spirvOptions.SetSourceLanguage(shaderc_source_language_glsl);
-    spirvOptions.SetOptimizationLevel(shaderc_optimization_level_performance);
-    spirvOptions.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_1);
+    // spirvOptions.SetOptimizationLevel(shaderc_optimization_level_performance);
+    // spirvOptions.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_1);
+    spirvOptions.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
     
     GLint shaderType;
     glGetShaderiv(shader, GL_SHADER_TYPE, &shaderType);
