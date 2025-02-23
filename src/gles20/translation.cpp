@@ -122,8 +122,8 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* source
     if (sscanf(fullSource.c_str(), "#version %i", &glslVersion) != 1) {
         throw new std::runtime_error("No #version preprocessor!");
     }
-
-    spirvOptions.SetTargetEnvironment(shaderc_target_env_opengl, glslVersion);
+    LOGI("Shader GLSL version is %i", glslVersion);
+    spirvOptions.SetTargetEnvironment(shaderc_target_env_opengl, glslVersion < 330 ? 330 : glslVersion);
 
     shaderc::SpvCompilationResult bytecode = spirvCompiler.CompileGlslToSpv(
         fullSource, kind, 
