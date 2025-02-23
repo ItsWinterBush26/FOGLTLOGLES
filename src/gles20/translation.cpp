@@ -3,13 +3,9 @@
 #include "es/texture.h"
 #include "es/shader.h"
 #include "main.h"
-#include "shaderc/shaderc.h"
-#include "shaderc/shaderc.hpp"
-#include "spirv_glsl.hpp"
 #include "utils/log.h"
 
 #include <GLES2/gl2.h>
-#include <regex>
 
 // TODO: texture.cpp shader.cpp separation
 
