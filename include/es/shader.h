@@ -64,7 +64,7 @@ namespace ESUtils {
             LOGI("Seems like we need to upgrade to GLSL 330... Kidding.");
 
             // upgradeTo330(kind, fullSource);
-            replaceShaderVersion(fullSource, 330);
+            replaceShaderVersion(fullSource, "330");
 
             LOGI("New shader GLSL version is %i", glslVersion);
         }
