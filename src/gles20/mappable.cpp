@@ -5,13 +5,9 @@
 
 void GLES20::registerMappableFunctions() {
     REGISTER(glGetString);
-    REGISTER(glGenVertexArrays);
-    REGISTER(glBindVertexArray);
     REGISTER(glGenBuffers);
     REGISTER(glBindBuffer);
     REGISTER(glBufferData);
-    REGISTER(glMapBuffer);
-    REGISTER(glUnmapBuffer);
     REGISTER(glVertexAttribPointer);
     REGISTER(glEnableVertexAttribArray);
     REGISTER(glCreateShader);
