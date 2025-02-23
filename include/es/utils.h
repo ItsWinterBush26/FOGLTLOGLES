@@ -1,10 +1,11 @@
 #pragma once
 
+#include "shaderc/shaderc.hpp"
 #include "utils/types.h"
 #include "utils/log.h"
 
 #include <atomic>
-#include <GLES3/gl3.h>
+#include <GLES3/gl31.h>
 #include <sstream>
 #include <stdexcept>
 #include <tuple>
@@ -64,6 +65,26 @@ namespace ESUtils {
             ESUtils::init();
         }
         return extensions.find(name) != extensions.end();
+    }
+
+    static inline shaderc_shader_kind getKindFromShader(GLuint& shader) {
+        GLint shaderType;
+        glGetShaderiv(shader, GL_SHADER_TYPE, &shaderType);
+        
+        switch (shaderType) {
+            case GL_FRAGMENT_SHADER:
+                return shaderc_fragment_shader;
+            case GL_VERTEX_SHADER:
+                return shaderc_vertex_shader;
+            case GL_COMPUTE_SHADER:
+                if (version.first == 3 && version.second >= 1) return shaderc_compute_shader;
+                throw std::runtime_error("You need OpenGL ES 3.1 or newer for compute shaders!");
+            
+            default:
+                LOGI("%u", shader);
+                throw std::runtime_error("Received an unsupported shader type!");
+
+        }
     }
 }
 

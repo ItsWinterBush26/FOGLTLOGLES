@@ -1,16 +1,15 @@
 #include "gles20/translation.h"
 #include "es/proxy.h"
 #include "es/texture.h"
+#include "es/utils.h"
 #include "main.h"
-#include "shaderc/env.h"
+#include "shaderc/shaderc.h"
 #include "shaderc/shaderc.hpp"
-#include "shaderc/status.h"
 #include "spirv_glsl.hpp"
 #include "utils/log.h"
+
 #include <GLES2/gl2.h>
-#include <GLES3/gl3.h>
-#include <cstdlib>
-#include <stdexcept>
+#include <regex>
 
 // TODO: texture.cpp shader.cpp separation
 
@@ -75,37 +74,14 @@ void OV_glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint
     }
 }
 
+void replaceShaderVersion(std::string& shaderSource, const std::string& newVersion) {
+    std::regex versionRegex(R"(#version\s+\d+(\s+\w+)?)");
+    shaderSource = std::regex_replace(shaderSource, versionRegex, "#version " + newVersion);
+}
+
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* sources, const GLint* length) {
     if (!count || !sources) return;
     LOGI("glShaderSource(%d, %d, %p, %p)", shader, count, sources, length);
-
-    shaderc::Compiler spirvCompiler;
-    shaderc::CompileOptions spirvOptions;
-    spirvOptions.SetAutoMapLocations(true);  // fixes SPIR-V requires location for user input/output
-    spirvOptions.SetAutoBindUniforms(true); // 
-    // spirvOptions.SetAutoSampledTextures(true);
-
-    spirvOptions.SetSourceLanguage(shaderc_source_language_glsl);
-    // spirvOptions.SetOptimizationLevel(shaderc_optimization_level_performance);
-    // spirvOptions.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_1);
-    // spirvOptions.SetTargetEnvironment(shaderc_target_env_opengl, 320 /* shaderc_env_version_opengl_4_5 */);
-    
-    GLint shaderType;
-    glGetShaderiv(shader, GL_SHADER_TYPE, &shaderType);
-
-    shaderc_shader_kind kind;
-    switch (shaderType) {
-        case GL_FRAGMENT_SHADER:
-            kind = shaderc_fragment_shader;
-        break;
-        case GL_VERTEX_SHADER:
-            kind = shaderc_vertex_shader;
-        break;
-        default:
-            LOGI("%u", shader);
-            throw std::runtime_error("Received an unsupported shader type!");
-        /* GL_COMPUTE_SHADER is in GLES3 */
-    }
 
     std::string fullSource;
     for (GLsizei i = 0; i < count; i++) {
@@ -122,17 +98,34 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* source
     if (sscanf(fullSource.c_str(), "#version %i", &glslVersion) != 1) {
         throw new std::runtime_error("No #version preprocessor!");
     }
+
     LOGI("Shader GLSL version is %i", glslVersion);
-    spirvOptions.SetTargetEnvironment(shaderc_target_env_opengl, glslVersion < 330 ? 330 : glslVersion);
+    if (glslVersion < 330) {
+        glslVersion = 330;
+        replaceShaderVersion(fullSource, std::to_string(glslVersion));
+
+        LOGI("New GLSL version is %i", glslVersion);
+    }
+
+    shaderc::Compiler spirvCompiler;
+    shaderc::CompileOptions spirvOptions;
+    spirvOptions.SetSourceLanguage(shaderc_source_language_glsl);
+    spirvOptions.SetTargetEnvironment(shaderc_target_env_opengl, glslVersion);
+    spirvOptions.SetOptimizationLevel(shaderc_optimization_level_performance);
+
+    spirvOptions.SetAutoMapLocations(true);
+    spirvOptions.SetAutoBindUniforms(true);
+    spirvOptions.SetAutoSampledTextures(true);
 
     shaderc::SpvCompilationResult bytecode = spirvCompiler.CompileGlslToSpv(
-        fullSource, kind, 
-        "shader", spirvOptions
+        fullSource,
+        ESUtils::getKindFromShader(shader),
+        "shader",
+        spirvOptions
     );
 
     if (bytecode.GetCompilationStatus() != shaderc_compilation_status_success) {
         std::string errorMessage = bytecode.GetErrorMessage();
-        // LOGE("SPIR-V compilation failed: %s", errorMessage.c_str());
         throw std::runtime_error("Shader compilation error: " + errorMessage);
     }
 
