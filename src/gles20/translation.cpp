@@ -37,7 +37,7 @@ void glClearDepth(double d) {
 GLint proxyWidth, proxyHeight, proxyInternalFormat;
 
 void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param) {
-    LOGI("glTexParameterf: target=%u pname=%u params=%f", target, pname, params);
+    LOGI("glTexParameterf: target=%u pname=%u params=%f", target, pname, param);
     glTexParameterf(target, pname, param);
 }
 
