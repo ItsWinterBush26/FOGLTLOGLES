@@ -1,14 +1,12 @@
 #pragma once
 
-#include "shaderc/shaderc.hpp"
-#include "utils/types.h"
+#include "shaderc/shaderc.h"
 #include "utils/log.h"
+#include "utils/types.h"
 
 #include <atomic>
 #include <GLES3/gl31.h>
 #include <sstream>
-#include <stdexcept>
-#include <tuple>
 #include <unordered_set>
 
 static std::atomic_bool extensionSetInitialized = ATOMIC_VAR_INIT(false);
