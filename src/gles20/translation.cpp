@@ -10,6 +10,7 @@
 #include <GLES2/gl2.h>
 #include <GLES3/gl3.h>
 #include <cstdlib>
+#include <stdexcept>
 
 // TODO: texture.cpp shader.cpp separation
 
@@ -80,14 +81,14 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* source
 
     shaderc::Compiler spirvCompiler;
     shaderc::CompileOptions spirvOptions;
-    // spirvOptions.SetAutoMapLocations(true);  // fixes SPIR-V requires location for user input/output
-    // spirvOptions.SetAutoBindUniforms(true);
+    spirvOptions.SetAutoMapLocations(true);  // fixes SPIR-V requires location for user input/output
+    spirvOptions.SetAutoBindUniforms(true); // 
     // spirvOptions.SetAutoSampledTextures(true);
 
     spirvOptions.SetSourceLanguage(shaderc_source_language_glsl);
     // spirvOptions.SetOptimizationLevel(shaderc_optimization_level_performance);
     // spirvOptions.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_1);
-    spirvOptions.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
+    // spirvOptions.SetTargetEnvironment(shaderc_target_env_opengl, 320 /* shaderc_env_version_opengl_4_5 */);
     
     GLint shaderType;
     glGetShaderiv(shader, GL_SHADER_TYPE, &shaderType);
@@ -116,6 +117,13 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* source
             }
         }
     }
+
+    int glslVersion = 0;
+    if (sscanf(fullSource.c_str(), "#version %i", &glslVersion) != 1) {
+        throw new std::runtime_error("No #version preprocessor!");
+    }
+
+    spirvOptions.SetTargetEnvironment(shaderc_target_env_opengl, glslVersion);
 
     shaderc::SpvCompilationResult bytecode = spirvCompiler.CompileGlslToSpv(
         fullSource, kind, 
