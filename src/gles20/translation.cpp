@@ -77,7 +77,7 @@ void OV_glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint
                 return;
         }
     } else {
-        glGetTexLevelParameteriv(target,level, pname, params);
+        glGetTexLevelParameteriv(target, level, pname, params);
     }
 }
 
@@ -92,5 +92,5 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* source
     const GLchar* newSource = fullSource.c_str();
     glShaderSource(shader, 1, &newSource, nullptr);
 
-    LOGI("Compilation successfull!");
+    LOGI("Compilation successful!");
 }
