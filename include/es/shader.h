@@ -48,12 +48,12 @@ namespace ESUtils {
         }
     }
 
-    static inline void replaceShaderVersion(std::string& shaderSource, const std::string newVersion, const std::string type = "") {
+    static inline void replaceShaderVersion(std::string& shaderSource, std::string newVersion, std::string type = "") {
         std::regex versionRegex(R"(#version\s+\d+(\s+\w+)?\b)");  // Ensures full match
-        shaderSource = std::regex_replace(
-            shaderSource, versionRegex, 
-            "#version " + newVersion
-             + (type != "" ? " " + type : "") + "\n");
+        std::string replacement = "#version " + newVersion + (type != "" ? " " + type : "") + "\n";
+
+        LOGI("Replacing shader version to %s", replacement.c_str());
+        shaderSource = std::regex_replace(shaderSource, versionRegex, replacement);
     }
 
     static inline void glslToEssl(shaderc_shader_kind kind, std::string& fullSource) {
@@ -77,6 +77,11 @@ namespace ESUtils {
             replaceShaderVersion(fullSource, "330");
 
             LOGI("New shader GLSL version is %i", glslVersion);
+
+            if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+                LOGI("Regexed shader:");
+                LOGI("%s", fullSource.c_str());
+            }
         }
 
         shaderc::CompileOptions spirvOptions;
@@ -118,9 +123,15 @@ namespace ESUtils {
         esslCompiler.set_common_options(esslOptions);
 
         fullSource = esslCompiler.compile();
-        replaceShaderVersion(fullSource,std::to_string(shadingVersion), "es");
+
         if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
             LOGI("Generated ESSL source:");
+            LOGI("%s", fullSource.c_str());
+        }
+
+        replaceShaderVersion(fullSource, std::to_string(shadingVersion), "es");
+        if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+            LOGI("Fixed version ESSL source:");
             LOGI("%s", fullSource.c_str());
         }
 
