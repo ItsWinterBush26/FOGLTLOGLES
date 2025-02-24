@@ -56,7 +56,7 @@ namespace ESUtils {
         shaderSource = std::regex_replace(shaderSource, versionRegex, replacement);
     }
 
-    inline void glslToEssl(shaderc_shader_kind kind, std::string& fullSource) {
+    	inline void glslToEssl(shaderc_shader_kind kind, std::string& fullSource) {
 		LOGI("GLSL to SPIR-V starting now...");
 		if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
 			LOGI("Input GLSL source:");
@@ -137,6 +137,11 @@ namespace ESUtils {
 				esslCompiler.unset_decoration(resource.id, spv::DecorationBinding);
 			}
 		}
+
+		// Unset binding decorations for standalone uniforms
+		for (auto& resource : resources.uniforms) {
+			esslCompiler.unset_decoration(resource.id, spv::DecorationBinding);
+		}
 		
 		fullSource = esslCompiler.compile();
 		
@@ -147,4 +152,5 @@ namespace ESUtils {
 
 		LOGI("SPIR-V to ESSL succeeded!");
 	}
+
 }
