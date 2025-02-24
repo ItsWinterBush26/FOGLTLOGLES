@@ -112,7 +112,7 @@ namespace ESUtils {
         esslCompiler.set_common_options(esslOptions);
 
         fullSource = esslCompiler.compile();
-        replaceShaderVersion(fullSource, "330 es");
+        replaceShaderVersion(fullSource, ESUtils::shadingVersion + " es");
         if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
             LOGI("Generated ESSL source:");
             LOGI("%s", fullSource.c_str());
