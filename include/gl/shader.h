@@ -13,10 +13,11 @@ inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
     options.SetSourceLanguage(shaderc_source_language_glsl);
     options.SetTargetEnvironment(shaderc_target_env_opengl, 330);
     options.SetForcedVersionProfile(330, shaderc_profile_core);
+    options.SetOptimizationLevel(shaderc_optimization_level_performance),
 
     options.SetAutoMapLocations(true);
-    options.SetAutoBindUniforms(true);
-    options.SetAutoSampledTextures(true);
+    // options.SetAutoBindUniforms(true);
+    // options.SetAutoSampledTextures(true);
 
     shaderc::Compiler spirvCompiler;
     shaderc::SpvCompilationResult module = spirvCompiler.CompileGlslToSpv(
@@ -33,6 +34,9 @@ inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
     glslOptions.version = 330;  // Output GLSL 330
     glslOptions.es = false;     // Not targeting OpenGL ES
     glslOptions.vulkan_semantics = false;
+    glslOptions.enable_420pack_extension = false;
+    glslOptions.force_flattened_io_blocks = true;
+    glslOptions.enable_storage_image_qualifier_deduction = false;
     glslCompiler.set_common_options(glslOptions);
 
     src = glslCompiler.compile();
