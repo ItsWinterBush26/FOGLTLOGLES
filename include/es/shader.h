@@ -1,6 +1,7 @@
 #pragma once
 
 #include "es/utils.h"
+#include "gl/shader.h"
 #include "shaderc/shaderc.h"
 #include "shaderc/shaderc.hpp"
 #include "spirv_glsl.hpp"
@@ -71,11 +72,13 @@ namespace ESUtils {
 		LOGI("Detected shader GLSL version is %i", glslVersion);
 		if (glslVersion < 330) {
 			glslVersion = 330;
-			replaceShaderVersion(fullSource, "330");
-			LOGI("New shader GLSL version is %i", glslVersion);
 
+            upgradeTo330(kind, fullSource);
+			
+            //replaceShaderVersion(fullSource, "330");
+			LOGI("New shader GLSL version is %i", glslVersion);
 			if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
-				LOGI("Regexed shader:");
+				LOGI("Upgraded shader:");
 				LOGI("%s", fullSource.c_str());
 			}
 		}
