@@ -47,7 +47,7 @@ namespace ESUtils {
     }
 
     static inline void replaceShaderVersion(std::string& shaderSource, const std::string& newVersion) {
-        std::regex versionRegex(R"(#version\s+\d{3}(\s+\w+)?\b)");  // Ensures full match
+        std::regex versionRegex(R"(#version\s+\d+(\s+\w+)?\b)");  // Ensures full match
         shaderSource = std::regex_replace(shaderSource, versionRegex, "#version " + newVersion + "\n");
     }
 
