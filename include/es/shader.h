@@ -57,85 +57,85 @@ namespace ESUtils {
     }
 
     inline void glslToEssl(shaderc_shader_kind kind, std::string& fullSource) {
-        LOGI("GLSL to SPIR-V starting now...");
-        if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
-            LOGI("Input GLSL source:");
-            LOGI("%s", fullSource.c_str());
-        }
+		LOGI("GLSL to SPIR-V starting now...");
+		if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+			LOGI("Input GLSL source:");
+			LOGI("%s", fullSource.c_str());
+		}
 
-        int glslVersion = 0;
-        if (sscanf(fullSource.c_str(), "#version %i", &glslVersion) != 1) {
-            throw new std::runtime_error("No '#version XXX' preprocessor!");
-        }
+		int glslVersion = 0;
+		if (sscanf(fullSource.c_str(), "#version %i", &glslVersion) != 1) {
+			throw new std::runtime_error("No '#version XXX' preprocessor!");
+		}
 
-        LOGI("Detected shader GLSL version is %i", glslVersion);
-        if (glslVersion < 330) {
-            glslVersion = 330;
-            LOGI("Seems like we need to upgrade to GLSL 330... Kidding.");
+		LOGI("Detected shader GLSL version is %i", glslVersion);
+		if (glslVersion < 330) {
+			glslVersion = 330;
+			replaceShaderVersion(fullSource, "330");
+			LOGI("New shader GLSL version is %i", glslVersion);
 
-            // upgradeTo330(kind, fullSource);
-            replaceShaderVersion(fullSource, "330");
+			if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+				LOGI("Regexed shader:");
+				LOGI("%s", fullSource.c_str());
+			}
+		}
 
-            LOGI("New shader GLSL version is %i", glslVersion);
+		shaderc::CompileOptions spirvOptions;
+		spirvOptions.SetSourceLanguage(shaderc_source_language_glsl);
+		spirvOptions.SetTargetEnvironment(shaderc_target_env_opengl, glslVersion);
+		spirvOptions.SetOptimizationLevel(shaderc_optimization_level_performance);
 
-            if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
-                LOGI("Regexed shader:");
-                LOGI("%s", fullSource.c_str());
-            }
-        }
+		spirvOptions.SetAutoMapLocations(true);
+		spirvOptions.SetAutoBindUniforms(true);
+		spirvOptions.SetAutoSampledTextures(true);
 
-        shaderc::CompileOptions spirvOptions;
-        spirvOptions.SetSourceLanguage(shaderc_source_language_glsl);
-        spirvOptions.SetTargetEnvironment(shaderc_target_env_opengl, glslVersion);
-        spirvOptions.SetOptimizationLevel(shaderc_optimization_level_performance);
+		shaderc::Compiler spirvCompiler;
+		shaderc::SpvCompilationResult bytecode = spirvCompiler.CompileGlslToSpv(
+			fullSource, kind,
+			"shader", spirvOptions
+		);
 
-        spirvOptions.SetAutoMapLocations(true);
-        spirvOptions.SetAutoBindUniforms(true);
-        spirvOptions.SetAutoSampledTextures(true);
+		if (bytecode.GetCompilationStatus() != shaderc_compilation_status_success) {
+			std::string errorMessage = bytecode.GetErrorMessage();
+			throw std::runtime_error("Shader compilation error: " + errorMessage);
+		}
 
-        shaderc::Compiler spirvCompiler;
-        shaderc::SpvCompilationResult bytecode = spirvCompiler.CompileGlslToSpv(
-            fullSource, kind,
-            "shader", spirvOptions
-        );
+		LOGI("GLSL to SPIR-V succeeded! Commencing stage 2...");
+		LOGI("Translating SPIR-V to ESSL %i", shadingVersion);
 
-        if (bytecode.GetCompilationStatus() != shaderc_compilation_status_success) {
-            std::string errorMessage = bytecode.GetErrorMessage();
-            throw std::runtime_error("Shader compilation error: " + errorMessage);
-        }
+		spirv_cross::CompilerGLSL::Options esslOptions;
+		esslOptions.version = shadingVersion;
+		esslOptions.es = true;
+		esslOptions.vulkan_semantics = false;
+		esslOptions.enable_420pack_extension = false;
+		esslOptions.force_flattened_io_blocks = true;
+		esslOptions.enable_storage_image_qualifier_deduction = false;
 
-        if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
-            LOGI("Generated SPIRV shader:");
-            LOGI("%s", std::string(bytecode.cbegin(), bytecode.cend()).c_str());
-        }
-
-        LOGI("GLSL to SPIR-V succeeded! Commencing stage 2...");
-        LOGI("Translating SPIR-V to ESSL %i", shadingVersion);
-
-        spirv_cross::CompilerGLSL::Options esslOptions;
-        esslOptions.version = shadingVersion;
-        esslOptions.es = true;
-        esslOptions.vulkan_semantics = false;
-
-        esslOptions.force_flattened_io_blocks = true;
-        esslOptions.enable_storage_image_qualifier_deduction = false;
-   
         spirv_cross::CompilerGLSL esslCompiler({ bytecode.cbegin(), bytecode.cend() });
-        esslCompiler.set_common_options(esslOptions);
+		esslCompiler.set_common_options(esslOptions);
+		
+		spirv_cross::ShaderResources resources = esslCompiler.get_shader_resources();
+		for (auto& resource : resources.separate_uniforms) {
+			auto type = esslCompiler.get_type(resource.base_type_id);
+			
+			if (type.basetype != spirv_cross::SPIRType::SampledImage && 
+				type.basetype != spirv_cross::SPIRType::Image &&
+				type.basetype != spirv_cross::SPIRType::AtomicCounter) {
+				
+				unsigned binding = esslCompiler.get_decoration(resource.id, spv::DecorationBinding);
+				esslCompiler.unset_decoration(resource.id, spv::DecorationBinding);
+				
+				LOGI("Removed binding=%u from uniform '%s'", binding, resource.name.c_str());
+			}
+		}
+		
+		fullSource = esslCompiler.compile();
+		
+		if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+			LOGI("Generated ESSL source:");
+			LOGI("%s", fullSource.c_str());
+		}
 
-        fullSource = esslCompiler.compile();
-        if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
-            LOGI("Generated ESSL source:");
-            LOGI("%s", fullSource.c_str());
-        }
-
-        /*
-        replaceShaderVersion(fullSource, std::to_string(shadingVersion), "es");
-        if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
-            LOGI("Fixed version ESSL source:");
-            LOGI("%s", fullSource.c_str());
-        } */
-
-        LOGI("SPIR-V to ESSL succeeded!");
+		LOGI("SPIR-V to ESSL succeeded!");
     }
 }
