@@ -13,6 +13,8 @@
 #include <stdexcept>
 #include <string>
 
+using namespace std::string_literals;
+
 namespace ESUtils {
     static inline void combineSources(GLsizei count, const GLchar *const* sources, const GLint* length, std::string& destination) {
         for (GLsizei i = 0; i < count; i++) {
@@ -112,7 +114,7 @@ namespace ESUtils {
         esslCompiler.set_common_options(esslOptions);
 
         fullSource = esslCompiler.compile();
-        replaceShaderVersion(fullSource, ESUtils::shadingVersion + " es");
+        replaceShaderVersion(fullSource, std::to_string(shadingVersion) + " es");
         if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
             LOGI("Generated ESSL source:");
             LOGI("%s", fullSource.c_str());
