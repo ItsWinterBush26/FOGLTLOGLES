@@ -31,7 +31,7 @@ void* glMapBuffer(GLenum target, GLenum access) {
 
         case GL_TEXTURE_BUFFER: // 3.1
             LOGI("glMapBuffer unsupported/unimplemented target=0x%x", target);
-            break;
+        break;
     }
 
     switch (access) {
