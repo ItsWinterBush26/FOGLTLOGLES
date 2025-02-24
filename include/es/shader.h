@@ -103,6 +103,8 @@ namespace ESUtils {
 		LOGI("GLSL to SPIR-V succeeded! Commencing stage 2...");
 		LOGI("Translating SPIR-V to ESSL %i", shadingVersion);
 
+		spirv_cross::CompilerGLSL esslCompiler({ bytecode.cbegin(), bytecode.cend() });
+		
 		spirv_cross::CompilerGLSL::Options esslOptions;
 		esslOptions.version = shadingVersion;
 		esslOptions.es = true;
@@ -110,22 +112,29 @@ namespace ESUtils {
 		esslOptions.enable_420pack_extension = false;
 		esslOptions.force_flattened_io_blocks = true;
 		esslOptions.enable_storage_image_qualifier_deduction = false;
-
-        spirv_cross::CompilerGLSL esslCompiler({ bytecode.cbegin(), bytecode.cend() });
+		
 		esslCompiler.set_common_options(esslOptions);
 		
 		spirv_cross::ShaderResources resources = esslCompiler.get_shader_resources();
-		for (auto& resource : resources.separate_uniforms) {
+		
+		for (auto& resource : resources.stage_inputs) {
+			esslCompiler.unset_decoration(resource.id, spv::DecorationBinding);
+		}
+		
+		for (auto& resource : resources.stage_outputs) {
+			esslCompiler.unset_decoration(resource.id, spv::DecorationBinding);
+		}
+		
+		for (auto& resource : resources.uniform_buffers) {
+			esslCompiler.unset_decoration(resource.id, spv::DecorationBinding);
+		}
+		
+		for (auto& resource : resources.separate_images) {
 			auto type = esslCompiler.get_type(resource.base_type_id);
-			
 			if (type.basetype != spirv_cross::SPIRType::SampledImage && 
 				type.basetype != spirv_cross::SPIRType::Image &&
 				type.basetype != spirv_cross::SPIRType::AtomicCounter) {
-				
-				unsigned binding = esslCompiler.get_decoration(resource.id, spv::DecorationBinding);
 				esslCompiler.unset_decoration(resource.id, spv::DecorationBinding);
-				
-				LOGI("Removed binding=%u from uniform '%s'", binding, resource.name.c_str());
 			}
 		}
 		
@@ -137,5 +146,5 @@ namespace ESUtils {
 		}
 
 		LOGI("SPIR-V to ESSL succeeded!");
-    }
+	}
 }
