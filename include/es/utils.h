@@ -15,16 +15,16 @@ void initExtensionsES2();
 void initExtensionsES3();
 
 namespace ESUtils {
-    static std::pair<int, int> version = std::make_pair(0, 0); // major, minor
-    static std::shared_ptr<int> shadingVersion; // (major * 100) + (minor * 10)
+    inline std::pair<int, int> version = std::make_pair(0, 0); // major, minor
+    inline int shadingVersion; // (major * 100) + (minor * 10)
     
-    static std::unordered_set<str> extensions;
-    static std::shared_ptr<int> extensionCount;
+    inline std::unordered_set<str> extensions;
+    inline int extensionCount;
 
-    static bool isAngle = false;
-    static std::tuple<int, int, int> angleVersion = std::make_tuple(0, 0, 0);
+    inline bool isAngle = false;
+    inline std::tuple<int, int, int> angleVersion = std::make_tuple(0, 0, 0);
 
-    static inline void init() {
+    inline void init() {
         if (extensionSetInitialized.load()) return;
         
         str versionStr = reinterpret_cast<str>(glGetString(GL_VERSION));
@@ -37,7 +37,7 @@ namespace ESUtils {
             throw std::runtime_error("Failed to get OpenGL ES version, is the context not initialized or what?");
         }
         version = std::make_pair(major, minor);
-        shadingVersion = std::make_shared<int>((major * 100) + (minor * 10)); // 3 -> 300, 2 -> 20 = 320 = 3.2
+        shadingVersion = (major * 100) + (minor * 10); // 3 -> 300, 2 -> 20 = 320 = 3.2
 
         int angleMajor = 0, angleMinor = 0, anglePatch = 0; // ts just made up
         if (sscanf(versionStr, "(ANGLE %d.%d.%d", &angleMajor, &angleMinor, &anglePatch) == 3) {
@@ -55,12 +55,12 @@ namespace ESUtils {
         }
 
         LOGI("GL version: %i.%i", major, minor);
-        LOGI("Shading version: %i", *shadingVersion.get());
+        LOGI("Shading version: %i", shadingVersion);
 
         extensionSetInitialized.store(true);
     }
 
-    static inline bool isSupported(str name) {
+    inline bool isSupported(str name) {
         if (!extensionSetInitialized.load()) {
             /* throw std::runtime_error */
             LOGW("Extension set wasn't initialized!");
@@ -80,7 +80,7 @@ inline void initExtensionsES2() {
         }
     }
 
-    ESUtils::extensionCount = std::make_shared<int>(ESUtils::extensions.size());
+    ESUtils::extensionCount = ESUtils::extensions.size();
 }
 
 inline void initExtensionsES3() {
@@ -92,5 +92,5 @@ inline void initExtensionsES3() {
         if (extension) ESUtils::extensions.insert(extension);
     }
 
-    ESUtils::extensionCount = std::make_shared<int>(extensionCount);
+    ESUtils::extensionCount = extensionCount;
 }

@@ -4,7 +4,7 @@
 
 #include "gl/header.h"
 
-static inline void selectProperTexParamf(GLenum target, GLenum& pname, GLfloat& param) {
+inline void selectProperTexParamf(GLenum target, GLenum& pname, GLfloat& param) {
     switch (pname) {
         case GL_TEXTURE_LOD_BIAS:
            switch (target) {

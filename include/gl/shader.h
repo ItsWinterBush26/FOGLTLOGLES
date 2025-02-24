@@ -5,7 +5,7 @@
 
 #include <stdexcept>
 
-static inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
+inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
     LOGI("Upgrading shader to GLSL 330");
 
     shaderc::CompileOptions options;

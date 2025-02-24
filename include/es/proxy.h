@@ -3,7 +3,7 @@
 #include <gl/gl.h>
 #include <GLES2/gl2.h>
 
-static inline bool isProxyTexture(GLenum target) {
+inline bool isProxyTexture(GLenum target) {
     switch (target) {
         case GL_PROXY_TEXTURE_1D:
         case GL_PROXY_TEXTURE_2D:
@@ -15,7 +15,7 @@ static inline bool isProxyTexture(GLenum target) {
     }
 }
 
-static inline GLint nlevel(GLint size, GLint level) {
+inline GLint nlevel(GLint size, GLint level) {
     // size > 0
     if (size) {
         size >>= level;

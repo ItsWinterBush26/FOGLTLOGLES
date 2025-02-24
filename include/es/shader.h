@@ -16,7 +16,7 @@
 using namespace std::string_literals;
 
 namespace ESUtils {
-    static inline void combineSources(GLsizei count, const GLchar *const* sources, const GLint* length, std::string& destination) {
+    inline void combineSources(GLsizei count, const GLchar *const* sources, const GLint* length, std::string& destination) {
         for (GLsizei i = 0; i < count; i++) {
             if (sources[i]) {
                if (length && length[i] > 0) {
@@ -28,7 +28,7 @@ namespace ESUtils {
        }
     }
 
-    static inline shaderc_shader_kind getKindFromShader(GLuint& shader) {
+    inline shaderc_shader_kind getKindFromShader(GLuint& shader) {
         GLint shaderType;
         glGetShaderiv(shader, GL_SHADER_TYPE, &shaderType);
         
@@ -48,7 +48,7 @@ namespace ESUtils {
         }
     }
 
-    static inline void replaceShaderVersion(std::string& shaderSource, std::string newVersion, std::string type = "") {
+    inline void replaceShaderVersion(std::string& shaderSource, std::string newVersion, std::string type = "") {
         std::regex versionRegex(R"(#version\s+\d+(\s+\w+)?\b)");  // Ensures full match
         std::string replacement = "#version " + newVersion + (type != "" ? " " + type : "") + "\n";
 
@@ -56,7 +56,7 @@ namespace ESUtils {
         shaderSource = std::regex_replace(shaderSource, versionRegex, replacement);
     }
 
-    static inline void glslToEssl(shaderc_shader_kind kind, std::string& fullSource) {
+    inline void glslToEssl(shaderc_shader_kind kind, std::string& fullSource) {
         LOGI("GLSL to SPIR-V starting now...");
         if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
             LOGI("Input GLSL source:");
@@ -110,10 +110,10 @@ namespace ESUtils {
         }
 
         LOGI("GLSL to SPIR-V succeeded! Commencing stage 2...");
-        LOGI("Translating SPIR-V to ESSL %i", *shadingVersion.get());
+        LOGI("Translating SPIR-V to ESSL %i", shadingVersion);
 
         spirv_cross::CompilerGLSL::Options esslOptions;
-        esslOptions.version = *shadingVersion.get();
+        esslOptions.version = shadingVersion;
         esslOptions.es = true;
         esslOptions.vulkan_semantics = false;
 
