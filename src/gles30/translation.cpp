@@ -1,4 +1,5 @@
 #include "gles30/translation.h"
+#include "es/texparam.h"
 #include "gl/glext.h"
 #include "main.h"
 #include "utils/log.h"
@@ -6,9 +7,12 @@
 #include <GLES3/gl3.h>
 
 void* glMapBuffer(GLenum target, GLenum access);
+void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param);
+
 
 void GLES30::registerTranslatedFunctions() {
     REGISTER(glMapBuffer);
+    REGISTEROV(glTexParameterf);
 }
 
 void* glMapBuffer(GLenum target, GLenum access) {
@@ -46,4 +50,10 @@ void* glMapBuffer(GLenum target, GLenum access) {
 
     glGetBufferParameteriv(target, GL_BUFFER_SIZE, &bufferSize);
     return glMapBufferRange(target, 0, bufferSize, accessRange);
+}
+
+void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param) {
+    LOGI("glTexParameterf: target=%u pname=%u params=%f", target, pname, param);
+    selectProperTexParamf(target, pname, param);
+    glTexParameterf(target, pname, param);
 }

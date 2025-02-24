@@ -1,6 +1,5 @@
 #include "gles20/translation.h"
 #include "es/proxy.h"
-#include "es/texparam.h"
 #include "es/texture.h"
 #include "es/shader.h"
 #include "main.h"
