@@ -118,6 +118,7 @@ namespace ESUtils {
         esslOptions.vulkan_semantics = false;
 
         esslOptions.force_flattened_io_blocks = true;
+        esslOptions.enable_storage_image_qualifier_deduction = false;
    
         spirv_cross::CompilerGLSL esslCompiler({ bytecode.cbegin(), bytecode.cend() });
         esslCompiler.set_common_options(esslOptions);
