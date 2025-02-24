@@ -15,7 +15,7 @@ void initExtensionsES3();
 
 namespace ESUtils {
     static std::pair<int, int> version = std::make_pair(0, 0); // major, minor
-    static int shadingVersion = 0; // (major * 100) + (minor * 10)
+    static int shadingVersion; // (major * 100) + (minor * 10)
     
     static std::unordered_set<str> extensions;
     static int extensionCount;
@@ -23,7 +23,7 @@ namespace ESUtils {
     static bool isAngle = false;
     static std::tuple<int, int, int> angleVersion = std::make_tuple(0, 0, 0);
 
-    static void init() {
+    static inline void init() {
         if (extensionSetInitialized.load()) return;
         
         str versionStr = reinterpret_cast<str>(glGetString(GL_VERSION));
