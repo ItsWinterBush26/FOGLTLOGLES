@@ -110,10 +110,10 @@ namespace ESUtils {
         }
 
         LOGI("GLSL to SPIR-V succeeded! Commencing stage 2...");
-        LOGI("Translating SPIR-V to ESSL %i", shadingVersion);
+        LOGI("Translating SPIR-V to ESSL %i", *shadingVersion.get());
 
         spirv_cross::CompilerGLSL::Options esslOptions;
-        esslOptions.version = shadingVersion;
+        esslOptions.version = *shadingVersion.get();
         esslOptions.es = true;
         esslOptions.vulkan_semantics = false;
 
@@ -123,17 +123,17 @@ namespace ESUtils {
         esslCompiler.set_common_options(esslOptions);
 
         fullSource = esslCompiler.compile();
-
         if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
             LOGI("Generated ESSL source:");
             LOGI("%s", fullSource.c_str());
         }
 
+        /*
         replaceShaderVersion(fullSource, std::to_string(shadingVersion), "es");
         if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
             LOGI("Fixed version ESSL source:");
             LOGI("%s", fullSource.c_str());
-        }
+        } */
 
         LOGI("SPIR-V to ESSL succeeded!");
     }
