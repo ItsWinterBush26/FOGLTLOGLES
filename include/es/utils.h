@@ -37,7 +37,7 @@ namespace ESUtils {
         }
         version = std::make_pair(major, minor);
         shadingVersion = (major * 100) + (minor * 10); // 3 -> 300, 2 -> 20 = 320 = 3.2
-        
+
         int angleMajor = 0, angleMinor = 0, anglePatch = 0; // ts just made up
         if (sscanf(versionStr, "(ANGLE %d.%d.%d", &angleMajor, &angleMinor, &anglePatch) == 3) {
             isAngle = true;
@@ -52,6 +52,9 @@ namespace ESUtils {
             default:
                 initExtensionsES3();
         }
+
+        LOGI("GL version: %i.%i", major, minor);
+        LOGI("Shading version: %i", shadingVersion);
 
         extensionSetInitialized.store(true);
     }
