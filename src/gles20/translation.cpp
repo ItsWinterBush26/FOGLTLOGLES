@@ -13,7 +13,6 @@
 void glClearDepth(double d);
 
 void OV_glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels);
-void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param);
 void OV_glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint* params);
 
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* string, const GLint* length);
@@ -26,7 +25,6 @@ void GLES20::registerTranslatedFunctions() {
 
     REGISTER(glClearDepth);
     REGISTEROV(glTexImage2D);
-    REGISTEROV(glTexParameterf)
     REGISTEROV(glGetTexLevelParameteriv);
     REGISTEROV(glShaderSource);
 }
@@ -36,12 +34,6 @@ void glClearDepth(double d) {
 }
 
 GLint proxyWidth, proxyHeight, proxyInternalFormat;
-
-void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param) {
-    LOGI("glTexParameterf: target=%u pname=%u params=%f", target, pname, param);
-    selectProperTexParamf(target, pname, param);
-    glTexParameterf(target, pname, param);
-}
 
 void OV_glTexImage2D(
     GLenum target,
