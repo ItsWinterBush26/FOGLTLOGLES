@@ -1,13 +1,14 @@
 #pragma once
 
 #include "es/utils.h"
-#include "gl/shader.h"
 #include "shaderc/shaderc.h"
 #include "shaderc/shaderc.hpp"
 #include "spirv_glsl.hpp"
+#include "../utils.h"
 #include "utils/log.h"
 
 #include <GLES3/gl31.h>
+#include <cstdlib>
 #include <regex>
 #include <stdexcept>
 #include <string>
@@ -52,6 +53,10 @@ namespace ESUtils {
 
     static inline void glslToEssl(shaderc_shader_kind kind, std::string& fullSource) {
         LOGI("GLSL to SPIR-V starting now...");
+        if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+            LOGI("Input GLSL source:");
+            LOGI("%s", fullSource.c_str());
+        }
 
         int glslVersion = 0;
         if (sscanf(fullSource.c_str(), "#version %i", &glslVersion) != 1) {
@@ -89,10 +94,15 @@ namespace ESUtils {
             throw std::runtime_error("Shader compilation error: " + errorMessage);
         }
 
+        if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+            LOGI("Generated SPIRV shader:");
+            LOGI("%s", std::string(bytecode.cbegin(), bytecode.cend()).c_str());
+        }
+
         LOGI("GLSL to SPIR-V succeeded! Commencing stage 2...");
 
         spirv_cross::CompilerGLSL::Options esslOptions;
-        esslOptions.version = shadingVersion;
+        esslOptions.version = ESUtils::shadingVersion;
         esslOptions.es = true;
         esslOptions.vulkan_semantics = false;
 
@@ -102,6 +112,10 @@ namespace ESUtils {
         esslCompiler.set_common_options(esslOptions);
 
         fullSource = esslCompiler.compile();
+        if (FOGLTLOGLES::getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+            LOGI("Generated ESSL source:");
+            LOGI("%s", fullSource.c_str());
+        }
 
         LOGI("SPIR-V to ESSL succeeded!");
     }
