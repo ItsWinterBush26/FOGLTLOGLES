@@ -1,5 +1,6 @@
 #include "gles20/translation.h"
 #include "es/proxy.h"
+#include "es/texparam.h"
 #include "es/texture.h"
 #include "es/shader.h"
 #include "main.h"
@@ -38,6 +39,7 @@ GLint proxyWidth, proxyHeight, proxyInternalFormat;
 
 void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param) {
     LOGI("glTexParameterf: target=%u pname=%u params=%f", target, pname, param);
+    selectProperTexParamf(target, pname, param);
     glTexParameterf(target, pname, param);
 }
 
