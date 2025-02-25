@@ -84,9 +84,10 @@ namespace ESUtils {
 		}
 
 		shaderc::CompileOptions spirvOptions;
+		spirvOptions.SetGenerateDebugInfo();
 		spirvOptions.SetSourceLanguage(shaderc_source_language_glsl);
 		spirvOptions.SetTargetEnvironment(shaderc_target_env_opengl, glslVersion);
-		spirvOptions.SetOptimizationLevel(shaderc_optimization_level_performance);
+		spirvOptions.SetOptimizationLevel(shaderc_optimization_level_zero);
 
 		spirvOptions.SetAutoMapLocations(true);
 		// spirvOptions.SetAutoBindUniforms(true); // might be the problem

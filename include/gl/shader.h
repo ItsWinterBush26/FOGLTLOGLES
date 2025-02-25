@@ -10,10 +10,11 @@ inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
     LOGI("Upgrading shader to GLSL 330");
 
     shaderc::CompileOptions options;
+    options.SetGenerateDebugInfo();
     options.SetSourceLanguage(shaderc_source_language_glsl);
     options.SetTargetEnvironment(shaderc_target_env_opengl, 330);
     options.SetForcedVersionProfile(330, shaderc_profile_core);
-    options.SetOptimizationLevel(shaderc_optimization_level_performance),
+    options.SetOptimizationLevel(shaderc_optimization_level_zero);
 
     options.SetAutoMapLocations(true);
     // options.SetAutoBindUniforms(true);
