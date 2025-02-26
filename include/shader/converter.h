@@ -89,8 +89,11 @@ private:
         return compiler.CompileGlslToSpv(source, kind, "shader", options);
     }
 
-    std::unordered_map<std::string, uint32_t> locationMap; // Maps variable names to locations
-    uint32_t nextAvailableLocation = 0;
+    static std::unordered_map<std::string, uint32_t> g_uniformLocationMap;
+    static uint32_t g_nextUniformLocation = 0;
+
+    static std::unordered_map<std::string, uint32_t> g_varyingLocationMap;
+    static uint32_t g_nextVaryingLocation = 0;
 
     void transpileSPV2ESSL(shaderc_shader_kind kind, shaderc::SpvCompilationResult& module, std::string& target) {
         spirv_cross::CompilerGLSL::Options options = generateSPV2ESSLOptions(ESUtils::shadingVersion);
@@ -103,14 +106,33 @@ private:
 
         spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
-        for (auto& var : (kind == shaderc_vertex_shader ? resources.stage_outputs : resources.stage_inputs)) {
-            std::string name = var.name;
-
-            if (locationMap.find(name) == locationMap.end()) {
-                locationMap[name] = nextAvailableLocation++;
+        for (auto &uniform : resources.uniforms) {
+            std::string name = uniform.name;
+            if (g_uniformLocationMap.find(name) == g_uniformLocationMap.end()) {
+                g_uniformLocationMap[name] = g_nextUniformLocation++;
             }
+            compiler.set_decoration(uniform.id, spv::DecorationLocation, g_uniformLocationMap[name]);
+        }
 
-            compiler.set_decoration(var.id, spv::DecorationLocation, locationMap[name]);
+    switch (kind) {
+        case shaderc_vertex_shader:
+    for (auto &var : resources.stage_outputs) {
+        std::string name = var.name;
+        if (g_varyingLocationMap.find(name) == g_varyingLocationMap.end()) {
+            g_varyingLocationMap[name] = g_nextVaryingLocation++;
+        }
+        compiler.set_decoration(var.id, spv::DecorationLocation, g_varyingLocationMap[name]);
+    }
+        break;
+        case shaderc_fragment_shader:
+    for (auto &var : resources.stage_inputs) {
+        std::string name = var.name;
+        if (g_varyingLocationMap.find(name) == g_varyingLocationMap.end()) {
+            g_varyingLocationMap[name] = g_nextVaryingLocation++;
+        }
+        compiler.set_decoration(var.id, spv::DecorationLocation, g_varyingLocationMap[name]);
+    }
+        break;
         }
 
         target = compiler.compile();
