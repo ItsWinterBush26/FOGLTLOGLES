@@ -1,6 +1,6 @@
 #pragma once
 
-#include "spirv_core.hpp"
+#include "spirv_cross.hpp"
 #include "spirv_glsl.hpp"
 
 #include <cstdint>

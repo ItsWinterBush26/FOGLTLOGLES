@@ -104,7 +104,7 @@ private:
         compiler.add_header_line("precision mediump float;");
         compiler.add_header_line("precision highp int;");
 
-        processESSLSource(compiler);
+        processESSLSource(compiler, kind);
 
         target = compiler.compile();
 
