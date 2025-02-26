@@ -28,6 +28,12 @@ jobs:
         submodules: true
         fetch-depth: 1
 
+    - name: Setup JDK 21
+      uses: actions/setup-java@v4
+      with:
+        distribution: "temurin"
+        java-version: 21
+
     - name: Install CCache
       uses: Chocobo1/setup-ccache-action@v1
       with:
