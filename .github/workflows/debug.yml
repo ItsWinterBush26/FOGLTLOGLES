@@ -37,6 +37,11 @@ jobs:
     - name: Install Ninja
       uses: seanmiddleditch/gha-setup-ninja@master
 
+    - name: Install ANDK
+      uses: nttld/setup-ndk@v1
+      with:
+        ndk-version: r28
+
     - name: Build
       run: |
         chmod +x build.sh
