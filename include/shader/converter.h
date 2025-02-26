@@ -89,11 +89,11 @@ private:
         return compiler.CompileGlslToSpv(source, kind, "shader", options);
     }
 
-    static std::unordered_map<std::string, uint32_t> g_uniformLocationMap;
-    static uint32_t g_nextUniformLocation = 0;
+    std::unordered_map<std::string, uint32_t> g_uniformLocationMap;
+    uint32_t g_nextUniformLocation = 0;
 
-    static std::unordered_map<std::string, uint32_t> g_varyingLocationMap;
-    static uint32_t g_nextVaryingLocation = 0;
+    std::unordered_map<std::string, uint32_t> g_varyingLocationMap;
+    uint32_t g_nextVaryingLocation = 0;
 
     void transpileSPV2ESSL(shaderc_shader_kind kind, shaderc::SpvCompilationResult& module, std::string& target) {
         spirv_cross::CompilerGLSL::Options options = generateSPV2ESSLOptions(ESUtils::shadingVersion);
