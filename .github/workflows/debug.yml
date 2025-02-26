@@ -7,6 +7,9 @@ on:
 
 jobs:
   build:
+    permissions:
+      id-token: write
+      contents: read
     strategy:
       matrix:
         include:
@@ -16,9 +19,11 @@ jobs:
           - name: 32-bit
             arch-double: armeabi-v7a
     
-    runs-on: ubuntu-latest
+    runs-on: namespace-profile-anglebuild
     steps:
-    - uses: actions/checkout@v4
+    - uses: namespacelabs/nscloud-setup@v0
+    
+    - uses: namespacelabs/nscloud-checkout-action@v5
       with:
         submodules: true
         fetch-depth: 1
