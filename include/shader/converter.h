@@ -96,6 +96,8 @@ private:
         spirv_cross::CompilerGLSL::Options options = generateSPV2ESSLOptions(ESUtils::shadingVersion);
 
         spirv_cross::CompilerGLSL compiler({ module.cbegin(), module.cend() });
+        compiler.set_common_options(options);
+
         spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
         for (auto& var : (kind == shaderc_vertex_shader ? resources.stage_outputs : resources.stage_inputs)) {
