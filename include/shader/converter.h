@@ -3,9 +3,7 @@
 #include "es/utils.h"
 #include "gl/shader.h"
 #include "preprocess.h"
-#include "shaderc/env.h"
 #include "shaderc/shaderc.h"
-#include "spirv_cross.hpp"
 #include "spirv_glsl.hpp"
 #include "utils/compilers.h"
 
@@ -63,6 +61,7 @@ public:
 
 private:
     GLuint program;
+    Preprocessor preprocessor = Preprocessor();
 
     std::string vertexSource;
     std::string fragmentSource;
@@ -103,7 +102,7 @@ private:
         compiler.add_header_line("precision mediump float;");
         compiler.add_header_line("precision highp int;");
 
-        processESSLSource(compiler, kind);
+        preprocessor.processSPVBytecode(compiler, kind);
 
         target = compiler.compile();
 

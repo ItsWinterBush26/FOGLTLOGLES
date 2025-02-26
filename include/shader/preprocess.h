@@ -2,19 +2,22 @@
 
 #include "spirv_cross.hpp"
 #include "spirv_glsl.hpp"
+#include "utils/log.h"
 
 #include <cstdint>
 #include <shaderc/shaderc.hpp>
 #include <string>
 #include <unordered_map>
 
-inline std::unordered_map<std::string, int> uniformLocationMap;
-inline uint32_t nextAvailableUniformLocation = 0;
+class Preprocessor {
+private:
+std::unordered_map<std::string, int> uniformLocationMap;
+uint32_t nextAvailableUniformLocation = 0;
 
-inline std::unordered_map<std::string, int> varyingLocationMap;
-inline uint32_t nextAvailableVaryingLocation = 0;
+std::unordered_map<std::string, int> varyingLocationMap;
+uint32_t nextAvailableVaryingLocation = 0;
 
-inline void processSamplerUniforms(
+void processSamplerUniforms(
     spirv_cross::CompilerGLSL& compiler,
     spirv_cross::SmallVector<spirv_cross::Resource> separateImages
 ) {
@@ -29,7 +32,7 @@ inline void processSamplerUniforms(
     }
 }
 
-inline void processUniformBuffers(
+void processUniformBuffers(
     spirv_cross::CompilerGLSL& compiler,
     spirv_cross::SmallVector<spirv_cross::Resource> uniformBuffers
 ) {
@@ -48,7 +51,7 @@ inline void processUniformBuffers(
     } 
 }
 
-inline void processVaryings(
+void processVaryings(
     spirv_cross::CompilerGLSL &compiler,
     const spirv_cross::ShaderResources &resources,
     shaderc_shader_kind kind
@@ -77,11 +80,17 @@ inline void processVaryings(
     }
 }
 
-inline void processESSLSource(spirv_cross::CompilerGLSL& compiler, shaderc_shader_kind kind) {
+public:
+void processSPVBytecode(spirv_cross::CompilerGLSL& compiler, shaderc_shader_kind kind) {
+    LOGI("Processing SPIRV bytecode");
+
     spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
     processSamplerUniforms(compiler, resources.separate_images);
     processUniformBuffers(compiler, resources.uniform_buffers);
     processVaryings(compiler, resources, kind);
 
+    LOGI("Success! NAUL=%u NAVL=%u", nextAvailableUniformLocation, nextAvailableVaryingLocation);
 }
+
+};
