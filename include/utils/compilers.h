@@ -2,7 +2,6 @@
 
 #include <shaderc/shaderc.hpp>
 #include "spirv_glsl.hpp"
-#include <string>
 
 inline shaderc::CompileOptions generateGLSL2SPVOptions(int glslVersion) {
     shaderc::CompileOptions options;

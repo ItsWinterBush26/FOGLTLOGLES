@@ -2,6 +2,7 @@
 
 #include "shaderc/shaderc.hpp"
 #include "spirv_glsl.hpp"
+#include "utils/env.h"
 #include "utils/log.h"
 
 #include <stdexcept>
@@ -41,6 +42,11 @@ inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
     glslCompiler.set_common_options(glslOptions);
 
     src = glslCompiler.compile();
+
+    if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+        LOGI("Upgrade shader source:");
+        LOGI("%s", src.c_str());
+    }
 
     LOGI("Upgrade successful!");
 }

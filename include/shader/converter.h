@@ -19,14 +19,19 @@ public:
     ShaderConverter(GLuint program) : program(program) {}
 
     void attachSource(shaderc_shader_kind kind, std::string source) {
+        if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+            LOGI("Recieved shader source:");
+            LOGI("%s", source.c_str());
+        }
+
         switch (kind) {
             case shaderc_vertex_shader:
-                convertAndFix(kind, source);
                 vertexSource = source;
+                convertAndFix(kind, &vertexSource);
                 return;
             case shaderc_fragment_shader:
-                convertAndFix(kind, source);
                 fragmentSource = source;
+                convertAndFix(kind, &fragmentSource);
                 return;
             default: return;
         }
@@ -100,5 +105,10 @@ private:
         }
 
         target = compiler.compile();
+
+        if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+            LOGI("Transpiled GLSL -> ESSL source:");
+            LOGI("%s", target.c_str());
+        }
     }
 };
