@@ -97,6 +97,9 @@ private:
 
         spirv_cross::CompilerGLSL compiler({ module.cbegin(), module.cend() });
         compiler.set_common_options(options);
+        compiler.add_header_line("precision mediump float;");
+        compiler.add_header_line("precision highp int;");
+
 
         spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
