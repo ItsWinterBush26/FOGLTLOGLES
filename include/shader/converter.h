@@ -20,6 +20,7 @@ public:
     ShaderConverter(GLuint program) : program(program) {}
 
     void attachSource(shaderc_shader_kind kind, std::string source) {
+        LOGI("Attaching shader source to %i", kind);
         if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
             LOGI("Recieved shader source:");
             LOGI("%s", source.c_str());
@@ -43,6 +44,10 @@ public:
         shaderc::SpvCompilationResult spirv = compileGLSl2SPV(shaderc_vertex_shader, source);
         LOGI("SPV -> ESSL");
         transpileSPV2ESSL(kind, spirv, source);
+    }
+
+    void finish() {
+        LOGI("FINISH!")
     }
 
     GLuint getProgram() { return program; }
@@ -89,12 +94,6 @@ private:
 
         return compiler.CompileGlslToSpv(source, kind, "shader", options);
     }
-
-    std::unordered_map<std::string, uint32_t> g_uniformLocationMap;
-    uint32_t g_nextUniformLocation = 0;
-
-    std::unordered_map<std::string, uint32_t> g_varyingLocationMap;
-    uint32_t g_nextVaryingLocation = 0;
 
     void transpileSPV2ESSL(shaderc_shader_kind kind, shaderc::SpvCompilationResult& module, std::string& target) {
         spirv_cross::CompilerGLSL::Options options = generateSPV2ESSLOptions(ESUtils::shadingVersion);

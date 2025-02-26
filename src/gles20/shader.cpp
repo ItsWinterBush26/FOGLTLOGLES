@@ -36,5 +36,7 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* source
 
 void OV_glLinkProgram(GLuint program) {
     glLinkProgram(program);
+
+    converter.finish();
     converter = ShaderConverter();
 }
