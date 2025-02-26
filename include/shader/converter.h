@@ -47,7 +47,7 @@ public:
     }
 
     void finish() {
-        LOGI("FINISH!")
+        LOGI("FINISH!");
     }
 
     GLuint getProgram() { return program; }
