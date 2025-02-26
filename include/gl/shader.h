@@ -1,5 +1,6 @@
 #pragma once
 
+#include "es/utils.h"
 #include "shaderc/shaderc.hpp"
 #include "spirv_glsl.hpp"
 #include "utils/env.h"
@@ -33,8 +34,8 @@ inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
 
     spirv_cross::CompilerGLSL glslCompiler({ module.cbegin(), module.cend() });
     spirv_cross::CompilerGLSL::Options glslOptions;
-    glslOptions.version = 330;  // Output GLSL 330
-    glslOptions.es = false;     // Not targeting OpenGL ES
+    glslOptions.version = ESUtils::shadingVersion; 
+    glslOptions.es = true;
     glslOptions.vulkan_semantics = false;
     glslOptions.enable_420pack_extension = false;
     glslOptions.force_flattened_io_blocks = true;
