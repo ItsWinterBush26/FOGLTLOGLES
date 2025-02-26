@@ -1,7 +1,6 @@
 #include "gles20/translation.h"
 #include "es/proxy.h"
 #include "es/texture.h"
-#include "es/shader.h"
 #include "main.h"
 #include "utils/log.h"
 
@@ -14,8 +13,6 @@ void glClearDepth(double d);
 void OV_glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels);
 void OV_glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint* params);
 
-void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* string, const GLint* length);
-
 static GLint maxTextureSize = 0;
 
 void GLES20::registerTranslatedFunctions() {
@@ -25,7 +22,6 @@ void GLES20::registerTranslatedFunctions() {
     REGISTER(glClearDepth);
     REGISTEROV(glTexImage2D);
     REGISTEROV(glGetTexLevelParameteriv);
-    REGISTEROV(glShaderSource);
 }
 
 void glClearDepth(double d) {
@@ -72,18 +68,4 @@ void OV_glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint
     } else {
         glGetTexLevelParameteriv(target, level, pname, params);
     }
-}
-
-void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* sources, const GLint* length) {
-    if (!count || !sources) return;
-    LOGI("glShaderSource called!");
-
-    std::string fullSource;
-    ESUtils::combineSources(count, sources, length, fullSource);
-    ESUtils::glslToEssl(ESUtils::getKindFromShader(shader), fullSource);
-
-    const GLchar* newSource = fullSource.c_str();
-    glShaderSource(shader, 1, &newSource, nullptr);
-
-    LOGI("Compilation successful!");
 }

@@ -11,4 +11,7 @@ namespace GLES20 {
     };
     
     const inline std::shared_ptr<GLES20Wrapper> wrapper = std::make_shared<GLES20Wrapper>();
+
+
+    void registerShaderOverrides();
 }
