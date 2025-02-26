@@ -38,7 +38,9 @@ public:
     }
 
     void convertAndFix(shaderc_shader_kind kind, std::string& source) {
+        LOGI("GLSL -> SPV");
         shaderc::SpvCompilationResult spirv = compileGLSl2SPV(shaderc_vertex_shader, source);
+        LOGI("SPV -> ESSL");
         transpileSPV2ESSL(kind, spirv, source);
     }
 
@@ -67,6 +69,8 @@ private:
 
         if (detectedVersion < 330) {
             detectedVersion = 330;
+
+            LOGI("GLSL <330 -> GLSL 330");
 
             upgradeTo330(kind, source);
         }
