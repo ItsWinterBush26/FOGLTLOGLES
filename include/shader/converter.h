@@ -27,19 +27,19 @@ public:
         switch (kind) {
             case shaderc_vertex_shader:
                 vertexSource = source;
-                convertAndFix(kind, &vertexSource);
+                convertAndFix(kind, vertexSource);
                 return;
             case shaderc_fragment_shader:
                 fragmentSource = source;
-                convertAndFix(kind, &fragmentSource);
+                convertAndFix(kind, fragmentSource);
                 return;
             default: return;
         }
     }
 
     void convertAndFix(shaderc_shader_kind kind, std::string& source) {
-        shaderc::SpvCompilationResult spirv = compileGLSl2SPV(shaderc_vertex_shader, &source);
-        transpileSPV2ESSL(kind, &spirv, &source);
+        shaderc::SpvCompilationResult spirv = compileGLSl2SPV(shaderc_vertex_shader, source);
+        transpileSPV2ESSL(kind, spirv, source);
     }
 
     GLuint getProgram() { return program; }
