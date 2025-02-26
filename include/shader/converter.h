@@ -106,34 +106,49 @@ private:
 
         spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
-        for (auto &uniform : resources.uniforms) {
-            std::string name = uniform.name;
-            if (g_uniformLocationMap.find(name) == g_uniformLocationMap.end()) {
-                g_uniformLocationMap[name] = g_nextUniformLocation++;
-            }
-            compiler.set_decoration(uniform.id, spv::DecorationLocation, g_uniformLocationMap[name]);
-        }
+        for (auto &img : resources.separate_images) {
+    std::string name = img.name;
+    if (g_uniformLocationMap.find(name) == g_uniformLocationMap.end()) {
+        g_uniformLocationMap[name] = g_nextUniformLocation++;
+    }
+    compiler.set_decoration(img.id, spv::DecorationLocation, g_uniformLocationMap[name]);
+}
 
-    switch (kind) {
-        case shaderc_vertex_shader:
-    for (auto &var : resources.stage_outputs) {
-        std::string name = var.name;
-        if (g_varyingLocationMap.find(name) == g_varyingLocationMap.end()) {
-            g_varyingLocationMap[name] = g_nextVaryingLocation++;
+for (auto &ubo : resources.uniform_buffers) {
+    auto type = compiler.get_type(ubo.type_id);
+    for (uint32_t i = 0; i < type.member_types.size(); ++i) {
+        std::string memberName = compiler.get_member_name(ubo.id, i);
+        if (memberName.empty()) {
+            memberName = "ub_member_" + std::to_string(i);
         }
-        compiler.set_decoration(var.id, spv::DecorationLocation, g_varyingLocationMap[name]);
+        if (g_uniformLocationMap.find(memberName) == g_uniformLocationMap.end()) {
+            g_uniformLocationMap[memberName] = g_nextUniformLocation++;
+        }
+        compiler.set_decoration(ubo.id, i, spv::DecorationLocation, g_uniformLocationMap[memberName]);
     }
-        break;
-        case shaderc_fragment_shader:
-    for (auto &var : resources.stage_inputs) {
-        std::string name = var.name;
-        if (g_varyingLocationMap.find(name) == g_varyingLocationMap.end()) {
-            g_varyingLocationMap[name] = g_nextVaryingLocation++;
+}
+
+switch (kind) {
+    case shaderc_vertex_shader:
+        for (auto &var : resources.stage_outputs) {
+            std::string name = var.name;
+            if (g_varyingLocationMap.find(name) == g_varyingLocationMap.end()) {
+                g_varyingLocationMap[name] = g_nextVaryingLocation++;
+            }
+            compiler.set_decoration(var.id, spv::DecorationLocation, g_varyingLocationMap[name]);
         }
-        compiler.set_decoration(var.id, spv::DecorationLocation, g_varyingLocationMap[name]);
-    }
         break;
+
+    case shaderc_fragment_shader:
+        for (auto &var : resources.stage_inputs) {
+            std::string name = var.name;
+            if (g_varyingLocationMap.find(name) == g_varyingLocationMap.end()) {
+                g_varyingLocationMap[name] = g_nextVaryingLocation++;
+            }
+            compiler.set_decoration(var.id, spv::DecorationLocation, g_varyingLocationMap[name]);
         }
+        break;
+}
 
         target = compiler.compile();
 
