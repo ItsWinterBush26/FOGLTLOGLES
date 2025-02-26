@@ -18,5 +18,7 @@
     ],
     "cmake.configureOnEdit": false,
     "cmake.ctest.parallelJobs": 8,
-    "cmake.generator": "Ninja"
+    "cmake.generator": "Ninja",
+    "clangd.checkUpdates": true,
+    "clangd.serverCompletionRanking": false
 }
