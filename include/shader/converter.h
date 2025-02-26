@@ -33,8 +33,8 @@ public:
     }
 
     void convertAndFix(shaderc_shader_kind kind, std::string& source) {
-        shaderc::SpvCompilationResult spirv = compileGLSl2SPV(shaderc_vertex_shader, source);
-        transpileSPV2ESSL(kind, spirv, source);
+        shaderc::SpvCompilationResult spirv = compileGLSl2SPV(shaderc_vertex_shader, &source);
+        transpileSPV2ESSL(kind, &spirv, &source);
     }
 
     GLuint getProgram() { return program; }
