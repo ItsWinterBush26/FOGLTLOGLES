@@ -39,7 +39,7 @@ public:
     }
 
     void convertAndFix(shaderc_shader_kind kind, std::string& source) {
-        LOG("Currently %s", getKindStringFromKind(kind));
+        LOGI("Currently %s", getKindStringFromKind(kind));
         LOGI("GLSL -> SPV");
         shaderc::SpvCompilationResult spirv = compileGLSl2SPV(kind, source);
         LOGI("SPV -> ESSL");
