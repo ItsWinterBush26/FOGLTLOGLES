@@ -41,11 +41,13 @@ void OV_glLinkProgram(GLuint program) {
     GLint success = 0;
     glGetProgramiv(program, GL_LINK_STATUS, &success);
     if (success != GL_TRUE) {
-        /*
+        
         GLchar bufLog[4096] = { 0 };
         GLint size = 0;
 
-        glGetProgramInfoLog(program, 4096, &size, bufLog); */
+        glGetProgramInfoLog(program, 4096, &size, bufLog);
+
+        LOGI("Link error: %s", bufLog);
 
         throw std::runtime_error("Failed to link program!");
     }
