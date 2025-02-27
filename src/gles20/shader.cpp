@@ -4,6 +4,7 @@
 #include "shader/converter.h"
 
 #include <GLES2/gl2.h>
+#include <stdexcept>
 #include <string>
 
 GLuint OV_glCreateProgram();
@@ -36,6 +37,18 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* source
 
 void OV_glLinkProgram(GLuint program) {
     glLinkProgram(program);
+
+    GLint success = 0;
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    if (success != GL_TRUE) {
+        /*
+        GLchar bufLog[4096] = { 0 };
+        GLint size = 0;
+
+        glGetProgramInfoLog(program, 4096, &size, bufLog); */
+
+        throw std::runtime_error("Failed to link program!");
+    }
 
     converter.finish();
     converter = ShaderConverter();
