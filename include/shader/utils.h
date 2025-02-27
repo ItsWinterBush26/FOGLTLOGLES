@@ -1,6 +1,7 @@
 #pragma once
 
 #include "es/utils.h"
+#include "utils/types.h"
 #include "shaderc/shaderc.hpp"
 #include "utils/log.h"
 
@@ -36,6 +37,18 @@ inline shaderc_shader_kind getKindFromShader(GLuint shader) {
             LOGI("%u", shader);
             throw std::runtime_error("Received an unsupported shader type!");
 
+    }
+}
+
+inline str getKindStringFromKind(shaderc_shader_kind kind) {
+    switch (kind) {
+        case shaderc_vertex_shader:
+            return "VertexShader";
+        case shaderc_fragment_shader:
+            return "FragmentShader";
+        case shaderc_compute_shader:
+            return "ComputeShader";
+        default: return "";
     }
 }
 

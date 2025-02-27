@@ -5,6 +5,7 @@
 #include "preprocess.h"
 #include "shaderc/shaderc.h"
 #include "spirv_glsl.hpp"
+#include "utils.h"
 #include "utils/compilers.h"
 
 #include <stdexcept>
@@ -18,7 +19,7 @@ public:
     ShaderConverter(GLuint program) : program(program) {}
 
     void attachSource(shaderc_shader_kind kind, std::string source) {
-        LOGI("Attaching shader source to %i", kind);
+        LOGI("Doin magic on a %s", getKindStringFromKind(kind));
         if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
             LOGI("Recieved shader source:");
             LOGI("%s", source.c_str());
@@ -69,7 +70,7 @@ private:
     int ensure330(shaderc_shader_kind kind, std::string& source) {
         int detectedVersion = 0;
         if (sscanf(source.c_str(), "#version %i", &detectedVersion) != 1) {
-            throw std::runtime_error("Source with no version preprocessor!");
+            throw std::runtime_error("Shader with no version preprocessor!");
         }
 
         if (detectedVersion < 330) {

@@ -1,14 +1,15 @@
 #pragma once
 
+#include "shader/utils.h"
 #include "shaderc/shaderc.hpp"
 #include "spirv_glsl.hpp"
-#include "utils/env.h"
 #include "utils/log.h"
+#include "utils/env.h"
 
 #include <stdexcept>
 
 inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
-    LOGI("Upgrading shader to GLSL 330");
+    LOGI("Upgrading %s to GLSL 330", getKindStringFromKind(kind));
 
     shaderc::CompileOptions options;
     options.SetGenerateDebugInfo();
