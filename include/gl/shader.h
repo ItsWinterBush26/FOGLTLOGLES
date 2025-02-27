@@ -1,6 +1,5 @@
 #pragma once
 
-#include "es/utils.h"
 #include "shaderc/shaderc.hpp"
 #include "spirv_glsl.hpp"
 #include "utils/env.h"
@@ -16,9 +15,9 @@ inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
     options.SetSourceLanguage(shaderc_source_language_glsl);
     options.SetTargetEnvironment(shaderc_target_env_opengl, 330);
     options.SetForcedVersionProfile(330, shaderc_profile_core);
-    options.SetOptimizationLevel(shaderc_optimization_level_zero);
+    options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
-    options.SetAutoMapLocations(true);
+    // options.SetAutoMapLocations(true);
     // options.SetAutoBindUniforms(true);
     // options.SetAutoSampledTextures(true);
 
@@ -34,8 +33,8 @@ inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
 
     spirv_cross::CompilerGLSL glslCompiler({ module.cbegin(), module.cend() });
     spirv_cross::CompilerGLSL::Options glslOptions;
-    glslOptions.version = ESUtils::shadingVersion; 
-    glslOptions.es = true;
+    glslOptions.version = 330;
+    glslOptions.es = false;
     glslOptions.vulkan_semantics = false;
     glslOptions.enable_420pack_extension = false;
     glslOptions.force_flattened_io_blocks = true;
