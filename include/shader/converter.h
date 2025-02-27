@@ -40,8 +40,8 @@ public:
     void convertAndFix(shaderc_shader_kind kind, std::string& source) {
         LOGI("GLSL -> SPV");
         shaderc::SpvCompilationResult spirv = compileGLSl2SPV(shaderc_vertex_shader, source);
-        LOGI("SPV -> ESSL");
-        transpileSPV2ESSL(kind, spirv, source);
+        // LOGI("SPV -> ESSL");
+        // transpileSPV2ESSL(kind, spirv, source);
     }
 
     void finish() {
@@ -88,11 +88,12 @@ private:
 
         int glslVersion = ensure330(kind, source);
 
-        shaderc::Compiler compiler;
-        shaderc::CompileOptions options = generateGLSL2SPVOptions(glslVersion);
-        options.SetAutoMapLocations(false);
+        // shaderc::Compiler compiler;
+        // shaderc::CompileOptions options = generateGLSL2SPVOptions(glslVersion);
+        // options.SetAutoMapLocations(false);
 
-        return compiler.CompileGlslToSpv(source, kind, "shader", options);
+        return shaderc::SpvCompilationResult();
+        // return compiler.CompileGlslToSpv(source, kind, "shader", options);
     }
 
     void transpileSPV2ESSL(shaderc_shader_kind kind, shaderc::SpvCompilationResult& module, std::string& target) {
