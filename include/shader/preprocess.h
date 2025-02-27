@@ -178,7 +178,7 @@ public:
         processSamplerUniforms(compiler, resources.sampled_images);
         processSamplerUniforms(compiler, resources.separate_samplers);
         processUniformBuffers(compiler, resources.uniform_buffers);
-        processStandaloneUniforms(compiler, resources.separate_constants);
+        // processStandaloneUniforms(compiler, resources.separate_constants);
 
         // Process shader stage-specific resources
         switch (kind) {
