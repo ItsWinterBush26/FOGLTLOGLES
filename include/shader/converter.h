@@ -28,19 +28,20 @@ public:
         switch (kind) {
             case shaderc_vertex_shader:
                 vertexSource = source;
-                convertAndFix(kind, vertexSource);
+                convertAndFix(shaderc_vertex_shader, vertexSource);
                 return;
             case shaderc_fragment_shader:
                 fragmentSource = source;
-                convertAndFix(kind, fragmentSource);
+                convertAndFix(shaderc_fragment_shader, fragmentSource);
                 return;
             default: return;
         }
     }
 
     void convertAndFix(shaderc_shader_kind kind, std::string& source) {
+        LOG("Currently %s", getKindStringFromKind(kind));
         LOGI("GLSL -> SPV");
-        shaderc::SpvCompilationResult spirv = compileGLSl2SPV(shaderc_vertex_shader, source);
+        shaderc::SpvCompilationResult spirv = compileGLSl2SPV(kind, source);
         LOGI("SPV -> ESSL");
         transpileSPV2ESSL(kind, spirv, source);
     }
