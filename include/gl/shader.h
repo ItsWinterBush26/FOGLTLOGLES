@@ -22,6 +22,15 @@ inline void autoAssignLocations(spirv_cross::CompilerGLSL& compiler) {
     for (const auto& output : resources.stage_outputs) {
         compiler.set_decoration(output.id, spv::DecorationLocation, location++);
     }
+
+    int binding = 0;
+    // Assign bindings for uniforms
+    for (const auto& uniform : resources.uniform_buffers) {
+        compiler.set_decoration(uniform.id, spv::DecorationBinding, binding++);
+    }
+    for (const auto& sampler : resources.sampled_images) {
+        compiler.set_decoration(sampler.id, spv::DecorationBinding, binding++);
+    }
 }
 
 inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
@@ -35,7 +44,7 @@ inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
     options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
     options.SetAutoMapLocations(true);
-    // options.SetAutoBindUniforms(true);
+    options.SetAutoBindUniforms(true);
     options.SetAutoSampledTextures(true);
 
     shaderc::Compiler spirvCompiler;
