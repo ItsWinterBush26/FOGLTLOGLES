@@ -61,7 +61,7 @@ void processVaryings(
             for (auto &var : resources.stage_outputs) {
                 std::string name = var.name;
                 if (varyingLocationMap.find(name) == varyingLocationMap.end()) {
-                        varyingLocationMap[name] = nextAvailableVaryingLocation++;
+                    varyingLocationMap[name] = nextAvailableVaryingLocation++;
                 }
                 compiler.set_decoration(var.id, spv::DecorationLocation, varyingLocationMap[name]);
             }
@@ -71,7 +71,7 @@ void processVaryings(
             for (auto &var : resources.stage_inputs) {
                 std::string name = var.name;
                 if (varyingLocationMap.find(name) == varyingLocationMap.end()) {
-                        varyingLocationMap[name] = nextAvailableVaryingLocation++;
+                    varyingLocationMap[name] = nextAvailableVaryingLocation++;
                 }
                 compiler.set_decoration(var.id, spv::DecorationLocation, varyingLocationMap[name]);
             }
