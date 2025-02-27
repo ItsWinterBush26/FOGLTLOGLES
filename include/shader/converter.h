@@ -19,7 +19,7 @@ public:
     ShaderConverter(GLuint program) : program(program) {}
 
     void attachSource(shaderc_shader_kind kind, std::string source) {
-        LOGI("Doin magic on a %s", getKindStringFromKind(kind));
+        LOGI("Doing magic on a %s", getKindStringFromKind(kind));
         if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
             LOGI("Recieved shader source:");
             LOGI("%s", source.c_str());
@@ -39,7 +39,6 @@ public:
     }
 
     void convertAndFix(shaderc_shader_kind kind, std::string& source) {
-        LOGI("Currently %s", getKindStringFromKind(kind));
         LOGI("GLSL -> SPV");
         shaderc::SpvCompilationResult spirv = compileGLSl2SPV(kind, source);
         LOGI("SPV -> ESSL");
@@ -75,11 +74,10 @@ private:
         }
 
         if (detectedVersion < 330) {
-            detectedVersion = 330;
-
-            LOGI("GLSL <330 -> GLSL 330");
+            LOGI("GLSL %i -> GLSL 330", detectedVersion);
 
             upgradeTo330(kind, source);
+            detectedVersion = 330;
         }
 
         return detectedVersion;

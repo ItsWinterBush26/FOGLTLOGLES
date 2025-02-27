@@ -2,6 +2,7 @@
 
 #include "spirv_cross.hpp"
 #include "spirv_glsl.hpp"
+#include "utils.h"
 #include "utils/log.h"
 
 #include <cstdint>
@@ -141,7 +142,7 @@ private:
             if (varyingLocationMap.find(name) == varyingLocationMap.end()) {
                 // Warn if a fragment input doesn’t match a vertex output.
                 varyingLocationMap[name] = nextAvailableVaryingLocation++;
-                LOGI("Warning: Fragment shader input '%s' not found in vertex outputs", name.c_str());
+                LOGW("Fragment shader input '%s' not found in vertex outputs", name.c_str());
             }
             int location = varyingLocationMap[name];
             compiler.set_decoration(varying.id, spv::DecorationLocation, location);
@@ -163,9 +164,8 @@ private:
     }
 
 public:
-    // Process the SPIRV bytecode, assigning resource locations based on shader stage.
     void processSPVBytecode(spirv_cross::CompilerGLSL &compiler, shaderc_shader_kind kind) {
-        LOGI("Processing SPIRV bytecode for shader kind %d", kind);
+        LOGI("Processing SPIRV bytecode for %s", getKindStringFromKind(kind));
 
         spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
@@ -191,7 +191,7 @@ public:
                 processFragmentOutputs(compiler, resources.stage_outputs);
                 break;
             case shaderc_compute_shader:
-                LOGI("Compute shader processing - special handling may be required");
+                // LOGI("Compute shader processing - special handling may be required");
                 break;
             default:
                 LOGI("Unsupported shader kind %d for resource processing", kind);
