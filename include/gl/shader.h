@@ -1,37 +1,11 @@
 #pragma once
 
-#include "es/utils.h"
 #include "shaderc/shaderc.hpp"
 #include "spirv_glsl.hpp"
 #include "utils/env.h"
 #include "utils/log.h"
 
 #include <stdexcept>
-
-inline void autoAssignLocations(spirv_cross::CompilerGLSL& compiler) {
-    auto resources = compiler.get_shader_resources();
-
-    // Assign locations for vertex shader inputs
-    int location = 0;
-    for (const auto& input : resources.stage_inputs) {
-        compiler.set_decoration(input.id, spv::DecorationLocation, location++);
-    }
-
-    // Assign locations for fragment shader inputs (varyings)
-    location = 0;
-    for (const auto& output : resources.stage_outputs) {
-        compiler.set_decoration(output.id, spv::DecorationLocation, location++);
-    }
-
-    int binding = 0;
-    // Assign bindings for uniforms
-    for (const auto& uniform : resources.uniform_buffers) {
-        compiler.set_decoration(uniform.id, spv::DecorationBinding, binding++);
-    }
-    for (const auto& sampler : resources.sampled_images) {
-        compiler.set_decoration(sampler.id, spv::DecorationBinding, binding++);
-    }
-}
 
 inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
     LOGI("Upgrading shader to GLSL 330");
@@ -59,18 +33,14 @@ inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
 
     spirv_cross::CompilerGLSL glslCompiler({ module.cbegin(), module.cend() });
     spirv_cross::CompilerGLSL::Options glslOptions;
-    glslOptions.version = ESUtils::shadingVersion;
-    glslOptions.es = true;
+    glslOptions.version = 330;
+    glslOptions.es = false;
     glslOptions.vulkan_semantics = false;
     glslOptions.enable_420pack_extension = false;
     glslOptions.force_flattened_io_blocks = true;
     glslOptions.enable_storage_image_qualifier_deduction = false;
-
     glslCompiler.set_common_options(glslOptions);
-    glslCompiler.add_header_line("precision mediump float;");
-    glslCompiler.add_header_line("precision highp int;");
-
-    autoAssignLocations(glslCompiler);
+    
     src = glslCompiler.compile();
 
     if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
