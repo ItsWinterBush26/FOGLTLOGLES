@@ -19,9 +19,10 @@ void FOGLTLOGLES::registerFunction(std::string name, FunctionPtr function) {
 }
 
 FunctionPtr FOGLTLOGLES::getFunctionAddress(std::string name) {
+    if (name.empty()) return nullptr; // fast path
     if (auto it = registeredFunctions.find(name);
         it != registeredFunctions.end()) {
-        LOGI("Found function named %s", name.c_str());
+        // LOGI("Found function named %s", name.c_str());
         return it->second;
     }
 
