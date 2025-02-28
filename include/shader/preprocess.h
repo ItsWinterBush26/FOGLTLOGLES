@@ -122,6 +122,8 @@ private:
             std::string name = compiler.get_name(varying.id);
             if (varyingLocationMap.find(name) == varyingLocationMap.end()) {
                 varyingLocationMap[name] = nextAvailableVaryingLocation++;
+            } else {
+                LOGI("VS output '%s' is already present in the map... Weird", name.c_str());
             }
             int location = varyingLocationMap[name];
             compiler.set_decoration(varying.id, spv::DecorationLocation, location);
