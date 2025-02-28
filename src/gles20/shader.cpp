@@ -64,8 +64,8 @@ void OV_glAttachShader(GLuint program, GLuint shader) {
             if (tempIt != tempConverters.end()) {
                 // Transfer any source from temp converter to program converter
                 auto& tempConverter = tempIt->second;
-                ShaderKind kind = getKindFromShader(shader);
-                std::string source = tempConverter.getOriginalSource(kind);
+                shaderc_shader_kind kind = getKindFromShader(shader);
+                std::string source = tempConverter.getShaderSource(kind);
                 if (!source.empty()) {
                     programIt->second.attachSource(kind, source);
                     LOGI("OV_glAttachShader: Transferred source from temp converter to program %u for shader %u", 
@@ -88,7 +88,7 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* source
 
     std::string fullSource;
     combineSources(count, sources, length, fullSource);
-    ShaderKind kind = getKindFromShader(shader);
+    shaderc_shader_kind kind = getKindFromShader(shader);
 
     ShaderConverter* converter = nullptr;
     {
