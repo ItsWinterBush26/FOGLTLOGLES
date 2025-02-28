@@ -167,6 +167,11 @@ public:
     void processSPVBytecode(spirv_cross::CompilerGLSL &compiler, shaderc_shader_kind kind) {
         LOGI("Processing SPIRV bytecode for %s", getKindStringFromKind(kind));
 
+        if (kind == shaderc_fragment_shader) {
+            // Reserve 100 locations for vertex shader uniforms.
+            nextAvailableUniformLocation = 100;
+        }
+
         spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
         // Process uniform samplers (textures)
