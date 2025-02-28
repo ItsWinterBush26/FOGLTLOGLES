@@ -7,38 +7,74 @@
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
+#include <mutex>
 
 GLuint OV_glCreateProgram();
-void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* string, const GLint* length);
+void OV_glAttachShader(GLuint program, GLuint shader);
+void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* sources, const GLint* length);
 void OV_glLinkProgram(GLuint program);
 void OV_glDeleteProgram(GLuint program);
+void OV_glDeleteShader(GLuint shader);
 
 void GLES20::registerShaderOverrides() {
     REGISTEROV(glCreateProgram);
+    REGISTEROV(glAttachShader);
     REGISTEROV(glShaderSource);
     REGISTEROV(glLinkProgram);
     REGISTEROV(glDeleteProgram);
+    REGISTEROV(glDeleteShader);
 }
 
-std::unordered_map<GLuint, ShaderConverter> converters;
-ShaderConverter currentConverter;
+namespace {
+    std::unordered_map<GLuint, ShaderConverter> programConverters;
+    std::unordered_map<GLuint, ShaderConverter*> shaderConverters;
+    std::mutex convertersMutex;
+}
 
 GLuint OV_glCreateProgram() {
-    currentConverter = ShaderConverter(glCreateProgram());
+    GLuint program = glCreateProgram();
+    ShaderConverter converter(program);
+    {
+        std::lock_guard<std::mutex> lock(convertersMutex);
+        programConverters[program] = converter;
+    }
+    return program;
+}
 
-    converters[currentConverter.getProgram()] = currentConverter;
-    return currentConverter.getProgram();
+void OV_glAttachShader(GLuint program, GLuint shader) {
+    glAttachShader(program, shader);
+    {
+        std::lock_guard<std::mutex> lock(convertersMutex);
+        auto it = programConverters.find(program);
+        if (it != programConverters.end()) {
+            shaderConverters[shader] = &it->second;
+        } else {
+            LOGI("OV_glAttachShader: Program %u not found for shader %u", program, shader);
+        }
+    }
 }
 
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* sources, const GLint* length) {
-    LOGI("glShaderSource %s", getKindStringFromKind(getKindFromShader(shader)));
+    LOGI("OV_glShaderSource for shader %u", shader);
 
     std::string fullSource;
     combineSources(count, sources, length, fullSource);
-    
-    currentConverter.attachSource(getKindFromShader(shader), fullSource);
-    auto source = currentConverter.getShaderSource(getKindFromShader(shader));
-    const GLchar* cSource = source.c_str();
+
+    ShaderConverter* converter = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(convertersMutex);
+        auto it = shaderConverters.find(shader);
+        if (it != shaderConverters.end()) {
+            converter = it->second;
+        }
+    }
+    if (!converter) {
+        throw std::runtime_error("OV_glShaderSource: Converter not found for shader");
+    }
+
+    converter->attachSource(getKindFromShader(shader), fullSource);
+    std::string convertedSource = converter->getShaderSource(getKindFromShader(shader));
+    const GLchar* cSource = convertedSource.c_str();
 
     glShaderSource(shader, 1, &cSource, nullptr);
 }
@@ -46,28 +82,50 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* source
 void OV_glLinkProgram(GLuint program) {
     glLinkProgram(program);
 
-    ShaderConverter converter = converters[program];
+    ShaderConverter converter(0);
+    {
+        std::lock_guard<std::mutex> lock(convertersMutex);
+        auto it = programConverters.find(program);
+        if (it == programConverters.end()) {
+            throw std::runtime_error("OV_glLinkProgram: Converter not found for program");
+        }
+        converter = it->second;
+    }
 
     GLint success = 0;
     glGetProgramiv(program, GL_LINK_STATUS, &success);
     if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1" && success != GL_TRUE) {
         GLchar bufLog[4096] = { 0 };
         GLint size = 0;
-
         glGetProgramInfoLog(program, 4096, &size, bufLog);
-
-        LOGI("Link error: %s", bufLog);
-
-        throw std::runtime_error("Failed to link program!");
+        LOGI("OV_glLinkProgram Link error: %s", bufLog);
+        throw std::runtime_error("OV_glLinkProgram: Failed to link program!");
     }
-
-    // converter.finish();
 }
 
 void OV_glDeleteProgram(GLuint program) {
     glDeleteProgram(program);
+    {
+        std::lock_guard<std::mutex> lock(convertersMutex);
+        auto it = programConverters.find(program);
+        if (it != programConverters.end()) {
+            it->second.finish();
+            programConverters.erase(it);
+        } else {
+            LOGI("OV_glDeleteProgram: Program %u not tracked", program);
+        }
+    }
+}
 
-    ShaderConverter converter = converters[program];
-    converter.finish();
-    converters.erase(program);
+void OV_glDeleteShader(GLuint shader) {
+    glDeleteShader(shader);
+    {
+        std::lock_guard<std::mutex> lock(convertersMutex);
+        auto it = shaderConverters.find(shader);
+        if (it != shaderConverters.end()) {
+            shaderConverters.erase(it);
+        } else {
+            LOGI("OV_glDeleteShader: Shader %u not tracked", shader);
+        }
+    }
 }
