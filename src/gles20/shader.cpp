@@ -73,6 +73,8 @@ void OV_glGetShaderiv(GLuint shader, GLenum pname, GLint* params) {
             if (wasNoop) {
                 LOGI("It's gaslight time! :devil:");
                 (*params) = GL_TRUE;
+
+                wasNoop = false;
                 return;
             }
         default: break;
