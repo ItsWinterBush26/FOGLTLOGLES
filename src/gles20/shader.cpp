@@ -6,6 +6,7 @@
 #include <GLES2/gl2.h>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 
 GLuint OV_glCreateProgram();
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* string, const GLint* length);
@@ -19,11 +20,14 @@ void GLES20::registerShaderOverrides() {
     REGISTEROV(glDeleteProgram);
 }
 
-ShaderConverter converter;
+std::unordered_map<GLuint, ShaderConverter> converters;
+ShaderConverter currentConverter;
 
 GLuint OV_glCreateProgram() {
-    converter = ShaderConverter(glCreateProgram());
-    return converter.getProgram();
+    currentConverter = ShaderConverter(glCreateProgram());
+
+    converters[currentConverter.getProgram()] = currentConverter;
+    return currentConverter.getProgram();
 }
 
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* sources, const GLint* length) {
@@ -32,8 +36,8 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* source
     std::string fullSource;
     combineSources(count, sources, length, fullSource);
     
-    converter.attachSource(getKindFromShader(shader), fullSource);
-    auto source = converter.getShaderSource(getKindFromShader(shader));
+    currentConverter.attachSource(getKindFromShader(shader), fullSource);
+    auto source = currentConverter.getShaderSource(getKindFromShader(shader));
     const GLchar* cSource = source.c_str();
 
     glShaderSource(shader, 1, &cSource, nullptr);
@@ -41,6 +45,8 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* source
 
 void OV_glLinkProgram(GLuint program) {
     glLinkProgram(program);
+
+    ShaderConverter converter = converters[program];
 
     GLint success = 0;
     glGetProgramiv(program, GL_LINK_STATUS, &success);
@@ -55,13 +61,13 @@ void OV_glLinkProgram(GLuint program) {
         throw std::runtime_error("Failed to link program!");
     }
 
-    converter.finish();
-    converter = ShaderConverter();
+    // converter.finish();
 }
 
 void OV_glDeleteProgram(GLuint program) {
     glDeleteProgram(program);
 
+    ShaderConverter converter = converters[program];
     converter.finish();
-    converter = ShaderConverter();
+    converters.erase(program);
 }
