@@ -7,29 +7,37 @@
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
-#include <mutex>
 
 GLuint OV_glCreateProgram();
+void OV_glShaderSource(GLuint shader, GLint count, const GLchar* const* sources, GLint length);
 void OV_glAttachShader(GLuint program, GLuint shader);
+void OV_glCompileShader(GLuint shader);
 void OV_glLinkProgram(GLuint program);
 void OV_glDeleteProgram(GLuint program);
 
 void GLES20::registerShaderOverrides() {
     REGISTEROV(glCreateProgram);
+    REGISTEROV(glShaderSource);
     REGISTEROV(glAttachShader);
+    REGISTEROV(glCompileShader);
     REGISTEROV(glLinkProgram);
     REGISTEROV(glDeleteProgram);
 }
 
 std::unordered_map<GLuint, ShaderConverter> converters;
+ShaderConverter converter;
 
 GLuint OV_glCreateProgram() {
     GLuint program = glCreateProgram();
-    converters[program] = ShaderConverter(program);
+    LOGI("OV_glCreateProgram: New program %u", program);
+    // converters[program] = ShaderConverter(program);
+    converter = ShaderConverter(program);
     return program;
 }
 
 void OV_glAttachShader(GLuint program, GLuint shader) {
+    LOGI("OV_glAttachShader: Attaching %u (shader) to %u (program)", shader, program);
+    /*
     GLint length = 0;
     glGetShaderiv(shader, GL_SHADER_SOURCE_LENGTH, &length);
 
@@ -43,11 +51,26 @@ void OV_glAttachShader(GLuint program, GLuint shader) {
         std::string realSource = converter.getShaderSource(getKindFromShader(shader));
         const GLchar* newSource = realSource.c_str();
         glShaderSource(shader, 1, &newSource, nullptr);
-    }
+    } */
+
     glAttachShader(program, shader);
 }
 
+void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* sources, const GLint* length) {
+    LOGI("OV_glShaderSource: Shader %u", shader);
+
+    std::string fullSource;
+    combineSources(count, sources, length, fullSource);
+    
+    converter.attachSource(getKindFromShader(shader), fullSource);
+        
+    std::string realSource = converter.getShaderSource(getKindFromShader(shader));
+    const GLchar* newSource = realSource.c_str();
+    glShaderSource(shader, 1, &newSource, nullptr);
+}
+
 void OV_glLinkProgram(GLuint program) {
+    LOGI("OV_glLinkProgram: Linking program %u", program);
     glLinkProgram(program);
 
     GLint success = 0;
@@ -67,8 +90,8 @@ void OV_glDeleteProgram(GLuint program) {
     LOGI("OV_glDeleteProgram: Deleting program %u", program);
     glDeleteProgram(program);
 
-    ShaderConverter converter = converters[program];
+    // ShaderConverter converter = converters[program];
     converter.finish();
-    
-    converters.erase(program);
+    converter = ShaderConverter();
+    // converters.erase(program);
 }
