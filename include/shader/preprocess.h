@@ -22,6 +22,10 @@ private:
     std::unordered_map<std::string, int> attributeLocationMap;
     uint32_t nextAvailableAttributeLocation = 0;
 
+    // Track which shader stages have been processed
+    bool vertexShaderProcessed = false;
+    bool fragmentShaderProcessed = false;
+
     void processSamplerUniforms(
         spirv_cross::CompilerGLSL &compiler,
         const spirv_cross::SmallVector<spirv_cross::Resource> &resources
@@ -132,7 +136,7 @@ private:
         for (auto &varying : resources) {
             std::string name = compiler.get_name(varying.id);
             if (varyingLocationMap.find(name) == varyingLocationMap.end()) {
-                // Warn if a fragment input doesn’t match a vertex output.
+                // Warn if a fragment input doesn't match a vertex output.
                 varyingLocationMap[name] = nextAvailableVaryingLocation++;
                 LOGW("Fragment shader input '%s' not found in vertex outputs", name.c_str());
             }
@@ -158,9 +162,18 @@ public:
     void processSPVBytecode(spirv_cross::CompilerGLSL &compiler, shaderc_shader_kind kind) {
         LOGI("Processing SPIRV bytecode for %s", getKindStringFromKind(kind));
 
+        // Set uniform location base based on shader type
         if (kind == shaderc_fragment_shader) {
-            // Reserve 100 locations for vertex shader uniforms.
-            nextAvailableUniformLocation = 100;
+            if (!fragmentShaderProcessed) {
+                nextAvailableUniformLocation = 100;
+                fragmentShaderProcessed = true;
+            }
+        } else if (kind == shaderc_vertex_shader) {
+            if (!vertexShaderProcessed) {
+                // Keep or reset to 0 for vertex shader
+                nextAvailableUniformLocation = 0;
+                vertexShaderProcessed = true;
+            }
         }
 
         spirv_cross::ShaderResources resources = compiler.get_shader_resources();
