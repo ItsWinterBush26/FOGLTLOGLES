@@ -66,10 +66,11 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* source
         auto it = shaderConverters.find(shader);
         if (it != shaderConverters.end()) {
             converter = it->second;
+        } else {
+            LOGI("OV_glShaderSource: Shader %u not attached yet, creating temporary converter", shader);
+            static std::unordered_map<GLuint, ShaderConverter> tempConverters;
+            converter = &tempConverters[shader];
         }
-    }
-    if (!converter) {
-        throw std::runtime_error("OV_glShaderSource: Converter not found for shader");
     }
 
     converter->attachSource(getKindFromShader(shader), fullSource);
