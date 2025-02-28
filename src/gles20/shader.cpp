@@ -44,8 +44,7 @@ void OV_glLinkProgram(GLuint program) {
 
     GLint success = 0;
     glGetProgramiv(program, GL_LINK_STATUS, &success);
-    if (success != GL_TRUE) {
-        
+    if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1" && success != GL_TRUE) {
         GLchar bufLog[4096] = { 0 };
         GLint size = 0;
 
