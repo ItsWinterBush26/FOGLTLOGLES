@@ -22,7 +22,6 @@ private:
     std::unordered_map<std::string, int> attributeLocationMap;
     uint32_t nextAvailableAttributeLocation = 0;
 
-    // Process uniform samplers (textures)
     void processSamplerUniforms(
         spirv_cross::CompilerGLSL &compiler,
         const spirv_cross::SmallVector<spirv_cross::Resource> &resources
@@ -39,8 +38,6 @@ private:
         }
     }
 
-    // Process uniform buffers and standalone uniforms within the uniform_buffers resource.
-    // Standalone uniforms (declared outside of a block) will not have the Block decoration.
     void processUniformBuffersAndStandaloneUniforms(
         spirv_cross::CompilerGLSL &compiler,
         const spirv_cross::SmallVector<spirv_cross::Resource> &resources
@@ -83,8 +80,6 @@ private:
         }
     }
 
-    // Process plain uniforms that are declared outside of any block.
-    // In recent SPIRV‑Cross versions these appear in gl_plain_uniforms.
     void processPlainUniforms(
         spirv_cross::CompilerGLSL &compiler,
         const spirv_cross::SmallVector<spirv_cross::Resource> &resources
@@ -100,7 +95,6 @@ private:
         }
     }
 
-    // Process vertex attributes
     void processAttributes(
         spirv_cross::CompilerGLSL &compiler,
         const spirv_cross::SmallVector<spirv_cross::Resource> &resources
@@ -116,7 +110,6 @@ private:
         }
     }
 
-    // Process vertex shader outputs (varyings)
     void processVertexOutputs(
         spirv_cross::CompilerGLSL &compiler,
         const spirv_cross::SmallVector<spirv_cross::Resource> &resources
@@ -132,7 +125,6 @@ private:
         }
     }
 
-    // Process fragment shader inputs (varyings)
     void processFragmentInputs(
         spirv_cross::CompilerGLSL &compiler,
         const spirv_cross::SmallVector<spirv_cross::Resource> &resources
@@ -150,7 +142,6 @@ private:
         }
     }
 
-    // Process fragment shader outputs
     void processFragmentOutputs(
         spirv_cross::CompilerGLSL &compiler,
         const spirv_cross::SmallVector<spirv_cross::Resource> &resources
@@ -185,7 +176,6 @@ public:
         // Process uniforms declared outside any block using gl_plain_uniforms
         processPlainUniforms(compiler, resources.gl_plain_uniforms);
 
-        // Process shader stage-specific resources
         switch (kind) {
             case shaderc_vertex_shader:
                 processAttributes(compiler, resources.stage_inputs);
@@ -207,16 +197,5 @@ public:
              nextAvailableUniformLocation, 
              nextAvailableVaryingLocation,
              nextAvailableAttributeLocation);
-    }
-
-    // Reset the preprocessor state.
-    void reset() {
-        uniformLocationMap.clear();
-        varyingLocationMap.clear();
-        attributeLocationMap.clear();
-        nextAvailableUniformLocation = 0;
-        nextAvailableVaryingLocation = 0;
-        nextAvailableAttributeLocation = 0;
-        LOGI("Preprocessor state reset");
     }
 };
