@@ -16,7 +16,9 @@
 class ShaderConverter {
 public:
     ShaderConverter() { }
-    ShaderConverter(GLuint program) : program(program) {}
+    ShaderConverter(GLuint program) : program(program) {
+        LOGI("New program created so new ShaderConverter created");
+    }
 
     void attachSource(shaderc_shader_kind kind, std::string source) {
         LOGI("Doing magic on a %s", getKindStringFromKind(kind));

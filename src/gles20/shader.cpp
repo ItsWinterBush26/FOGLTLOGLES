@@ -10,11 +10,13 @@
 GLuint OV_glCreateProgram();
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* string, const GLint* length);
 void OV_glLinkProgram(GLuint program);
+void OV_glDeleteProgram(GLuint program);
 
 void GLES20::registerShaderOverrides() {
     REGISTEROV(glCreateProgram);
     REGISTEROV(glShaderSource);
     REGISTEROV(glLinkProgram);
+    REGISTEROV(glDeleteProgram);
 }
 
 ShaderConverter converter;
@@ -25,6 +27,8 @@ GLuint OV_glCreateProgram() {
 }
 
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar *const* sources, const GLint* length) {
+    LOGI("glShaderSource %s", getKindStringFromKind(getKindFromShader(shader)));
+
     std::string fullSource;
     combineSources(count, sources, length, fullSource);
     
@@ -51,6 +55,13 @@ void OV_glLinkProgram(GLuint program) {
 
         throw std::runtime_error("Failed to link program!");
     }
+
+    converter.finish();
+    converter = ShaderConverter();
+}
+
+void OV_glDeleteProgram(GLuint program) {
+    glDeleteProgram(program);
 
     converter.finish();
     converter = ShaderConverter();
