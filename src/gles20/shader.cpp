@@ -14,6 +14,7 @@ void OV_glAttachShader(GLuint program, GLuint shader);
 void OV_glCompileShader(GLuint shader);
 void OV_glLinkProgram(GLuint program);
 void OV_glDeleteProgram(GLuint program);
+void OV_glGetShaderiv(GLuint shader, GLenum pname, GLint* params);
 
 void GLES20::registerShaderOverrides() {
     REGISTEROV(glCreateProgram);
@@ -22,16 +23,18 @@ void GLES20::registerShaderOverrides() {
     REGISTEROV(glCompileShader);
     REGISTEROV(glLinkProgram);
     REGISTEROV(glDeleteProgram);
+    REGISTEROV(glGetShaderiv);
 }
 
 std::unordered_map<GLuint, ShaderConverter> converters;
 ShaderConverter converter;
+bool wasNoop;
 
 GLuint OV_glCreateProgram() {
     GLuint program = glCreateProgram();
     LOGI("OV_glCreateProgram: New program %u", program);
-    // converters[program] = ShaderConverter(program);
-    converter = ShaderConverter(program);
+    converters[program] = ShaderConverter(program);
+    // converter = ShaderConverter(program);
     return program;
 }
 
@@ -60,6 +63,22 @@ void OV_glAttachShader(GLuint program, GLuint shader) {
 void OV_glCompileShader(GLuint shader) {
     LOGI("OV_glCompileShader: Shader %u", shader);
     LOGI("NOOP :>");
+    wasNoop = true;
+}
+
+void OV_glGetShaderiv(GLuint shader, GLenum pname, GLint* params) {
+    LOGI("OV_getShaderiv: Shader %u", shader);
+    switch (pname) {
+        case GL_COMPILE_STATUS:
+            if (wasNoop) {
+                LOGI("It's gaslight time! :devil:");
+                (*params) = GL_TRUE;
+                return;
+            }
+        default: break;
+    }
+
+    glGetShaderiv(shader, pname, params);
 }
 
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* sources, const GLint* length) {
@@ -97,8 +116,8 @@ void OV_glDeleteProgram(GLuint program) {
     LOGI("OV_glDeleteProgram: Deleting program %u", program);
     glDeleteProgram(program);
 
-    // ShaderConverter converter = converters[program];
+    ShaderConverter converter = converters[program];
     converter.finish();
-    converter = ShaderConverter();
-    // converters.erase(program);
+    // converter = ShaderConverter();
+    converters.erase(program);
 }
