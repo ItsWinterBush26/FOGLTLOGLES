@@ -26,9 +26,9 @@ void GLES20::registerShaderOverrides() {
     REGISTEROV(glGetShaderiv);
 }
 
-std::unordered_map<GLuint, ShaderConverter> converters;
-ShaderConverter converter;
-bool wasNoop;
+inline std::unordered_map<GLuint, ShaderConverter> converters;
+// ShaderConverter converter;
+inline bool wasNoop;
 
 GLuint OV_glCreateProgram() {
     GLuint program = glCreateProgram();
