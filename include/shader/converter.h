@@ -48,7 +48,7 @@ public:
     }
 
     void finish() {
-        LOGI("FINISH!");
+        LOGI("Linked!");
     }
 
     GLuint getProgram() { return program; }
@@ -63,8 +63,8 @@ public:
     }
 
 private:
-    GLuint program;
     Preprocessor preprocessor = Preprocessor();
+    GLuint program;
 
     std::string vertexSource;
     std::string fragmentSource;
@@ -101,12 +101,6 @@ private:
 
         spirv_cross::CompilerGLSL compiler({ module.cbegin(), module.cend() });
         compiler.set_common_options(options);
-
-        // Whatever pays the bills aah fix
-        /* compiler.add_header_line("precision highp float;");
-        compiler.add_header_line("precision highp int;");
-        compiler.add_header_line("precision highp sampler2D;");
-        compiler.add_header_line("precision highp mat4;"); */
 
         preprocessor.processSPVBytecode(compiler, kind);
 
