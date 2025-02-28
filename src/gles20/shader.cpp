@@ -9,7 +9,7 @@
 #include <unordered_map>
 
 GLuint OV_glCreateProgram();
-void OV_glShaderSource(GLuint shader, GLint count, const GLchar* const* sources, GLint length);
+void OV_glShaderSource(GLuint shader, GLint count, const GLchar* const* sources, const GLint* length);
 void OV_glAttachShader(GLuint program, GLuint shader);
 void OV_glCompileShader(GLuint shader);
 void OV_glLinkProgram(GLuint program);
@@ -37,7 +37,7 @@ GLuint OV_glCreateProgram() {
 
 void OV_glAttachShader(GLuint program, GLuint shader) {
     LOGI("OV_glAttachShader: Attaching %u (shader) to %u (program)", shader, program);
-    /*
+    
     GLint length = 0;
     glGetShaderiv(shader, GL_SHADER_SOURCE_LENGTH, &length);
 
@@ -51,22 +51,29 @@ void OV_glAttachShader(GLuint program, GLuint shader) {
         std::string realSource = converter.getShaderSource(getKindFromShader(shader));
         const GLchar* newSource = realSource.c_str();
         glShaderSource(shader, 1, &newSource, nullptr);
-    } */
+        glCompileShader(shader);
+    }
 
     glAttachShader(program, shader);
 }
 
+void OV_glCompileShader(GLuint shader) {
+    LOGI("OV_glCompileShader: Shader %u", shader);
+    LOGI("NOOP :>");
+}
+
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* sources, const GLint* length) {
     LOGI("OV_glShaderSource: Shader %u", shader);
+    LOGI("Passtrough");
 
-    std::string fullSource;
+    /* std::string fullSource;
     combineSources(count, sources, length, fullSource);
     
     converter.attachSource(getKindFromShader(shader), fullSource);
         
     std::string realSource = converter.getShaderSource(getKindFromShader(shader));
-    const GLchar* newSource = realSource.c_str();
-    glShaderSource(shader, 1, &newSource, nullptr);
+    const GLchar* newSource = realSource.c_str(); */
+    glShaderSource(shader, 1, sources, nullptr);
 }
 
 void OV_glLinkProgram(GLuint program) {
