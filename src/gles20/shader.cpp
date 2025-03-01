@@ -9,6 +9,8 @@
 #include <string>
 #include <unordered_map>
 
+#define CHECKS
+
 GLuint OV_glCreateProgram();
 void OV_glShaderSource(GLuint shader, GLint count, const GLchar* const* sources, const GLint* length);
 void OV_glAttachShader(GLuint program, GLuint shader);
@@ -28,14 +30,13 @@ void GLES20::registerShaderOverrides() {
 }
 
 inline std::unordered_map<GLuint, std::shared_ptr<ShaderConverter>> converters;
-// ShaderConverter converter;
 inline bool wasNoop;
 
 GLuint OV_glCreateProgram() {
     GLuint program = glCreateProgram();
     LOGI("OV_glCreateProgram: New program %u", program);
+    // remove existing key and replace with new shaderconverter when?
     converters.insert({ program, std::make_shared<ShaderConverter>(program) });
-    // converter = ShaderConverter(program);
     return program;
 }
 
@@ -45,7 +46,7 @@ void OV_glAttachShader(GLuint program, GLuint shader) {
     GLint length = 0;
     glGetShaderiv(shader, GL_SHADER_SOURCE_LENGTH, &length);
 
-    if (length > 0) {
+    if (length != 0) {
         std::vector<GLchar> source(length);
         glGetShaderSource(shader, length, nullptr, source.data());
     
@@ -56,9 +57,10 @@ void OV_glAttachShader(GLuint program, GLuint shader) {
         const GLchar* newSource = realSource.c_str();
         glShaderSource(shader, 1, &newSource, nullptr);
         glCompileShader(shader);
+        glAttachShader(program, shader);
     }
 
-    glAttachShader(program, shader);
+    throw std::runtime_error("Cannot attach shader to program with a shader that has no source!");
 }
 
 void OV_glCompileShader(GLuint shader) {
@@ -84,17 +86,10 @@ void OV_glGetShaderiv(GLuint shader, GLenum pname, GLint* params) {
     glGetShaderiv(shader, pname, params);
 }
 
+// Lowkey just remove this
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* sources, const GLint* length) {
     LOGI("OV_glShaderSource: Shader %u", shader);
     LOGI("Passtrough");
-
-    /* std::string fullSource;
-    combineSources(count, sources, length, fullSource);
-    
-    converter.attachSource(getKindFromShader(shader), fullSource);
-        
-    std::string realSource = converter.getShaderSource(getKindFromShader(shader));
-    const GLchar* newSource = realSource.c_str(); */
     glShaderSource(shader, 1, sources, nullptr);
 }
 
@@ -102,6 +97,7 @@ void OV_glLinkProgram(GLuint program) {
     LOGI("OV_glLinkProgram: Linking program %u", program);
     glLinkProgram(program);
 
+    #ifdef CHECKS
     GLint success = 0;
     glGetProgramiv(program, GL_LINK_STATUS, &success);
     if (success != GL_TRUE && getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
@@ -113,6 +109,7 @@ void OV_glLinkProgram(GLuint program) {
             throw std::runtime_error("Failed to link program!");
         }
     }
+    #endif
 
     LOGI("Linked! Removing from converter map.");
     std::shared_ptr<ShaderConverter> converter = converters.at(program);
@@ -124,7 +121,9 @@ void OV_glDeleteProgram(GLuint program) {
     LOGI("OV_glDeleteProgram: Deleting program %u", program);
     glDeleteProgram(program);
 
-    std::shared_ptr<ShaderConverter> converter = converters.at(program);
-    converter->finish();
-    converters.erase(program);
+    if (converters.count(program) == 1) {
+        std::shared_ptr<ShaderConverter> converter = converters.at(program);
+        converter->finish();
+        converters.erase(program);
+    }
 }
