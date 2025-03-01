@@ -33,7 +33,7 @@ inline bool wasNoop;
 GLuint OV_glCreateProgram() {
     GLuint program = glCreateProgram();
     LOGI("OV_glCreateProgram: New program %u", program);
-    converters[program] = ShaderConverter(program);
+    converters.insert({ program, ShaderConverter(program) });
     // converter = ShaderConverter(program);
     return program;
 }
@@ -48,7 +48,7 @@ void OV_glAttachShader(GLuint program, GLuint shader) {
         std::vector<GLchar> source(length);
         glGetShaderSource(shader, length, nullptr, source.data());
     
-        ShaderConverter converter = converters[program];
+        ShaderConverter converter = converters.at(program);
         converter.attachSource(getKindFromShader(shader), std::string(source.data()));
         
         std::string realSource = converter.getShaderSource(getKindFromShader(shader));
@@ -118,7 +118,7 @@ void OV_glDeleteProgram(GLuint program) {
     LOGI("OV_glDeleteProgram: Deleting program %u", program);
     glDeleteProgram(program);
 
-    ShaderConverter converter = converters[program];
+    ShaderConverter converter = converters.at(program);
     converter.finish();
     // converter = ShaderConverter();
     converters.erase(program);
