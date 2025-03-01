@@ -23,6 +23,8 @@ inline shaderc::CompileOptions generateESSL2SPVOptions(int esslVersion) {
     options.SetSourceLanguage(shaderc_source_language_glsl);
     options.SetForcedVersionProfile(esslVersion, shaderc_profile_es);
     options.SetOptimizationLevel(shaderc_optimization_level_performance);
+    options.SetVulkanRulesRelaxed(true);
+    options.SetWarningsAsErrors(false);
 
     options.SetAutoMapLocations(true);
 
