@@ -113,6 +113,11 @@ void OV_glLinkProgram(GLuint program) {
             throw std::runtime_error("Failed to link program!");
         }
     }
+
+    LOGI("Linked! Removing from converter map.");
+    std::shared_ptr<ShaderConverter> converter = converters.at(program);
+    converter->finish();
+    converters.erase(program);
 }
 
 void OV_glDeleteProgram(GLuint program) {
@@ -121,12 +126,5 @@ void OV_glDeleteProgram(GLuint program) {
 
     std::shared_ptr<ShaderConverter> converter = converters.at(program);
     converter->finish();
-    // converter = ShaderConverter();
     converters.erase(program);
-}
-
-__attribute__((__destructor__(0)))
-void destroy() {
-    LOGI("Erasing shader converters!");
-    converters.erase(converters.begin(), converters.end());
 }
