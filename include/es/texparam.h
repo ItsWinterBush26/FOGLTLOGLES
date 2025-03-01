@@ -1,8 +1,10 @@
 #pragma once
 
 #include <GLES3/gl3.h>
+#include <GLES2/gl2ext.h>
 
 #include "gl/header.h"
+#include "gl/glext.h"
 
 inline void selectProperTexParamf(GLenum target, GLenum& pname, GLfloat& param) {
     switch (pname) {
@@ -39,7 +41,6 @@ inline void selectProperTexParami(GLenum target, GLenum& pname, GLint& param) {
     switch (pname) {
         case GL_TEXTURE_WRAP_S:
         case GL_TEXTURE_WRAP_T:
-        case GL_TEXTURE_WRAP_R:
             if (target == GL_TEXTURE_EXTERNAL_OES && param != GL_CLAMP_TO_EDGE) {
                 param = GL_CLAMP_TO_EDGE;
             }

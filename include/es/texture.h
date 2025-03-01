@@ -3,6 +3,7 @@
 #include <GLES2/gl2.h>
 
 #include "gl/header.h"
+#include "gl/glext.h"
 
 inline void selectProperTexType(GLint internalFormat, GLenum& type) {
     switch (internalFormat) {
