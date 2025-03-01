@@ -49,7 +49,7 @@ public:
     }
 
     void finish() {
-        LOGI("Program destroyed!");
+        LOGI("Converter destroyed!");
     }
 
     GLuint getProgram() { return program; }
@@ -71,8 +71,6 @@ private:
     std::string fragmentSource;
 
     shaderc::SpvCompilationResult compileToSPV(shaderc_shader_kind kind, std::string& source, bool& isVulkanSPV) {
-        if (source.empty()) return shaderc::SpvCompilationResult();
-
         int shaderVersion = 0;
         std::string shaderProfile = "";
         if (!getShaderVersion(source, shaderVersion, shaderProfile)) {
@@ -103,7 +101,7 @@ private:
 
         if (result.GetCompilationStatus() != shaderc_compilation_status_success) {
             LOGI("Failed to compile shader: %s", result.GetErrorMessage().c_str());
-            throw new std::runtime_error("Shader compilation failed!");
+            throw std::runtime_error("Shader compilation failed!");
         }
 
         return result;

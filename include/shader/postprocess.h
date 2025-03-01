@@ -33,9 +33,9 @@ private:
         for (auto &resource : resources) {
             std::string name = compiler.get_name(resource.id);
             if (uniformLocationMap.find(name) == uniformLocationMap.end()) {
-                uniformLocationMap[name] = nextAvailableUniformLocation++;
+                uniformLocationMap.insert({ name, nextAvailableUniformLocation++ });
             }
-            int location = uniformLocationMap[name];
+            int location = uniformLocationMap.at(name);
             compiler.set_decoration(resource.id, spv::DecorationLocation, location);
             compiler.set_decoration(resource.id, spv::DecorationBinding, location);
             LOGI("Sampler '%s' set to location/binding %d", name.c_str(), location);
@@ -52,9 +52,9 @@ private:
                 // Process as a true uniform block (UBO)
                 std::string uboName = compiler.get_name(ubo.id);
                 if (uniformLocationMap.find(uboName) == uniformLocationMap.end()) {
-                    uniformLocationMap[uboName] = nextAvailableUniformLocation++;
+                    uniformLocationMap.insert({ uboName, nextAvailableUniformLocation++ });
                 }
-                int uboBinding = uniformLocationMap[uboName];
+                int uboBinding = uniformLocationMap.at(uboName);
                 compiler.set_decoration(ubo.id, spv::DecorationBinding, uboBinding);
                 LOGI("UBO '%s' set to binding %d", uboName.c_str(), uboBinding);
                 
@@ -65,7 +65,7 @@ private:
                     std::string memberName = compiler.get_member_name(ubo.base_type_id, i);
                     std::string fullName = uboName + "." + memberName;
                     if (uniformLocationMap.find(fullName) == uniformLocationMap.end()) {
-                        uniformLocationMap[fullName] = nextAvailableUniformLocation++;
+                        uniformLocationMap.insert({ fullName, nextAvailableUniformLocation++ });
                     }
                     LOGI("UBO member '%s' tracked (offset %u)",
                          fullName.c_str(),
@@ -75,9 +75,9 @@ private:
                 // This is a standalone uniform that happens to be in the uniform_buffers group.
                 std::string name = compiler.get_name(ubo.id);
                 if (uniformLocationMap.find(name) == uniformLocationMap.end()) {
-                    uniformLocationMap[name] = nextAvailableUniformLocation++;
+                    uniformLocationMap.insert({ name, nextAvailableUniformLocation++ });
                 }
-                int location = uniformLocationMap[name];
+                int location = uniformLocationMap.at(name);
                 compiler.set_decoration(ubo.id, spv::DecorationLocation, location);
                 LOGI("Standalone Uniform '%s' set to location %d", name.c_str(), location);
             }
@@ -98,9 +98,9 @@ private:
             }
             
             if (uniformLocationMap.find(name) == uniformLocationMap.end()) {
-                uniformLocationMap[name] = nextAvailableUniformLocation++;
+                uniformLocationMap.insert({ name, nextAvailableUniformLocation++ });
             }
-            int location = uniformLocationMap[name];
+            int location = uniformLocationMap.at(name);
             compiler.set_decoration(uniform.id, spv::DecorationLocation, location);
             LOGI("Plain Uniform '%s' set to location %d", name.c_str(), location);
         }
@@ -113,9 +113,9 @@ private:
         for (auto &attr : resources) {
             std::string name = compiler.get_name(attr.id);
             if (attributeLocationMap.find(name) == attributeLocationMap.end()) {
-                attributeLocationMap[name] = nextAvailableAttributeLocation++;
+                attributeLocationMap.insert({ name, nextAvailableAttributeLocation++ });
             }
-            int location = attributeLocationMap[name];
+            int location = attributeLocationMap.at(name);
             compiler.set_decoration(attr.id, spv::DecorationLocation, location);
             LOGI("Attribute '%s' set to location %d", name.c_str(), location);
         }
@@ -196,6 +196,7 @@ public:
         // Process uniforms declared outside any block using gl_plain_uniforms
         processPlainUniforms(compiler, resources.gl_plain_uniforms);
 
+        // Process shader things
         switch (kind) {
             case shaderc_vertex_shader:
                 processAttributes(compiler, resources.stage_inputs);

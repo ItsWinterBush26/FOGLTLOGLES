@@ -123,7 +123,7 @@ void OV_glDeleteProgram(GLuint program) {
     LOGI("OV_glDeleteProgram: Deleting program %u", program);
     glDeleteProgram(program);
 
-    if (converters.count(program) == 1) {
+    if (converters.find(program) != converters.end()) {
         std::shared_ptr<ShaderConverter> converter = converters.at(program);
         converter->finish();
         converters.erase(program);

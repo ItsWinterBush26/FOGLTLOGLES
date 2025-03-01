@@ -6,7 +6,7 @@
 
 #include <unordered_map>
 
-static std::unordered_map<std::string, FunctionPtr> registeredFunctions(256);
+inline std::unordered_map<std::string, FunctionPtr> registeredFunctions(256);
 
 void FOGLTLOGLES::registerFunction(std::string name, FunctionPtr function) {
     if (registeredFunctions.find(name) != registeredFunctions.end()) {
@@ -15,7 +15,7 @@ void FOGLTLOGLES::registerFunction(std::string name, FunctionPtr function) {
         LOGI("Registering %s", name.c_str());
     }
     
-    registeredFunctions[name] = function;
+    registeredFunctions.insert({ name, function });
 }
 
 FunctionPtr FOGLTLOGLES::getFunctionAddress(std::string name) {
