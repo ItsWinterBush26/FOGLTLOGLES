@@ -2,7 +2,7 @@
 
 #include "es/utils.h"
 #include "gl/shader.h"
-#include "preprocess.h"
+#include "postprocess.h"
 #include "shaderc/shaderc.h"
 #include "spirv_glsl.hpp"
 #include "utils.h"
@@ -16,8 +16,8 @@
 class ShaderConverter {
 public:
     ShaderConverter() { }
-    ShaderConverter(GLuint program) : program(program) {
-        LOGI("New program created so new ShaderConverter created");
+    ShaderConverter(GLuint program) : program(program), postProcessor(PostProcessor()) {
+        LOGI("New program created so new ShaderConverter created (and PostProcessor())");
     }
 
     void attachSource(shaderc_shader_kind kind, std::string source) {
@@ -63,7 +63,7 @@ public:
     }
 
 private:
-    Preprocessor preprocessor = Preprocessor();
+    Postprocessor postProcessor;
     GLuint program;
 
     std::string vertexSource;
@@ -102,7 +102,7 @@ private:
         spirv_cross::CompilerGLSL compiler({ module.cbegin(), module.cend() });
         compiler.set_common_options(options);
 
-        preprocessor.processSPVBytecode(compiler, kind);
+        postProcessor.processSPVBytecode(compiler, kind);
 
         target = compiler.compile();
 

@@ -10,7 +10,7 @@
 #include <string>
 #include <unordered_map>
 
-class Preprocessor {
+class PostProcessor {
 private:
     // Maps to track various resource locations
     std::unordered_map<std::string, int> uniformLocationMap;

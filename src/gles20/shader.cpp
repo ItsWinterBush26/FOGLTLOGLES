@@ -4,6 +4,7 @@
 #include "shader/converter.h"
 
 #include <GLES2/gl2.h>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
@@ -26,14 +27,14 @@ void GLES20::registerShaderOverrides() {
     REGISTEROV(glGetShaderiv);
 }
 
-inline std::unordered_map<GLuint, ShaderConverter> converters;
+inline std::unordered_map<GLuint, std::shared_ptr<ShaderConverter>> converters;
 // ShaderConverter converter;
 inline bool wasNoop;
 
 GLuint OV_glCreateProgram() {
     GLuint program = glCreateProgram();
     LOGI("OV_glCreateProgram: New program %u", program);
-    converters.insert({ program, ShaderConverter(program) });
+    converters.insert({ program, std::make_shared<ShaderConverter>(program) });
     // converter = ShaderConverter(program);
     return program;
 }
@@ -48,10 +49,10 @@ void OV_glAttachShader(GLuint program, GLuint shader) {
         std::vector<GLchar> source(length);
         glGetShaderSource(shader, length, nullptr, source.data());
     
-        ShaderConverter& converter = converters.at(program);
-        converter.attachSource(getKindFromShader(shader), std::string(source.data()));
+        std::shared_ptr<ShaderConverter> converter = converters.at(program);
+        converter->attachSource(getKindFromShader(shader), std::string(source.data()));
         
-        std::string realSource = converter.getShaderSource(getKindFromShader(shader));
+        std::string realSource = converter->getShaderSource(getKindFromShader(shader));
         const GLchar* newSource = realSource.c_str();
         glShaderSource(shader, 1, &newSource, nullptr);
         glCompileShader(shader);
@@ -118,8 +119,14 @@ void OV_glDeleteProgram(GLuint program) {
     LOGI("OV_glDeleteProgram: Deleting program %u", program);
     glDeleteProgram(program);
 
-    ShaderConverter& converter = converters.at(program);
-    converter.finish();
+    std::shared_ptr<ShaderConverter> converter = converters.at(program);
+    converter->finish();
     // converter = ShaderConverter();
     converters.erase(program);
+}
+
+__attribute__((__destructor__(0)))
+void destroy() {
+    LOGI("Erasing shader converters!");
+    converters.erase(converters.begin(), converters.end());
 }
