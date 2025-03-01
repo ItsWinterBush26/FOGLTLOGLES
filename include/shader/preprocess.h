@@ -120,12 +120,12 @@ private:
     ) {
         for (auto &varying : resources) {
             std::string name = compiler.get_name(varying.id);
-            if (varyingLocationMap.find(name) == varyingLocationMap.end()) {
-                varyingLocationMap[name] = nextAvailableVaryingLocation++;
+            if (varyingLocationMap.count(name) == 0) {
+                varyingLocationMap.insert({ name, nextAvailableVaryingLocation++ });
             } else {
                 LOGI("VS output '%s' is already present in the map... Weird", name.c_str());
             }
-            int location = varyingLocationMap[name];
+            int location = varyingLocationMap.at(name);
             compiler.set_decoration(varying.id, spv::DecorationLocation, location);
             LOGI("VS output varying '%s' set to location %d", name.c_str(), location);
         }
@@ -137,12 +137,12 @@ private:
     ) {
         for (auto &varying : resources) {
             std::string name = compiler.get_name(varying.id);
-            if (varyingLocationMap.find(name) == varyingLocationMap.end()) {
+            if (varyingLocationMap.count(name) == 0) {
                 // Warn if a fragment input doesn't match a vertex output.
-                varyingLocationMap[name] = nextAvailableVaryingLocation++;
+                varyingLocationMap.insert({ name, nextAvailableVaryingLocation++ });
                 LOGW("Fragment shader input '%s' not found in vertex outputs", name.c_str());
             }
-            int location = varyingLocationMap[name];
+            int location = varyingLocationMap.at(name);
             compiler.set_decoration(varying.id, spv::DecorationLocation, location);
             LOGI("FS input varying '%s' set to location %d", name.c_str(), location);
         }
@@ -177,6 +177,8 @@ public:
                 vertexShaderProcessed = true;
             }
         }
+
+        LOGI("FSP=%d, VSP=%d", fragmentShaderProcessed, vertexShaderProcessed);
 
         spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
