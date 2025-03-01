@@ -63,7 +63,7 @@ public:
     }
 
 private:
-    Postprocessor postProcessor;
+    PostProcessor postProcessor;
     GLuint program;
 
     std::string vertexSource;
