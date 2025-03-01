@@ -1,4 +1,4 @@
-#include "gles30/translation.h"
+#include "gles30/main.h"
 #include "es/texparam.h"
 #include "gl/glext.h"
 #include "main.h"
@@ -8,7 +8,6 @@
 
 void* glMapBuffer(GLenum target, GLenum access);
 void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param);
-
 
 void GLES30::registerTranslatedFunctions() {
     REGISTER(glMapBuffer);

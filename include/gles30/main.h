@@ -10,4 +10,7 @@ namespace GLES30 {
     };
     
     const inline std::shared_ptr<GLES30Wrapper> wrapper = std::make_shared<GLES30Wrapper>();
+
+    void registerMappableFunctions();
+    void registerTranslatedFunctions();
 }

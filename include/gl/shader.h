@@ -20,7 +20,7 @@ inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
 
     options.SetAutoMapLocations(true);
     // options.SetAutoBindUniforms(true);
-    options.SetAutoSampledTextures(true);
+    // options.SetAutoSampledTextures(true);
 
     shaderc::Compiler spirvCompiler;
     shaderc::SpvCompilationResult module = spirvCompiler.CompileGlslToSpv(

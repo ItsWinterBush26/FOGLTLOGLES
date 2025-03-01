@@ -1,4 +1,4 @@
-#include "gles20/mappable.h"
+#include "gles20/main.h"
 #include "main.h"
 
 #include <GLES2/gl2.h>
@@ -11,6 +11,7 @@ void GLES20::registerMappableFunctions() {
     REGISTER(glVertexAttribPointer);
     REGISTER(glEnableVertexAttribArray);
     REGISTER(glCreateShader);
+
     // Removed: Functions overridden in shader.cpp
     // REGISTER(glShaderSource);
     // REGISTER(glCompileShader);
@@ -24,6 +25,7 @@ void GLES20::registerMappableFunctions() {
     REGISTER(glActiveTexture);
     REGISTER(glBindTexture);
     REGISTER(glTexParameteri);
+    
     // Removed: Functions overridden in translation.cpp
     // REGISTER(glTexImage2D);
     // REGISTER(glGetTexLevelParameteriv);
