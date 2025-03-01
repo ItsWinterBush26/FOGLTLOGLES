@@ -58,6 +58,8 @@ void OV_glAttachShader(GLuint program, GLuint shader) {
         glShaderSource(shader, 1, &newSource, nullptr);
         glCompileShader(shader);
         glAttachShader(program, shader);
+
+        return;
     }
 
     throw std::runtime_error("Cannot attach shader to program with a shader that has no source!");
