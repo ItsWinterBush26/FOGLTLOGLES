@@ -21,7 +21,8 @@ void OV_glGetShaderiv(GLuint shader, GLenum pname, GLint* params);
 
 void GLES20::registerShaderOverrides() {
     REGISTEROV(glCreateProgram);
-    REGISTEROV(glShaderSource);
+    // disable for now
+    // REGISTEROV(glShaderSource);
     REGISTEROV(glAttachShader);
     REGISTEROV(glCompileShader);
     REGISTEROV(glLinkProgram);
@@ -92,7 +93,7 @@ void OV_glGetShaderiv(GLuint shader, GLenum pname, GLint* params) {
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* sources, const GLint* length) {
     LOGI("OV_glShaderSource: Shader %u", shader);
     LOGI("Passtrough");
-    glShaderSource(shader, 1, sources, nullptr);
+    glShaderSource(shader, count, sources, nullptr);
 }
 
 void OV_glLinkProgram(GLuint program) {

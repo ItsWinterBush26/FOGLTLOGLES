@@ -3,8 +3,6 @@
 
 #include <GLES2/gl2.h>
 
-// TODO: texture.cpp shader.cpp separation
-
 void glClearDepth(double d);
 
 void GLES20::registerTranslatedFunctions() {
