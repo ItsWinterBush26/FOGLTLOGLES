@@ -4,6 +4,7 @@
 #include "gl/shader.h"
 #include "postprocess.h"
 #include "shaderc/shaderc.h"
+#include "shaderc/status.h"
 #include "spirv_glsl.hpp"
 #include "utils.h"
 #include "utils/compilers.h"
@@ -41,9 +42,7 @@ public:
     }
 
     void convertAndFix(shaderc_shader_kind kind, std::string& source) {
-        LOGI("GLSL/ESSL -> SPV");
         shaderc::SpvCompilationResult spirv = compileToSPV(kind, source);
-        LOGI("SPV -> ESSL");
         transpileSPV2ESSL(kind, spirv, source);
     }
 
@@ -82,22 +81,34 @@ private:
         shaderc::SpvCompilationResult result;
 
         if (shaderProfile == "es") {
+            LOGI("ESSL %i -> SPV", shaderVersion); // i assume that shaderVersion matches ESUtils::shadingVersion
+
             shaderc::CompileOptions options = generateESSL2SPVOptions(shaderVersion);
             result = compiler.CompileGlslToSpv(source, kind, "esslShader", options);
         } else {
             if (shaderVersion < 330) {
+                LOGI("GLSL %i -> GLSL 330", shaderVersion);
                 upgradeTo330(kind, source);
                 shaderVersion = 330;
             }
 
+            LOGI("GLSL %i -> SPV", shaderVersion);
+
             shaderc::CompileOptions options = generateGLSL2SPVOptions(shaderVersion);
             result = compiler.CompileGlslToSpv(source, kind, "glslShader", options);
+        }
+
+        if (result.GetCompilationStatus() != shaderc_compilation_status_success) {
+            LOGI("Failed to compile shader: %s", result.GetErrorMessage().c_str());
+            throw new std::runtime_error("Shader compilation failed!");
         }
 
         return result;
     }
 
     void transpileSPV2ESSL(shaderc_shader_kind kind, shaderc::SpvCompilationResult& module, std::string& target) {
+        LOGI("SPV -> ESSL %i", ESUtils::shadingVersion);
+
         spirv_cross::CompilerGLSL::Options options = generateSPV2ESSLOptions(ESUtils::shadingVersion);
 
         spirv_cross::CompilerGLSL compiler({ module.cbegin(), module.cend() });
