@@ -27,7 +27,7 @@ inline shaderc::CompileOptions generateESSL2SPVOptions(int esslVersion) {
     // options.SetWarningsAsErrors(false);
 
     options.SetAutoMapLocations(true);
-    options.SetAutoBindUniforms(true);
+    // options.SetAutoBindUniforms(true);
 
     return options;
 }
