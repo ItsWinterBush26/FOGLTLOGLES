@@ -167,7 +167,7 @@ public:
         // Set uniform location base based on shader type
         if (kind == shaderc_fragment_shader) {
             if (!fragmentShaderProcessed) {
-                nextAvailableUniformLocation = 100;
+                nextAvailableUniformLocation = 20;
                 fragmentShaderProcessed = true;
             }
         } else if (kind == shaderc_vertex_shader) {
@@ -177,8 +177,6 @@ public:
                 vertexShaderProcessed = true;
             }
         }
-
-        LOGI("FSP=%d, VSP=%d", fragmentShaderProcessed, vertexShaderProcessed);
 
         spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
