@@ -90,6 +90,13 @@ private:
     ) {
         for (auto &uniform : resources) {
             std::string name = compiler.get_name(uniform.id);
+            
+            // Skip uniforms that are actually blocks
+            if (compiler.has_decoration(uniform.id, spv::DecorationBlock)) {
+                LOGI("Skipping plain uniform processing for uniform block '%s'", name.c_str());
+                continue;
+            }
+            
             if (uniformLocationMap.find(name) == uniformLocationMap.end()) {
                 uniformLocationMap[name] = nextAvailableUniformLocation++;
             }
@@ -120,10 +127,8 @@ private:
     ) {
         for (auto &varying : resources) {
             std::string name = compiler.get_name(varying.id);
-            if (varyingLocationMap.count(name) == 0) {
+            if (varyingLocationMap.find(name) == varyingLocationMap.end()) {
                 varyingLocationMap.insert({ name, nextAvailableVaryingLocation++ });
-            } else {
-                LOGI("VS output '%s' is already present in the map... Weird", name.c_str());
             }
             int location = varyingLocationMap.at(name);
             compiler.set_decoration(varying.id, spv::DecorationLocation, location);
@@ -137,7 +142,7 @@ private:
     ) {
         for (auto &varying : resources) {
             std::string name = compiler.get_name(varying.id);
-            if (varyingLocationMap.count(name) == 0) {
+            if (varyingLocationMap.find(name) == varyingLocationMap.end()) {
                 // Warn if a fragment input doesn't match a vertex output.
                 varyingLocationMap.insert({ name, nextAvailableVaryingLocation++ });
                 LOGW("Fragment shader input '%s' not found in vertex outputs", name.c_str());
