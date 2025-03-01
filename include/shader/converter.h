@@ -42,8 +42,10 @@ public:
     }
 
     void convertAndFix(shaderc_shader_kind kind, std::string& source) {
-        shaderc::SpvCompilationResult spirv = compileToSPV(kind, source);
-        transpileSPV2ESSL(kind, spirv, source);
+        bool isVulkanSPV = false;
+
+        shaderc::SpvCompilationResult spirv = compileToSPV(kind, source, isVulkanSPV);
+        transpileSPV2ESSL(kind, spirv, source, isVulkanSPV);
     }
 
     void finish() {
@@ -68,7 +70,7 @@ private:
     std::string vertexSource;
     std::string fragmentSource;
 
-    shaderc::SpvCompilationResult compileToSPV(shaderc_shader_kind kind, std::string& source) {
+    shaderc::SpvCompilationResult compileToSPV(shaderc_shader_kind kind, std::string& source, bool& isVulkanSPV) {
         if (source.empty()) return shaderc::SpvCompilationResult();
 
         int shaderVersion = 0;
@@ -85,6 +87,7 @@ private:
 
             shaderc::CompileOptions options = generateESSL2SPVOptions(shaderVersion);
             result = compiler.CompileGlslToSpv(source, kind, "esslShader", options);
+            isVulkanSPV = true;
         } else {
             if (shaderVersion < 330) {
                 LOGI("GLSL %i -> GLSL 330", shaderVersion);
@@ -106,10 +109,10 @@ private:
         return result;
     }
 
-    void transpileSPV2ESSL(shaderc_shader_kind kind, shaderc::SpvCompilationResult& module, std::string& target) {
+    void transpileSPV2ESSL(shaderc_shader_kind kind, shaderc::SpvCompilationResult& module, std::string& target, bool isVulkanSPV) {
         LOGI("SPV -> ESSL %i", ESUtils::shadingVersion);
 
-        spirv_cross::CompilerGLSL::Options options = generateSPV2ESSLOptions(ESUtils::shadingVersion);
+        spirv_cross::CompilerGLSL::Options options = generateSPV2ESSLOptions(ESUtils::shadingVersion, isVulkanSPV);
 
         spirv_cross::CompilerGLSL compiler({ module.cbegin(), module.cend() });
         compiler.set_common_options(options);
