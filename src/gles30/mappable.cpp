@@ -3,7 +3,7 @@
 
 #include <GLES3/gl32.h>
 
-void GLES32::registerMappableFunctions() {
+void GLES30::registerMappableFunctions() {
     // GLES 3.0 core functions
     REGISTER(glGenVertexArrays);
     REGISTER(glBindVertexArray);
