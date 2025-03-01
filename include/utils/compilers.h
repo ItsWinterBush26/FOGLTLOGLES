@@ -15,6 +15,19 @@ inline shaderc::CompileOptions generateGLSL2SPVOptions(int glslVersion) {
     return options;
 }
 
+inline shaderc::CompileOptions generateESSL2SPVOptions(int esslVersion) {
+    shaderc::CompileOptions options;
+    options.SetGenerateDebugInfo();
+    // options.SetTargetEnvironment(shaderc_target_env_opengl, 0);
+    options.SetSourceLanguage(shaderc_source_language_glsl);
+    options.SetForcedVersionProfile(esslVersion, shaderc_profile_es);
+    options.SetOptimizationLevel(shaderc_optimization_level_performance);
+
+    options.SetAutoMapLocations(true);
+
+    return options;
+}
+
 inline spirv_cross::CompilerGLSL::Options generateSPV2ESSLOptions(int esslVersion) {
     spirv_cross::CompilerGLSL::Options options;
     options.version = esslVersion;

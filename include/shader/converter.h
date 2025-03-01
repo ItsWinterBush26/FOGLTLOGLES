@@ -41,23 +41,14 @@ public:
     }
 
     void convertAndFix(shaderc_shader_kind kind, std::string& source) {
-        int tmpVersion = 0;
-        std::string profile = "";
-
-        if (!getShaderVersion(source, tmpVersion, profile)) {
-            throw new std::runtime_error("Shader with no version preprocessor");
-        }
-
-        if (profile != "es") {
-            LOGI("GLSL -> SPV");
-            shaderc::SpvCompilationResult spirv = compileGLSl2SPV(kind, source);
-            LOGI("SPV -> ESSL");
-            transpileSPV2ESSL(kind, spirv, source);
-        } else LOGI("Shader already ESSL, no conversion needed");
+        LOGI("GLSL/ESSL -> SPV");
+        shaderc::SpvCompilationResult spirv = compileToSPV(kind, source);
+        LOGI("SPV -> ESSL");
+        transpileSPV2ESSL(kind, spirv, source);
     }
 
     void finish() {
-        LOGI("Linked!");
+        LOGI("Program destroyed!");
     }
 
     GLuint getProgram() { return program; }
@@ -78,33 +69,32 @@ private:
     std::string vertexSource;
     std::string fragmentSource;
 
-    int ensure330(shaderc_shader_kind kind, std::string& source, int& version) {
-        int detectedVersion = 0;
-        std::string detectedProfile = "";
-        if (!getShaderVersion(source, detectedVersion, detectedProfile)) {
+    shaderc::SpvCompilationResult compileToSPV(shaderc_shader_kind kind, std::string& source) {
+        if (source.empty()) return shaderc::SpvCompilationResult();
+
+        int shaderVersion = 0;
+        std::string shaderProfile = "";
+        if (!getShaderVersion(source, shaderVersion, shaderProfile)) {
             throw std::runtime_error("Shader with no version preprocessor!");
         }
 
-        if (detectedVersion < 330 && detectedProfile != "es") {
-            LOGI("GLSL %i -> GLSL 330", detectedVersion);
+        shaderc::Compiler compiler;
+        shaderc::SpvCompilationResult result;
 
-            upgradeTo330(kind, source);
-            detectedVersion = 330;
+        if (shaderProfile == "es") {
+            shaderc::CompileOptions options = generateESSL2SPVOptions(shaderVersion);
+            result = compiler.CompileGlslToSpv(source, kind, "esslShader", options);
+        } else {
+            if (shaderVersion < 330) {
+                upgradeTo330(kind, source);
+                shaderVersion = 330;
+            }
+
+            shaderc::CompileOptions options = generateGLSL2SPVOptions(shaderVersion);
+            result = compiler.CompileGlslToSpv(source, kind, "glslShader", options);
         }
 
-        version = detectedVersion;
-    }
-
-    shaderc::SpvCompilationResult compileGLSl2SPV(shaderc_shader_kind kind, std::string& source) {
-        if (source.empty()) return shaderc::SpvCompilationResult();
-
-        int glslVersion = 0;
-        ensure330(kind, source, glslVersion);
-
-        shaderc::Compiler compiler;
-        shaderc::CompileOptions options = generateGLSL2SPVOptions(glslVersion);
-        
-        return compiler.CompileGlslToSpv(source, kind, "shader", options);
+        return result;
     }
 
     void transpileSPV2ESSL(shaderc_shader_kind kind, shaderc::SpvCompilationResult& module, std::string& target) {
