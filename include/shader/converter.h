@@ -41,10 +41,19 @@ public:
     }
 
     void convertAndFix(shaderc_shader_kind kind, std::string& source) {
-        LOGI("GLSL -> SPV");
-        shaderc::SpvCompilationResult spirv = compileGLSl2SPV(kind, source);
-        LOGI("SPV -> ESSL");
-        transpileSPV2ESSL(kind, spirv, source);
+        int tmpVersion = 0;
+        std::string profile = "";
+
+        if (!getShaderVersion(source, tmpVersion, profile)) {
+            throw new std::runtime_error("Shader with no version preprocessor");
+        }
+
+        if (profile != "es") {
+            LOGI("GLSL -> SPV");
+            shaderc::SpvCompilationResult spirv = compileGLSl2SPV(kind, source);
+            LOGI("SPV -> ESSL");
+            transpileSPV2ESSL(kind, spirv, source);
+        } else LOGI("Shader already ESSL, no conversion needed");
     }
 
     void finish() {
@@ -69,26 +78,28 @@ private:
     std::string vertexSource;
     std::string fragmentSource;
 
-    int ensure330(shaderc_shader_kind kind, std::string& source) {
+    int ensure330(shaderc_shader_kind kind, std::string& source, int& version) {
         int detectedVersion = 0;
-        if (sscanf(source.c_str(), "#version %i", &detectedVersion) != 1) {
+        std::string detectedProfile = "";
+        if (!getShaderVersion(source, detectedVersion, detectedProfile)) {
             throw std::runtime_error("Shader with no version preprocessor!");
         }
 
-        if (detectedVersion < 330) {
+        if (detectedVersion < 330 && detectedProfile != "es") {
             LOGI("GLSL %i -> GLSL 330", detectedVersion);
 
             upgradeTo330(kind, source);
             detectedVersion = 330;
         }
 
-        return detectedVersion;
+        version = detectedVersion;
     }
 
     shaderc::SpvCompilationResult compileGLSl2SPV(shaderc_shader_kind kind, std::string& source) {
         if (source.empty()) return shaderc::SpvCompilationResult();
 
-        int glslVersion = ensure330(kind, source);
+        int glslVersion = 0;
+        ensure330(kind, source, glslVersion);
 
         shaderc::Compiler compiler;
         shaderc::CompileOptions options = generateGLSL2SPVOptions(glslVersion);

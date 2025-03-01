@@ -59,3 +59,18 @@ inline void replaceShaderVersion(std::string& shaderSource, std::string newVersi
     LOGI("Replacing shader version to %s", replacement.c_str());
     shaderSource = std::regex_replace(shaderSource, versionRegex, replacement);
 }
+
+inline bool getShaderVersion(const std::string& source, int& version, std::string& profile) {
+    static const std::regex pattern(R"(#version\s+(\d+)(?:\s+(es|core|compatibility))?)");
+    std::smatch match;
+    
+    // Search for #version in the entire source
+    if (std::regex_search(source, match, pattern)) {
+        version = std::stoi(match[1].str());
+        profile = match[2].matched ? match[2].str() : "";
+
+        LOGI("Parsed Version: %d, Profile: %s", version, profile.empty() ? "None" : profile.c_str());
+        return true;
+    }
+    return false;
+}
