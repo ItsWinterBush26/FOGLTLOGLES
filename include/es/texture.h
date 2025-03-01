@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GLES2/gl2.h>
+
 #include "gl/header.h"
 
 inline void selectProperTexType(GLint internalFormat, GLenum& type) {
@@ -32,7 +33,7 @@ inline void selectProperTexType(GLint internalFormat, GLenum& type) {
     }
 }
 
-inline GLenum getProperTexFormat(GLint internalFormat) {
+inline GLenum selectProperTexFormat(GLint internalFormat) {
     switch (internalFormat) {
         case GL_DEPTH_COMPONENT:
         case GL_DEPTH_COMPONENT16:
@@ -56,6 +57,6 @@ inline GLenum getProperTexFormat(GLint internalFormat) {
         case GL_RGBA32F:
             return GL_RGBA;
         default:
-            return internalFormat; // Default to the same format
+            return GL_RGBA;
     }
 }
