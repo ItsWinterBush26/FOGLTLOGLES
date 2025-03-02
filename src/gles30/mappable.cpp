@@ -175,16 +175,16 @@ void GLES30::registerMappableFunctions() {
     REGISTER(glMemoryBarrierByRegion);
     REGISTER(glGetTexLevelParameteriv);
     REGISTER(glGetTexLevelParameterfv);
-    REGISTER(glBindImageTextures);
-    REGISTER(glBindVertexBuffers);
-    REGISTER(glBindTextures);
-    REGISTER(glBindSamplers);
+    REGISTER(glBindImageTexture);
+    REGISTER(glBindVertexBuffer);
+    REGISTER(glBindTexture);
+    REGISTER(glBindSampler);
     
     // Additional GLES 3.2 mappable functions
     REGISTER(glDrawElementsBaseVertex);
     REGISTER(glDrawRangeElementsBaseVertex);
     REGISTER(glDrawElementsInstancedBaseVertex);
-    REGISTER(glFramebufferTexture2DMultisampleEXT);
+    // REGISTER(glFramebufferTexture2DMultisampleEXT);
     REGISTER(glFramebufferTextureLayer);
     REGISTER(glTexStorage2DMultisample);
     REGISTER(glGetMultisamplefv);
