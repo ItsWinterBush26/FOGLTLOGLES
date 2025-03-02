@@ -13,4 +13,5 @@ namespace GLES30 {
 
     void registerMappableFunctions();
     void registerTranslatedFunctions();
+    void registerDSAEmulation();
 }
