@@ -4,7 +4,7 @@
 #include <GLES3/gl32.h>
 
 void GLES30::registerMappableFunctions() {
-    // GLES 3.0 core functions
+    // Existing GLES 3.0 core functions
     REGISTER(glGenVertexArrays);
     REGISTER(glBindVertexArray);
     REGISTER(glDeleteVertexArrays);
@@ -17,7 +17,7 @@ void GLES30::registerMappableFunctions() {
     REGISTER(glBindBufferRange);
     REGISTER(glBindBufferBase);
     
-    // GLES 3.1 functions
+    // Existing GLES 3.1 functions
     REGISTER(glDispatchCompute);
     REGISTER(glDispatchComputeIndirect);
     REGISTER(glBindImageTexture);
@@ -32,7 +32,7 @@ void GLES30::registerMappableFunctions() {
     REGISTER(glProgramUniformMatrix4fv);
     REGISTER(glGetProgramResourceIndex);
     
-    // GLES 3.2 functions
+    // Existing GLES 3.2 functions
     REGISTER(glBlendBarrier);
     REGISTER(glCopyImageSubData);
     REGISTER(glDebugMessageControl);
@@ -57,4 +57,139 @@ void GLES30::registerMappableFunctions() {
     REGISTER(glTexParameterIuiv);
     REGISTER(glTexStorage3DMultisample);
     REGISTER(glFramebufferTexture);
+    
+    // Additional GLES 3.0 mappable functions
+    REGISTER(glDrawRangeElements);
+    REGISTER(glTexImage3D);
+    REGISTER(glTexSubImage3D);
+    REGISTER(glCopyTexSubImage3D);
+    REGISTER(glCompressedTexImage3D);
+    REGISTER(glCompressedTexSubImage3D);
+    REGISTER(glGenQueries);
+    REGISTER(glDeleteQueries);
+    REGISTER(glIsQuery);
+    REGISTER(glBeginQuery);
+    REGISTER(glEndQuery);
+    REGISTER(glGetQueryiv);
+    REGISTER(glGetQueryObjectuiv);
+    REGISTER(glUnmapBuffer);
+    REGISTER(glGetBufferParameteri64v);
+    REGISTER(glSamplerParameteri);
+    REGISTER(glSamplerParameterf);
+    REGISTER(glSamplerParameteriv);
+    REGISTER(glSamplerParameterfv);
+    REGISTER(glGetSamplerParameteriv);
+    REGISTER(glGetSamplerParameterfv);
+    REGISTER(glVertexAttribIPointer);
+    REGISTER(glGetVertexAttribIiv);
+    REGISTER(glGetVertexAttribIuiv);
+    REGISTER(glVertexAttribI4i);
+    REGISTER(glVertexAttribI4ui);
+    REGISTER(glVertexAttribI4iv);
+    REGISTER(glVertexAttribI4uiv);
+    REGISTER(glGetUniformuiv);
+    REGISTER(glGetFragDataLocation);
+    REGISTER(glUniform1ui);
+    REGISTER(glUniform2ui);
+    REGISTER(glUniform3ui);
+    REGISTER(glUniform4ui);
+    REGISTER(glUniform1uiv);
+    REGISTER(glUniform2uiv);
+    REGISTER(glUniform3uiv);
+    REGISTER(glUniform4uiv);
+    REGISTER(glClearBufferiv);
+    REGISTER(glClearBufferuiv);
+    REGISTER(glClearBufferfv);
+    REGISTER(glClearBufferfi);
+    REGISTER(glGetStringi);
+    REGISTER(glCopyBufferSubData);
+    REGISTER(glGetUniformIndices);
+    REGISTER(glGetActiveUniformsiv);
+    REGISTER(glGetUniformBlockIndex);
+    REGISTER(glGetActiveUniformBlockiv);
+    REGISTER(glGetActiveUniformBlockName);
+    REGISTER(glUniformBlockBinding);
+    REGISTER(glDrawArraysInstanced);
+    REGISTER(glDrawElementsInstanced);
+    REGISTER(glFenceSync);
+    REGISTER(glIsSync);
+    REGISTER(glDeleteSync);
+    REGISTER(glClientWaitSync);
+    REGISTER(glWaitSync);
+    REGISTER(glGetInteger64v);
+    REGISTER(glGetSynciv);
+    REGISTER(glGetInteger64i_v);
+    REGISTER(glGetIntegeri_v);
+    REGISTER(glGenSamplers);
+    REGISTER(glDeleteSamplers);
+    REGISTER(glIsSampler);
+    REGISTER(glBindSampler);
+    REGISTER(glTexStorage2D);
+    REGISTER(glTexStorage3D);
+    REGISTER(glRenderbufferStorageMultisample);
+    
+    // Additional GLES 3.1 mappable functions
+    REGISTER(glDrawArraysIndirect);
+    REGISTER(glDrawElementsIndirect);
+    REGISTER(glFramebufferParameteri);
+    REGISTER(glGetFramebufferParameteriv);
+    REGISTER(glGetProgramInterfaceiv);
+    REGISTER(glGetProgramResourceName);
+    REGISTER(glGetProgramResourceiv);
+    REGISTER(glGetProgramResourceLocation);
+    REGISTER(glUseProgramStages);
+    REGISTER(glActiveShaderProgram);
+    REGISTER(glCreateShaderProgramv);
+    REGISTER(glBindProgramPipeline);
+    REGISTER(glDeleteProgramPipelines);
+    REGISTER(glGenProgramPipelines);
+    REGISTER(glIsProgramPipeline);
+    REGISTER(glGetProgramPipelineiv);
+    REGISTER(glProgramUniform1ui);
+    REGISTER(glProgramUniform2ui);
+    REGISTER(glProgramUniform3ui);
+    REGISTER(glProgramUniform4ui);
+    REGISTER(glProgramUniform1uiv);
+    REGISTER(glProgramUniform2uiv);
+    REGISTER(glProgramUniform3uiv);
+    REGISTER(glProgramUniform4uiv);
+    REGISTER(glProgramUniform1iv);
+    REGISTER(glProgramUniform2iv);
+    REGISTER(glProgramUniform3iv);
+    REGISTER(glProgramUniform4iv);
+    REGISTER(glProgramUniform2fv);
+    REGISTER(glProgramUniform3fv);
+    REGISTER(glProgramUniform4fv);
+    REGISTER(glProgramUniformMatrix2fv);
+    REGISTER(glProgramUniformMatrix3fv);
+    REGISTER(glProgramUniformMatrix4fv);
+    REGISTER(glProgramUniformMatrix2x3fv);
+    REGISTER(glProgramUniformMatrix3x2fv);
+    REGISTER(glProgramUniformMatrix2x4fv);
+    REGISTER(glProgramUniformMatrix4x2fv);
+    REGISTER(glProgramUniformMatrix3x4fv);
+    REGISTER(glProgramUniformMatrix4x3fv);
+    REGISTER(glValidateProgramPipeline);
+    REGISTER(glGetProgramPipelineInfoLog);
+    REGISTER(glGetBooleani_v);
+    REGISTER(glMemoryBarrierByRegion);
+    REGISTER(glGetTexLevelParameteriv);
+    REGISTER(glGetTexLevelParameterfv);
+    REGISTER(glBindImageTextures);
+    REGISTER(glBindVertexBuffers);
+    REGISTER(glBindTextures);
+    REGISTER(glBindSamplers);
+    
+    // Additional GLES 3.2 mappable functions
+    REGISTER(glDrawElementsBaseVertex);
+    REGISTER(glDrawRangeElementsBaseVertex);
+    REGISTER(glDrawElementsInstancedBaseVertex);
+    REGISTER(glFramebufferTexture2DMultisampleEXT);
+    REGISTER(glFramebufferTextureLayer);
+    REGISTER(glTexStorage2DMultisample);
+    REGISTER(glGetMultisamplefv);
+    REGISTER(glSampleMaski);
+    REGISTER(glPatchParameteri);
+    REGISTER(glTexBufferRange);
+    REGISTER(glTexBuffer);
 }
