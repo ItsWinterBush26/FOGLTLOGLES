@@ -17,6 +17,10 @@
 class ShaderConverter {
 public:
     ShaderConverter() { }
+    ~ShaderConverter() {
+        LOGI("Converter destroyed!");
+    }
+
     ShaderConverter(GLuint program) : program(program), postProcessor(PostProcessor()) {
         LOGI("New program created so new ShaderConverter created (and PostProcessor())");
     }
@@ -48,10 +52,6 @@ public:
         transpileSPV2ESSL(kind, spirv, source, isVulkanSPV);
     }
 
-    void finish() {
-        LOGI("Converter destroyed!");
-    }
-
     GLuint getProgram() { return program; }
     std::string getShaderSource(shaderc_shader_kind kind) {
         switch (kind) {
@@ -73,9 +73,8 @@ private:
     shaderc::SpvCompilationResult compileToSPV(shaderc_shader_kind kind, std::string& source, bool& isVulkanSPV) {
         int shaderVersion = 0;
         std::string shaderProfile = "";
-        if (!getShaderVersion(source, shaderVersion, shaderProfile)) {
-            throw std::runtime_error("Shader with no version preprocessor!");
-        }
+        getShaderVersion(source, shaderVersion, shaderProfile);
+        // no need to check as shader.cpp already checks it
 
         shaderc::Compiler compiler;
         shaderc::SpvCompilationResult result;

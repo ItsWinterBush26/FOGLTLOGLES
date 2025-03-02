@@ -50,15 +50,28 @@ void OV_glAttachShader(GLuint program, GLuint shader) {
     if (length != 0) {
         std::vector<GLchar> source(length);
         glGetShaderSource(shader, length, nullptr, source.data());
-    
-        std::shared_ptr<ShaderConverter> converter = converters.at(program);
-        converter->attachSource(getKindFromShader(shader), std::string(source.data()));
+        std::string convertedSource = std::string(source.data());
+
+        int version = 0; // useless
+        std::string profile = "";
+        if (!getShaderVersion(convertedSource, version, profile)) {
+            throw std::runtime_error("Shader with no version preprocessor!");
+        }
+
+        if (profile != "es") {
+            std::shared_ptr<ShaderConverter> converter = converters.at(program);
+            converter->attachSource(getKindFromShader(shader), std::string(source.data()));
         
-        std::string realSource = converter->getShaderSource(getKindFromShader(shader));
-        const GLchar* newSource = realSource.c_str();
-        glShaderSource(shader, 1, &newSource, nullptr);
-        glCompileShader(shader);
-        glAttachShader(program, shader);
+            std::string realSource = converter->getShaderSource(getKindFromShader(shader));
+            const GLchar* newSource = realSource.c_str();
+        
+            glShaderSource(shader, 1, &newSource, nullptr);
+            glCompileShader(shader);
+            glAttachShader(program, shader);
+        } else {
+            glCompileShader(shader);
+            glAttachShader(program, shader);
+        }
 
         return;
     }
@@ -108,15 +121,11 @@ void OV_glLinkProgram(GLuint program) {
         GLint size = 0;
         glGetProgramInfoLog(program, 4096, &size, bufLog);
         LOGI("Link error for program %u: %s", program, bufLog);
-        if (getEnvironmentVar("LIBGL_VGPU_ABORT_ON_ERROR") == "1") {
-            throw std::runtime_error("Failed to link program!");
-        }
+        throw std::runtime_error("Failed to link program!");
     }
     #endif
 
     LOGI("Linked! Removing from converter map.");
-    std::shared_ptr<ShaderConverter> converter = converters.at(program);
-    converter->finish();
     converters.erase(program);
 }
 
@@ -125,8 +134,6 @@ void OV_glDeleteProgram(GLuint program) {
     glDeleteProgram(program);
 
     if (converters.find(program) != converters.end()) {
-        std::shared_ptr<ShaderConverter> converter = converters.at(program);
-        converter->finish();
         converters.erase(program);
     }
 }
