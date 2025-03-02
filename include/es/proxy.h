@@ -1,6 +1,7 @@
 #pragma once
 
 #include <gl/gl.h>
+
 #include <GLES2/gl2.h>
 
 inline bool isProxyTexture(GLenum target) {

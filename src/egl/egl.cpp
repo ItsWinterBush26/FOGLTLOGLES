@@ -5,8 +5,8 @@
 #include "utils/types.h"
 #include <mutex>
 
-static std::once_flag eglInitFlag;
-static std::once_flag rendererInitFlag;
+inline std::once_flag eglInitFlag;
+inline std::once_flag rendererInitFlag;
 
 FunctionPtr eglGetProcAddress(str procname) {
     std::call_once(eglInitFlag, eglInit);
@@ -19,7 +19,7 @@ EGLBoolean OV_eglMakeCurrent(EGLDisplay dpy, EGLSurface draw, EGLSurface read, E
     return result;
 }
 
-void eglInit() {
+inline void eglInit() {
     LOGI("Initializing EGL functions...");
 
     REGISTER(eglBindAPI);

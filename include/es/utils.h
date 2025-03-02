@@ -5,11 +5,10 @@
 
 #include <atomic>
 #include <GLES3/gl31.h>
-#include <memory>
 #include <sstream>
 #include <unordered_set>
 
-static std::atomic_bool extensionSetInitialized = ATOMIC_VAR_INIT(false);
+static std::atomic_bool esUtilsInitialized = ATOMIC_VAR_INIT(false);
 
 void initExtensionsES2();
 void initExtensionsES3();
@@ -25,7 +24,7 @@ namespace ESUtils {
     inline std::tuple<int, int, int> angleVersion = std::make_tuple(0, 0, 0);
 
     inline void init() {
-        if (extensionSetInitialized.load()) return;
+        if (esUtilsInitialized.load()) return;
         
         str versionStr = reinterpret_cast<str>(glGetString(GL_VERSION));
         if (!versionStr) {
@@ -57,12 +56,11 @@ namespace ESUtils {
         LOGI("GL version: %i.%i", major, minor);
         LOGI("Shading version: %i", shadingVersion);
 
-        extensionSetInitialized.store(true);
+        esUtilsInitialized.store(true);
     }
 
-    inline bool isSupported(str name) {
-        if (!extensionSetInitialized.load()) {
-            /* throw std::runtime_error */
+    inline bool isExtensionSupported(str name) {
+        if (!esUtilsInitialized.load()) {
             LOGW("Extension set wasn't initialized!");
             ESUtils::init();
         }

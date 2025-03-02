@@ -1,5 +1,4 @@
 #include "gles30/main.h"
-#include "es/texparam.h"
 #include "gl/glext.h"
 #include "main.h"
 #include "utils/log.h"
