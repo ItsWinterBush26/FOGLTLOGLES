@@ -9,10 +9,7 @@
 #include <string>
 #include <unordered_map>
 
-#define CHECKS
-
 GLuint OV_glCreateProgram();
-void OV_glShaderSource(GLuint shader, GLint count, const GLchar* const* sources, const GLint* length);
 void OV_glAttachShader(GLuint program, GLuint shader);
 void OV_glCompileShader(GLuint shader);
 void OV_glLinkProgram(GLuint program);
@@ -21,8 +18,6 @@ void OV_glGetShaderiv(GLuint shader, GLenum pname, GLint* params);
 
 void GLES20::registerShaderOverrides() {
     REGISTEROV(glCreateProgram);
-    // disable for now
-    // REGISTEROV(glShaderSource);
     REGISTEROV(glAttachShader);
     REGISTEROV(glCompileShader);
     REGISTEROV(glLinkProgram);
@@ -47,36 +42,34 @@ void OV_glAttachShader(GLuint program, GLuint shader) {
     GLint length = 0;
     glGetShaderiv(shader, GL_SHADER_SOURCE_LENGTH, &length);
 
-    if (length != 0) {
-        std::vector<GLchar> source(length);
-        glGetShaderSource(shader, length, nullptr, source.data());
-        std::string convertedSource = std::string(source.data());
+    if (length == 0) {
+        throw std::runtime_error("Cannot attach shader to program with a shader that has no source!");
+    }
+    
+    std::vector<GLchar> source(length);
+    glGetShaderSource(shader, length, nullptr, source.data());
+    std::string convertedSource = std::string(source.data());
 
-        int version = 0; // useless
-        std::string profile = "";
-        if (!getShaderVersion(convertedSource, version, profile)) {
-            throw std::runtime_error("Shader with no version preprocessor!");
-        }
-
-        if (profile != "es") {
-            std::shared_ptr<ShaderConverter> converter = converters.at(program);
-            converter->attachSource(getKindFromShader(shader), std::string(source.data()));
-        
-            std::string realSource = converter->getShaderSource(getKindFromShader(shader));
-            const GLchar* newSource = realSource.c_str();
-        
-            glShaderSource(shader, 1, &newSource, nullptr);
-            glCompileShader(shader);
-            glAttachShader(program, shader);
-        } else {
-            glCompileShader(shader);
-            glAttachShader(program, shader);
-        }
-
-        return;
+    int version = 0; // useless
+    std::string profile = "";
+    if (!getShaderVersion(convertedSource, version, profile)) {
+        throw std::runtime_error("Shader with no version preprocessor!");
     }
 
-    throw std::runtime_error("Cannot attach shader to program with a shader that has no source!");
+    if (profile != "es") {
+        std::shared_ptr<ShaderConverter> converter = converters.at(program);
+        converter->attachSource(getKindFromShader(shader), std::string(source.data()));
+        
+        std::string realSource = converter->getShaderSource(getKindFromShader(shader));
+        const GLchar* newSource = realSource.c_str();
+        
+        glShaderSource(shader, 1, &newSource, nullptr);
+        glCompileShader(shader);
+        glAttachShader(program, shader);
+    } else {
+        glCompileShader(shader);
+        glAttachShader(program, shader);
+    }
 }
 
 void OV_glCompileShader(GLuint shader) {
@@ -102,28 +95,21 @@ void OV_glGetShaderiv(GLuint shader, GLenum pname, GLint* params) {
     glGetShaderiv(shader, pname, params);
 }
 
-// Lowkey just remove this
-void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* sources, const GLint* length) {
-    LOGI("OV_glShaderSource: Shader %u", shader);
-    LOGI("Passtrough");
-    glShaderSource(shader, count, sources, nullptr);
-}
-
 void OV_glLinkProgram(GLuint program) {
     LOGI("OV_glLinkProgram: Linking program %u", program);
     glLinkProgram(program);
 
-    #ifdef CHECKS
     GLint success = 0;
     glGetProgramiv(program, GL_LINK_STATUS, &success);
+    
     if (success != GL_TRUE && getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
         GLchar bufLog[4096] = { 0 };
         GLint size = 0;
         glGetProgramInfoLog(program, 4096, &size, bufLog);
+        
         LOGI("Link error for program %u: %s", program, bufLog);
         throw std::runtime_error("Failed to link program!");
     }
-    #endif
 
     LOGI("Linked! Removing from converter map.");
     converters.erase(program);
