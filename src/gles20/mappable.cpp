@@ -11,9 +11,9 @@ void GLES20::registerMappableFunctions() {
     REGISTER(glVertexAttribPointer);
     REGISTER(glEnableVertexAttribArray);
     REGISTER(glCreateShader);
+    REGISTER(glShaderSource);
 
     // Removed: Functions overridden in shader.cpp
-    // REGISTER(glShaderSource);
     // REGISTER(glCompileShader);
     // REGISTER(glGetShaderiv);
     // REGISTER(glCreateProgram);

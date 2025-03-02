@@ -67,6 +67,7 @@ void OV_glAttachShader(GLuint program, GLuint shader) {
         glCompileShader(shader);
         glAttachShader(program, shader);
     } else {
+        LOGI("Shader already ESSL, no need to convert!");
         glCompileShader(shader);
         glAttachShader(program, shader);
     }
