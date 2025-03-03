@@ -60,7 +60,11 @@ void OV_glTexImage2D(
         proxyInternalFormat = internalFormat;
     } else {
         selectProperTexType(internalFormat, type);
-        glTexImage2D(target, level, internalFormat, width, height, border, format, type, pixels);
+        glTexImage2D(
+            target, level, internalFormat, 
+            width, height,
+            border, format, type, pixels
+        );
     }
 }
 
@@ -82,8 +86,11 @@ void OV_glTexImage3D(
         proxyInternalFormat = internalFormat;
     } else {
         selectProperTexType(internalFormat, type);
-        glTexImage3D(target, level, internalFormat, width, height, depth, 
-                     border, format, type, pixels);
+        glTexImage3D(
+            target, level, internalFormat,
+            width, height, depth, 
+            border, format, type, pixels
+        );
     }
 }
 
