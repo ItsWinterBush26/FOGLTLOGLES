@@ -27,7 +27,7 @@ void GLES20::registerTextureOverrides() {
     REGISTEROV(glTexImage3D);
     REGISTEROV(glGetTexLevelParameteriv);
     REGISTEROV(glTexParameterf);
-    REGISTEROV(glTexParameteri);
+    // REGISTEROV(glTexParameteri);
 }
 
 void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param) {
