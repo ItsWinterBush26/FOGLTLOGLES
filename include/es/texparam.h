@@ -22,16 +22,10 @@ inline void selectProperTexParamf(GLenum target, GLenum& pname, GLfloat& param) 
 
     switch (pname) {
         case GL_TEXTURE_LOD_BIAS:
-            // GL_TEXTURE_LOD_BIAS is not in GLES 3.2, replace with GL_TEXTURE_MIN_LOD.
             pname = GL_TEXTURE_MIN_LOD;
             return;
 
         case GL_TEXTURE_MAX_ANISOTROPY_EXT:
-            // GLES 3.2 does not guarantee anisotropic filtering support, check extension.
-            if (!ESUtils::isExtensionSupported("GL_EXT_texture_filter_anisotropic")) {
-                param = 1.0f;
-                return;
-            }
             if (param > maxAniso) param = maxAniso;
             return;
     }
