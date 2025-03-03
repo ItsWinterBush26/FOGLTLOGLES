@@ -6,4 +6,4 @@
 
 PUBLIC_API FunctionPtr glXGetProcAddress(const GLchar* pn);
 
-void glInit();
+void initDebug();

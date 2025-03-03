@@ -118,6 +118,8 @@ void OV_glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint
 }
 
 void glBindTextures(GLuint first, GLsizei count, const GLuint* textures) {
+    LOGI("glBindTextures: first=%u, count=%i, textures=%p", first, count, textures);
+
     GLint prevActiveTexture;
     glGetIntegerv(GL_ACTIVE_TEXTURE, &prevActiveTexture);
 
