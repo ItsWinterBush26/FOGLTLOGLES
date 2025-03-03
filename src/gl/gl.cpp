@@ -31,8 +31,12 @@ void customDebugCallback(
     const GLchar* message,
     const void* userParam
 ) {
-    LOGD("[GL DEBUG] Source: %u, Type: %u, ID: %u, Severity: %u\n", source, type, id, severity);
-    LOGD("[GL DEBUG] Message: %s\n", message);
+    LOGD("[GL DEBUG] Source: %u, Type: %u, ID: %u, Severity: %u", source, type, id, severity);
+    LOGD("[GL DEBUG] Message: %s", message);
+
+    previousRegisteredCallback.first(
+        source, type, id, severity, length, message, previousRegisteredCallback.second
+    );
 }
 
 void OV_glDebugMessageCallback(GLDEBUGPROC callback, const void* userParam) {
