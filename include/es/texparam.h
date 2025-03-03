@@ -39,11 +39,17 @@ inline void selectProperTexParamf(GLenum target, GLenum& pname, GLfloat& param) 
 
 inline void selectProperTexParami(GLenum target, GLenum& pname, GLint& param) {
     switch (pname) {
+        case GL_TEXTURE_WRAP_S:
+        case GL_TEXTURE_WRAP_T:
+            param = GL_CLAMP_TO_EDGE;
+            return;
         case GL_TEXTURE_WRAP_R:
-            // GLES 3.2 requires GL_CLAMP_TO_EDGE if GL_EXT_texture_cube_map_array is not supported.
-            if (!ESUtils::isExtensionSupported("GL_EXT_texture_cube_map_array")) {
-                param = GL_CLAMP_TO_EDGE;
+            if (ESUtils::version.first < 3) {
+                LOGI("GL_TEXTURE_WRAP_R not supported on GLES 3.x below!");
+                return;
             }
+            
+            param = GL_CLAMP_TO_EDGE;
             return;
     }
 }

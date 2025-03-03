@@ -12,6 +12,7 @@ void OV_glTexImage3D(GLenum target, GLint level, GLint internalFormat, GLsizei w
 void OV_glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint* params);
 void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param);
 void OV_glTexParameteri(GLenum target, GLenum pname, GLint param);
+void glBindTextures(GLuint first, GLsizei count, const GLuint* textures);
 
 static GLint maxTextureSize = 0;
 GLint proxyWidth, proxyHeight, proxyDepth, proxyInternalFormat;
@@ -19,6 +20,8 @@ GLint proxyWidth, proxyHeight, proxyDepth, proxyInternalFormat;
 void GLES20::registerTextureOverrides() {
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
     LOGI("GL_MAX_TEXTURE_SIZE is %i", maxTextureSize);
+
+    REGISTER(glBindTextures);
 
     REGISTEROV(glTexImage2D);
     REGISTEROV(glTexImage3D);
@@ -122,4 +125,26 @@ void OV_glGetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint
     }
 
     glGetTexLevelParameteriv(target, level, pname, params);
+}
+
+void glBindTextures(GLuint first, GLsizei count, const GLuint* textures) {
+    GLint prevActiveTexture;
+    glGetIntegerv(GL_ACTIVE_TEXTURE, &prevActiveTexture);
+
+    for (GLsizei i = 0; i < count; ++i) {
+        GLuint texture = textures ? textures[i] : 0;
+        glActiveTexture(GL_TEXTURE0 + first + i);
+
+        if (texture != 0) {
+            GLenum target = getTextureTarget(texture);
+            glBindTexture(target, texture);
+        } else {
+            // Unbind from all possible texture targets
+            for (GLenum target : {GL_TEXTURE_2D, GL_TEXTURE_CUBE_MAP, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_3D }) {
+                glBindTexture(target, 0);
+            }
+        }
+    }
+
+    glActiveTexture(prevActiveTexture);
 }
