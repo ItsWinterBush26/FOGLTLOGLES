@@ -22,36 +22,7 @@ inline void selectProperTexType(GLint internalFormat, GLenum& type) {
 }
 
 inline GLenum selectProperTexFormat(GLint internalFormat) {
-    switch (internalFormat) {
-        case GL_DEPTH_COMPONENT:
-        case GL_DEPTH_COMPONENT16:
-        case GL_DEPTH_COMPONENT24:
-        case GL_DEPTH_COMPONENT32F:
-            return GL_DEPTH_COMPONENT;
-
-        case GL_R8:
-        case GL_R16F:
-        case GL_R32F:
-            return GL_RED;
-
-        case GL_RG8:
-        case GL_RG16F:
-        case GL_RG32F:
-            return GL_RG;
-
-        case GL_RGB8:
-        case GL_RGB16F:
-        case GL_RGB32F:
-            return GL_RGB;
-
-        case GL_RGBA8:
-        case GL_RGBA16F:
-        case GL_RGBA32F:
-            return GL_RGBA;
-
-        default:
-            return GL_RGBA;
-    }
+    return internalFormat;
 }
 
 inline GLenum getTextureTarget(GLuint texture) {

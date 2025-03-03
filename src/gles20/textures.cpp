@@ -60,15 +60,6 @@ void OV_glTexImage2D(
         proxyInternalFormat = internalFormat;
     } else {
         selectProperTexType(internalFormat, type);
-        
-        // Check if format needs adjustment based on internalFormat
-        if (format == GL_RGBA && internalFormat != GL_RGBA) {
-            GLenum properFormat = selectProperTexFormat(internalFormat);
-            if (properFormat != format) {
-                LOGI("glTexImage2D format adjusted: %u->%u", format, properFormat);
-                format = properFormat;
-            }
-        }
         glTexImage2D(target, level, internalFormat, width, height, border, format, type, pixels);
     }
 }
@@ -91,14 +82,6 @@ void OV_glTexImage3D(
         proxyInternalFormat = internalFormat;
     } else {
         selectProperTexType(internalFormat, type);
-        
-        if (format == GL_RGBA && internalFormat != GL_RGBA) {
-            GLenum properFormat = selectProperTexFormat(internalFormat);
-            if (properFormat != format) {
-                LOGI("glTexImage3D format adjusted: %u->%u", format, properFormat);
-                format = properFormat;
-            }
-        }
         glTexImage3D(target, level, internalFormat, width, height, depth, 
                      border, format, type, pixels);
     }
