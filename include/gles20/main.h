@@ -17,4 +17,5 @@ namespace GLES20 {
     void registerShaderOverrides();
     void registerTextureOverrides();
     void registerMultiDrawEmulation();
+    void registerBufferWorkarounds();
 }
