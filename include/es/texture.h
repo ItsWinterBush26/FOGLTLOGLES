@@ -3,7 +3,7 @@
 #include <GLES3/gl32.h>
 #include <GLES2/gl2ext.h>
 
-inline struct {
+inline struct TextureTargets {
     GLenum target;
     GLenum queryTarget;
 } targets[] = {
