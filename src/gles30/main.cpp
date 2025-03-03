@@ -4,7 +4,7 @@
 void GLES30::GLES30Wrapper::init() {
     LOGI("GLES 3.x overrides entrypoint!");
 
-    GLES30::registerMappableFunctions();
+    // GLES30::registerMappableFunctions();
     GLES30::registerTranslatedFunctions();
     GLES30::registerDSAEmulation();
 }
