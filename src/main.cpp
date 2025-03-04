@@ -4,6 +4,7 @@
 #include "gles30/main.h"
 #include "utils/log.h"
 
+#include <GLES2/gl2.h>
 #include <unordered_map>
 
 inline std::unordered_map<std::string, FunctionPtr> registeredFunctions(256);
@@ -34,6 +35,8 @@ void FOGLTLOGLES::init() {
     ESUtils::init();
     LOGI("FOGLTLOGLES launched on ES %i.%i", ESUtils::version.first, ESUtils::version.second);
 
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    
     if (ESUtils::version.first >= 2) GLES20::wrapper->init();
     if (ESUtils::version.first >= 3) GLES30::wrapper->init();
 }
