@@ -4,7 +4,6 @@
 void GLES20::GLES20Wrapper::init() {
     LOGI("GLES 2.0 overrides entrypoint!");
 
-    // GLES20::registerMappableFunctions();
     GLES20::registerTranslatedFunctions();
     GLES20::registerShaderOverrides();
     GLES20::registerTextureOverrides();

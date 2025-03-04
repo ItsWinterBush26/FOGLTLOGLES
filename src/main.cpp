@@ -36,4 +36,6 @@ void FOGLTLOGLES::init() {
 
     if (ESUtils::version.first >= 2) GLES20::wrapper->init();
     if (ESUtils::version.first >= 3) GLES30::wrapper->init();
+
+    setGLTraceLevel(1);
 }
