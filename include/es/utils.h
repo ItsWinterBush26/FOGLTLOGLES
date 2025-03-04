@@ -28,12 +28,12 @@ namespace ESUtils {
         
         str versionStr = reinterpret_cast<str>(glGetString(GL_VERSION));
         if (!versionStr) {
-            throw std::runtime_error("Failed to get OpenGL ES version, is the context not initialized or what?");
+            throw std::runtime_error("Failed to get OpenGL ES version, is the context current or is there no context at all?");
         }
 
         int major = 0, minor = 0;
         if (sscanf(versionStr, "OpenGL ES %d.%d", &major, &minor) != 2) {
-            throw std::runtime_error("Failed to get OpenGL ES version, is the context not initialized or what?");
+            throw std::runtime_error("Failed to get OpenGL ES version, is the context current or is there no context at all?");
         }
         version = std::make_pair(major, minor);
         shadingVersion = (major * 100) + (minor * 10); // 3 -> 300, 2 -> 20 = 320 = 3.2
@@ -52,9 +52,6 @@ namespace ESUtils {
             default:
                 initExtensionsES3();
         }
-
-        LOGI("GL version: %i.%i", major, minor);
-        LOGI("Shading version: %i", shadingVersion);
 
         esUtilsInitialized.store(true);
     }

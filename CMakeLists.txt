@@ -54,6 +54,7 @@ endif()
 
 ######## DEPENDENCIES ########
 find_library(ANDROID_DEP android REQUIRED)
+find_library(JNI_DEP jni REQUIRED)
 find_library(EGL_DEP EGL REQUIRED)
 find_library(GLES2_DEP GLESv2 REQUIRED)
 find_library(GLES3_DEP GLESv3 REQUIRED)
@@ -63,6 +64,7 @@ find_library(CXX_STATIC_DEP c++_static REQUIRED)
 
 set(DEPENDENCIES
 	${ANDROID_DEP}
+	${JNI_DEP}
 	${EGL_DEP}
 	${GLES2_DEP}
 	${GLES3_DEP}
