@@ -4,7 +4,7 @@
 #include "gles30/main.h"
 #include "utils/log.h"
 
-#include <GLES2/gl2.h>
+#include <GLES3/gl32.h>
 #include <unordered_map>
 
 inline std::unordered_map<std::string, FunctionPtr> registeredFunctions(256);
