@@ -26,19 +26,17 @@ void GLES20::registerShaderOverrides() {
 }
 
 inline std::unordered_map<GLuint, std::shared_ptr<ShaderConverter>> converters;
-inline bool wasNoop;
+inline std::unordered_map<GLuint, bool> previouslyNoop; // couldve just paired but whatever
 
 GLuint OV_glCreateProgram() {
     GLuint program = glCreateProgram();
-    LOGI("OV_glCreateProgram: New program %u", program);
+
     // remove existing key and replace with new shaderconverter when?
     converters.insert({ program, std::make_shared<ShaderConverter>(program) });
     return program;
 }
 
 void OV_glAttachShader(GLuint program, GLuint shader) {
-    LOGI("OV_glAttachShader: Attaching %u (shader) to %u (program)", shader, program);
-    
     GLint length = 0;
     glGetShaderiv(shader, GL_SHADER_SOURCE_LENGTH, &length);
 
@@ -71,33 +69,35 @@ void OV_glAttachShader(GLuint program, GLuint shader) {
         glCompileShader(shader);
         glAttachShader(program, shader);
     }
+
+    previouslyNoop.erase(shader);
 }
 
 void OV_glCompileShader(GLuint shader) {
-    LOGI("OV_glCompileShader: Shader %u", shader);
-    LOGI("NOOP :>");
-    wasNoop = true;
+    previouslyNoop[shader] = true;
 }
 
 void OV_glGetShaderiv(GLuint shader, GLenum pname, GLint* params) {
-    LOGI("OV_getShaderiv: Shader %u", shader);
     switch (pname) {
         case GL_COMPILE_STATUS:
-            if (wasNoop) {
-                LOGI("It's gaslight time! :devil:");
-                (*params) = GL_TRUE;
-
-                wasNoop = false;
-                return;
+            {
+                auto it = previouslyNoop.find(shader);
+                if (it != previouslyNoop.end() && it->second) {
+                    (*params) = GL_TRUE;
+                    
+                    previouslyNoop[it->first] = false;
+                }
             }
-        default: break;
-    }
+            break;
+        
+        default:
+            glGetShaderiv(shader, pname, params);
 
-    glGetShaderiv(shader, pname, params);
+            break;
+    }
 }
 
 void OV_glLinkProgram(GLuint program) {
-    LOGI("OV_glLinkProgram: Linking program %u", program);
     glLinkProgram(program);
 
     GLint success = 0;
@@ -112,12 +112,10 @@ void OV_glLinkProgram(GLuint program) {
         throw std::runtime_error("Failed to link program!");
     }
 
-    LOGI("Linked! Removing from converter map.");
     converters.erase(program);
 }
 
 void OV_glDeleteProgram(GLuint program) {
-    LOGI("OV_glDeleteProgram: Deleting program %u", program);
     glDeleteProgram(program);
 
     if (converters.find(program) != converters.end()) {
