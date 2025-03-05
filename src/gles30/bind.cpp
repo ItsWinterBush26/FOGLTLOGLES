@@ -1,14 +1,18 @@
-#include <GLES3/gl32.h>
-#include <GLES3/gl3ext.h>
+#include <EGL/egl.h>
+#include <GLES3/gl3.h>
 
 #include "gles30/main.h"
 #include "main.h"
 
-extern "C" void glBindFragDataLocationEXT(GLuint program, GLuint colorNumber, const char* name);
+typedef void (*glBindFragDataLocationEXT_PTR)(GLuint program, GLuint colorNumber, const char* name);
+inline glBindFragDataLocationEXT_PTR glBindFragDataLocationEXT;
+
 void glBindFragDataLocation(GLuint program, GLuint colorNumber, const char* name); 
 
 void GLES30::registerBindFunctions() {
     REGISTER(glBindFragDataLocation);
+
+    glBindFragDataLocationEXT = reinterpret_cast<glBindFragDataLocationEXT_PTR>(eglGetProcAddress("glBindFragDataLocationEXT"));
 }
 
 void glBindFragDataLocation(GLuint program, GLuint colorNumber, const char* name) {
