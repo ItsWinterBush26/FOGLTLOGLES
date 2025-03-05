@@ -12,6 +12,8 @@ void GLES30::registerBufferWorkarounds() {
 }
 
 void* glMapBuffer(GLenum target, GLenum access) {
+    LOGI("glMapBuffer: target=%i access=%i", target, access);
+
     GLenum accessRange;
     GLint bufferSize;
 

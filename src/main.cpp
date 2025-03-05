@@ -52,5 +52,9 @@ extern "C" {
             LOGE("Failed to get Java environment");
             return JNI_ERR;
         }
+
+        LOGI("Hello from JNI!!!!!!!");
+
+        return JNI_VERSION_1_6;
     }
 }

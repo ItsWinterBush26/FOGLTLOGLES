@@ -47,7 +47,7 @@ void GLES30::registerDSAEmulation() {
     REGISTER(glEnableVertexArrayAttrib);
 }
 
-// Helper to save and restore texture bindings
+// Helper to save and restore bindings
 class TextureBindingSaver {
 private:
     GLint savedUnit;
