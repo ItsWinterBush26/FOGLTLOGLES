@@ -69,7 +69,7 @@ void OV_glAttachShader(GLuint program, GLuint shader) {
         glCompileShader(shader);
         glAttachShader(program, shader);
     } else {
-        LOGI("Shader already ESSL, no need to convert!");
+        /* LOGI("Shader already ESSL, no need to convert!");
 
         std::string newSource = "";
 
@@ -87,7 +87,7 @@ void OV_glAttachShader(GLuint program, GLuint shader) {
             LOGI("%s", newSource.c_str());
         }
 
-        glShaderSource(shader, 1, &casted, nullptr);
+        glShaderSource(shader, 1, &casted, nullptr); */
         glCompileShader(shader);
         glAttachShader(program, shader);
     }
