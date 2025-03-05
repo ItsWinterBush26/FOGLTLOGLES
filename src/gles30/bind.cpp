@@ -4,7 +4,7 @@
 #include "gles30/main.h"
 #include "main.h"
 
-void glBindFragDataLocationEXT(GLuint program, GLuint colorNumber, const char* name);
+extern "C" void glBindFragDataLocationEXT(GLuint program, GLuint colorNumber, const char* name);
 void glBindFragDataLocation(GLuint program, GLuint colorNumber, const char* name); 
 
 void GLES30::registerBindFunctions() {
