@@ -54,7 +54,7 @@ export NDK_CCACHE="$(which ccache)"
 cmake -G Ninja .. \
     -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake" \
     -DANDROID_ABI="$ABI" \
-    -DANDROID_PLATFORM=24 \
+    -DANDROID_PLATFORM=29 \
     -DANDROID_CCACHE="$NDK_CCACHE" \
     -DCMAKE_BUILD_TYPE=Release
 
