@@ -54,7 +54,7 @@ endif()
 
 ######## DEPENDENCIES ########
 find_library(ANDROID_DEP android REQUIRED)
-find_library(JNI_DEP jni REQUIRED)
+find_library(JNI_DEP JNI REQUIRED)
 find_library(EGL_DEP EGL REQUIRED)
 find_library(GLES2_DEP GLESv2 REQUIRED)
 find_library(GLES3_DEP GLESv3 REQUIRED)
