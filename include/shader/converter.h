@@ -113,6 +113,7 @@ private:
 
         spirv_cross::CompilerGLSL compiler({ module.cbegin(), module.cend() });
         compiler.set_common_options(options);
+        compiler.add_header_line("#extension GL_EXT_blend_func_extended : enable;");
 
         postProcessor.processSPVBytecode(compiler, kind);
 

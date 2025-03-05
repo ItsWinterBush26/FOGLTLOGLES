@@ -2,6 +2,7 @@
 #include "gles20/main.h"
 #include "main.h"
 #include "shader/converter.h"
+#include "utils/env.h"
 
 #include <GLES2/gl2.h>
 #include <memory>
@@ -27,6 +28,9 @@ void GLES20::registerShaderOverrides() {
 
 inline std::unordered_map<GLuint, std::shared_ptr<ShaderConverter>> converters;
 inline std::unordered_map<GLuint, bool> previouslyNoop; // couldve just paired but whatever
+inline std::unordered_set<std::string> requiredExtensions = {
+    "GL_EXT_blend_func_extended"
+};
 
 GLuint OV_glCreateProgram() {
     GLuint program = glCreateProgram();
@@ -56,7 +60,7 @@ void OV_glAttachShader(GLuint program, GLuint shader) {
 
     if (profile != "es") {
         std::shared_ptr<ShaderConverter> converter = converters.at(program);
-        converter->attachSource(getKindFromShader(shader), std::string(source.data()));
+        converter->attachSource(getKindFromShader(shader), convertedSource);
         
         std::string realSource = converter->getShaderSource(getKindFromShader(shader));
         const GLchar* newSource = realSource.c_str();
@@ -66,6 +70,24 @@ void OV_glAttachShader(GLuint program, GLuint shader) {
         glAttachShader(program, shader);
     } else {
         LOGI("Shader already ESSL, no need to convert!");
+
+        std::string newSource = "";
+
+        for (const auto& it : requiredExtensions) {
+            newSource += "#extension " + it + " : enable;\n";
+        }
+
+        newSource += "\n";
+        newSource += convertedSource;
+
+        const GLchar* casted = newSource.c_str();
+
+        if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+            LOGI("Modified ESSL:");
+            LOGI("%s", newSource.c_str());
+        }
+
+        glShaderSource(shader, 1, &casted, nullptr);
         glCompileShader(shader);
         glAttachShader(program, shader);
     }
