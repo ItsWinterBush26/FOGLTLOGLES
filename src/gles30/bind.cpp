@@ -1,16 +1,13 @@
-#include "gles20/main.h"
+#include <GLES3/gl32.h>
+#include <GLES3/gl3ext.h>
+
+#include "gles30/main.h"
 #include "main.h"
 
-#ifndef GL_GLEXT_PROTOTYPES
-#define GL_GLEXT_PROTOTYPES
-#endif
-
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
-
+void glBindFragDataLocationEXT(GLuint program, GLuint colorNumber, const char* name);
 void glBindFragDataLocation(GLuint program, GLuint colorNumber, const char* name); 
 
-void GLES20::registerBindFunctions() {
+void GLES30::registerBindFunctions() {
     REGISTER(glBindFragDataLocation);
 }
 

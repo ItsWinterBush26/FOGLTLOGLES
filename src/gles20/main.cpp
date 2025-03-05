@@ -9,5 +9,4 @@ void GLES20::GLES20Wrapper::init() {
     GLES20::registerTextureOverrides();
     GLES20::registerMultiDrawEmulation();
     GLES20::registerBufferWorkarounds();
-    GLES20::registerBindFunctions();
 }
