@@ -22,11 +22,11 @@ public:
     }
 
     ShaderConverter(GLuint program) : program(program), postProcessor(PostProcessor()) {
-        LOGI("New program created so new ShaderConverter created (and PostProcessor())");
+        // LOGI("New program created so new ShaderConverter created (and PostProcessor())");
     }
 
     void attachSource(shaderc_shader_kind kind, std::string source) {
-        LOGI("Doing magic on a %s", getKindStringFromKind(kind));
+        // LOGI("Doing magic on a %s", getKindStringFromKind(kind));
         if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
             LOGI("Recieved shader source:");
             LOGI("%s", source.c_str());
@@ -80,7 +80,7 @@ private:
         shaderc::SpvCompilationResult result;
 
         if (shaderProfile == "es") {
-            LOGI("ESSL %i -> SPV", shaderVersion); // i assume that shaderVersion matches ESUtils::shadingVersion
+            // LOGI("ESSL %i -> SPV", shaderVersion); // i assume that shaderVersion matches ESUtils::shadingVersion
 
             shaderc::CompileOptions options = generateESSL2SPVOptions(shaderVersion);
             result = compiler.CompileGlslToSpv(source, kind, "esslShader", options);
@@ -92,14 +92,14 @@ private:
                 shaderVersion = 330;
             }
 
-            LOGI("GLSL %i -> SPV", shaderVersion);
+            // LOGI("GLSL %i -> SPV", shaderVersion);
 
             shaderc::CompileOptions options = generateGLSL2SPVOptions(shaderVersion);
             result = compiler.CompileGlslToSpv(source, kind, "glslShader", options);
         }
 
         if (result.GetCompilationStatus() != shaderc_compilation_status_success) {
-            LOGI("Failed to compile shader: %s", result.GetErrorMessage().c_str());
+            LOGE("Failed to compile shader: %s", result.GetErrorMessage().c_str());
             throw std::runtime_error("Shader compilation failed!");
         }
 
@@ -107,7 +107,7 @@ private:
     }
 
     void transpileSPV2ESSL(shaderc_shader_kind kind, shaderc::SpvCompilationResult& module, std::string& target, bool isVulkanSPV) {
-        LOGI("SPV -> ESSL %i", ESUtils::shadingVersion);
+        // LOGI("SPV -> ESSL %i", ESUtils::shadingVersion);
 
         spirv_cross::CompilerGLSL::Options options = generateSPV2ESSLOptions(ESUtils::shadingVersion, isVulkanSPV);
 

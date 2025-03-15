@@ -22,7 +22,6 @@ private:
     std::unordered_map<std::string, int> attributeLocationMap;
     uint32_t nextAvailableAttributeLocation = 0;
 
-    // Track which shader stages have been processed
     bool vertexShaderProcessed = false;
     bool fragmentShaderProcessed = false;
 
@@ -38,7 +37,7 @@ private:
             int location = uniformLocationMap.at(name);
             compiler.set_decoration(resource.id, spv::DecorationLocation, location);
             compiler.set_decoration(resource.id, spv::DecorationBinding, location);
-            LOGI("Sampler '%s' set to location/binding %d", name.c_str(), location);
+            // LOGI("Sampler '%s' set to location/binding %d", name.c_str(), location);
         }
     }
 
@@ -56,7 +55,7 @@ private:
                 }
                 int uboBinding = uniformLocationMap.at(uboName);
                 compiler.set_decoration(ubo.id, spv::DecorationBinding, uboBinding);
-                LOGI("UBO '%s' set to binding %d", uboName.c_str(), uboBinding);
+                // LOGI("UBO '%s' set to binding %d", uboName.c_str(), uboBinding);
                 
                 // Optionally process UBO members for debugging/tracking (locations not set in GLES)
                 auto type = compiler.get_type(ubo.base_type_id);
@@ -67,9 +66,9 @@ private:
                     if (uniformLocationMap.find(fullName) == uniformLocationMap.end()) {
                         uniformLocationMap.insert({ fullName, nextAvailableUniformLocation++ });
                     }
-                    LOGI("UBO member '%s' tracked (offset %u)",
+                    /* LOGI("UBO member '%s' tracked (offset %u)",
                          fullName.c_str(),
-                         compiler.get_member_decoration(ubo.base_type_id, i, spv::DecorationOffset));
+                         compiler.get_member_decoration(ubo.base_type_id, i, spv::DecorationOffset)); */
                 }
             } else {
                 // This is a standalone uniform that happens to be in the uniform_buffers group.
@@ -79,7 +78,7 @@ private:
                 }
                 int location = uniformLocationMap.at(name);
                 compiler.set_decoration(ubo.id, spv::DecorationLocation, location);
-                LOGI("Standalone Uniform '%s' set to location %d", name.c_str(), location);
+                // LOGI("Standalone Uniform '%s' set to location %d", name.c_str(), location);
             }
         }
     }
@@ -93,7 +92,7 @@ private:
             
             // Skip uniforms that are actually blocks
             if (compiler.has_decoration(uniform.id, spv::DecorationBlock)) {
-                LOGI("Skipping plain uniform processing for uniform block '%s'", name.c_str());
+                // LOGI("Skipping plain uniform processing for uniform block '%s'", name.c_str());
                 continue;
             }
             
@@ -102,7 +101,7 @@ private:
             }
             int location = uniformLocationMap.at(name);
             compiler.set_decoration(uniform.id, spv::DecorationLocation, location);
-            LOGI("Plain Uniform '%s' set to location %d", name.c_str(), location);
+            // LOGI("Plain Uniform '%s' set to location %d", name.c_str(), location);
         }
     }
 
@@ -117,7 +116,7 @@ private:
             }
             int location = attributeLocationMap.at(name);
             compiler.set_decoration(attr.id, spv::DecorationLocation, location);
-            LOGI("Attribute '%s' set to location %d", name.c_str(), location);
+            // LOGI("Attribute '%s' set to location %d", name.c_str(), location);
         }
     }
 
@@ -132,7 +131,7 @@ private:
             }
             int location = varyingLocationMap.at(name);
             compiler.set_decoration(varying.id, spv::DecorationLocation, location);
-            LOGI("VS output varying '%s' set to location %d", name.c_str(), location);
+            // LOGI("VS output varying '%s' set to location %d", name.c_str(), location);
         }
     }
 
@@ -149,7 +148,7 @@ private:
             }
             int location = varyingLocationMap.at(name);
             compiler.set_decoration(varying.id, spv::DecorationLocation, location);
-            LOGI("FS input varying '%s' set to location %d", name.c_str(), location);
+            // LOGI("FS input varying '%s' set to location %d", name.c_str(), location);
         }
     }
 
@@ -161,7 +160,7 @@ private:
             std::string name = compiler.get_name(output.id);
             // For simplicity, setting all fragment outputs to location 0.
             compiler.set_decoration(output.id, spv::DecorationLocation, 0);
-            LOGI("FS output '%s' set to location 0", name.c_str());
+            // LOGI("FS output '%s' set to location 0", name.c_str());
         }
     }
 
