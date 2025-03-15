@@ -7,5 +7,4 @@ void GLES30::GLES30Wrapper::init() {
     GLES30::registerTranslatedFunctions();
     GLES30::registerDSAEmulation();
     GLES30::registerBufferWorkarounds();
-    GLES30::registerBindFunctions();
 }

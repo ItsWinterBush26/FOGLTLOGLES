@@ -14,5 +14,4 @@ namespace GLES30 {
     void registerTranslatedFunctions();
     void registerDSAEmulation();
     void registerBufferWorkarounds();
-    void registerBindFunctions();
 }
