@@ -171,7 +171,7 @@ public:
         // Set uniform location base based on shader type
         if (kind == shaderc_fragment_shader) {
             if (!fragmentShaderProcessed) {
-                nextAvailableUniformLocation = 20;
+                nextAvailableUniformLocation = 0;
                 fragmentShaderProcessed = true;
             }
         } else if (kind == shaderc_vertex_shader) {
