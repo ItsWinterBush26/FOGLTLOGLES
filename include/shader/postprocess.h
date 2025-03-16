@@ -22,7 +22,7 @@ private:
     std::unordered_map<std::string, int> attributeLocationMap;
     uint32_t nextAvailableAttributeLocation = 0;
 
-    uint32_t nextAvailableFSOutput = 0:
+    uint32_t nextAvailableFSOutput = 0;
 
     bool vertexShaderProcessed = false;
     bool fragmentShaderProcessed = false;
