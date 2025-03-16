@@ -22,6 +22,8 @@ private:
     std::unordered_map<std::string, int> attributeLocationMap;
     uint32_t nextAvailableAttributeLocation = 0;
 
+    uint32_t nextAvailableFSOutput = 0:
+
     bool vertexShaderProcessed = false;
     bool fragmentShaderProcessed = false;
 
@@ -158,8 +160,7 @@ private:
     ) {
         for (auto &output : resources) {
             std::string name = compiler.get_name(output.id);
-            // For simplicity, setting all fragment outputs to location 0.
-            compiler.set_decoration(output.id, spv::DecorationLocation, 0);
+            compiler.set_decoration(output.id, spv::DecorationLocation, nextAvailableFSOutput++);
             // LOGI("FS output '%s' set to location 0", name.c_str());
         }
     }
