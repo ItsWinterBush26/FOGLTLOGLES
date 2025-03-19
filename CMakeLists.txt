@@ -53,8 +53,6 @@ if(CMAKE_BUILD_TYPE MATCHES Release)
 endif()
 
 ######## DEPENDENCIES ########
-find_package(JNI REQUIRED)
-
 find_library(ANDROID_DEP android REQUIRED)
 find_library(EGL_DEP EGL REQUIRED)
 find_library(GLES1_DEP GLESv1_CM REQUIRED)
@@ -71,7 +69,7 @@ set(DEPENDENCIES
 	${GLES2_DEP}
 	${GLES3_DEP}
 	${LOG_DEP}
-    ${DL_DEP}
+        ${DL_DEP}
 	${CXX_STATIC_DEP}
 
 	# Static ShaderC
