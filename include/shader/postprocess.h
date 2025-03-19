@@ -1,14 +1,14 @@
 #pragma once
 
+#include "shader/utils.h"
 #include "spirv_cross.hpp"
 #include "spirv_glsl.hpp"
 #include "utils/log.h"
 
 #include <shaderc/shaderc.hpp>
 
-class PostProcessor {
-private:
-    void removeLocationBindingAndDescriptorSets(
+namespace ShaderConverter::SPVPostprocessor {
+    inline void removeLocationBindingAndDescriptorSets(
         spirv_cross::CompilerGLSL &compiler,
         const spirv_cross::SmallVector<spirv_cross::Resource> &resources
     ) {
@@ -19,8 +19,7 @@ private:
         }
     }
 
-public:
-    void processSPVBytecode(spirv_cross::CompilerGLSL &compiler, shaderc_shader_kind kind) {
+    inline void processSPVBytecode(spirv_cross::CompilerGLSL &compiler, shaderc_shader_kind kind) {
         LOGI("Processing SPIRV bytecode for %s", getKindStringFromKind(kind));
         if (kind == shaderc_glsl_compute_shader) {
             LOGI("Compute shader processing is unimplemented right now...");
@@ -41,7 +40,8 @@ public:
         // Process shader inputs and outputs
         removeLocationBindingAndDescriptorSets(compiler, resources.stage_inputs);
         removeLocationBindingAndDescriptorSets(compiler, resources.stage_outputs);
-   
+
         LOGI("Processing complete!");
     }
-};
+
+}; // namespace SPVPostprocessor

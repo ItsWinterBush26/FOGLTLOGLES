@@ -69,7 +69,6 @@ inline bool getShaderVersion(const std::string& source, int& version, std::strin
         version = std::stoi(match[1].str());
         profile = match[2].matched ? match[2].str() : "";
 
-        LOGI("Parsed Version: %d, Profile: %s", version, profile.empty() ? "None" : profile.c_str());
         return true;
     }
     return false;

@@ -14,75 +14,16 @@
 #include <GLES2/gl2.h>
 #include <shaderc/shaderc.hpp>
 
-class ShaderConverter {
-public:
-    ShaderConverter() { }
-    ~ShaderConverter() {
-        LOGI("Converter destroyed!");
-    }
-
-    ShaderConverter(GLuint program) : program(program), postProcessor(PostProcessor()) {
-        // LOGI("New program created so new ShaderConverter created (and PostProcessor())");
-    }
-
-    void attachSource(shaderc_shader_kind kind, std::string source) {
-        // LOGI("Doing magic on a %s", getKindStringFromKind(kind));
-        if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
-            LOGI("Recieved shader source:");
-            LOGI("%s", source.c_str());
-        }
-
-        switch (kind) {
-            case shaderc_vertex_shader:
-                vertexSource = source;
-                convertAndFix(shaderc_vertex_shader, vertexSource);
-                return;
-            case shaderc_fragment_shader:
-                fragmentSource = source;
-                convertAndFix(shaderc_fragment_shader, fragmentSource);
-                return;
-            default: return;
-        }
-    }
-
-    void convertAndFix(shaderc_shader_kind kind, std::string& source) {
-        bool isVulkanSPV = false;
-
-        shaderc::SpvCompilationResult spirv = compileToSPV(kind, source, isVulkanSPV);
-        transpileSPV2ESSL(kind, spirv, source, isVulkanSPV);
-    }
-
-    GLuint getProgram() { return program; }
-    std::string getShaderSource(shaderc_shader_kind kind) {
-        switch (kind) {
-            case shaderc_vertex_shader:
-                return vertexSource;
-            case shaderc_fragment_shader:
-                return fragmentSource;
-            default: return "";
-        }
-    }
-
-private:
-    PostProcessor postProcessor;
-    GLuint program;
-
-    std::string vertexSource;
-    std::string fragmentSource;
-
-
-    shaderc::SpvCompilationResult compileToSPV(shaderc_shader_kind kind, std::string& source, bool& isVulkanSPV) {
+namespace ShaderConverter {
+    inline shaderc::SpvCompilationResult compileToSPV(shaderc_shader_kind kind, std::string& source, bool& isVulkanSPV) {
         int shaderVersion = 0;
         std::string shaderProfile = "";
         getShaderVersion(source, shaderVersion, shaderProfile);
-        // no need to check as shader.cpp already checks it
 
         shaderc::Compiler compiler;
         shaderc::SpvCompilationResult result;
 
         if (shaderProfile == "es") {
-            // LOGI("ESSL %i -> SPV", shaderVersion); // i assume that shaderVersion matches ESUtils::shadingVersion
-
             shaderc::CompileOptions options = generateESSL2SPVOptions(shaderVersion);
             result = compiler.CompileGlslToSpv(source, kind, "esslShader", options);
             isVulkanSPV = true;
@@ -92,8 +33,6 @@ private:
                 upgradeTo330(kind, source);
                 shaderVersion = 330;
             }
-
-            // LOGI("GLSL %i -> SPV", shaderVersion);
 
             shaderc::CompileOptions options = generateGLSL2SPVOptions(shaderVersion);
             result = compiler.CompileGlslToSpv(source, kind, "glslShader", options);
@@ -107,16 +46,14 @@ private:
         return result;
     }
 
-    void transpileSPV2ESSL(shaderc_shader_kind kind, shaderc::SpvCompilationResult& module, std::string& target, bool isVulkanSPV) {
-        // LOGI("SPV -> ESSL %i", ESUtils::shadingVersion);
-
+    inline void transpileSPV2ESSL(shaderc_shader_kind kind, shaderc::SpvCompilationResult& module, std::string& target, bool isVulkanSPV) {
         spirv_cross::CompilerGLSL::Options options = generateSPV2ESSLOptions(ESUtils::shadingVersion, isVulkanSPV);
 
         spirv_cross::CompilerGLSL compiler({ module.cbegin(), module.cend() });
         compiler.set_common_options(options);
 
-        postProcessor.processSPVBytecode(compiler, kind);
-
+        SPVPostprocessor::processSPVBytecode(compiler, kind);
+        
         target = compiler.compile();
 
         if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
@@ -124,4 +61,11 @@ private:
             LOGI("%s", target.c_str());
         }
     }
-};
+
+    inline void convertAndFix(shaderc_shader_kind kind, std::string& source) {
+        bool isVulkanSPV = false;
+
+        shaderc::SpvCompilationResult spirv = compileToSPV(kind, source, isVulkanSPV);
+        transpileSPV2ESSL(kind, spirv, source, isVulkanSPV);
+    }
+}; // namespace ShaderConverter
