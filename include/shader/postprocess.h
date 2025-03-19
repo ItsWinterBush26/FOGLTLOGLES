@@ -39,9 +39,9 @@ private:
             int location = uniformLocationMap.at(name);
             // compiler.set_decoration(resource.id, spv::DecorationLocation, location);
             // compiler.set_decoration(resource.id, spv::DecorationBinding, location);
-            compiler.unset_decoration(varying.id, spv::DecorationLocation);
-            compiler.unset_decoration(varying.id, spv::DecorationBinding);
-            compiler.unset_decoration(varying.id, spv::DecorationDescriptorSet);
+            compiler.unset_decoration(resource.id, spv::DecorationLocation);
+            compiler.unset_decoration(resource.id, spv::DecorationBinding);
+            compiler.unset_decoration(resource.id, spv::DecorationDescriptorSet);
             // LOGI("Sampler '%s' set to location/binding %d", name.c_str(), location);
         }
     }
