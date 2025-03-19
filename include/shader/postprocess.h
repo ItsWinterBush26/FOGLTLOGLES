@@ -20,7 +20,6 @@ namespace ShaderConverter::SPVPostprocessor {
     }
 
     inline void processSPVBytecode(spirv_cross::CompilerGLSL &compiler, shaderc_shader_kind kind) {
-        LOGI("Processing SPIRV bytecode for %s", getKindStringFromKind(kind));
         if (kind == shaderc_glsl_compute_shader) {
             LOGI("Compute shader processing is unimplemented right now...");
             return;
@@ -40,8 +39,5 @@ namespace ShaderConverter::SPVPostprocessor {
         // Process shader inputs and outputs
         removeLocationBindingAndDescriptorSets(compiler, resources.stage_inputs);
         removeLocationBindingAndDescriptorSets(compiler, resources.stage_outputs);
-
-        LOGI("Processing complete!");
     }
-
 }; // namespace SPVPostprocessor
