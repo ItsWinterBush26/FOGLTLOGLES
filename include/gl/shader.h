@@ -17,8 +17,9 @@ inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
     options.SetTargetEnvironment(shaderc_target_env_opengl, 330);
     options.SetForcedVersionProfile(330, shaderc_profile_core);
     options.SetOptimizationLevel(shaderc_optimization_level_performance);
-
-    options.SetAutoMapLocations(true);
+    options.SetVulkanRulesRelaxed(true);
+    
+    // options.SetAutoMapLocations(true);
     // options.SetAutoBindUniforms(true);
     // options.SetAutoSampledTextures(true);
 
