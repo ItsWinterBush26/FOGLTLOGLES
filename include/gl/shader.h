@@ -19,8 +19,8 @@ inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
     options.SetOptimizationLevel(shaderc_optimization_level_performance);
     options.SetVulkanRulesRelaxed(true);
     
-    // options.SetAutoMapLocations(true);
-    // options.SetAutoBindUniforms(true);
+    options.SetAutoMapLocations(true);
+    options.SetAutoBindUniforms(true);
     // options.SetAutoSampledTextures(true);
 
     shaderc::Compiler spirvCompiler;

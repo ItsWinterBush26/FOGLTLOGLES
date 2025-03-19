@@ -70,6 +70,7 @@ private:
     std::string vertexSource;
     std::string fragmentSource;
 
+
     shaderc::SpvCompilationResult compileToSPV(shaderc_shader_kind kind, std::string& source, bool& isVulkanSPV) {
         int shaderVersion = 0;
         std::string shaderProfile = "";
@@ -113,7 +114,6 @@ private:
 
         spirv_cross::CompilerGLSL compiler({ module.cbegin(), module.cend() });
         compiler.set_common_options(options);
-        // compiler.add_header_line("#extension GL_EXT_blend_func_extended : enable");
 
         postProcessor.processSPVBytecode(compiler, kind);
 

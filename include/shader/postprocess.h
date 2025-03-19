@@ -56,7 +56,8 @@ private:
                     uniformLocationMap.insert({ uboName, nextAvailableUniformLocation++ });
                 }
                 int uboBinding = uniformLocationMap.at(uboName);
-                compiler.set_decoration(ubo.id, spv::DecorationBinding, uboBinding);
+                // compiler.set_decoration(ubo.id, spv::DecorationBinding, uboBinding);
+                compiler.unset_decoration(ubo.id, spv::DecorationLocation);
                 // LOGI("UBO '%s' set to binding %d", uboName.c_str(), uboBinding);
                 
                 // Optionally process UBO members for debugging/tracking (locations not set in GLES)
@@ -79,7 +80,8 @@ private:
                     uniformLocationMap.insert({ name, nextAvailableUniformLocation++ });
                 }
                 int location = uniformLocationMap.at(name);
-                compiler.set_decoration(ubo.id, spv::DecorationLocation, location);
+                // compiler.set_decoration(ubo.id, spv::DecorationLocation, location);
+                compiler.unset_decoration(ubo.id, spv::DecorationLocation);
                 // LOGI("Standalone Uniform '%s' set to location %d", name.c_str(), location);
             }
         }
@@ -102,7 +104,8 @@ private:
                 uniformLocationMap.insert({ name, nextAvailableUniformLocation++ });
             }
             int location = uniformLocationMap.at(name);
-            compiler.set_decoration(uniform.id, spv::DecorationLocation, location);
+            // compiler.set_decoration(uniform.id, spv::DecorationLocation, location);
+            compiler.unset_decoration(uniform.id, spv::DecorationLocation);
             // LOGI("Plain Uniform '%s' set to location %d", name.c_str(), location);
         }
     }
@@ -117,7 +120,8 @@ private:
                 attributeLocationMap.insert({ name, nextAvailableAttributeLocation++ });
             }
             int location = attributeLocationMap.at(name);
-            compiler.set_decoration(attr.id, spv::DecorationLocation, location);
+            // compiler.set_decoration(attr.id, spv::DecorationLocation, location);
+            compiler.unset_decoration(attr.id, spv::DecorationLocation);
             // LOGI("Attribute '%s' set to location %d", name.c_str(), location);
         }
     }
@@ -132,7 +136,8 @@ private:
                 varyingLocationMap.insert({ name, nextAvailableVaryingLocation++ });
             }
             int location = varyingLocationMap.at(name);
-            compiler.set_decoration(varying.id, spv::DecorationLocation, location);
+            // compiler.set_decoration(varying.id, spv::DecorationLocation, location);
+            compiler.unset_decoration(varying.id, spv::DecorationLocation);
             // LOGI("VS output varying '%s' set to location %d", name.c_str(), location);
         }
     }
@@ -149,7 +154,8 @@ private:
                 LOGW("Fragment shader input '%s' not found in vertex outputs", name.c_str());
             }
             int location = varyingLocationMap.at(name);
-            compiler.set_decoration(varying.id, spv::DecorationLocation, location);
+            // compiler.set_decoration(varying.id, spv::DecorationLocation, location);
+            compiler.unset_decoration(varying.id, spv::DecorationLocation);
             // LOGI("FS input varying '%s' set to location %d", name.c_str(), location);
         }
     }
@@ -160,7 +166,8 @@ private:
     ) {
         for (auto &output : resources) {
             std::string name = compiler.get_name(output.id);
-            compiler.set_decoration(output.id, spv::DecorationLocation, nextAvailableFSOutput++);
+            // compiler.set_decoration(output.id, spv::DecorationLocation, nextAvailableFSOutput++);
+            compiler.unset_decoration(output.id, spv::DecorationLocation);
             // LOGI("FS output '%s' set to location 0", name.c_str());
         }
     }
