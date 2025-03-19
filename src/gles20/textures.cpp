@@ -59,6 +59,7 @@ void OV_glTexImage2D(
         proxyHeight = (( height << level ) > maxTextureSize) ? 0 : height;
         proxyInternalFormat = internalFormat;
     } else {
+        selectProperTexFormat(internalFormat, format);
         selectProperTexType(internalFormat, type);
         glTexImage2D(
             target, level, internalFormat, 
