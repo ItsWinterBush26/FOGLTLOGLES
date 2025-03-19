@@ -15,7 +15,7 @@ inline std::string glVersion;
 
 void GLES::registerBrandingOverride() {
     glVersion = string_format(
-        "OpenGL 3.2 (running on OpenGL ES %i.%i)",
+        "3.2.0 FOGLTLOGLES on OpenGL ES %i.%i",
         ESUtils::version.first,
         ESUtils::version.second
     );
