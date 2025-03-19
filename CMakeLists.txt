@@ -69,7 +69,7 @@ set(DEPENDENCIES
 	${GLES2_DEP}
 	${GLES3_DEP}
 	${LOG_DEP}
-        ${DL_DEP}
+    ${DL_DEP}
 	${CXX_STATIC_DEP}
 
 	# Static ShaderC
@@ -78,8 +78,13 @@ set(DEPENDENCIES
 	# Minimal static SPIRV-Cross
 	spirv-cross-core
 	spirv-cross-glsl
+
+	# OpenMP static
+	-fopenmp
+	-static-openmp
 )
 
+set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_OPTIONS -fopenmp)
 target_link_libraries(
 	${PROJECT_NAME} PRIVATE ${DEPENDENCIES}
 )
