@@ -9,8 +9,6 @@
 #include <stdexcept>
 
 inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
-    // LOGI("Upgrading %s to GLSL 330", getKindStringFromKind(kind));
-
     shaderc::CompileOptions options;
     options.SetGenerateDebugInfo();
     options.SetSourceLanguage(shaderc_source_language_glsl);
@@ -21,7 +19,6 @@ inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
     
     options.SetAutoMapLocations(true);
     options.SetAutoBindUniforms(true);
-    // options.SetAutoSampledTextures(true);
 
     shaderc::Compiler spirvCompiler;
     shaderc::SpvCompilationResult module = spirvCompiler.CompileGlslToSpv(
@@ -49,6 +46,4 @@ inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
         LOGI("Upgrade shader source:");
         LOGI("%s", src.c_str());
     }
-
-    // LOGI("Upgrade successful!");
 }

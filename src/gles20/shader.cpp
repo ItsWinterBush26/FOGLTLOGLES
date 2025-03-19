@@ -42,15 +42,17 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* string
 void OV_glLinkProgram(GLuint program) {
     glLinkProgram(program);
 
-    GLint success = 0;
-    glGetProgramiv(program, GL_LINK_STATUS, &success);
-    
-    if (success != GL_TRUE && getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
-        GLchar bufLog[4096] = { 0 };
-        GLint size = 0;
-        glGetProgramInfoLog(program, 4096, &size, bufLog);
+    if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+        GLint success = 0;
+        glGetProgramiv(program, GL_LINK_STATUS, &success);
         
-        LOGI("Link error for program %u: %s", program, bufLog);
-        throw std::runtime_error("Failed to link program!");
+        if (success != GL_TRUE) {
+            GLchar bufLog[4096] = { 0 };
+            GLint size = 0;
+            glGetProgramInfoLog(program, 4096, &size, bufLog);
+            
+            LOGI("Link error for program %u: %s", program, bufLog);
+            throw std::runtime_error("Failed to link program!");
+        }
     }
 }
