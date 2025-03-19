@@ -21,9 +21,9 @@ inline void selectProperTexParamf(GLenum target, GLenum& pname, GLfloat& param) 
     std::call_once(initVarsFlag, initVars);
 
     switch (pname) {
-        /* case GL_TEXTURE_LOD_BIAS:
-            // pname = GL_TEXTURE_MIN_LOD;
-            return; */
+        case GL_TEXTURE_LOD_BIAS:
+            pname = GL_TEXTURE_MIN_LOD;
+            return;
 
         case GL_TEXTURE_MAX_ANISOTROPY_EXT:
             if (param > maxAniso) param = maxAniso;
