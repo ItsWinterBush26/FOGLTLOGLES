@@ -1,6 +1,5 @@
 #pragma once
 
-#include "shader/utils.h"
 #include "shaderc/shaderc.hpp"
 #include "spirv_glsl.hpp"
 #include "utils/log.h"

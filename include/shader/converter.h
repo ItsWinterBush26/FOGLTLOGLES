@@ -15,28 +15,21 @@
 #include <shaderc/shaderc.hpp>
 
 namespace ShaderConverter {
-    inline shaderc::SpvCompilationResult compileToSPV(shaderc_shader_kind kind, std::string& source, bool& isVulkanSPV) {
+    inline shaderc::SpvCompilationResult compileToSPV(shaderc_shader_kind kind, std::string& source) {
         int shaderVersion = 0;
-        std::string shaderProfile = "";
+        std::string shaderProfile = ""; // useless
         getShaderVersion(source, shaderVersion, shaderProfile);
 
         shaderc::Compiler compiler;
         shaderc::SpvCompilationResult result;
 
-        if (shaderProfile == "es") {
-            shaderc::CompileOptions options = generateESSL2SPVOptions(shaderVersion);
-            result = compiler.CompileGlslToSpv(source, kind, "esslShader", options);
-            isVulkanSPV = true;
-        } else {
-            if (shaderVersion < 330) {
-                LOGI("GLSL %i -> GLSL 330", shaderVersion);
-                upgradeTo330(kind, source);
-                shaderVersion = 330;
-            }
-
-            shaderc::CompileOptions options = generateGLSL2SPVOptions(shaderVersion);
-            result = compiler.CompileGlslToSpv(source, kind, "glslShader", options);
+        if (shaderVersion < 330) {
+            upgradeTo330(kind, source);
+            shaderVersion = 330;
         }
+
+        shaderc::CompileOptions options = generateGLSL2SPVOptions(shaderVersion);
+        result = compiler.CompileGlslToSpv(source, kind, "glslShader", options);
 
         if (result.GetCompilationStatus() != shaderc_compilation_status_success) {
             LOGE("Failed to compile shader: %s", result.GetErrorMessage().c_str());
@@ -46,14 +39,14 @@ namespace ShaderConverter {
         return result;
     }
 
-    inline void transpileSPV2ESSL(shaderc_shader_kind kind, shaderc::SpvCompilationResult& module, std::string& target, bool isVulkanSPV) {
-        spirv_cross::CompilerGLSL::Options options = generateSPV2ESSLOptions(ESUtils::shadingVersion, isVulkanSPV);
+    inline void transpileSPV2ESSL(shaderc_shader_kind kind, shaderc::SpvCompilationResult& module, std::string& target) {
+        spirv_cross::CompilerGLSL::Options options = generateSPV2ESSLOptions(ESUtils::shadingVersion);
 
         spirv_cross::CompilerGLSL compiler({ module.cbegin(), module.cend() });
         compiler.set_common_options(options);
 
         SPVPostprocessor::processSPVBytecode(compiler, kind);
-        
+
         target = compiler.compile();
 
         if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
@@ -63,9 +56,7 @@ namespace ShaderConverter {
     }
 
     inline void convertAndFix(shaderc_shader_kind kind, std::string& source) {
-        bool isVulkanSPV = false;
-
-        shaderc::SpvCompilationResult spirv = compileToSPV(kind, source, isVulkanSPV);
-        transpileSPV2ESSL(kind, spirv, source, isVulkanSPV);
+        shaderc::SpvCompilationResult spirv = compileToSPV(kind, source);
+        transpileSPV2ESSL(kind, spirv, source);
     }
 }; // namespace ShaderConverter

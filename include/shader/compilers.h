@@ -31,11 +31,11 @@ inline shaderc::CompileOptions generateESSL2SPVOptions(int esslVersion) {
     return options;
 }
 
-inline spirv_cross::CompilerGLSL::Options generateSPV2ESSLOptions(int esslVersion, bool vulkan = false) {
+inline spirv_cross::CompilerGLSL::Options generateSPV2ESSLOptions(int esslVersion) {
     spirv_cross::CompilerGLSL::Options options;
     options.version = esslVersion;
     options.es = true;
-    options.vulkan_semantics = vulkan;
+    options.vulkan_semantics = false;
     options.enable_420pack_extension = false;
     options.force_flattened_io_blocks = true;
     options.enable_storage_image_qualifier_deduction = false;
