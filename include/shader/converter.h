@@ -7,7 +7,7 @@
 #include "shaderc/status.h"
 #include "spirv_glsl.hpp"
 #include "utils.h"
-#include "utils/compilers.h"
+#include "shader/compilers.h"
 
 #include <stdexcept>
 #include <string>

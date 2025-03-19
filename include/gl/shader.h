@@ -9,7 +9,7 @@
 #include <stdexcept>
 
 inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
-    LOGI("Upgrading %s to GLSL 330", getKindStringFromKind(kind));
+    // LOGI("Upgrading %s to GLSL 330", getKindStringFromKind(kind));
 
     shaderc::CompileOptions options;
     options.SetGenerateDebugInfo();
@@ -50,5 +50,5 @@ inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
         LOGI("%s", src.c_str());
     }
 
-    LOGI("Upgrade successful!");
+    // LOGI("Upgrade successful!");
 }
