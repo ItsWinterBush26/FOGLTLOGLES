@@ -17,8 +17,11 @@ void glMultiDrawElementsBaseVertex(
     GLsizei drawcount,
     const GLint* basevertex
 ) {
-    #pragma omp parallel for if(drawcount > 8)
+    #pragma omp parallel for if(drawcount > 32)
     for(GLsizei i = 0; i < drawcount; i++) {
-        glDrawElementsBaseVertex(mode, count[i], type, indices[i], basevertex[i]);
+        #pragma omp critical
+        {
+            glDrawElementsBaseVertex(mode, count[i], type, indices[i], basevertex[i]);
+        }
     }
 }
