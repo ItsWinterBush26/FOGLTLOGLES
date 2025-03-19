@@ -29,7 +29,7 @@ const GLubyte* OV_glGetString(GLenum name) {
             return CAST_TO_CUBYTE(glVersion.c_str());
         
         case GL_SHADING_LANGUAGE_VERSION:
-            return CAST_TO_CUBYTE("3.20 FOGLTLOGLES");
+            return CAST_TO_CUBYTE("1.50 FOGLTLOGLES"); // 1.50 for GL3.2
 
         case GL_VENDOR:
             return CAST_TO_CUBYTE("ThatMG393");
