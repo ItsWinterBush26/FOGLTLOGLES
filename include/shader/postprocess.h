@@ -37,8 +37,11 @@ private:
                 uniformLocationMap.insert({ name, nextAvailableUniformLocation++ });
             }
             int location = uniformLocationMap.at(name);
-            compiler.set_decoration(resource.id, spv::DecorationLocation, location);
-            compiler.set_decoration(resource.id, spv::DecorationBinding, location);
+            // compiler.set_decoration(resource.id, spv::DecorationLocation, location);
+            // compiler.set_decoration(resource.id, spv::DecorationBinding, location);
+            compiler.unset_decoration(varying.id, spv::DecorationLocation);
+            compiler.unset_decoration(varying.id, spv::DecorationBinding);
+            compiler.unset_decoration(varying.id, spv::DecorationDescriptorSet);
             // LOGI("Sampler '%s' set to location/binding %d", name.c_str(), location);
         }
     }
@@ -84,6 +87,8 @@ private:
                 compiler.unset_decoration(ubo.id, spv::DecorationLocation);
                 // LOGI("Standalone Uniform '%s' set to location %d", name.c_str(), location);
             }
+
+            compiler.unset_decoration(ubo.id, spv::DecorationDescriptorSet);
         }
     }
 
