@@ -27,7 +27,7 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* string
     }
 
     if (profile != "es") {
-        if (profile == "core") LOGI("Let's see how this goes...");
+        if (profile == "core" || profile == "compatibility") LOGI("Shader is on '%s' profile! Let's see how this goes...", profile.c_str());
 
         ShaderConverter::convertAndFix(getKindFromShader(shader), combinedSource);
         const GLchar* newSource = combinedSource.c_str();
