@@ -3,6 +3,7 @@
 #include "utils/env.h"
 #include "utils/log.h"
 
+#include <__filesystem/perm_options.h>
 #include <filesystem>
 #include <fstream>
 #include <functional>
@@ -46,8 +47,15 @@ namespace ShaderConverter::Cache {
         return buffer.str();
     }
 
-    inline std::string invalidateShaderCache(size_t key) {
-        // TODO
+    inline void invalidateShaderCache(size_t key) {
+        std::string filename = shaderCache.at(key);
+        shaderCache.erase(key);
+
+        if (std::filesystem::exists(filename)) {
+            std::filesystem::remove(filename);
+
+            LOGI("Invalidated shader with key %i", key);
+        }
     }
 
     inline size_t getHash(std::string key) {
