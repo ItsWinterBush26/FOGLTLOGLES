@@ -6,4 +6,5 @@ void GLES20Ext::GLES20ExtWrapper::init() {
 
     GLES20Ext::register_EXT_buffer_storage();
     GLES20Ext::register_OES_mapbuffer();
+    GLES20Ext::register_EXT_blend_func_extended();
 }
