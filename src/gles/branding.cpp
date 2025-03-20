@@ -6,7 +6,6 @@
 #include "utils/strings.h"
 
 #include <GLES/gl.h>
-#include <unordered_map>
 
 #ifndef CAST_TO_CUBYTE
 #define CAST_TO_CUBYTE(str) reinterpret_cast<const GLubyte*>(str)
@@ -89,7 +88,7 @@ const GLubyte* OV_glGetStringi(GLenum pname, int index) {
             {
                 auto it = extensionMap.begin();
                 std::advance(it, index);
-                return CAST_TO_CUBYTE(it);
+                return CAST_TO_CUBYTE(*it);
             }
 
         default:
