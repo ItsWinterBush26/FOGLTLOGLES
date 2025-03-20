@@ -55,6 +55,8 @@ namespace ShaderConverter::Cache {
     }
 
     inline void init() {
+        LOGI("Indexing shader caches!");
+
         if (!std::filesystem::is_directory(CACHE_DIRECTORY) || !std::filesystem::exists(CACHE_DIRECTORY)) {
             LOGI("Cache doesn't exist, creating...");
             std::filesystem::create_directory(CACHE_DIRECTORY);
@@ -70,5 +72,7 @@ namespace ShaderConverter::Cache {
                 }
             }
         }
+
+        LOGI("Shader cache size : %i", shaderCache.size());
     }
 }
