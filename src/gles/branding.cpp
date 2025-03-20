@@ -29,7 +29,7 @@ void GLES::registerBrandingOverride() {
     );
 
     rendererString = string_format(
-        "FOGLTLOGLES (on %s)",
+        "FOGLTLOGLES v0.0.1 (on %s)", // TODO: implement versioning
         glGetString(GL_RENDERER)
     );
 

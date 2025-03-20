@@ -35,6 +35,7 @@ namespace ESUtils {
         if (sscanf(versionStr, "OpenGL ES %d.%d", &major, &minor) != 2) {
             throw std::runtime_error("Failed to get OpenGL ES version, is the context current or is there no context at all?");
         }
+        
         version = std::make_pair(major, minor);
         shadingVersion = (major * 100) + (minor * 10); // 3 -> 300, 2 -> 20 = 320 = 3.2
 
@@ -46,7 +47,7 @@ namespace ESUtils {
 
         switch (major) {
             case 1:
-                throw std::runtime_error("OpenGL ES 1.x is NOT supported");
+                throw std::runtime_error("OpenGL ES 1.0 is NOT supported");
             case 2:
                 initExtensionsES2();
             default:
