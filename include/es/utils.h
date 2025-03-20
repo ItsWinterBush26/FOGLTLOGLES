@@ -8,7 +8,7 @@
 #include <sstream>
 #include <unordered_set>
 
-static std::atomic_bool esUtilsInitialized = ATOMIC_VAR_INIT(false);
+inline std::atomic_bool esUtilsInitialized = ATOMIC_VAR_INIT(false);
 
 void initExtensionsES2();
 void initExtensionsES3();
@@ -17,8 +17,8 @@ namespace ESUtils {
     inline std::pair<int, int> version = std::make_pair(0, 0); // major, minor
     inline int shadingVersion; // (major * 100) + (minor * 10)
     
-    inline std::unordered_set<str> extensions;
-    inline int extensionCount;
+    inline std::unordered_set<str> realExtensions;
+    inline std::unordered_set<str> fakeExtensions;
 
     inline bool isAngle = false;
     inline std::tuple<int, int, int> angleVersion = std::make_tuple(0, 0, 0);
@@ -53,6 +53,8 @@ namespace ESUtils {
                 initExtensionsES3();
         }
 
+        fakeExtensions = realExtensions;
+
         esUtilsInitialized.store(true);
     }
 
@@ -61,7 +63,7 @@ namespace ESUtils {
             LOGW("Extension set wasn't initialized!");
             ESUtils::init();
         }
-        return extensions.find(name) != extensions.end();
+        return realExtensions.find(name) != realExtensions.end();
     }
 }
 
@@ -71,11 +73,9 @@ inline void initExtensionsES2() {
         std::istringstream iss(extensions);
         std::string extension;
         while (iss >> extension) {
-            ESUtils::extensions.insert(extension.c_str());
+            ESUtils::realExtensions.insert(extension.c_str());
         }
     }
-
-    ESUtils::extensionCount = ESUtils::extensions.size();
 }
 
 inline void initExtensionsES3() {
@@ -84,8 +84,6 @@ inline void initExtensionsES3() {
 
     for (GLint i = 0; i < extensionCount; ++i) {
         str extension = reinterpret_cast<str>(glGetStringi(GL_EXTENSIONS, i));
-        if (extension) ESUtils::extensions.insert(extension);
+        if (extension) ESUtils::realExtensions.insert(extension);
     }
-
-    ESUtils::extensionCount = extensionCount;
 }

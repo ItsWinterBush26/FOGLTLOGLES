@@ -1,4 +1,5 @@
 #include "gles20/main.h"
+#include "gles20/ext/main.h"
 #include "utils/log.h"
 
 void GLES20::GLES20Wrapper::init() {
@@ -8,6 +9,7 @@ void GLES20::GLES20Wrapper::init() {
     GLES20::registerShaderOverrides();
     GLES20::registerTextureOverrides();
     GLES20::registerMultiDrawEmulation();
-    GLES20::registerBufferWorkarounds();
     GLES20::registerFramebufferOverride();
+
+    GLES20Ext::wrapper->init();
 }

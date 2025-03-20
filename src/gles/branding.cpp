@@ -19,8 +19,7 @@ void OV_glEnable(GLenum cap);
 inline std::string glVersion;
 inline std::string rendererString;
 
-inline std::unordered_set<str> extensionMap; // move this to es/utils.h somehow?
-inline std::string extensions;
+inline std::string fakeExtensionsJoined;
 
 void GLES::registerBrandingOverride() {
     glVersion = string_format(
@@ -33,13 +32,6 @@ void GLES::registerBrandingOverride() {
         "FOGLTLOGLES (on %s)",
         glGetString(GL_RENDERER)
     );
-
-    extensionMap = ESUtils::extensions;
-
-    LOGI("Spoofing ARB_buffer_storage");
-    extensionMap.insert("GL_ARB_buffer_storage");
-
-    extensions = join_set(extensionMap, " ");
 
     REGISTEROV(glGetString);
     REGISTEROV(glGetIntegerv);
@@ -62,7 +54,8 @@ const GLubyte* OV_glGetString(GLenum name) {
             return CAST_TO_CUBYTE(rendererString.c_str());
 
         case GL_EXTENSIONS:
-            return CAST_TO_CUBYTE(extensions.c_str());
+            fakeExtensionsJoined = join_set(ESUtils::fakeExtensions, " ");
+            return CAST_TO_CUBYTE(fakeExtensionsJoined.c_str());
 
         default:
             return glGetString(name);
@@ -72,7 +65,7 @@ const GLubyte* OV_glGetString(GLenum name) {
 void OV_glGetIntegerv(GLenum pname, int* v) {
     switch (pname) {
         case GL_NUM_EXTENSIONS:
-            (*v) = extensionMap.size();
+            (*v) = ESUtils::fakeExtensions.size();
             break;
 
         default:
@@ -84,9 +77,9 @@ void OV_glGetIntegerv(GLenum pname, int* v) {
 const GLubyte* OV_glGetStringi(GLenum pname, int index) {
     switch (pname) {
         case GL_EXTENSIONS:
-            if (index < 0 || index >= extensionMap.size()) return nullptr;
+            if (index < 0 || index >= ESUtils::fakeExtensions.size()) return nullptr;
             {
-                auto it = extensionMap.begin();
+                auto it = ESUtils::fakeExtensions.begin();
                 std::advance(it, index);
                 return CAST_TO_CUBYTE(*it);
             }

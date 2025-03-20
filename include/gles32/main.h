@@ -11,4 +11,7 @@ namespace GLES32 {
     };
     
     const inline std::shared_ptr<GLES32Wrapper> wrapper = std::make_shared<GLES32Wrapper>();
+
+    void registerBaseVertexFunction();
+
 }

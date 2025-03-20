@@ -14,10 +14,4 @@ namespace GLES30 {
     void registerTranslatedFunctions();
     void registerDSAEmulation();
     void registerBufferWorkarounds();
-
-    // GLES32 class when?
-    void registerBaseVertexFunction();
-
-    // GLES Ext class when?
-    void registerBufferStorageFunction();
 }

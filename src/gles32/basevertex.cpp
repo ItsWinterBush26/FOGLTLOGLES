@@ -1,11 +1,11 @@
-#include "gles30/main.h"
+#include "gles32/main.h"
 #include "main.h"
 
 #include <GLES3/gl32.h>
 
 void glMultiDrawElementsBaseVertex(GLenum mode, const GLsizei* count, GLenum type, const void* const* indices, GLsizei drawcount, const GLint* basevertex);
 
-void GLES30::registerBaseVertexFunction() {
+void GLES32::registerBaseVertexFunction() {
     REGISTER(glMultiDrawElementsBaseVertex);
 }
 

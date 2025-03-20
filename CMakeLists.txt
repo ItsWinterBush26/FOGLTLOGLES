@@ -23,12 +23,14 @@ add_subdirectory(deps/spirv-cross)
 file(GLOB_RECURSE SOURCES
 	"src/*.cpp"
 	"src/*/*.cpp"
+	"src/*/*/*.cpp"
 )
 
 set(HEADER_DIRS "include")
 file(GLOB_RECURSE HEADERS
 	"include/*.h"
 	"include/*/*.h"
+	"include/*/*/*'h"
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
