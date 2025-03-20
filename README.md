@@ -6,7 +6,6 @@ This project is a Proof of Concept.
 # Goal
 - [x] Run Sodium 
 - [ ] Support most shaders
-- [ ] Multithreaded multidraw
 - [ ] Improve performance
 
 # License
