@@ -63,6 +63,7 @@ namespace ESUtils {
             LOGW("Extension set wasn't initialized!");
             ESUtils::init();
         }
+        LOGI("Checking for %s", name);
         return realExtensions.find(name) != realExtensions.end();
     }
 }

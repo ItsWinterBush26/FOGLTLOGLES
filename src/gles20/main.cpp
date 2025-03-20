@@ -3,7 +3,7 @@
 #include "utils/log.h"
 
 void GLES20::GLES20Wrapper::init() {
-    LOGI("GLES 2.0 overrides entrypoint!");
+    LOGI("GLES 2.0 entrypoint!");
 
     GLES20::registerTranslatedFunctions();
     GLES20::registerShaderOverrides();
