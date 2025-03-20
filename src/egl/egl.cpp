@@ -14,7 +14,7 @@ FunctionPtr eglGetProcAddress(str procname) {
     std::call_once(eglInitFlag, eglInit);
     FunctionPtr tmp = FOGLTLOGLES::getFunctionAddress(procname);
     
-    if (!tmp) return tmp;
+    if (tmp != nullptr) return tmp;
     else return real_eglGetProcAddress(procname);
 }
 
