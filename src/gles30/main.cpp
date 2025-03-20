@@ -8,5 +8,5 @@ void GLES30::GLES30Wrapper::init() {
     GLES30::registerDSAEmulation();
     GLES30::registerBufferWorkarounds();
     GLES30::registerBaseVertexFunction();
-    GLES30::registerBufferStorageFunction();
+    // GLES30::registerBufferStorageFunction(); lets test if gles20/buffer.cpp would work
 }

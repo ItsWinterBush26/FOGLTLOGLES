@@ -20,7 +20,7 @@ void OV_glEnable(GLenum cap);
 inline std::string glVersion;
 inline std::string rendererString;
 
-inline std::unordered_set<str> extensionMap;
+inline std::unordered_set<str> extensionMap; // move this to es/utils.h somehow?
 inline std::string extensions;
 
 void GLES::registerBrandingOverride() {
