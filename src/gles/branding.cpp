@@ -1,18 +1,25 @@
 #include "es/utils.h"
+#include "gl/glext.h"
+#include "gl/header.h"
 #include "gles/main.h"
 #include "main.h"
 #include "utils/strings.h"
 
 #include <GLES/gl.h>
+#include <unordered_map>
 
 #ifndef CAST_TO_CUBYTE
 #define CAST_TO_CUBYTE(str) reinterpret_cast<const GLubyte*>(str)
 #endif
 
 const GLubyte* OV_glGetString(GLenum name);
+void OV_glGetIntegerv(GLenum pname, int* v);
+const GLubyte* OV_glGetStringi(GLenum pname, int index);
 
 inline std::string glVersion;
 inline std::string rendererString;
+
+inline std::unordered_set<str> extensionMap;
 inline std::string extensions;
 
 void GLES::registerBrandingOverride() {
@@ -27,12 +34,12 @@ void GLES::registerBrandingOverride() {
         glGetString(GL_RENDERER)
     );
 
-    std::unordered_set<str> temp = ESUtils::extensions;
+    extensionMap = ESUtils::extensions;
 
     LOGI("Spoofing ARB_buffer_storage");
-    temp.insert("ARB_buffer_storage");
+    extensionMap.insert("ARB_buffer_storage");
 
-    extensions = join_set(temp, " ");
+    extensions = join_set(extensionMap, " ");
 
     REGISTEROV(glGetString);
 }
@@ -56,5 +63,28 @@ const GLubyte* OV_glGetString(GLenum name) {
 
         default:
             return glGetString(name);
+    }
+}
+
+void OV_glGetIntegerv(GLenum pname, int* v) {
+    switch (pname) {
+        case GL_NUM_EXTENSIONS:
+            (*v) = extensions.size();
+            break;
+
+        default:
+            glGetIntegerv(pname, v);
+            break;
+    }
+}
+
+const GLubyte* OV_glGetStringi(GLenum pname, int index) {
+    switch (pname) {
+        case GL_EXTENSIONS:
+            if (index < 1 || index > extensionMap.size()) return nullptr;
+            return (GLubyte*) *std::next(extensionMap.begin(), index);
+
+        default:
+            return glGetStringi(pname, index);
     }
 }
