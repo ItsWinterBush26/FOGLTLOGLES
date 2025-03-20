@@ -17,8 +17,8 @@ namespace ESUtils {
     inline std::pair<int, int> version = std::make_pair(0, 0); // major, minor
     inline int shadingVersion; // (major * 100) + (minor * 10)
     
-    inline std::unordered_set<str> realExtensions;
-    inline std::unordered_set<str> fakeExtensions;
+    inline std::unordered_set<std::string> realExtensions;
+    inline std::unordered_set<std::string> fakeExtensions;
 
     inline bool isAngle = false;
     inline std::tuple<int, int, int> angleVersion = std::make_tuple(0, 0, 0);
@@ -59,12 +59,12 @@ namespace ESUtils {
         esUtilsInitialized.store(true);
     }
 
-    inline bool isExtensionSupported(str name) {
+    inline bool isExtensionSupported(std::string name) {
         if (!esUtilsInitialized.load()) {
             LOGW("Extension set wasn't initialized!");
             ESUtils::init();
         }
-        LOGI("Checking for %s", name);
+        LOGI("Checking for %s", name.c_str());
         return realExtensions.find(name) != realExtensions.end();
     }
 }
@@ -75,7 +75,7 @@ inline void initExtensionsES2() {
         std::istringstream iss(extensions);
         std::string extension;
         while (iss >> extension) {
-            ESUtils::realExtensions.insert(extension.c_str());
+            ESUtils::realExtensions.insert(extension);
         }
     }
 }
@@ -86,6 +86,6 @@ inline void initExtensionsES3() {
 
     for (GLint i = 0; i < extensionCount; ++i) {
         str extension = reinterpret_cast<str>(glGetStringi(GL_EXTENSIONS, i));
-        if (extension) ESUtils::realExtensions.insert(extension);
+        if (extension) ESUtils::realExtensions.insert(std::string(extension));
     }
 }

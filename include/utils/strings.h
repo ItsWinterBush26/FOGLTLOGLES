@@ -14,7 +14,7 @@ inline std::string string_format(const std::string& format, Args ... args) {
     return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
 }
 
-inline std::string join_set(const std::unordered_set<str>& uset, const std::string& delimiter) {
+inline std::string join_set(const std::unordered_set<std::string>& uset, const std::string& delimiter) {
     std::string result;
     for (auto it = uset.begin(); it != uset.end(); ++it) {
         result += *it;

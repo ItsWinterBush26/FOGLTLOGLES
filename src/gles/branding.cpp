@@ -81,7 +81,7 @@ const GLubyte* OV_glGetStringi(GLenum pname, int index) {
             {
                 auto it = ESUtils::fakeExtensions.begin();
                 std::advance(it, index);
-                return CAST_TO_CUBYTE(*it);
+                return CAST_TO_CUBYTE((*it).c_str());
             }
 
         default:
