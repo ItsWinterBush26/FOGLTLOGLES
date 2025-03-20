@@ -2,7 +2,7 @@
 #include "utils/log.h"
 
 void GLES::GLESWrapper::init() {
-    LOGI("GLES1.0 endpoint!");
+    LOGI("GLES 1.0 endpoint!");
 
     GLES::registerBrandingOverride();
 }

@@ -7,9 +7,10 @@ void* glMapBuffer(GLenum target, GLenum access);
 
 void GLES20Ext::register_OES_mapbuffer() {
     if (!ESUtils::isExtensionSupported("GL_OES_mapbuffer")) {
-        LOGI("GL_OES_mapbuffer unavailable, using fallback...");
+        LOGI("OES_mapbuffer unavailable, using fallback...");
         REGISTER(glMapBuffer);
     } else {
+        LOGI("OES_mapbuffer is present and so used.");
         REGISTEREXT(glMapBuffer, "OES");
     }
 }
@@ -25,7 +26,7 @@ void* glMapBuffer(GLenum target, GLenum access) {
         case GL_ATOMIC_COUNTER_BUFFER: // (4.2)
         case GL_DRAW_INDIRECT_BUFFER: // (4.0)
         case 0x8c2a: // GL_TEXTURE_BUFFER (3.1)
-            LOGI("glMapBuffer unsupported/unimplemented target=0x%x", target);
+            LOGI("glMapBuffer: unsupported/unimplemented target=0x%x", target);
         break;
     }
 
