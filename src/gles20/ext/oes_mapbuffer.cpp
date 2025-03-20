@@ -1,29 +1,31 @@
-#include "gles30/main.h"
-#include "gl/glext.h"
+#include "es/utils.h"
+#include "gles20/ext/main.h"
 #include "main.h"
-#include "utils/log.h"
 
-#include <GLES3/gl32.h>
+#include <EGL/egl.h>
 
 void* glMapBuffer(GLenum target, GLenum access);
 
-void GLES30::registerBufferWorkarounds() {
-    REGISTER(glMapBuffer);
+void GLES20Ext::register_OES_mapbuffer() {
+    if (!ESUtils::isExtensionSupported("GL_OES_mapbuffer")) {
+        LOGI("GL_OES_mapbuffer unavailable, using fallback...");
+        REGISTER(glMapBuffer);
+    } else {
+        REGISTEREXT(glMapBuffer, "OES");
+    }
 }
 
 void* glMapBuffer(GLenum target, GLenum access) {
-    LOGI("glMapBuffer: target=%i access=%i", target, access);
-
     GLenum accessRange;
     GLint bufferSize;
 
     switch (target) {
-        case GL_QUERY_BUFFER: // 4.4
-        case GL_DISPATCH_INDIRECT_BUFFER: // 4.3
-        case GL_SHADER_STORAGE_BUFFER: // 4.3
-        case GL_ATOMIC_COUNTER_BUFFER: // 4.2
-        case GL_DRAW_INDIRECT_BUFFER: // 4.0
-        case GL_TEXTURE_BUFFER: // 3.1
+        case 0x9192: // GL_QUERY_BUFFER (4.4)
+        case GL_DISPATCH_INDIRECT_BUFFER: // (4.3)
+        case GL_SHADER_STORAGE_BUFFER: // (4.3)
+        case GL_ATOMIC_COUNTER_BUFFER: // (4.2)
+        case GL_DRAW_INDIRECT_BUFFER: // (4.0)
+        case 0x8c2a: // GL_TEXTURE_BUFFER (3.1)
             LOGI("glMapBuffer unsupported/unimplemented target=0x%x", target);
         break;
     }

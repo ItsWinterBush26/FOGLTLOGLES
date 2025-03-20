@@ -14,5 +14,6 @@ namespace GLES20Ext {
 
     const inline std::shared_ptr<GLES20ExtWrapper> wrapper = std::make_shared<GLES20ExtWrapper>();
 
-    void register_ARB_buffer_storage();
+    void register_EXT_buffer_storage();
+    void register_OES_mapbuffer();
 }

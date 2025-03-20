@@ -4,5 +4,6 @@
 void GLES20Ext::GLES20ExtWrapper::init() {
     LOGI("GLES2.0 extension entrypoint!");
 
-    GLES20Ext::register_ARB_buffer_storage();
+    GLES20Ext::register_EXT_buffer_storage();
+    GLES20Ext::register_OES_mapbuffer();
 }
