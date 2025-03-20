@@ -1,13 +1,14 @@
 #pragma once
 
+#include "cache.h"
+#include "compilers.h"
+#include "postprocess.h"
 #include "es/utils.h"
 #include "gl/shader.h"
-#include "postprocess.h"
 #include "shaderc/shaderc.h"
 #include "shaderc/status.h"
 #include "spirv_glsl.hpp"
 #include "utils.h"
-#include "shader/compilers.h"
 
 #include <stdexcept>
 #include <string>
@@ -56,7 +57,15 @@ namespace ShaderConverter {
     }
 
     inline void convertAndFix(shaderc_shader_kind kind, std::string& source) {
+        size_t key = Cache::getHash(source);
+        if (Cache::isShaderInCache(key)) {
+            source = Cache::getCachedShaderSource(key);
+            return;
+        }
+
         shaderc::SpvCompilationResult spirv = compileToSPV(kind, source);
         transpileSPV2ESSL(kind, spirv, source);
+
+        Cache::putShaderInCache(key, source);
     }
 }; // namespace ShaderConverter

@@ -20,5 +20,12 @@
     "cmake.ctest.parallelJobs": 8,
     "cmake.generator": "Ninja",
     "clangd.checkUpdates": true,
-    "clangd.serverCompletionRanking": false
+    "clangd.serverCompletionRanking": false,
+    "clangd.arguments": [
+        "-j=8",
+        "--malloc-trim",
+        "--background-index",
+        "--pch-storage=memory",
+        "--background-index"
+    ]
 }
