@@ -1,3 +1,4 @@
+#include "es/validation.h"
 #include "gles20/main.h"
 #include "main.h"
 
@@ -33,6 +34,7 @@ void glMultiDrawElements(
     GLsizei drawcount
 ) {
     if (drawcount == 0) return;
+    if (!Validation::isCurrentFramebufferValid()) return;
 
     #pragma omp parallel for if (drawcount > 32)
     for (GLsizei i = 0; i < drawcount; ++i) {
