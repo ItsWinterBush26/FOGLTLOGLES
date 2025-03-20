@@ -4,7 +4,7 @@
 
 #include <memory>
 
-#define REGISTEREXT(name, prefix) FOGLTLOGLES::registerFunction(#name, TO_FUNCPTR(eglGetProcAddress(#name prefix)));
+#define REGISTEREXT(name, prefix) FOGLTLOGLES::registerFunction(#name, TO_FUNCPTR(real_eglGetProcAddress(#name prefix)));
 
 namespace GLES20Ext {
     class GLES20ExtWrapper : BaseWrapper {
