@@ -45,5 +45,5 @@ void FOGLTLOGLES::init() {
     if (ESUtils::version.first >= 3) GLES30::wrapper->init();
     if (ESUtils::version.first >= 3 && ESUtils::version.second == 2) GLES32::wrapper->init();
 
-    Cache::init();
+    ShaderConverter::Cache::init();
 }
