@@ -61,7 +61,14 @@ namespace ShaderConverter::Cache {
         }
 
         for (const auto& entry : std::filesystem::directory_iterator { CACHE_DIRECTORY }) {
-            
+            if (std::filesystem::is_regular_file(entry.status())) {
+                try {
+                    size_t realFilename = std::stoull(entry.path().filename().string());
+                    shaderCache.insert({ realFilename, entry.path().string() });
+                } catch (const std::exception& e) {
+                    continue;
+                }
+            }
         }
     }
 }

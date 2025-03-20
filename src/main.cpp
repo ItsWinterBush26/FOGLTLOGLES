@@ -4,6 +4,7 @@
 #include "gles20/main.h"
 #include "gles30/main.h"
 #include "gles32/main.h"
+#include "shader/cache.h"
 #include "utils/log.h"
 
 #include <GLES3/gl32.h>
@@ -43,4 +44,6 @@ void FOGLTLOGLES::init() {
     if (ESUtils::version.first >= 2) GLES20::wrapper->init();
     if (ESUtils::version.first >= 3) GLES30::wrapper->init();
     if (ESUtils::version.first >= 3 && ESUtils::version.second == 2) GLES32::wrapper->init();
+
+    Cache::init();
 }
