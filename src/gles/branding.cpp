@@ -37,7 +37,7 @@ void GLES::registerBrandingOverride() {
     extensionMap = ESUtils::extensions;
 
     LOGI("Spoofing ARB_buffer_storage");
-    extensionMap.insert("ARB_buffer_storage");
+    extensionMap.insert("GL_ARB_buffer_storage");
 
     extensions = join_set(extensionMap, " ");
 
