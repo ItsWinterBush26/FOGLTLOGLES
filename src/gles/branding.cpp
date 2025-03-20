@@ -15,6 +15,7 @@
 const GLubyte* OV_glGetString(GLenum name);
 void OV_glGetIntegerv(GLenum pname, int* v);
 const GLubyte* OV_glGetStringi(GLenum pname, int index);
+void OV_glEnable(GLenum cap);
 
 inline std::string glVersion;
 inline std::string rendererString;
@@ -42,6 +43,9 @@ void GLES::registerBrandingOverride() {
     extensions = join_set(extensionMap, " ");
 
     REGISTEROV(glGetString);
+    REGISTEROV(glGetIntegerv);
+    REGISTEROV(glGetStringi);
+    REGISTEROV(glEnable)
 }
 
 const GLubyte* OV_glGetString(GLenum name) {
@@ -69,7 +73,7 @@ const GLubyte* OV_glGetString(GLenum name) {
 void OV_glGetIntegerv(GLenum pname, int* v) {
     switch (pname) {
         case GL_NUM_EXTENSIONS:
-            (*v) = extensions.size();
+            (*v) = extensionMap.size();
             break;
 
         default:
@@ -82,9 +86,20 @@ const GLubyte* OV_glGetStringi(GLenum pname, int index) {
     switch (pname) {
         case GL_EXTENSIONS:
             if (index < 1 || index > extensionMap.size()) return nullptr;
-            return (GLubyte*) *std::next(extensionMap.begin(), index);
+            return CAST_TO_CUBYTE(*std::next(extensionMap.begin(), index));
 
         default:
             return glGetStringi(pname, index);
+    }
+}
+
+void OV_glEnable(GLenum cap) {
+    switch (cap) {
+        case GL_DEBUG_OUTPUT:
+            break;
+
+        default:
+            glEnable(cap);
+            break;
     }
 }
