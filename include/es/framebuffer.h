@@ -2,12 +2,14 @@
 
 #include <GLES2/gl2.h>
 
-inline void ensureCorrectAttachmentPName(GLenum& pname) {
-    switch (pname) {
-        case 0x8DA7: // GL_FRAMEBUFFER_ATTACHMENT_LAYERED in gl/glext.h
-            pname = GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE;
-            break;
-        default:
-            break;
+inline GLuint getAttachmentIndex(GLenum attachment) {
+    switch (attachment) {
+        case GL_NONE:
+        case GL_DEPTH_ATTACHMENT:
+        case GL_STENCIL_ATTACHMENT:
+        case 0x821a: // GL_DEPTH_STENCIL_ATTACHMENT
+            return -1;
     }
+
+    return attachment - 0x8ce0; /* GL_COLOR_ATTACHMENT0 */
 }
