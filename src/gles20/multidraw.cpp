@@ -26,7 +26,7 @@ void glMultiDrawArrays(
 
     #pragma omp parallel for if (drawcount > DRAWCOUNT_THRESHOLD)
     for (GLsizei i = 0; i < drawcount; ++i) {
-        glDrawArrays(mode, first[i], count[i]);
+        if (count[i] > 0) glDrawArrays(mode, first[i], count[i]);
     }
 }
 
@@ -38,10 +38,10 @@ void glMultiDrawElements(
     GLsizei drawcount
 ) {
     if (drawcount == 0) return;
-    if (!Validation::isCurrentFramebufferValid()) return;
+    // if (!Validation::isCurrentFramebufferValid()) return;
 
     #pragma omp parallel for if (drawcount > DRAWCOUNT_THRESHOLD)
     for (GLsizei i = 0; i < drawcount; ++i) {
-        glDrawElements(mode, count[i], type, indices[i]);
+        if (count[i] > 0) glDrawElements(mode, count[i], type, indices[i]);
     }
 }

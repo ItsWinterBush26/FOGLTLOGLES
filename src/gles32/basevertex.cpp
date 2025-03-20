@@ -20,6 +20,6 @@ void glMultiDrawElementsBaseVertex(
     if (drawcount == 0) return;
 
     for(GLsizei i = 0; i < drawcount; i++) {
-        glDrawElementsBaseVertex(mode, count[i], type, indices[i], basevertex[i]);
+        if (count[i] > 0) glDrawElementsBaseVertex(mode, count[i], type, indices[i], basevertex[i]);
     }
 }
