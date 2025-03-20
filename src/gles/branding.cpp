@@ -86,9 +86,11 @@ const GLubyte* OV_glGetStringi(GLenum pname, int index) {
     switch (pname) {
         case GL_EXTENSIONS:
             if (index < 0 || index >= extensionMap.size()) return nullptr;
-            auto it = extensionMap.begin();
-            std::advance(it, index);
-            return CAST_TO_CUBYTE(it->c_str());
+            {
+                auto it = extensionMap.begin();
+                std::advance(it, index);
+                return CAST_TO_CUBYTE(it);
+            }
 
         default:
             return glGetStringi(pname, index);
