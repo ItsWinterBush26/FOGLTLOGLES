@@ -17,4 +17,7 @@ namespace GLES30 {
 
     // GLES32 class when?
     void registerBaseVertexFunction();
+
+    // GLES Ext class when?
+    void registerBufferStorageFunction();
 }

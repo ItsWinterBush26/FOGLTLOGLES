@@ -13,6 +13,7 @@ const GLubyte* OV_glGetString(GLenum name);
 
 inline std::string glVersion;
 inline std::string rendererString;
+inline std::string extensions;
 
 void GLES::registerBrandingOverride() {
     glVersion = string_format(
@@ -25,6 +26,13 @@ void GLES::registerBrandingOverride() {
         "FOGLTLOGLES (on %s)",
         glGetString(GL_RENDERER)
     );
+
+    std::unordered_set<str> temp = ESUtils::extensions;
+
+    LOGI("Spoofing ARB_buffer_storage");
+    temp.insert("ARB_buffer_storage");
+
+    extensions = join_set(temp, " ");
 
     REGISTEROV(glGetString);
 }
@@ -42,6 +50,9 @@ const GLubyte* OV_glGetString(GLenum name) {
 
         case GL_RENDERER:
             return CAST_TO_CUBYTE(rendererString.c_str());
+
+        case GL_EXTENSIONS:
+            return CAST_TO_CUBYTE(extensions.c_str());
 
         default:
             return glGetString(name);
