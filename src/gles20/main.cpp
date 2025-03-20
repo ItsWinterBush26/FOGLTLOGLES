@@ -10,6 +10,7 @@ void GLES20::GLES20Wrapper::init() {
     GLES20::registerTextureOverrides();
     GLES20::registerMultiDrawEmulation();
     GLES20::registerFramebufferOverride();
+    GLES20::registerRenderbufferWorkaround();
 
     GLES20Ext::wrapper->init();
 }
