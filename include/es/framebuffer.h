@@ -13,3 +13,5 @@ inline GLuint getAttachmentIndex(GLenum attachment) {
 
     return attachment - 0x8ce0; /* GL_COLOR_ATTACHMENT0 */
 }
+
+// inline GLenum getMapAttachment();
