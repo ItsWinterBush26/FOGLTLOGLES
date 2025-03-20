@@ -17,7 +17,9 @@ void glMultiDrawArrays(
     const GLsizei* count,
     GLsizei drawcount
 ) {
-    #pragma omp parallel for if (drawcount > 16)
+    if (drawcount == 0) return;
+
+    #pragma omp parallel for if (drawcount > 32)
     for (GLsizei i = 0; i < drawcount; ++i) {
         glDrawArrays(mode, first[i], count[i]);
     }
@@ -30,7 +32,9 @@ void glMultiDrawElements(
     const void* const* indices,
     GLsizei drawcount
 ) {
-    #pragma omp parallel for if (drawcount > 16)
+    if (drawcount == 0) return;
+
+    #pragma omp parallel for if (drawcount > 32)
     for (GLsizei i = 0; i < drawcount; ++i) {
         glDrawElements(mode, count[i], type, indices[i]);
     }
