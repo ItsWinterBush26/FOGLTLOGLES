@@ -85,8 +85,10 @@ void OV_glGetIntegerv(GLenum pname, int* v) {
 const GLubyte* OV_glGetStringi(GLenum pname, int index) {
     switch (pname) {
         case GL_EXTENSIONS:
-            if (index < 1 || index > extensionMap.size()) return nullptr;
-            return CAST_TO_CUBYTE(*std::next(extensionMap.begin(), index));
+            if (index < 0 || index >= extensionMap.size()) return nullptr;
+            auto it = extensionMap.begin();
+            std::advance(it, index);
+            return CAST_TO_CUBYTE(it->c_str());
 
         default:
             return glGetStringi(pname, index);
