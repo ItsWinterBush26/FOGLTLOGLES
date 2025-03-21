@@ -40,11 +40,14 @@ inline void doSwizzling(GLenum target, const std::vector<SwizzleOperation>& oper
     
     std::vector<GLint> currentSwizzle = swizzleArrayMap.at(operations[0]);
     
+    if (operations.size() == 1) goto swizzle;
+    
     for (size_t i = 1; i < operations.size(); i++) {
         const std::vector<GLint>& nextTransform = swizzleArrayMap.at(operations[i]);
         currentSwizzle = transformSwizzle(currentSwizzle, nextTransform);
     }
     
+swizzle:
     // Apply the final swizzle settings to the texture
     glTexParameteri(target, GL_TEXTURE_SWIZZLE_R, currentSwizzle[0]);
     glTexParameteri(target, GL_TEXTURE_SWIZZLE_G, currentSwizzle[1]);
