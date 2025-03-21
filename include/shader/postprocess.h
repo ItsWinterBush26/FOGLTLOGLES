@@ -57,7 +57,21 @@ namespace ShaderConverter::SPVPostprocessor {
         removeLocationBindingAndDescriptorSets(compiler, resources.stage_inputs);
         removeLocationBindingAndDescriptorSets(compiler, resources.stage_outputs);
 
-        removeInitializers(compiler, resources.uniform_buffers);
-        removeInitializers(compiler, resources.storage_buffers);
+        // removeInitializers(compiler, resources.uniform_buffers);
+        // removeInitializers(compiler, resources.storage_buffers);
     }
-}; // namespace SPVPostprocessor
+}; // namespace ShaderConverer::SPVPostprocessor
+
+namespace ShaderConverter::RegexPostprocessor {
+    // I JUST HAD TO DO IT 💀
+
+    std::regex patternMat4(R"(uniform\s+mat4\s+(\w+)\s*=\s*mat4\s*\([^)]*\)\s*;)");
+
+    inline void removeInitializersMat4(std::string& source) {
+        source = std::regex_replace(source, patternMat4, "uniform mat4 $1;");
+    }
+
+    inline void processESSLSource(std::string& source) {
+        removeInitializersMat4(source);
+    }
+}

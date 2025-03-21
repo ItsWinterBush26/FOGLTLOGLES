@@ -50,6 +50,8 @@ namespace ShaderConverter {
 
         target = compiler.compile();
 
+        RegexPostprocessor::processESSLSource(target);
+
         if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
             LOGI("Transpiled GLSL -> ESSL source:");
             LOGI("%s", target.c_str());
