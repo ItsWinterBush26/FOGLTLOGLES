@@ -1,84 +1,155 @@
+// Based on:
+// https://github.com/artdeell/LTW/blob/master/ltw/src/main/tinywrapper/framebuffer.c
+
 #include "es/framebuffer.h"
 #include "gles20/main.h"
+#include "main.h"
 
 #include <GLES2/gl2.h>
 #include <GLES3/gl3.h>
-#include <unordered_map>
 
-#define MAX_FBTARGETS 8
-#define MAX_DRAWBUFFERS 8
+void glDrawBuffer(GLenum buffer);
+void OV_glDrawBuffers(GLsizei n, const GLenum* buffers);
 
-typedef struct {
-    GLuint colorTargets[MAX_FBTARGETS];
-    GLuint colorObjects[MAX_FBTARGETS];
-    GLuint colorLevels[MAX_FBTARGETS];
-    GLuint colorLayers[MAX_FBTARGETS];
-} FramebufferColorInfo;
+void OV_glClearBufferfv(GLenum buffer, GLint drawbuffer, const GLfloat* value);
+void OV_glClearBufferiv(GLenum buffer, GLint drawbuffer, const GLint* value);
+void OV_glClearBufferuiv(GLenum buffer, GLint drawbuffer, const GLuint* value);
 
-typedef struct {
-    FramebufferColorInfo colorInfo;
-    GLenum virtualDrawbuffers[MAX_DRAWBUFFERS] = { GL_COLOR_ATTACHMENT0 };
-    GLenum physicalDrawbuffers[MAX_DRAWBUFFERS];
-    GLsizei bufferAmount = 1;
-} Framebuffer;
-
-inline GLuint drawBuffer = 0, readBuffer = 0;
-inline std::unordered_map<GLuint, std::shared_ptr<Framebuffer>> boundFramebuffers;
-
-std::shared_ptr<Framebuffer> getFramebufferObject(GLenum target) {
-    GLuint framebuffer = 0;
-    switch (target) {
-        case GL_FRAMEBUFFER:
-        case GL_DRAW_FRAMEBUFFER:
-            framebuffer = drawBuffer;
-            break;
-        case GL_READ_FRAMEBUFFER:
-            framebuffer = readBuffer;
-            break;
-    }
-
-    return boundFramebuffers.at(framebuffer);
-}
-
-inline GLenum getMapAttachment(std::shared_ptr<Framebuffer> framebuffer, GLenum attachment) {
-    if (framebuffer->bufferAmount == 0) return GL_NONE;
-
-    for (GLsizei i = 0; i < framebuffer->bufferAmount; ++i) {
-        if (framebuffer->virtualDrawbuffers[i] == attachment) {
-            return framebuffer->virtualDrawbuffers[i];
-        }
-    }
-
-    return GL_NONE;
-}
-
-void OV_glGenFramebuffers(GLsizei n, GLuint *framebuffers);
 void OV_glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
+void OV_glFramebufferTextureLayer(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer);
 void OV_glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
+
+void OV_glGenFramebuffers(GLsizei n, GLuint* framebuffers);
 void OV_glBindFramebuffer(GLenum target, GLuint framebuffer);
 
-void OV_glDrawBuffers(GLsizei n, const GLenum* buffers);
-void glDrawBuffer(GLenum buffer) { OV_glDrawBuffers(1, &buffer); }
-
+void OV_glGetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, GLenum pname, GLint* params);
 GLenum OV_glCheckFramebufferStatus(GLenum target);
-void OV_glGetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, GLenum pname, GLint *params);
-
-void OV_glClearBufferiv(GLenum pname, GLint drawbuffer, const GLint* value);
-void OV_glClearBufferuiv(GLenum pname, GLint drawbuffer, const GLint* value);
-void OV_glClearBufferfv(GLenum pname, GLint drawbuffer, const GLint* value);
 
 void GLES20::registerFramebufferOverride() {
-    
+    REGISTER(glDrawBuffer);
+    REGISTEROV(glDrawBuffers);
+
+    REGISTEROV(glClearBufferfv);
+    REGISTEROV(glClearBufferiv)
+    REGISTEROV(glClearBufferuiv);
+
+    REGISTEROV(glFramebufferTexture2D);
+    REGISTEROV(glFramebufferTextureLayer);
+    REGISTEROV(glFramebufferRenderbuffer);
+
+    REGISTEROV(glGenFramebuffers);
+    REGISTEROV(glBindFramebuffer);
+
+    REGISTEROV(glGetFramebufferAttachmentParameteriv);
+    REGISTEROV(glCheckFramebufferStatus);
 }
 
-void glGetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, GLenum pname, GLint *params) {
-    
+void glDrawBuffer(GLenum buffer) {
+    OV_glDrawBuffers(1, &buffer);
 }
 
-void OV_glGenFramebuffers(GLsizei n, GLuint *framebuffers) {
+void OV_glDrawBuffers(GLsizei n, const GLenum* buffers) {
+    auto framebuffer = getFramebufferObject(GL_DRAW_FRAMEBUFFER);
+    if (framebuffer == nullptr) {
+        glDrawBuffers(n, buffers);
+        return;
+    }
+
+    framebuffer->bufferAmount = n;
+    memcpy(framebuffer->virtualDrawbuffers, buffers, n * sizeof(GLenum));
+
+    GLenum physicalDrawbuffer[n];
+
+    for (int i = 0; i < n; ++i) {
+        GLenum buffer = buffers[i];
+        rebindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer, buffer);
+
+        if (buffer != GL_NONE) physicalDrawbuffer[i] = GL_COLOR_ATTACHMENT0+i;
+        else physicalDrawbuffer[i] = GL_NONE;
+    }
+
+    glDrawBuffers(n, buffers);
+}
+
+void OV_glClearBufferfv(GLenum buffer, GLint drawbuffer, const GLfloat* value) {
+    clearFramebuffer(buffer, drawbuffer);
+    glClearBufferfv(buffer, drawbuffer, value);
+}
+
+void OV_glClearBufferiv(GLenum buffer, GLint drawbuffer, const GLint* value) {
+    clearFramebuffer(buffer, drawbuffer);
+    glClearBufferiv(buffer, drawbuffer, value);
+}
+
+void OV_glClearBufferuiv(GLenum buffer, GLint drawbuffer, const GLuint* value) {
+    clearFramebuffer(buffer, drawbuffer);
+    glClearBufferuiv(buffer, drawbuffer, value);
+}
+
+
+void OV_glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level) {
+    auto framebuffer = getFramebufferObject(target);
+    GLuint attachmentIndex = getAttachmentIndex(attachment);
+
+    if (framebuffer.get() == nullptr || attachmentIndex == -1) {
+        glFramebufferTexture2D(target, attachment, textarget, texture, level);
+        return;
+    }
+
+    if (texture == 0) {
+        framebuffer->colorInfo.colorTargets[attachmentIndex] = GL_NONE;
+    } else {
+        framebuffer->colorInfo.colorTargets[attachmentIndex] = textarget;
+        framebuffer->colorInfo.colorObjects[attachmentIndex] = texture;
+        framebuffer->colorInfo.colorLevels[attachmentIndex] = level;
+    }
+
+    rebindFramebuffer(target, framebuffer, attachment);
+}
+
+void OV_glFramebufferTextureLayer(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer) {
+    auto framebuffer = getFramebufferObject(target);
+    GLuint attachmentIndex = getAttachmentIndex(attachment);
+
+    if (framebuffer.get() == nullptr || attachmentIndex == -1) {
+        glFramebufferTextureLayer(target, attachment, texture, level, layer);
+        return;
+    }
+
+    if (texture == 0) {
+        framebuffer->colorInfo.colorTargets[attachmentIndex] = GL_NONE;
+    } else {
+        framebuffer->colorInfo.colorTargets[attachmentIndex] = GL_TEXTURE;
+        framebuffer->colorInfo.colorObjects[attachmentIndex] = texture;
+        framebuffer->colorInfo.colorLevels[attachmentIndex] = level;
+        framebuffer->colorInfo.colorLayers[attachmentIndex] = layer;
+    }
+
+    rebindFramebuffer(target, framebuffer, attachment);
+}
+
+void OV_glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer) {
+    auto framebuffer = getFramebufferObject(target);
+    GLuint attachmentIndex = getAttachmentIndex(attachment);
+
+    if (framebuffer.get() == nullptr || attachmentIndex == -1) {
+        glFramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer);
+        return;
+    }
+
+    if (renderbuffer == 0) {
+        framebuffer->colorInfo.colorTargets[attachmentIndex] = GL_NONE;
+    } else {
+        framebuffer->colorInfo.colorTargets[attachmentIndex] = renderbuffertarget;
+        framebuffer->colorInfo.colorObjects[attachmentIndex] = renderbuffer;
+    }
+
+    rebindFramebuffer(target, framebuffer, attachment);
+}
+
+void OV_glGenFramebuffers(GLsizei n, GLuint* framebuffers) {
     glGenFramebuffers(n, framebuffers);
 
-    Framebuffer* framebuffer;
     for (GLsizei i = 0; i < n; ++i) {
         boundFramebuffers.insert({ framebuffers[i], std::make_shared<Framebuffer>() });
     }
@@ -91,11 +162,32 @@ void OV_glBindFramebuffer(GLenum target, GLuint framebuffer) {
         case GL_FRAMEBUFFER:
             readBuffer = drawBuffer = framebuffer;
             break;
-        case GL_READ_FRAMEBUFFER:
-            readBuffer = framebuffer;
-            break;
-        case GL_DRAW_FRAMEBUFFER:
-            drawBuffer = framebuffer;
-            break;
+        case GL_READ_FRAMEBUFFER: readBuffer = framebuffer; break;
+        case GL_DRAW_FRAMEBUFFER: drawBuffer = framebuffer; break;
     }
+}
+
+void OV_glGetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, GLenum pname, GLint* params) {
+    auto framebuffer = getFramebufferObject(target);
+    GLuint attachmentIndex = getAttachmentIndex(attachment);
+
+    if (framebuffer.get() == nullptr || attachmentIndex == -1) {
+        glGetFramebufferAttachmentParameteriv(target, attachment, pname, params);
+        return;
+    }
+
+    getFramebufferAttachmentParameter(framebuffer, attachmentIndex, pname, params);
+}
+
+GLenum OV_glCheckFramebufferStatus(GLenum target) {
+    GLenum framebufferStatus = glCheckFramebufferStatus(target);
+    if (framebufferStatus == GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT) {
+        auto framebuffer = getFramebufferObject(target);
+        for (GLint i = 0; i < MAX_FBTARGETS; ++i) {
+            if (framebuffer->colorInfo.colorTargets[i] != GL_NONE
+             || framebuffer->colorInfo.colorObjects[i] != 0) return GL_FRAMEBUFFER_COMPLETE;
+        }
+    }
+
+    return framebufferStatus;
 }
