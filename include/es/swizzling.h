@@ -11,7 +11,7 @@ enum SwizzleOperation {
 };
 
 inline const std::unordered_map<SwizzleOperation, std::vector<GLint>> swizzleArrayMap = {
-    { BGRA2RGBA,           { GL_BLUE, GL_GREEN, GL_RED, GL_ALPHA } },
+    { BGRA2RGBA,           { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA } },
     { ENDIANNESS_SWAP,     { GL_ALPHA, GL_BLUE, GL_GREEN, GL_RED } }
     // { ENDIANNESS_SWAP_REV, { GL_BLUE, GL_GREEN, GL_RED, GL_ALPHA } }
 };
@@ -41,7 +41,7 @@ inline void doSwizzling(GLenum target, const std::vector<SwizzleOperation>& oper
     std::vector<GLint> currentSwizzle = swizzleArrayMap.at(operations[0]);
     
     if (operations.size() == 1) goto swizzle;
-    
+
     for (size_t i = 1; i < operations.size(); i++) {
         const std::vector<GLint>& nextTransform = swizzleArrayMap.at(operations[i]);
         currentSwizzle = transformSwizzle(currentSwizzle, nextTransform);
