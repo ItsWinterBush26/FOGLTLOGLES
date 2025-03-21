@@ -51,7 +51,8 @@ inline std::shared_ptr<Framebuffer> getFramebufferObject(GLenum target) {
             break;
     }
 
-    return boundFramebuffers.at(framebuffer);
+    // if (boundFramebuffers.find(framebuffer) == boundFramebuffers.end()) return nullptr;
+    return boundFramebuffers[framebuffer];
 }
 
 inline GLuint getAttachmentIndex(GLenum attachment) {
