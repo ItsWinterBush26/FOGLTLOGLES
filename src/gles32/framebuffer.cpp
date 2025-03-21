@@ -60,7 +60,9 @@ void OV_glDrawBuffers(GLsizei n, const GLenum* buffers) {
     framebuffer->bufferAmount = n;
     std::memcpy(framebuffer->virtualDrawbuffers, buffers, n * sizeof(GLenum));
 
-    for (int i = 0; i < n && i < MAX_DRAWBUFFERS; ++i) {
+    // no bounds checking as theres a memcpy
+    // above that clearly ignores MAX_DRAWBUFFERS
+    for (int i = 0; i < n; ++i) {
         GLenum buffer = buffers[i];
         rebindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer, buffer);
 

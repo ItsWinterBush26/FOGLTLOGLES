@@ -49,8 +49,7 @@ inline std::shared_ptr<Framebuffer> getFramebufferObject(GLenum target) {
             framebuffer = readBuffer;
             break;
     }
-
-    // if (boundFramebuffers.find(framebuffer) == boundFramebuffers.end()) return nullptr;
+    
     return boundFramebuffers[framebuffer];
 }
 
@@ -79,7 +78,7 @@ inline GLenum getMapAttachment(std::shared_ptr<Framebuffer> framebuffer, GLenum 
 
     for (GLsizei i = 0; i < framebuffer->bufferAmount; ++i) {
         if (framebuffer->virtualDrawbuffers[i] == attachment) {
-            return framebuffer->physicalDrawbuffers[i];
+            return attachment;
         }
     }
 
@@ -187,14 +186,14 @@ inline void getFramebufferAttachmentParameter(std::shared_ptr<Framebuffer> frame
 inline void clearFramebuffer(GLenum buffer, GLint& drawBuffer) {
     auto framebuffer = getFramebufferObject(GL_DRAW_FRAMEBUFFER);
     if (framebuffer.get() != nullptr && buffer == GL_COLOR) {
-        for (GLsizei i = 0; i < framebuffer->bufferAmount; ++i) {
+        /* for (GLsizei i = 0; i < framebuffer->bufferAmount; ++i) {
             if (i == drawBuffer) {
                 drawBuffer = framebuffer->physicalDrawbuffers[i] - GL_COLOR_ATTACHMENT0;
                 break;
             }
-        }
+        } */
+        
+        GLenum attachment = getMapAttachment(framebuffer, GL_COLOR_ATTACHMENT0 + drawBuffer);
+        drawBuffer = attachment - GL_COLOR_ATTACHMENT0;
     }
-
-    // GLenum attachment = getMapAttachment(framebuffer, GL_COLOR_ATTACHMENT0 + drawBuffer);
-    // drawBuffer = attachment - GL_COLOR_ATTACHMENT0;
 }
