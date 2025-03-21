@@ -92,7 +92,7 @@ const GLubyte* OV_glGetStringi(GLenum pname, int index) {
 void OV_glEnable(GLenum cap) {
     switch (cap) {
         case GL_DEBUG_OUTPUT:
-            break;
+            // break;
 
         default:
             glEnable(cap);
