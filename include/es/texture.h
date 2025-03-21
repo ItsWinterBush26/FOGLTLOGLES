@@ -1,5 +1,6 @@
 #pragma once
 
+#include "es/swizzling.h"
 #include <GLES3/gl32.h>
 #include <unordered_map>
 
@@ -35,10 +36,18 @@ inline void selectProperTexType(GLint internalFormat, GLenum& type) {
     }
 }
 
-inline void selectProperTexFormat(GLint internalFormat, GLenum& format) {
+inline void selectProperTexFormat(GLenum target, GLint internalFormat, GLenum& format) {
     switch (internalFormat) {
         case 5898: // GL_RGB16F
             format = GL_RGB;
+            break;
+        case GL_RGBA:
+            switch (format) {
+                case 0x80e1: // GL_BGRA
+                    format = GL_RGBA;
+                    doSwizzling(BGRA2RGBA, target);
+                    break;
+            }
             break;
     }
 }
@@ -50,3 +59,4 @@ inline void selectProperTexIFormat(GLint& internalFormat) {
             break;
     }
 }
+

@@ -7,7 +7,9 @@
 #include "utils/pointers.h"
 
 #include <GLES2/gl2.h>
+#include <cstring>
 #include <memory>
+#include <vector>
 
 void OV_glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels);
 void OV_glTexImage3D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const void* pixels);
@@ -40,6 +42,7 @@ void OV_glTexImage2D(
     GLenum type, const void* pixels
 ) {
     LOGI("glTexImage2D: internalformat=%i border=%i format=%i type=%u", internalFormat, border, format, type);
+
     if (isProxyTexture(target)) {
         boundProxyTexture = MakeAggregateShared<ProxyTexture>(
             target,
@@ -50,8 +53,9 @@ void OV_glTexImage2D(
         );
     } else {
         selectProperTexIFormat(internalFormat);
-        selectProperTexFormat(internalFormat, format);
         selectProperTexType(internalFormat, type);
+        selectProperTexFormat(target, internalFormat, format);
+
         glTexImage2D(
             target, level, internalFormat, 
             width, height,

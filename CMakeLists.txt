@@ -80,6 +80,10 @@ set(DEPENDENCIES
 	# Minimal static SPIRV-Cross
 	spirv-cross-core
 	spirv-cross-glsl
+
+	# OpenMP static
+	-fopenmp
+	-static-openmp
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_OPTIONS -fopenmp)
