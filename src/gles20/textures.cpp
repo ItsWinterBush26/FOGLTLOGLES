@@ -53,8 +53,8 @@ void OV_glTexImage2D(
         );
     } else {
         selectProperTexIFormat(internalFormat);
-        selectProperTexType(internalFormat, type);
         selectProperTexFormat(target, internalFormat, format);
+        selectProperTexType(target, internalFormat, type);
 
         glTexImage2D(
             target, level, internalFormat, 
