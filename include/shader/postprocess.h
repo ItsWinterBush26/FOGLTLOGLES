@@ -7,15 +7,16 @@
 
 #include <shaderc/shaderc.hpp>
 
-class SPVC_Exposed_CompilerGLSL : public spirv_cross::CompilerGLSL {
+class SPVCExposed_CompilerGLSL : public spirv_cross::CompilerGLSL {
     public:
         using spirv_cross::CompilerGLSL::CompilerGLSL;
         using spirv_cross::CompilerGLSL::get;
-    };
+};
+
 
 namespace ShaderConverter::SPVPostprocessor {
     inline void removeLocationBindingAndDescriptorSets(
-        SPVC_Exposed_CompilerGLSL& compiler,
+        SPVCExposed_CompilerGLSL& compiler,
         const spirv_cross::SmallVector<spirv_cross::Resource>& resources
     ) {
         for (const auto& resource : resources) {
@@ -26,7 +27,7 @@ namespace ShaderConverter::SPVPostprocessor {
     }
 
     inline void removeInitializers(
-        SPVC_Exposed_CompilerGLSL& compiler,
+        SPVCExposed_CompilerGLSL& compiler,
         const spirv_cross::SmallVector<spirv_cross::Resource>& resources
     ) {
         for (const auto& resource : resources) {
@@ -35,7 +36,7 @@ namespace ShaderConverter::SPVPostprocessor {
         }
     }
 
-    inline void processSPVBytecode(SPVC_Exposed_CompilerGLSL &compiler, shaderc_shader_kind kind) {
+    inline void processSPVBytecode(SPVCExposed_CompilerGLSL &compiler, shaderc_shader_kind kind) {
         if (kind == shaderc_glsl_compute_shader) {
             LOGI("Compute shader processing is unimplemented right now...");
             return;
