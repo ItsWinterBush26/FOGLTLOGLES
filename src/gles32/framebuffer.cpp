@@ -49,7 +49,7 @@ void glDrawBuffer(GLenum buffer) {
 
 void OV_glDrawBuffers(GLsizei n, const GLenum* buffers) {
     auto framebuffer = getFramebufferObject(GL_DRAW_FRAMEBUFFER);
-    if (framebuffer == nullptr) {
+    if (framebuffer.get() == nullptr) {
         glDrawBuffers(n, buffers);
         return;
     }
