@@ -6,4 +6,5 @@ void GLES32::GLES32Wrapper::init() {
 
     GLES32::registerBaseVertexFunction();
     GLES32::registerFramebufferOverrides();
+    GLES32::registerTextureOverrides();
 }

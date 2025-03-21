@@ -320,8 +320,12 @@ inline void updateTextureAttachmentProperties(
     GLint textureFormat;
     GLint previousTexture;
     glGetIntegerv(bindTarget, &previousTexture);
+
+    LOGI("Binding texture=%u to bindTarget=%u", texture, bindTarget);
     glBindTexture(bindTarget, texture);
-    glGetTexLevelParameteriv(bindTarget, level, GL_TEXTURE_INTERNAL_FORMAT, &textureFormat);
+
+    reinterpret_cast<PFNGLGETTEXLEVELPARAMETERIVPROC>(FOGLTLOGLES::getFunctionAddress("glGetTexLevelParameteriv"))(bindTarget, level, GL_TEXTURE_INTERNAL_FORMAT, &textureFormat);
+    
     glBindTexture(bindTarget, previousTexture);
     
     framebuffer->colorInfo.colorComponentType[attachmentIndex] = getComponentTypeFromFormat(textureFormat);

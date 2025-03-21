@@ -14,4 +14,5 @@ namespace GLES32 {
 
     void registerBaseVertexFunction();
     void registerFramebufferOverrides();
+    void registerTextureOverrides();
 }
