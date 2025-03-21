@@ -9,7 +9,7 @@ struct ProxyTexture {
     GLenum type;
     GLint width;
     GLint height;
-    GLint depth; // if GL_PROXY_TEXTURE_3D
+    // GLint depth; // if GL_PROXY_TEXTURE_3D
     GLint level;
     GLint internalFormat;
 };
@@ -44,10 +44,10 @@ inline void getProxyTexLevelParameter(GLenum pname, GLint* params) {
         case GL_TEXTURE_HEIGHT:
             (*params) = nlevel(boundProxyTexture->height, boundProxyTexture->level);
             return;
-        case GL_TEXTURE_DEPTH:
+        /* case GL_TEXTURE_DEPTH:
             if (boundProxyTexture->type != GL_TEXTURE_3D) return;
             (*params) = nlevel(boundProxyTexture->depth, boundProxyTexture->level);
-            return;
+            return; */
         case GL_TEXTURE_INTERNAL_FORMAT:
             (*params) = boundProxyTexture->internalFormat;
             return;

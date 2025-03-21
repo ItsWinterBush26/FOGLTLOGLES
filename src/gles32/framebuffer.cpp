@@ -97,11 +97,16 @@ void OV_glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarge
 
     if (texture == 0) {
         framebuffer->colorInfo.colorTargets[attachmentIndex] = GL_NONE;
+        framebuffer->colorInfo.colorComponentType[attachmentIndex] = 0;
+        framebuffer->colorInfo.colorEncoding[attachmentIndex] = 0;
     } else {
         framebuffer->colorInfo.colorTargets[attachmentIndex] = textarget;
         framebuffer->colorInfo.colorObjects[attachmentIndex] = texture;
         framebuffer->colorInfo.colorLevels[attachmentIndex] = level;
-        updateTextureAttachmentProperties(framebuffer, attachmentIndex, textarget, texture, level);
+
+        GLint textureFormat = trackedTextures[texture];
+        framebuffer->colorInfo.colorComponentType[attachmentIndex] = getComponentTypeFromFormat(textureFormat);
+        framebuffer->colorInfo.colorEncoding[attachmentIndex] = isSRGBFormat(textureFormat) ? GL_SRGB : GL_LINEAR;
     }
 
     rebindFramebuffer(target, framebuffer, attachment);
@@ -118,12 +123,20 @@ void OV_glFramebufferTextureLayer(GLenum target, GLenum attachment, GLuint textu
 
     if (texture == 0) {
         framebuffer->colorInfo.colorTargets[attachmentIndex] = GL_NONE;
+        framebuffer->colorInfo.colorObjects[attachmentIndex] = 0;
+        framebuffer->colorInfo.colorLevels[attachmentIndex] = 0;
+        framebuffer->colorInfo.colorLayers[attachmentIndex] = 0;
+        framebuffer->colorInfo.colorComponentType[attachmentIndex] = 0;
+        framebuffer->colorInfo.colorEncoding[attachmentIndex] = 0;
     } else {
-        framebuffer->colorInfo.colorTargets[attachmentIndex] = GL_TEXTURE;
+        framebuffer->colorInfo.colorTargets[attachmentIndex] = GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER;
         framebuffer->colorInfo.colorObjects[attachmentIndex] = texture;
         framebuffer->colorInfo.colorLevels[attachmentIndex] = level;
         framebuffer->colorInfo.colorLayers[attachmentIndex] = layer;
-        updateTextureAttachmentProperties(framebuffer, attachmentIndex, GL_TEXTURE, texture, level);
+        
+        GLint textureFormat = trackedTextures[texture];
+        framebuffer->colorInfo.colorComponentType[attachmentIndex] = getComponentTypeFromFormat(textureFormat);
+        framebuffer->colorInfo.colorEncoding[attachmentIndex] = isSRGBFormat(textureFormat) ? GL_SRGB : GL_LINEAR;
     }
 
     rebindFramebuffer(target, framebuffer, attachment);
@@ -140,6 +153,7 @@ void OV_glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum rende
 
     if (renderbuffer == 0) {
         framebuffer->colorInfo.colorTargets[attachmentIndex] = GL_NONE;
+        framebuffer->colorInfo.colorObjects[attachmentIndex] = 0;
     } else {
         framebuffer->colorInfo.colorTargets[attachmentIndex] = renderbuffertarget;
         framebuffer->colorInfo.colorObjects[attachmentIndex] = renderbuffer;

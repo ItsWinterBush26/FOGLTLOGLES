@@ -15,6 +15,8 @@ void OV_glTexImage3D(GLenum target, GLint level, GLint internalFormat, GLsizei w
 void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param);
 void OV_glTexParameteri(GLenum target, GLenum pname, GLint param);
 
+void OV_glDeleteTextures(GLsizei n, const GLuint *textures);
+
 inline GLint maxTextureSize = 0;
 
 void GLES20::registerTextureOverrides() {
@@ -22,10 +24,11 @@ void GLES20::registerTextureOverrides() {
     LOGI("GL_MAX_TEXTURE_SIZE is %i", maxTextureSize);
 
     REGISTEROV(glTexImage2D);
-    REGISTEROV(glTexImage3D);
     
     REGISTEROV(glTexParameterf);
     REGISTEROV(glTexParameteri);
+
+    REGISTEROV(glDeleteTextures);
 }
 
 void OV_glTexImage2D(
@@ -42,7 +45,6 @@ void OV_glTexImage2D(
             target,
             (( width << level ) > maxTextureSize) ? 0 : width,
             (( height << level ) > maxTextureSize) ? 0 : height,
-            0,
             level,
             internalFormat
         );
@@ -56,37 +58,8 @@ void OV_glTexImage2D(
             border, format, type, pixels
         );
     }
-}
 
-void OV_glTexImage3D(
-    GLenum target,
-    GLint level,
-    GLint internalFormat,
-    GLsizei width, GLsizei height, GLsizei depth,
-    GLint border, GLenum format,
-    GLenum type, const void* pixels
-) {
-    LOGI("glTexImage3D: internalformat=%i border=%i format=%i type=%u", internalFormat, border, format, type);
-    
-    if (isProxyTexture(target)) {
-        boundProxyTexture = MakeAggregateShared<ProxyTexture>(
-            target,
-            (( width << level ) > maxTextureSize) ? 0 : width,
-            (( height << level ) > maxTextureSize) ? 0 : height,
-            depth,
-            level,
-            internalFormat
-        );
-    } else {
-        selectProperTexIFormat(internalFormat);
-        selectProperTexFormat(internalFormat, format);
-        selectProperTexType(internalFormat, type);
-        glTexImage3D(
-            target, level, internalFormat,
-            width, height, depth, 
-            border, format, type, pixels
-        );
-    }
+    trackTextureFormat(internalFormat);
 }
 
 void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param) {
@@ -101,4 +74,12 @@ void OV_glTexParameteri(GLenum target, GLenum pname, GLint param) {
 
     selectProperTexParami(target, pname, param);
     glTexParameteri(target, pname, param);
+}
+
+void OV_glDeleteTextures(GLsizei n, const GLuint *textures) {
+    glDeleteTextures(n, textures);
+
+    for (GLint i = 0; i < n; ++i) {
+        trackedTextures.erase(textures[i]);
+    }
 }

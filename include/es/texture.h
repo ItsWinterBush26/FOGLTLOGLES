@@ -1,6 +1,16 @@
 #pragma once
 
 #include <GLES3/gl32.h>
+#include <unordered_map>
+
+// texture, internal format
+inline std::unordered_map<GLint, GLint> trackedTextures;
+
+inline void trackTextureFormat(GLenum internalFormat) {
+    GLint boundTexture;
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &boundTexture);
+    trackedTextures.insert({ boundTexture, internalFormat });
+}
 
 inline void selectProperTexType(GLint internalFormat, GLenum& type) {
     switch (internalFormat) {
