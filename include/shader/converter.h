@@ -43,7 +43,7 @@ namespace ShaderConverter {
     inline void transpileSPV2ESSL(shaderc_shader_kind kind, shaderc::SpvCompilationResult& module, std::string& target) {
         spirv_cross::CompilerGLSL::Options options = generateSPV2ESSLOptions(ESUtils::shadingVersion);
 
-        spirv_cross::CompilerGLSL compiler({ module.cbegin(), module.cend() });
+        SPVC_Exposed_CompilerGLSL compiler({ module.cbegin(), module.cend() });
         compiler.set_common_options(options);
 
         SPVPostprocessor::processSPVBytecode(compiler, kind);

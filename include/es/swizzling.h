@@ -7,13 +7,11 @@
 enum SwizzleOperation {
     BGRA2RGBA,
     ENDIANNESS_SWAP,
-    // ENDIANNESS_SWAP_REV
 };
 
 inline const std::unordered_map<SwizzleOperation, std::vector<GLint>> swizzleArrayMap = {
-    { BGRA2RGBA,           { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA } },
+    { BGRA2RGBA,           { GL_BLUE, GL_GREEN, GL_RED, GL_ALPHA } },
     { ENDIANNESS_SWAP,     { GL_ALPHA, GL_BLUE, GL_GREEN, GL_RED } }
-    // { ENDIANNESS_SWAP_REV, { GL_BLUE, GL_GREEN, GL_RED, GL_ALPHA } }
 };
 
 /// Transforms the current swizzle vector using the provided transformation vector.

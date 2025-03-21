@@ -36,17 +36,14 @@ inline void fixTexArguments(GLenum& target, GLint& internalFormat, GLenum& type,
             switch (format) {
                 case 0x80e1: // GL_BGRA
                     format = GL_RGBA;
-
                     switch (type) {
                         case 0x8035: // GL_UNSIGNED_INT_8_8_8_8
+                            swizzlingOperations.push_back(BGRA2RGBA);
                             swizzlingOperations.push_back(ENDIANNESS_SWAP);
-                        /*   \/ \/ \/   */
                         case 0x8367: // GL_UNSIGNED_INT_8_8_8_8_REV
-                            type = GL_UNSIGNED_BYTE; // this might need to go
-                        break;                       // first but idc anymore
+                            type = GL_UNSIGNED_BYTE; // /\ ts is basically BGRA2RGBA
+                        break;
                     }
-
-                    swizzlingOperations.push_back(BGRA2RGBA);
                 break;
             }
         break;
