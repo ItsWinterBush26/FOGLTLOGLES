@@ -26,7 +26,7 @@ void GLES20::registerTextureOverrides() {
     REGISTEROV(glTexImage2D);
     
     REGISTEROV(glTexParameterf);
-    REGISTEROV(glTexParameteri);
+    // REGISTEROV(glTexParameteri);
 
     REGISTEROV(glDeleteTextures);
 }
@@ -70,7 +70,7 @@ void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param) {
 }
 
 void OV_glTexParameteri(GLenum target, GLenum pname, GLint param) {
-    LOGI("glTexParameteri: target=%u pname=%u param=%d", target, pname, param);
+    // LOGI("glTexParameteri: target=%u pname=%u param=%d", target, pname, param);
 
     selectProperTexParami(target, pname, param);
     glTexParameteri(target, pname, param);
