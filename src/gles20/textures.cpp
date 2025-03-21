@@ -52,10 +52,7 @@ void OV_glTexImage2D(
             internalFormat
         );
     } else {
-        selectProperTexIFormat(internalFormat);
-        selectProperTexFormat(target, internalFormat, format);
-        selectProperTexType(target, internalFormat, type);
-
+        fixTexArguments(target, internalFormat, type, format);
         glTexImage2D(
             target, level, internalFormat, 
             width, height,
