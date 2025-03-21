@@ -314,59 +314,35 @@ inline void updateTextureAttachmentProperties(
         return;
     }
     
-    // Save current texture binding
-    GLint previousTexture = 0;
-    GLenum bindTarget = textarget;
-    
-    if (textarget >= GL_TEXTURE_CUBE_MAP_POSITIVE_X && 
-        textarget <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z) {
-        bindTarget = GL_TEXTURE_CUBE_MAP;
-    }
-    
-    switch (bindTarget) {
-        case GL_TEXTURE_2D:
-            glGetIntegerv(GL_TEXTURE_BINDING_2D, &previousTexture);
-            break;
-        case GL_TEXTURE_3D:
-            glGetIntegerv(GL_TEXTURE_BINDING_3D, &previousTexture);
-            break;
-        case GL_TEXTURE_2D_ARRAY:
-            glGetIntegerv(GL_TEXTURE_BINDING_2D_ARRAY, &previousTexture);
-            break;
-        case GL_TEXTURE_CUBE_MAP:
-            glGetIntegerv(GL_TEXTURE_BINDING_CUBE_MAP, &previousTexture);
-            break;
-    }
-    
-    glBindTexture(bindTarget, texture);
+    GLenum bindTarget = getTextureBindingEnum(textarget);
 
     GLint textureFormat;
+    GLint previousTexture;
+    glGetIntegerv(bindTarget, &previousTexture);
+    glBindTexture(bindTarget, texture);
     glGetTexLevelParameteriv(bindTarget, level, GL_TEXTURE_INTERNAL_FORMAT, &textureFormat);
-    
     glBindTexture(bindTarget, previousTexture);
     
     framebuffer->colorInfo.colorComponentType[attachmentIndex] = getComponentTypeFromFormat(textureFormat);
     framebuffer->colorInfo.colorEncoding[attachmentIndex] = isSRGBFormat(textureFormat) ? GL_SRGB : GL_LINEAR;
 }
 
-// Function to update component type and color encoding for renderbuffer attachments
-inline void updateRenderbufferAttachmentProperties(std::shared_ptr<Framebuffer> framebuffer,
-                                           GLuint attachmentIndex,
-                                           GLuint renderbuffer) {
+inline void updateRenderbufferAttachmentProperties(
+    std::shared_ptr<Framebuffer> framebuffer,
+    GLuint attachmentIndex,
+    GLuint renderbuffer
+) {
     if (renderbuffer == 0) {
         framebuffer->colorInfo.colorComponentType[attachmentIndex] = 0;
         framebuffer->colorInfo.colorEncoding[attachmentIndex] = 0;
         return;
     }
     
+    GLint renderbufferFormat;
     GLint previousRenderbuffer;
     glGetIntegerv(GL_RENDERBUFFER_BINDING, &previousRenderbuffer);
-    
     glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
-    
-    GLint renderbufferFormat;
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_INTERNAL_FORMAT, &renderbufferFormat);
-    
     glBindRenderbuffer(GL_RENDERBUFFER, previousRenderbuffer);
     
     framebuffer->colorInfo.colorComponentType[attachmentIndex] = getComponentTypeFromFormat(renderbufferFormat);
