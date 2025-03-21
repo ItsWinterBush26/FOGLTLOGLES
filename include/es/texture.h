@@ -22,6 +22,12 @@ inline void selectProperTexType(GLint internalFormat, GLenum& type) {
             // if (ESUtils::version.first != 3) LOGW("GL_RGB16F isn't supported below ES 3");
             type = GL_UNSIGNED_BYTE; // GL_FLOAT;
             break;
+        case GL_RGBA:
+            switch (type) {
+                case 0x8367: // GL_UNSIGNED_INT_8_8_8_8
+                    type = GL_UNSIGNED_SHORT_4_4_4_4;
+            }
+            break;
     }
 }
 
