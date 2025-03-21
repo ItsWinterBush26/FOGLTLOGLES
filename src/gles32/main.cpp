@@ -5,4 +5,5 @@ void GLES32::GLES32Wrapper::init() {
     LOGI("GLES 3.2 entrypoint!");
 
     GLES32::registerBaseVertexFunction();
+    GLES32::registerFramebufferOverrides();
 }

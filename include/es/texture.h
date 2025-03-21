@@ -1,9 +1,6 @@
 #pragma once
 
-#include "es/utils.h"
-
 #include <GLES3/gl32.h>
-#include <GLES2/gl2ext.h>
 
 inline struct TextureTargets {
     GLenum target;

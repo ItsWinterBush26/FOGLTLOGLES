@@ -3,9 +3,10 @@
 
 #pragma once
 
+#include "main.h"
 #include "utils/log.h"
 
-#include <GLES3/gl3.h>
+#include <GLES3/gl32.h>
 #include <memory>
 #include <unordered_map>
 
@@ -189,4 +190,185 @@ inline void clearFramebuffer(GLenum buffer, GLint& drawBuffer) {
         GLenum attachment = getMapAttachment(framebuffer, GL_COLOR_ATTACHMENT0 + drawBuffer);
         drawBuffer = attachment - GL_COLOR_ATTACHMENT0;
     }
+}
+
+inline GLenum getTextureBindingEnum(GLenum target) {
+    switch (target) {
+        case GL_TEXTURE_2D:
+            return GL_TEXTURE_BINDING_2D;
+        case GL_TEXTURE_3D:
+            return GL_TEXTURE_BINDING_3D;
+        case GL_TEXTURE_2D_ARRAY:
+            return GL_TEXTURE_BINDING_2D_ARRAY;
+        case GL_TEXTURE_CUBE_MAP:
+        case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
+        case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
+        case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
+        case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
+        case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
+        case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
+            return GL_TEXTURE_BINDING_CUBE_MAP;
+        default:
+            return GL_TEXTURE_BINDING_2D;
+    }
+}
+
+inline GLenum getComponentTypeFromFormat(GLint format) {
+    // Per OpenGL ES 3.0 spec, map internal formats to component types
+    switch (format) {
+        // Float formats
+        case GL_R32F:
+        case GL_RG32F:
+        case GL_RGB32F:
+        case GL_RGBA32F:
+        case GL_R16F:
+        case GL_RG16F:
+        case GL_RGB16F:
+        case GL_RGBA16F:
+            return GL_FLOAT;
+        
+        // Integer formats
+        case GL_R8I:
+        case GL_R16I:
+        case GL_R32I:
+        case GL_RG8I:
+        case GL_RG16I:
+        case GL_RG32I:
+        case GL_RGB8I:
+        case GL_RGB16I:
+        case GL_RGB32I:
+        case GL_RGBA8I:
+        case GL_RGBA16I:
+        case GL_RGBA32I:
+            return GL_INT;
+        
+        // Unsigned integer formats
+        case GL_R8UI:
+        case GL_R16UI:
+        case GL_R32UI:
+        case GL_RG8UI:
+        case GL_RG16UI:
+        case GL_RG32UI:
+        case GL_RGB8UI:
+        case GL_RGB16UI:
+        case GL_RGB32UI:
+        case GL_RGBA8UI:
+        case GL_RGBA16UI:
+        case GL_RGBA32UI:
+            return GL_UNSIGNED_INT;
+        
+        // Normalized formats
+        case GL_R8:
+        case GL_RG8:
+        case GL_RGB8:
+        case GL_RGBA8:
+        case 0x822a: // GL_R16
+        case 0x822c: // GL_RG16
+        case 0x8050: // GL_RGB16
+        case 0x805b: // GL_RGBA16
+        case GL_RGB10_A2:
+            return GL_UNSIGNED_NORMALIZED;
+        
+        // Signed normalized formats
+        case GL_R8_SNORM:
+        case GL_RG8_SNORM:
+        case GL_RGB8_SNORM:
+        case GL_RGBA8_SNORM:
+            return GL_SIGNED_NORMALIZED;
+        
+        // Depth formats
+        case GL_DEPTH_COMPONENT16:
+        case GL_DEPTH_COMPONENT24:
+        case GL_DEPTH_COMPONENT32F:
+            return GL_FLOAT;
+        
+        default:
+            // Default to unsigned normalized for common formats
+            return GL_UNSIGNED_NORMALIZED;
+    }
+}
+
+inline bool isSRGBFormat(GLint format) {
+    switch (format) {
+        case GL_SRGB:
+        case GL_SRGB8:
+        case GL_SRGB8_ALPHA8:
+        case 0x8c48: // GL_COMPRESSED_SRGB
+        case 0x8c49: // GL_COMPRESSED_SRGB_ALPHA
+            return true;
+        default:
+            return false;
+    }
+}
+
+inline void updateTextureAttachmentProperties(
+    std::shared_ptr<Framebuffer> framebuffer, 
+    GLuint attachmentIndex,
+    GLenum textarget, 
+    GLuint texture, 
+    GLint level
+) {
+    if (texture == 0) {
+        framebuffer->colorInfo.colorComponentType[attachmentIndex] = 0;
+        framebuffer->colorInfo.colorEncoding[attachmentIndex] = 0;
+        return;
+    }
+    
+    // Save current texture binding
+    GLint previousTexture = 0;
+    GLenum bindTarget = textarget;
+    
+    if (textarget >= GL_TEXTURE_CUBE_MAP_POSITIVE_X && 
+        textarget <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z) {
+        bindTarget = GL_TEXTURE_CUBE_MAP;
+    }
+    
+    switch (bindTarget) {
+        case GL_TEXTURE_2D:
+            glGetIntegerv(GL_TEXTURE_BINDING_2D, &previousTexture);
+            break;
+        case GL_TEXTURE_3D:
+            glGetIntegerv(GL_TEXTURE_BINDING_3D, &previousTexture);
+            break;
+        case GL_TEXTURE_2D_ARRAY:
+            glGetIntegerv(GL_TEXTURE_BINDING_2D_ARRAY, &previousTexture);
+            break;
+        case GL_TEXTURE_CUBE_MAP:
+            glGetIntegerv(GL_TEXTURE_BINDING_CUBE_MAP, &previousTexture);
+            break;
+    }
+    
+    glBindTexture(bindTarget, texture);
+
+    GLint textureFormat;
+    glGetTexLevelParameteriv(bindTarget, level, GL_TEXTURE_INTERNAL_FORMAT, &textureFormat);
+    
+    glBindTexture(bindTarget, previousTexture);
+    
+    framebuffer->colorInfo.colorComponentType[attachmentIndex] = getComponentTypeFromFormat(textureFormat);
+    framebuffer->colorInfo.colorEncoding[attachmentIndex] = isSRGBFormat(textureFormat) ? GL_SRGB : GL_LINEAR;
+}
+
+// Function to update component type and color encoding for renderbuffer attachments
+inline void updateRenderbufferAttachmentProperties(std::shared_ptr<Framebuffer> framebuffer,
+                                           GLuint attachmentIndex,
+                                           GLuint renderbuffer) {
+    if (renderbuffer == 0) {
+        framebuffer->colorInfo.colorComponentType[attachmentIndex] = 0;
+        framebuffer->colorInfo.colorEncoding[attachmentIndex] = 0;
+        return;
+    }
+    
+    GLint previousRenderbuffer;
+    glGetIntegerv(GL_RENDERBUFFER_BINDING, &previousRenderbuffer);
+    
+    glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
+    
+    GLint renderbufferFormat;
+    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_INTERNAL_FORMAT, &renderbufferFormat);
+    
+    glBindRenderbuffer(GL_RENDERBUFFER, previousRenderbuffer);
+    
+    framebuffer->colorInfo.colorComponentType[attachmentIndex] = getComponentTypeFromFormat(renderbufferFormat);
+    framebuffer->colorInfo.colorEncoding[attachmentIndex] = isSRGBFormat(renderbufferFormat) ? GL_SRGB : GL_LINEAR;
 }

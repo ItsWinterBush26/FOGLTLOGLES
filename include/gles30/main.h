@@ -13,5 +13,4 @@ namespace GLES30 {
 
     void registerTranslatedFunctions();
     void registerDSAEmulation();
-    void registerFramebufferOverrides();
 }

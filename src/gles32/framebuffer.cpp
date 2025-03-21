@@ -2,7 +2,7 @@
 // https://github.com/artdeell/LTW/blob/master/ltw/src/main/tinywrapper/framebuffer.c
 
 #include "es/framebuffer.h"
-#include "gles30/main.h"
+#include "gles32/main.h"
 #include "main.h"
 
 #include <GLES3/gl3.h>
@@ -24,7 +24,7 @@ void OV_glBindFramebuffer(GLenum target, GLuint framebuffer);
 void OV_glGetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, GLenum pname, GLint* params);
 GLenum OV_glCheckFramebufferStatus(GLenum target);
 
-void GLES30::registerFramebufferOverrides() {
+void GLES32::registerFramebufferOverrides() {
     REGISTER(glDrawBuffer);
     REGISTEROV(glDrawBuffers);
 
@@ -101,6 +101,7 @@ void OV_glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarge
         framebuffer->colorInfo.colorTargets[attachmentIndex] = textarget;
         framebuffer->colorInfo.colorObjects[attachmentIndex] = texture;
         framebuffer->colorInfo.colorLevels[attachmentIndex] = level;
+        updateTextureAttachmentProperties(framebuffer, attachmentIndex, textarget, texture, level);
     }
 
     rebindFramebuffer(target, framebuffer, attachment);
@@ -122,6 +123,7 @@ void OV_glFramebufferTextureLayer(GLenum target, GLenum attachment, GLuint textu
         framebuffer->colorInfo.colorObjects[attachmentIndex] = texture;
         framebuffer->colorInfo.colorLevels[attachmentIndex] = level;
         framebuffer->colorInfo.colorLayers[attachmentIndex] = layer;
+        updateTextureAttachmentProperties(framebuffer, attachmentIndex, GL_TEXTURE, texture, level);
     }
 
     rebindFramebuffer(target, framebuffer, attachment);
@@ -141,6 +143,7 @@ void OV_glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum rende
     } else {
         framebuffer->colorInfo.colorTargets[attachmentIndex] = renderbuffertarget;
         framebuffer->colorInfo.colorObjects[attachmentIndex] = renderbuffer;
+        updateRenderbufferAttachmentProperties(framebuffer, attachmentIndex, renderbuffer);
     }
 
     rebindFramebuffer(target, framebuffer, attachment);
