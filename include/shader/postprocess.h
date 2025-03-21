@@ -10,7 +10,7 @@
 namespace ShaderConverter::SPVPostprocessor {
     inline void removeLocationBindingAndDescriptorSets(
         spirv_cross::CompilerGLSL &compiler,
-        const spirv_cross::SmallVector<spirv_cross::Resource> &resources
+        const spirv_cross::SmallVector<spirv_cross::Resource>& resources
     ) {
         for (const auto& resource : resources) {
             compiler.unset_decoration(resource.id, spv::DecorationLocation);
@@ -21,7 +21,7 @@ namespace ShaderConverter::SPVPostprocessor {
 
     inline void removeInitializers(
         spirv_cross::CompulerGLSL &compiler,
-        const spirv_cross::SmallVector<spirv_cross::Resources> &resources
+        const spirv_cross::SmallVector<spirv_cross::Resource>& resources
     ) {
         for (const auto& resource : resources) {
             auto &var = compiler.get<spirv_cross::SPIRVariable>(resource.id);
