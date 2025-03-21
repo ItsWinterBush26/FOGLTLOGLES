@@ -58,18 +58,17 @@ void OV_glDrawBuffers(GLsizei n, const GLenum* buffers) {
     }
 
     framebuffer->bufferAmount = n;
-    memcpy(framebuffer->virtualDrawbuffers, buffers, n * sizeof(GLenum));
+    std::memcpy(framebuffer->virtualDrawbuffers, buffers, n * sizeof(GLenum));
 
-    GLenum physicalDrawbuffers[n];
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < n && i < MAX_DRAWBUFFERS; ++i) {
         GLenum buffer = buffers[i];
         rebindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer, buffer);
 
-        if (buffer != GL_NONE) physicalDrawbuffers[i] = GL_COLOR_ATTACHMENT0 + i;
-        else physicalDrawbuffers[i] = GL_NONE;
+        if (buffer != GL_NONE) framebuffer->physicalDrawbuffers[i] = GL_COLOR_ATTACHMENT0 + i;
+        else framebuffer->physicalDrawbuffers[i] = GL_NONE;
     }
 
-    glDrawBuffers(n, physicalDrawbuffers);
+    glDrawBuffers(n, framebuffer->physicalDrawbuffers);
 }
 
 void OV_glClearBufferfv(GLenum buffer, GLint drawbuffer, const GLfloat* value) {
