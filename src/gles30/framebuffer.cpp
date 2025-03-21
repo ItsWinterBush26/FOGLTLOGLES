@@ -2,10 +2,9 @@
 // https://github.com/artdeell/LTW/blob/master/ltw/src/main/tinywrapper/framebuffer.c
 
 #include "es/framebuffer.h"
-#include "gles20/main.h"
+#include "gles30/main.h"
 #include "main.h"
 
-#include <GLES2/gl2.h>
 #include <GLES3/gl3.h>
 
 void glDrawBuffer(GLenum buffer);
@@ -25,7 +24,7 @@ void OV_glBindFramebuffer(GLenum target, GLuint framebuffer);
 void OV_glGetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, GLenum pname, GLint* params);
 GLenum OV_glCheckFramebufferStatus(GLenum target);
 
-void GLES20::registerFramebufferOverride() {
+void GLES30::registerFramebufferOverrides() {
     REGISTER(glDrawBuffer);
     REGISTEROV(glDrawBuffers);
 
