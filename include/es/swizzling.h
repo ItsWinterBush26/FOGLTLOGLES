@@ -16,36 +16,36 @@ inline const std::unordered_map<SwizzleOperation, std::vector<GLint>> swizzleArr
     { ENDIANNESS_SWAP_REV, { GL_BLUE, GL_GREEN, GL_RED, GL_ALPHA } }
 };
 
-inline void transformSwizzle(GLint* result, const GLint* input, const GLint* transform) {
-    GLint temp[4];
+/// Transforms the current swizzle vector using the provided transformation vector.
+/// It produces a new vector where each element is remapped from the current state.
+inline std::vector<GLint> transformSwizzle(
+    const std::vector<GLint>& current, 
+    const std::vector<GLint>& transform
+) {
+    std::vector<GLint> result(4);
     for (int i = 0; i < 4; i++) {
-        switch(transform[i]) {
-            case GL_RED:    temp[i] = input[0]; break;
-            case GL_GREEN:  temp[i] = input[1]; break;
-            case GL_BLUE:   temp[i] = input[2]; break;
-            case GL_ALPHA:  temp[i] = input[3]; break;
-            default:        temp[i] = transform[i]; break;
+        // Calculate index offset based on GL_RED
+        int idx = transform[i] - GL_RED;
+        if (idx >= 0 && idx < 4) {
+            result[i] = current[idx];  // Remap using the current state
+        } else {
+            result[i] = transform[i];  // Pass-through if the value isn't a swizzle enum
         }
     }
-    memcpy(result, temp, 4 * sizeof(GLint));
+    return result;
 }
 
 inline void doSwizzling(GLenum target, const std::vector<SwizzleOperation>& operations) {
     if (operations.empty()) return;
     
-    GLint currentSwizzle[4];
-    const GLint* firstSwizzle = swizzleArrayMap.at(operations[0]).data();
-    if (!firstSwizzle) return;
-    
-    memcpy(currentSwizzle, firstSwizzle, 4 * sizeof(GLint));
+    std::vector<GLint> currentSwizzle = swizzleArrayMap.at(operations[0]);
     
     for (size_t i = 1; i < operations.size(); i++) {
-        const GLint* nextTransform = swizzleArrayMap.at(operations[i]).data();
-        if (nextTransform) {
-            transformSwizzle(currentSwizzle, currentSwizzle, nextTransform);
-        }
+        const std::vector<GLint>& nextTransform = swizzleArrayMap.at(operations[i]);
+        currentSwizzle = transformSwizzle(currentSwizzle, nextTransform);
     }
     
+    // Apply the final swizzle settings to the texture
     glTexParameteri(target, GL_TEXTURE_SWIZZLE_R, currentSwizzle[0]);
     glTexParameteri(target, GL_TEXTURE_SWIZZLE_G, currentSwizzle[1]);
     glTexParameteri(target, GL_TEXTURE_SWIZZLE_B, currentSwizzle[2]);
