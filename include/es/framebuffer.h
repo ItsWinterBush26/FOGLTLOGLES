@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include "es/texture.h"
-#include "utils.h"
 #include "utils/log.h"
 
 #include <GLES3/gl32.h>
@@ -192,27 +190,4 @@ inline void clearFramebuffer(GLenum buffer, GLint& drawBuffer) {
         GLenum attachment = getMapAttachment(framebuffer, GL_COLOR_ATTACHMENT0 + drawBuffer);
         drawBuffer = attachment - GL_COLOR_ATTACHMENT0;
     }
-}
-
-inline void updateRenderbufferAttachmentProperties(
-    std::shared_ptr<Framebuffer> framebuffer,
-    GLuint attachmentIndex,
-    GLuint renderbuffer
-) {
-    if (renderbuffer == 0) {
-        framebuffer->colorInfo.colorComponentType[attachmentIndex] = 0;
-        framebuffer->colorInfo.colorEncoding[attachmentIndex] = 0;
-        return;
-    }
-    
-    // TODO: track internalFormat using glRenderbufferStorage
-    GLint renderbufferFormat;
-    GLint previousRenderbuffer;
-    glGetIntegerv(GL_RENDERBUFFER_BINDING, &previousRenderbuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
-    glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_INTERNAL_FORMAT, &renderbufferFormat);
-    glBindRenderbuffer(GL_RENDERBUFFER, previousRenderbuffer);
-    
-    framebuffer->colorInfo.colorComponentType[attachmentIndex] = getComponentTypeFromFormat(renderbufferFormat);
-    framebuffer->colorInfo.colorEncoding[attachmentIndex] = isSRGBFormat(renderbufferFormat) ? GL_SRGB : GL_LINEAR;
 }

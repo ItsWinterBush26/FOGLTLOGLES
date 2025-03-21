@@ -2,6 +2,9 @@
 // https://github.com/artdeell/LTW/blob/master/ltw/src/main/tinywrapper/framebuffer.c
 
 #include "es/framebuffer.h"
+#include "es/renderbuffer.h"
+#include "es/texture.h"
+#include "es/utils.h"
 #include "gles32/main.h"
 #include "main.h"
 
@@ -96,6 +99,8 @@ void OV_glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarge
 
     if (texture == 0) {
         framebuffer->colorInfo.colorTargets[attachmentIndex] = GL_NONE;
+        framebuffer->colorInfo.colorObjects[attachmentIndex] = 0;
+        framebuffer->colorInfo.colorLevels[attachmentIndex] = 0;
         framebuffer->colorInfo.colorComponentType[attachmentIndex] = 0;
         framebuffer->colorInfo.colorEncoding[attachmentIndex] = 0;
     } else {
@@ -153,10 +158,15 @@ void OV_glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum rende
     if (renderbuffer == 0) {
         framebuffer->colorInfo.colorTargets[attachmentIndex] = GL_NONE;
         framebuffer->colorInfo.colorObjects[attachmentIndex] = 0;
+        framebuffer->colorInfo.colorComponentType[attachmentIndex] = 0;
+        framebuffer->colorInfo.colorEncoding[attachmentIndex] = 0;
     } else {
         framebuffer->colorInfo.colorTargets[attachmentIndex] = renderbuffertarget;
         framebuffer->colorInfo.colorObjects[attachmentIndex] = renderbuffer;
-        updateRenderbufferAttachmentProperties(framebuffer, attachmentIndex, renderbuffer);
+        
+        GLint renderbufferFormat = trackedRenderbuffers[renderbuffer];
+        framebuffer->colorInfo.colorComponentType[attachmentIndex] = getComponentTypeFromFormat(renderbufferFormat);
+        framebuffer->colorInfo.colorEncoding[attachmentIndex] = isSRGBFormat(renderbufferFormat) ? GL_SRGB : GL_LINEAR;
     }
 
     rebindFramebuffer(target, framebuffer, attachment);
