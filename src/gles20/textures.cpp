@@ -4,6 +4,7 @@
 #include "es/texparam.h"
 #include "main.h"
 #include "utils/log.h"
+#include "utils/pointers.h"
 
 #include <GLES2/gl2.h>
 #include <memory>
@@ -37,7 +38,7 @@ void OV_glTexImage2D(
 ) {
     LOGI("glTexImage2D: internalformat=%i border=%i format=%i type=%u", internalFormat, border, format, type);
     if (isProxyTexture(target)) {
-        boundProxyTexture = std::make_shared<ProxyTexture>(
+        boundProxyTexture = MakeAggregateShared<ProxyTexture>(
             target,
             (( width << level ) > maxTextureSize) ? 0 : width,
             (( height << level ) > maxTextureSize) ? 0 : height,
@@ -68,7 +69,7 @@ void OV_glTexImage3D(
     LOGI("glTexImage3D: internalformat=%i border=%i format=%i type=%u", internalFormat, border, format, type);
     
     if (isProxyTexture(target)) {
-        boundProxyTexture = std::make_shared<ProxyTexture>(
+        boundProxyTexture = MakeAggregateShared<ProxyTexture>(
             target,
             (( width << level ) > maxTextureSize) ? 0 : width,
             (( height << level ) > maxTextureSize) ? 0 : height,
