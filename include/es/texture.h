@@ -15,6 +15,9 @@ inline void trackTextureFormat(GLenum internalFormat) {
 inline void selectProperTexType(GLint internalFormat, GLenum& type) {
     switch (internalFormat) {
         case GL_DEPTH_COMPONENT:
+            type = GL_UNSIGNED_SHORT;
+            break;
+
         case GL_DEPTH_COMPONENT24:
             type = GL_UNSIGNED_INT;
             break;
@@ -24,8 +27,9 @@ inline void selectProperTexType(GLint internalFormat, GLenum& type) {
             break;
         case GL_RGBA:
             switch (type) {
-                case 0x8367: // GL_UNSIGNED_INT_8_8_8_8
-                    type = GL_UNSIGNED_SHORT_4_4_4_4;
+                case 0x8367: // GL_UNSIGNED_INT_8_8_8_8_REV
+                    type = GL_UNSIGNED_BYTE;
+                    break; // NOTE: maybe reorder data if necessary
             }
             break;
     }
