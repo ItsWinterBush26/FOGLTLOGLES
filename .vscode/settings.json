@@ -23,9 +23,13 @@
     "clangd.serverCompletionRanking": false,
     "clangd.arguments": [
         "-j=6",
+        "-pretty",
         "--malloc-trim",
         "--background-index",
         "--pch-storage=memory",
-        "--background-index"
+        "--compile-commands-dir=/workspace/FOGLTOGLES/build"
     ]
+    /* "[cpp]": {
+        "editor.quickSuggestions": false
+    } */
 }
