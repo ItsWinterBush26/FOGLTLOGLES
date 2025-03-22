@@ -22,14 +22,31 @@
     "clangd.checkUpdates": true,
     "clangd.serverCompletionRanking": false,
     "clangd.arguments": [
+        "-j=4",
+        "-pretty",
+        "--malloc-trim",
+        "--background-index",
+        "--pch-storage=memory",
+        "--compile-commands-dir=/workspace/FOGLTOGLES/build",
+        "--limit-results=500",
+        "--header-insertion=iwyu",
+        "--function-arg-placeholders=false",
+        "--all-scopes-completion",
+        "--background-index-priority=low",
+        "--query-driver=/usr/bin/**/clang-*",
+        "--use-dirty-headers",
+        "--completion-style=detailed"
+    ],
+    "clangd.path": "/workspaces/FOGLTOGLES/tools/clangd"
+    /* "clangd.arguments": [
         "-j=6",
         "-pretty",
         "--malloc-trim",
         "--background-index",
         "--pch-storage=memory",
         "--compile-commands-dir=/workspace/FOGLTOGLES/build"
-    ]
-    /* "[cpp]": {
+    ],
+    "[cpp]": {
         "editor.quickSuggestions": false
     } */
 }

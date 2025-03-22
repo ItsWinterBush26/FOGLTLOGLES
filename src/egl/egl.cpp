@@ -1,9 +1,9 @@
-#include "EGL/egl.h"
 #include "egl/egl.h"
 #include "main.h"
 #include "utils/log.h"
 #include "utils/types.h"
 
+#include <EGL/egl.h>
 #include <dlfcn.h>
 #include <mutex>
 
