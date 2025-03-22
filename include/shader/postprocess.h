@@ -1,11 +1,9 @@
 #pragma once
 
-#include "shader/utils.h"
 #include "spirv_cross.hpp"
 #include "spirv_glsl.hpp"
 #include "utils/log.h"
 
-#include <regex>
 #include <shaderc/shaderc.hpp>
 
 class SPVCExposed_CompilerGLSL : public spirv_cross::CompilerGLSL {
@@ -15,7 +13,7 @@ class SPVCExposed_CompilerGLSL : public spirv_cross::CompilerGLSL {
 };
 
 
-namespace ShaderConverter::SPVPostprocessor {
+namespace ShaderConverter::SPVCPostprocessor {
     inline void removeLocationBindingAndDescriptorSets(
         SPVCExposed_CompilerGLSL& compiler,
         const spirv_cross::SmallVector<spirv_cross::Resource>& resources
@@ -62,19 +60,3 @@ namespace ShaderConverter::SPVPostprocessor {
         // removeInitializers(compiler, resources.storage_buffers);
     }
 }; // namespace ShaderConverer::SPVPostprocessor
-
-namespace ShaderConverter::RegexPostprocessor {
-    // I JUST HAD TO DO IT 💀
-
-    std::regex patternMat4_1(R"(uniform\s+mat4\s+(\w+)\s*=\s*mat4\s*\([^)]*\)\s*;)");
-    std::regex patternMat4_2(R"(uniform\s+mat4\s+(\w+)\s*=\s*mat4\s*\(\s+vec4\s*\(1.0,\s+0.0,\s+0.0,\s+0.0\),\s+vec4\s*\(0.0,\s+1.0,\s+0.0,\s+0.0\s*\),\s+vec4\s*\(0.0,\s+0.0,\s+1.0,\s+0.0\s*\),\s+vec4\s*\(0.0,\s+0.0,\s+0.0,\s+1.0\s*\)\s*\)\s*\))");
-
-    inline void removeInitializersMat4(std::string& source) {
-        source = std::regex_replace(source, patternMat4_1, "uniform mat4 $1;");
-        source = std::regex_replace(source, latternMat4_2, "uniform mat4 $1;");
-    }
-
-    inline void processESSLSource(std::string& source) {
-        removeInitializersMat4(source);
-    }
-}

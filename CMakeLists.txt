@@ -18,6 +18,7 @@ set(GLSLANG_TESTS OFF)
 
 add_subdirectory(deps/shaderc) 
 add_subdirectory(deps/spirv-cross)
+add_subdirectory(deps/glsl-parser)
 
 ######## MAIN PROJECT ########
 file(GLOB_RECURSE SOURCES
@@ -80,9 +81,11 @@ set(DEPENDENCIES
 	# Minimal static SPIRV-Cross
 	spirv-cross-core
 	spirv-cross-glsl
+
+	glsl-parser::glsl-parser
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_OPTIONS -fopenmp)
+# set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_OPTIONS -fopenmp)
 target_link_libraries(
 	${PROJECT_NAME} PRIVATE ${DEPENDENCIES}
 )

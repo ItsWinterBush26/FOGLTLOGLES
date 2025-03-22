@@ -42,7 +42,7 @@ inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
     src = glslCompiler.compile();
 
     if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
-        LOGI("Upgrade shader source:");
+        LOGI("Upgraded shader source:");
         LOGI("%s", src.c_str());
     }
 }

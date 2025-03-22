@@ -17,6 +17,8 @@
 
 namespace ShaderConverter {
     inline shaderc::SpvCompilationResult compileToSPV(shaderc_shader_kind kind, std::string& source) {
+        
+
         int shaderVersion = 0;
         std::string shaderProfile = ""; // useless
         getShaderVersion(source, shaderVersion, shaderProfile);
@@ -46,11 +48,9 @@ namespace ShaderConverter {
         SPVCExposed_CompilerGLSL compiler({ module.cbegin(), module.cend() });
         compiler.set_common_options(options);
 
-        SPVPostprocessor::processSPVBytecode(compiler, kind);
+        SPVCPostprocessor::processSPVBytecode(compiler, kind);
 
         target = compiler.compile();
-
-        RegexPostprocessor::processESSLSource(target);
 
         if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
             LOGI("Transpiled GLSL -> ESSL source:");

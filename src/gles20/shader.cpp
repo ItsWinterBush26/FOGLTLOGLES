@@ -26,6 +26,11 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* string
         throw std::runtime_error("Shader with no version preprocessor!");
     }
 
+    if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+        LOGI("Received GLSL source:");
+        LOGI("%s", combinedSource.data());
+    }
+
     if (profile != "es") {
         if (profile == "core" || profile == "compatibility") LOGI("Shader is on '%s' profile! Let's see how this goes...", profile.c_str());
 

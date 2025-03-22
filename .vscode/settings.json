@@ -22,7 +22,7 @@
     "clangd.checkUpdates": true,
     "clangd.serverCompletionRanking": false,
     "clangd.arguments": [
-        "-j=4",
+        "-j=6",
         "--malloc-trim",
         "--background-index",
         "--pch-storage=memory",
