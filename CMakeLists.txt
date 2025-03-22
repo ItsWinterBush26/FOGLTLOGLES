@@ -83,7 +83,8 @@ set(DEPENDENCIES
 	spirv-cross-core
 	spirv-cross-glsl
 
-	glsl-parser_static
+	# Static glsl-parser
+	glsl-parser-static
 )
 
 # set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_OPTIONS -fopenmp)
