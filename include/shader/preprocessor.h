@@ -4,6 +4,6 @@
 
 namespace ShaderConverter::ASTPreprocessor {
     inline void preprocessGLSL(std::string& source) {
-        glsl::astStatement
+        glsl::astExpression
     }
 }
