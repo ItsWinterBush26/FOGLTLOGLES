@@ -35,7 +35,7 @@ else
     echo "Using NDK at '$ANDROID_NDK_ROOT'"
 fi
 
-git submodule update --init --recursive --depth=1
+git submodule update --remote --merge --init --recursive --depth=1
 ./deps/shaderc/utils/git-sync-deps
 
 rm -rf build

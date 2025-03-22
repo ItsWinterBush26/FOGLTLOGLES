@@ -7,6 +7,7 @@
 	path = deps/spirv-cross
 	url = https://github.com/KhronosGroup/SPIRV-Cross
 	shallow = true
+
 [submodule "deps/glsl-parser"]
 	path = deps/glsl-parser
 	url = https://github.com/ThatMG393/glsl-parser.git
