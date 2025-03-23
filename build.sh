@@ -61,3 +61,9 @@ cmake -G Ninja .. \
 ninja -C . -j$(nproc)
 
 cd "$OLD"
+
+if ! command -v compdb 2>&1 >/dev/null
+then
+    compdb -p build/ list > compile_commands.json
+    mv compile_commands.json build/
+fi

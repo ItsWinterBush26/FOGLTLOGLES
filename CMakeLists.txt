@@ -16,6 +16,7 @@ set(SPIRV_CROSS_ENABLE_C_API OFF)
 set(GLSLANG_TESTS OFF)
 ## set(ENABLE_HLSL OFF) ## fails on libshaderc_util
 set(BUILD_EXECUTABLE OFF)
+set(BUILD_LIBRARY_STATIC ON)
 
 add_subdirectory(deps/shaderc) 
 add_subdirectory(deps/spirv-cross)
@@ -84,7 +85,7 @@ set(DEPENDENCIES
 	spirv-cross-glsl
 
 	# Static glsl-parser
-	glsl-parser-static
+	glsl-parser
 )
 
 # set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_OPTIONS -fopenmp)

@@ -1,7 +1,9 @@
 #pragma once
 
+#include "utils/env.h"
 #include "utils/log.h"
 
+#include <glsl-parser/converter.h>
 #include <glsl-parser/parser.h>
 #include <stdexcept>
 
@@ -21,6 +23,11 @@ namespace ShaderConverter::ASTPreprocessor {
             }
         }
 
-        
+        source = std::string(glsl::converter().convertTU(translationUnit));
+
+        if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+            LOGI("Pre-processed GLSL shader:");
+            LOGI("%s", source.c_str());
+        }
     }
 }
