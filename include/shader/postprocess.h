@@ -1,5 +1,6 @@
 #pragma once
 
+#include "spirv.hpp"
 #include "spirv_cross.hpp"
 #include "spirv_glsl.hpp"
 #include "utils/log.h"
@@ -30,7 +31,7 @@ namespace ShaderConverter::SPVCPostprocessor {
         const spirv_cross::SmallVector<spirv_cross::Resource>& resources
     ) {
         for (const auto& resource : resources) {
-            auto& var = compiler.get<spirv_cross::SPIRVariable>(resource.id);
+            auto& var = compiler.get<spirv_cross::SPIRVariable>(resource.base_type_id);
             if (var.initializer != 0) var.initializer = 0;
         }
     }
@@ -56,7 +57,7 @@ namespace ShaderConverter::SPVCPostprocessor {
         removeLocationBindingAndDescriptorSets(compiler, resources.stage_inputs);
         removeLocationBindingAndDescriptorSets(compiler, resources.stage_outputs);
 
-        // removeInitializers(compiler, resources.uniform_buffers);
-        // removeInitializers(compiler, resources.storage_buffers);
+        removeInitializers(compiler, resources.uniform_buffers);
+        removeInitializers(compiler, resources.storage_buffers);
     }
 }; // namespace ShaderConverer::SPVPostprocessor
