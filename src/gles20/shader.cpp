@@ -56,6 +56,8 @@ void OV_glLinkProgram(GLuint program) {
             GLint size = 0;
             glGetProgramInfoLog(program, 4096, &size, bufLog);
             
+            ShaderConverter::invalidateCurrentShader();
+
             LOGI("Link error for program %u: %s", program, bufLog);
             throw std::runtime_error("Failed to link program!");
         }

@@ -16,6 +16,8 @@
 #include <GLES2/gl2.h>
 #include <shaderc/shaderc.hpp>
 
+inline size_t currentKey = 0;
+
 namespace ShaderConverter {
     inline shaderc::SpvCompilationResult compileToSPV(shaderc_shader_kind kind, std::string& source) {
         RegexPreprocessor::processGLSLSource(source);
@@ -60,15 +62,23 @@ namespace ShaderConverter {
     }
 
     inline void convertAndFix(shaderc_shader_kind kind, std::string& source) {
-        size_t key = Cache::getHash(source);
-        if (Cache::isShaderInCache(key)) {
-            source = Cache::getCachedShaderSource(key);
+        currentKey = Cache::getHash(source);
+        if (Cache::isShaderInCache(currentKey)) {
+            source = Cache::getCachedShaderSource(currentKey);
             return;
         }
 
         shaderc::SpvCompilationResult spirv = compileToSPV(kind, source);
         transpileSPV2ESSL(kind, spirv, source);
 
-        Cache::putShaderInCache(key, source);
+        Cache::putShaderInCache(currentKey, source);
+    }
+
+    inline void invalidateCurrentShader() {
+        if (Cache::isShaderInCache(currentKey)) {
+            Cache::invalidateShaderCache(currentKey);
+
+            LOGI("Shader invalidated as it failed to link.");
+        }
     }
 }; // namespace ShaderConverter

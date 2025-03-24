@@ -16,6 +16,7 @@ inline const std::string CACHE_DIRECTORY = getEnvironmentVar("MESA_GLSL_CACHE_DI
 
 namespace ShaderConverter::Cache {
     inline bool isShaderInCache(size_t hashKey) {
+        if (!hashKey) return false;
         return shaderCache.find(hashKey) != shaderCache.end();
     }
 
