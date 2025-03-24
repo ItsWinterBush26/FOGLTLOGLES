@@ -13,11 +13,18 @@ class SPVCExposed_CompilerGLSL : public spirv_cross::CompilerGLSL {
         using spirv_cross::CompilerGLSL::get;
 };
 
+enum {
+    rLocation = 1 << 1,
+    rBinding = 1 << 2,
+    rDescSet = 1 << 3,
+    rDefault = rLocation | rBinding | rDescSet
+};
 
 namespace ShaderConverter::SPVCPostprocessor {
     inline void removeLocationBindingAndDescriptorSets(
         SPVCExposed_CompilerGLSL& compiler,
-        const spirv_cross::SmallVector<spirv_cross::Resource>& resources
+        const spirv_cross::SmallVector<spirv_cross::Resource>& resources,
+        int flags = rDefault
     ) {
         for (const auto& resource : resources) {
             compiler.unset_decoration(resource.id, spv::DecorationLocation);
@@ -45,6 +52,10 @@ namespace ShaderConverter::SPVCPostprocessor {
 
         // Process shader inputs and outputs
         removeLocationBindingAndDescriptorSets(compiler, resources.stage_inputs);
-        removeLocationBindingAndDescriptorSets(compiler, resources.stage_outputs);
+        
+        int flags = rDescSet | rBinding;
+        if (kind != shaderc_fragment_shader
+         && resources.stage_outputs.size() < 2) flags |= rLocation;
+        removeLocationBindingAndDescriptorSets(compiler, resources.stage_outputs, flags);
     }
 }; // namespace ShaderConverer::SPVPostprocessor
