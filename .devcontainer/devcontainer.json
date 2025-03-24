@@ -11,5 +11,15 @@
       "jdkDistro": "graal"
     }
   },
-  "postStartCommand": "sudo apt update && sudo apt install clang clangd ccache cmake ninja-build google-perftools python3-pip -y && sudo -H pip install compdb --break-system-packages"
+  "postStartCommand": "sudo apt update && sudo apt install clang clangd ccache cmake ninja-build google-perftools python3-pip -y && sudo -H pip install compdb --break-system-packages",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cmake-tools",
+        "llvm-vs-code-extensions.vscode-clangd",
+        "svdschoot.compdb",
+        "twxs.cmake"
+      ]
+    }
+  }
 }
