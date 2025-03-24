@@ -1,7 +1,8 @@
 #pragma once
 
 #include "es/swizzling.h"
-#include <GLES3/gl32.h>
+
+#include <GLES2/gl2.h>
 #include <unordered_map>
 
 // texture, internal format
@@ -32,6 +33,7 @@ inline void fixTexArguments(GLenum& target, GLint& internalFormat, GLenum& type,
             type = GL_UNSIGNED_BYTE; // GL_FLOAT;
         break;
 
+        case GL_R8:
         case GL_RGBA:
             switch (format) {
                 case 0x80e1: // GL_BGRA
