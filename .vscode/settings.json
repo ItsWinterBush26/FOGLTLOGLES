@@ -27,7 +27,7 @@
         "--malloc-trim",
         "--background-index",
         "--pch-storage=memory",
-        "--compile-commands-dir=/workspace/FOGLTOGLES/build",
+        "--compile-commands-dir=${workspaceFolder}/build",
         "--limit-results=500",
         "--header-insertion=iwyu",
         "--function-arg-placeholders=false",
@@ -37,7 +37,7 @@
         "--use-dirty-headers",
         "--completion-style=detailed"
     ],
-    "clangd.path": "/workspaces/FOGLTOGLES/tools/clangd"
+    "clangd.path": "${workspaceFolder}/tools/clangd"
     /* "clangd.arguments": [
         "-j=6",
         "-pretty",
