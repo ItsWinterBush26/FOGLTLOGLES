@@ -53,9 +53,9 @@ namespace ShaderConverter::SPVCPostprocessor {
         // Process shader inputs and outputs
         removeLocationBindingAndDescriptorSets(compiler, resources.stage_inputs);
         
-        int flags = rDescSet | rBinding;
-        if (kind != shaderc_fragment_shader
-         && resources.stage_outputs.size() < 2) flags |= rLocation;
+        int flags = rDescSet | rBinding | rLocation;
+        if (kind == shaderc_fragment_shader
+         && resources.stage_outputs.size() > 1) flags = rDescSet | rBinding;
         removeLocationBindingAndDescriptorSets(compiler, resources.stage_outputs, flags);
     }
 }; // namespace ShaderConverer::SPVPostprocessor
