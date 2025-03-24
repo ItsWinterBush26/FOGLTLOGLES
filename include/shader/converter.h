@@ -3,9 +3,9 @@
 #include "cache.h"
 #include "compilers.h"
 #include "postprocess.h"
+#include "preprocess.h"
 #include "es/utils.h"
 #include "gl/shader.h"
-#include "preprocessor.h"
 #include "shaderc/shaderc.h"
 #include "shaderc/status.h"
 #include "spirv_glsl.hpp"
@@ -18,7 +18,7 @@
 
 namespace ShaderConverter {
     inline shaderc::SpvCompilationResult compileToSPV(shaderc_shader_kind kind, std::string& source) {
-        ASTPreprocessor::preprocessGLSL(kind, source);
+        RegexPreprocessor::processGLSLSource(source);
 
         int shaderVersion = 0;
         std::string shaderProfile = ""; // useless

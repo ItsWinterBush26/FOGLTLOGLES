@@ -26,16 +26,6 @@ namespace ShaderConverter::SPVCPostprocessor {
         }
     }
 
-    inline void removeInitializers(
-        SPVCExposed_CompilerGLSL& compiler,
-        const spirv_cross::SmallVector<spirv_cross::Resource>& resources
-    ) {
-        for (const auto& resource : resources) {
-            auto& var = compiler.get<spirv_cross::SPIRVariable>(resource.base_type_id);
-            if (var.initializer != 0) var.initializer = 0;
-        }
-    }
-
     inline void processSPVBytecode(SPVCExposed_CompilerGLSL &compiler, shaderc_shader_kind kind) {
         if (kind == shaderc_glsl_compute_shader) {
             LOGI("Compute shader processing is unimplemented right now...");
@@ -56,8 +46,5 @@ namespace ShaderConverter::SPVCPostprocessor {
         // Process shader inputs and outputs
         removeLocationBindingAndDescriptorSets(compiler, resources.stage_inputs);
         removeLocationBindingAndDescriptorSets(compiler, resources.stage_outputs);
-
-        removeInitializers(compiler, resources.uniform_buffers);
-        removeInitializers(compiler, resources.storage_buffers);
     }
 }; // namespace ShaderConverer::SPVPostprocessor

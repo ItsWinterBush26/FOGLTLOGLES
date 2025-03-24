@@ -14,8 +14,11 @@ FunctionPtr eglGetProcAddress(str procname) {
     std::call_once(eglInitFlag, eglInit);
     FunctionPtr tmp = FOGLTLOGLES::getFunctionAddress(procname);
     
-    if (tmp != nullptr) return tmp;
-    else return real_eglGetProcAddress(procname);
+    if (tmp) return tmp;
+    else {
+        if (real_eglGetProcAddress) return real_eglGetProcAddress(procname);
+        else return nullptr;
+    }
 }
 
 EGLBoolean OV_eglMakeCurrent(EGLDisplay dpy, EGLSurface draw, EGLSurface read, EGLContext ctx) {

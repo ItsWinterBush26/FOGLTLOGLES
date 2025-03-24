@@ -27,7 +27,7 @@
         "--malloc-trim",
         "--background-index",
         "--pch-storage=memory",
-        "--compile-commands-dir=${workspaceFolder}/build",
+        "--compile-commands-dir=${workspaceFolder}",
         "--limit-results=500",
         "--header-insertion=iwyu",
         "--function-arg-placeholders=false",
