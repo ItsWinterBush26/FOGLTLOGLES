@@ -47,7 +47,9 @@ namespace ShaderConverter::Cache {
         return buffer.str();
     }
 
-    inline void invalidateShaderCache(size_t key) {
+    inline bool invalidateShaderCache(size_t key) {
+        if (!isShaderInCache(key)) return false;
+
         std::string filename = shaderCache.at(key);
         shaderCache.erase(key);
 
@@ -55,7 +57,10 @@ namespace ShaderConverter::Cache {
             std::filesystem::remove(filename);
 
             LOGI("Invalidated shader with key %i", key);
+            return true;
         }
+
+        return false;
     }
 
     inline size_t getHash(std::string key) {

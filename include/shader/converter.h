@@ -75,10 +75,6 @@ namespace ShaderConverter {
     }
 
     inline void invalidateCurrentShader() {
-        if (Cache::isShaderInCache(currentKey)) {
-            Cache::invalidateShaderCache(currentKey);
-
-            LOGI("Shader invalidated as it failed to link.");
-        }
+        if (Cache::invalidateShaderCache(currentKey)) LOGI("Shader invalidated as it failed to link.");
     }
 }; // namespace ShaderConverter
