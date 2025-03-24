@@ -24,12 +24,12 @@ namespace ShaderConverter::SPVCPostprocessor {
     inline void removeLocationBindingAndDescriptorSets(
         SPVCExposed_CompilerGLSL& compiler,
         const spirv_cross::SmallVector<spirv_cross::Resource>& resources,
-        int flags = rDefault
+        int flags = rDefault // (rBinding | rDescSet)
     ) {
         for (const auto& resource : resources) {
-            compiler.unset_decoration(resource.id, spv::DecorationLocation);
-            compiler.unset_decoration(resource.id, spv::DecorationBinding);
-            compiler.unset_decoration(resource.id, spv::DecorationDescriptorSet);
+            if (flags & rLocation) compiler.unset_decoration(resource.id, spv::DecorationLocation);
+            if (flags & rBinding) compiler.unset_decoration(resource.id, spv::DecorationBinding);
+            if (flags & rDescSet) compiler.unset_decoration(resource.id, spv::DecorationDescriptorSet);
         }
     }
 
