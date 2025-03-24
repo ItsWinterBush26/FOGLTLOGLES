@@ -44,6 +44,7 @@ inline void fixTexArguments(GLenum& target, GLint& internalFormat, GLenum& type,
             }
 
         case GL_RGBA:
+        case GL_RGBA8:
             switch (format) {
                 case 0x80e1: // GL_BGRA
                     format = GL_RGBA;
@@ -68,6 +69,20 @@ inline void fixTexArguments(GLenum& target, GLint& internalFormat, GLenum& type,
             format = GL_RGB;
             type = GL_HALF_FLOAT;
         break;
+
+        case GL_R16F:
+            format = GL_RED;
+            type = GL_HALF_FLOAT;
+        break;
+
+        case GL_R32F:
+            format = GL_RED;
+            type = GL_FLOAT;
+        break;
+
+        /* case GL_RGBA8:
+            type = GL_UNSIGNED_BYTE;
+        break; */
     }
 
     doSwizzling(target, swizzlingOperations);
