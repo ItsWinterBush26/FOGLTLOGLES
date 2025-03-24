@@ -2,7 +2,7 @@
 
 #include "es/swizzling.h"
 
-#include <GLES2/gl2.h>
+#include <GLES3/gl32.h>
 #include <unordered_map>
 
 // texture, internal format
@@ -28,12 +28,21 @@ inline void fixTexArguments(GLenum& target, GLint& internalFormat, GLenum& type,
             type = GL_UNSIGNED_INT;
         break;
 
-        case 35898: // GL_RGB16F
-            // if (ESUtils::version.first != 3) LOGW("GL_RGB16F isn't supported below ES 3");
-            type = GL_UNSIGNED_BYTE; // GL_FLOAT;
-        break;
-
         case GL_R8:
+            switch (format) {
+                case 0x80e1: // GL_BGRA
+                    format = GL_RED;
+                    switch (type) {
+                        case 0x8035: // GL_UNSIGNED_INT_8_8_8_8
+                            swizzlingOperations.push_back(BGRA2RGBA);
+                            swizzlingOperations.push_back(ENDIANNESS_SWAP);
+                        case 0x8367: // GL_UNSIGNED_INT_8_8_8_8_REV
+                            type = GL_UNSIGNED_BYTE; // /\ ts is basically BGRA2RGBA
+                        break;
+                    }
+                break;
+            }
+
         case GL_RGBA:
             switch (format) {
                 case 0x80e1: // GL_BGRA
@@ -48,6 +57,16 @@ inline void fixTexArguments(GLenum& target, GLint& internalFormat, GLenum& type,
                     }
                 break;
             }
+        break;
+
+        case 0x8c3a: // GL_R11F_G11F_B10F
+            format = GL_RGB;
+            type = GL_FLOAT;
+        break;
+
+        case GL_RGB16F:
+            format = GL_RGB;
+            type = GL_HALF_FLOAT;
         break;
     }
 
