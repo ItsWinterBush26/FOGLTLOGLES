@@ -5,8 +5,6 @@
 #include <GLES3/gl32.h>
 #include <unordered_map>
 
-#include "gl/header.h"
-
 // texture, internal format
 inline std::unordered_map<GLint, GLint> trackedTextures;
 
