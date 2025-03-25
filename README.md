@@ -7,6 +7,7 @@ This project is a Proof of Concept.
 - [x] Run Sodium 
 - [ ] Support most shaders
 - [ ] Improve performance
+- [ ] OpenGL 4.6 (core and compat 💀)
 
 # License
 **ARR**
