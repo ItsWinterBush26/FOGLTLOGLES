@@ -3,7 +3,7 @@
 #include "utils/defines.h"
 #include "utils/types.h"
 
-typedef FunctionPtr (PFNEGLGETPROCADDRESSPROC)(const char* procname);
+typedef FunctionPtr (*PFNEGLGETPROCADDRESSPROC)(const char* procname);
 
 inline PFNEGLGETPROCADDRESSPROC real_eglGetProcAddress;
 
