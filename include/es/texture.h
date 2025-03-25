@@ -53,8 +53,8 @@ inline void fixTexArguments(GLenum& target, GLint& internalFormat, GLenum& type,
     std::vector<SwizzleOperation> swizzlingOperations;
 
     // Special cases for depth, depth-stencil, red and RG unsized formats.
-    switch (internalFormat) {
-        case GL_DEPTH_COMPONENT: {
+    switch (format) {
+        case GL_DEPTH_COMPONENT:
             switch (type) {
                 case GL_UNSIGNED_SHORT:
                 case GL_UNSIGNED_INT:
@@ -67,7 +67,7 @@ inline void fixTexArguments(GLenum& target, GLint& internalFormat, GLenum& type,
                     break;
             }
             break;
-        }
+        
         case GL_DEPTH_STENCIL: {
             switch (type) {
                 case GL_UNSIGNED_INT_24_8:
