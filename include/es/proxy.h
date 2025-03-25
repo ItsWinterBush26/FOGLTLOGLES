@@ -1,8 +1,6 @@
 #pragma once
 
-#include <gl/gl.h>
-
-#include <GLES2/gl2.h>
+#include <GLES3/gl32.h>
 #include <memory>
 
 struct ProxyTexture {
@@ -18,10 +16,11 @@ inline std::shared_ptr<ProxyTexture> boundProxyTexture = nullptr; // std::make_s
 
 inline bool isProxyTexture(GLenum target) {
     switch (target) {
-        case GL_PROXY_TEXTURE_1D:
-        case GL_PROXY_TEXTURE_2D:
-        case GL_PROXY_TEXTURE_3D:
-        case GL_PROXY_TEXTURE_RECTANGLE_ARB:
+        case 0x8063: // GL_PROXY_TEXTURE_1D
+        case 0x8064: // GL_PROXY_TEXTURE_2D
+        case 0x8070: // GL_PROXY_TEXTURE_3D
+        case 0x84f5: // GL_PROXY_TEXTURE_RECTANGLE
+        case 0x84f7: // GL_PROXY_TEXTURE_RECTANGLE_ARB
             return true;
         default:
             return false;

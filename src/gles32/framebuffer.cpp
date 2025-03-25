@@ -44,6 +44,8 @@ void GLES32::registerFramebufferOverrides() {
 
     REGISTEROV(glGetFramebufferAttachmentParameteriv);
     REGISTEROV(glCheckFramebufferStatus);
+
+    fakeFramebuffer = std::make_shared<FakeDepthFramebuffer>();
 }
 
 void glDrawBuffer(GLenum buffer) {

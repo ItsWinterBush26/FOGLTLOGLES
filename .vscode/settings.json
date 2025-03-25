@@ -29,13 +29,7 @@
         "--pch-storage=memory",
         "--compile-commands-dir=${workspaceFolder}",
         "--limit-results=500",
-        "--header-insertion=iwyu",
-        "--function-arg-placeholders=false",
-        "--all-scopes-completion",
-        "--background-index-priority=low",
-        "--query-driver=/usr/bin/**/clang-*",
-        "--use-dirty-headers",
-        "--completion-style=detailed"
+        "--use-dirty-headers"
     ],
     "clangd.path": "${workspaceFolder}/tools/clangd"
     /* "clangd.arguments": [

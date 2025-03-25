@@ -1,3 +1,5 @@
+#include "es/framebuffer.h"
+#include "es/swizzling.h"
 #include "gles20/main.h"
 #include "es/proxy.h"
 #include "es/texture.h"
@@ -7,12 +9,10 @@
 #include "utils/pointers.h"
 
 #include <GLES2/gl2.h>
-#include <cstring>
-#include <memory>
-#include <vector>
 
 void OV_glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels);
-void OV_glTexImage3D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const void* pixels);
+void OV_glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels);
+void OV_glCopyTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height);
 
 void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param);
 void OV_glTexParameteri(GLenum target, GLenum pname, GLint param);
@@ -26,6 +26,7 @@ void GLES20::registerTextureOverrides() {
     LOGI("GL_MAX_TEXTURE_SIZE is %i", maxTextureSize);
 
     REGISTEROV(glTexImage2D);
+    REGISTEROV(glTexSubImage2D);
     
     REGISTEROV(glTexParameterf);
     // REGISTEROV(glTexParameteri);
@@ -61,6 +62,62 @@ void OV_glTexImage2D(
     }
 
     trackTextureFormat(internalFormat);
+}
+
+void OV_glTexSubImage2D(
+    GLenum target, GLint level, 
+    GLint xOffset, GLint yOffset, 
+    GLsizei width, GLsizei height, 
+    GLenum format, GLenum type, 
+    const void* pixels
+) {
+    std::vector<SwizzleOperation> ops;
+    swizzleBGRA(type, ops);
+    doSwizzling(target, ops);
+
+    if (format == GL_DEPTH_COMPONENT) {
+        if (width == fakeFramebuffer->width
+            && height == fakeFramebuffer->height
+            && fakeFramebuffer->data == pixels) {
+            fakeFramebuffer->release(target, level, xOffset, yOffset, width, height);
+            return;
+        }
+    }
+
+    glTexSubImage2D(
+        target, level,
+        xOffset, yOffset,
+        width, height,
+        format, type,
+        pixels
+    );
+}
+
+void OV_glCopyTexSubImage2D(
+    GLenum target, GLint level,
+    GLint xoffset, GLint yoffset,
+    GLint x, GLint y,
+    GLsizei width, GLsizei height
+) {
+    glGetError();
+    glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
+
+    if (glGetError() == GL_INVALID_OPERATION) {
+        GLint boundTexture;
+
+        glGetIntegerv(getEnumBindingForTarget(target), &boundTexture);
+        
+        auto glBindFB = GET_OVFUNC(PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer);
+        glBindFB(GL_DRAW_FRAMEBUFFER, fakeFramebuffer->drawFramebuffer);
+        
+        GET_OVFUNC(PFNGLFRAMEBUFFERTEXTURE2DPROC, glFramebufferTexture2D)(
+            GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+            target, boundTexture, level
+        );
+
+        glBlitFramebuffer(x, y, width+x, height+y, xoffset, yoffset, width+xoffset, height+yoffset, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+        glBindFB(GL_DRAW_FRAMEBUFFER, drawBuffer);
+    }
 }
 
 void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param) {

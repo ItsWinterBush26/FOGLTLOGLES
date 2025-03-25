@@ -11,7 +11,7 @@ inline void trackRenderbufferFormat(GLenum& internalFormat) {
     trackedRenderbuffers.insert({ boundRenderbuffer, internalFormat });
 }
 
-inline void selectProperIFormat(GLenum& internalFormat) {
+inline void fixStorageParams(GLenum& internalFormat) {
     switch (internalFormat) {
         case GL_DEPTH_COMPONENT:
             internalFormat = GL_DEPTH_COMPONENT16;

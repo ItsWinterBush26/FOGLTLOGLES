@@ -3,7 +3,12 @@
 
 #pragma once
 
+#include "es/texture.h"
+#include "gl/glext.h"
+#include "gl/header.h"
+#include "main.h"
 #include "utils/log.h"
+#include "utils/pointers.h"
 
 #include <GLES3/gl32.h>
 #include <memory>
@@ -16,6 +21,12 @@
 #ifndef MAX_DRAWBUFFERS
 #define MAX_DRAWBUFFERS 8
 #endif
+
+#ifndef GET_OVFUNC
+#define GET_OVFUNC(type, name) reinterpret_cast<type>(FOGLTLOGLES::getFunctionAddress(#name))
+#endif
+
+inline GLuint drawBuffer = 0, readBuffer = 0;
 
 struct FramebufferColorInfo {
     GLuint colorTargets[MAX_FBTARGETS];
@@ -35,7 +46,79 @@ struct Framebuffer {
     GLsizei bufferAmount = 1;
 };
 
-inline GLuint drawBuffer = 0, readBuffer = 0;
+class FakeDepthFramebuffer {
+public:
+    GLuint drawFramebuffer;
+    GLuint readFramebuffer;
+
+    GLuint framebufferTexture;
+
+    GLsizei width, height;
+    GLvoid* data;
+
+    bool ready;
+
+    FakeDepthFramebuffer() {
+        glGenTextures(1, &framebufferTexture);
+
+        auto glGenFB = GET_OVFUNC(PFNGLGENFRAMEBUFFERSPROC, glGenFramebuffers);
+        glGenFB(1, &drawFramebuffer);
+        glGenFB(1, &readFramebuffer);
+
+        glBindTexture(GL_TEXTURE_2D, framebufferTexture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        if (!glGetError()) ready = true;
+    }
+
+    void store(GLint x, GLint y, GLsizei w, GLsizei h) {
+        if (!ready) return;
+
+        GLint boundTexture;
+        glGetIntegerv(GL_TEXTURE_BINDING_2D, &boundTexture);
+
+        glBindTexture(GL_TEXTURE_2D, framebufferTexture);
+        GET_OVFUNC(PFNGLTEXIMAGE2DPROC, glTexImage2D)(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, w, h, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+        glBindTexture(GL_TEXTURE_2D, boundTexture);
+
+        auto glBindFB = GET_OVFUNC(PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer);
+        glBindFB(GL_DRAW_FRAMEBUFFER, drawFramebuffer);
+        GET_OVFUNC(PFNGLFRAMEBUFFERTEXTURE2DPROC, glFramebufferTexture2D)(
+            GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+            GL_TEXTURE_2D, framebufferTexture, 0
+        );
+
+        glBlitFramebuffer(x, y, x + w, y + h, 0, 0, w, h, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+        
+        glBindFB(GL_DRAW_FRAMEBUFFER, drawBuffer);
+    }
+
+    void release(GLenum target, GLint level, GLint x, GLint y, GLsizei w, GLsizei h) {
+        if (!ready) return;
+
+        auto glGenFB = GET_OVFUNC(PFNGLGENFRAMEBUFFERSPROC, glGenFramebuffers);
+        glGenFB(1, &drawFramebuffer);
+        glGenFB(1, &readFramebuffer);
+
+        GLint boundTexture;
+        glGetIntegerv(getEnumBindingForTarget(target), &boundTexture);
+
+        GET_OVFUNC(PFNGLFRAMEBUFFERTEXTURE2DPROC, glFramebufferTexture2D)(
+            GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+            target, boundTexture, level
+        );
+
+        glBlitFramebuffer(0, 0, w, h, x, y, x + w, y + h, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+        GET_OVFUNC(PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer)(GL_DRAW_BUFFER, drawBuffer);
+        GET_OVFUNC(PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer)(GL_READ_FRAMEBUFFER, readBuffer);
+    }
+};
+
+inline std::shared_ptr<FakeDepthFramebuffer> fakeFramebuffer;
 inline std::unordered_map<GLuint, std::shared_ptr<Framebuffer>> boundFramebuffers;
 
 inline std::shared_ptr<Framebuffer> getFramebufferObject(GLenum target) {

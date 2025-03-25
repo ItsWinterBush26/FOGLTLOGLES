@@ -14,6 +14,41 @@ inline void trackTextureFormat(GLint& internalFormat) {
     trackedTextures.insert({ boundTexture, internalFormat });
 }
 
+inline GLenum getEnumBindingForTarget(GLenum& target) {
+    switch (target) {
+        case GL_TEXTURE_2D: return GL_TEXTURE_BINDING_2D;
+        case GL_TEXTURE_2D_MULTISAMPLE: return GL_TEXTURE_BINDING_2D_MULTISAMPLE;
+        case GL_TEXTURE_2D_MULTISAMPLE_ARRAY: return GL_TEXTURE_BINDING_2D_MULTISAMPLE_ARRAY;
+        case GL_TEXTURE_3D: return GL_TEXTURE_BINDING_3D;
+        case GL_TEXTURE_2D_ARRAY: return GL_TEXTURE_BINDING_2D_ARRAY;
+        case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
+        case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
+        case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
+        case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
+        case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
+        case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
+        case GL_TEXTURE_CUBE_MAP: return GL_TEXTURE_BINDING_CUBE_MAP;
+        case GL_TEXTURE_CUBE_MAP_ARRAY: return GL_TEXTURE_BINDING_CUBE_MAP_ARRAY;
+        case GL_TEXTURE_BUFFER: return GL_TEXTURE_BUFFER_BINDING;
+        default: return 0;
+    }
+}
+
+inline void swizzleBGRA(GLenum& type, std::vector<SwizzleOperation>& ops) {
+    switch (type) {
+        case 0x8035: // GL_UNSIGNED_INT_8_8_8_8
+            ops.push_back(BGRA2RGBA);
+            ops.push_back(ENDIANNESS_SWAP);
+            break;
+        case 0x8367: // GL_UNSIGNED_INT_8_8_8_8_REV
+            type = GL_UNSIGNED_BYTE;
+            break;
+
+        default:
+            break;
+    }
+}
+
 inline void fixTexArguments(GLenum& target, GLint& internalFormat, GLenum& type, GLenum& format) {
     std::vector<SwizzleOperation> swizzlingOperations;
 
@@ -314,27 +349,24 @@ inline void fixTexArguments(GLenum& target, GLint& internalFormat, GLenum& type,
             format = GL_RGBA_INTEGER;
             type = GL_UNSIGNED_INT;
             break;
+        
         default:
-            // Leave the arguments unchanged if not handled.
             break;
     }
 
     // Finally, apply BGRA swizzling adjustments.
     switch (internalFormat) {
         case GL_R8: {
-            if (format == 0x80e1) { // GL_BGRA
+            if (format == 0x80e1) {
                 format = GL_RED;
-                switch (type) {
-                    case 0x8035: // GL_UNSIGNED_INT_8_8_8_8
-                        swizzlingOperations.push_back(BGRA2RGBA);
-                        swizzlingOperations.push_back(ENDIANNESS_SWAP);
-                        break;
-                    case 0x8367: // GL_UNSIGNED_INT_8_8_8_8_REV
-                        type = GL_UNSIGNED_BYTE;
-                        break;
-                    default:
-                        break;
-                }
+                swizzleBGRA(type, swizzlingOperations);
+            }
+            break;
+        }
+        case GL_RG8: {
+            if (format == 0x80e1) {
+                format = GL_RG;
+                swizzleBGRA(type, swizzlingOperations);
             }
             break;
         }
@@ -342,17 +374,7 @@ inline void fixTexArguments(GLenum& target, GLint& internalFormat, GLenum& type,
         case GL_RGBA8: {
             if (format == 0x80e1) { // GL_BGRA
                 format = GL_RGBA;
-                switch (type) {
-                    case 0x8035:
-                        swizzlingOperations.push_back(BGRA2RGBA);
-                        swizzlingOperations.push_back(ENDIANNESS_SWAP);
-                        break;
-                    case 0x8367:
-                        type = GL_UNSIGNED_BYTE;
-                        break;
-                    default:
-                        break;
-                }
+                swizzleBGRA(type, swizzlingOperations);
             }
             break;
         }
@@ -360,79 +382,3 @@ inline void fixTexArguments(GLenum& target, GLint& internalFormat, GLenum& type,
 
     doSwizzling(target, swizzlingOperations);
 }
-
-
-
-/* inline void fixTexArguments(GLenum& target, GLint& internalFormat, GLenum& type, GLenum& format) {
-    std::vector<SwizzleOperation> swizzlingOperations { };
-
-    switch (internalFormat) {
-        case GL_DEPTH_COMPONENT:
-            type = GL_UNSIGNED_SHORT;
-        break;
-
-        case 0x81a7: // GL_DEPTH_COMPONENT32
-            internalFormat = GL_DEPTH_COMPONENT24;
-        case GL_DEPTH_COMPONENT24:
-            type = GL_UNSIGNED_INT;
-        break;
-
-        case GL_R8:
-            switch (format) {
-                case 0x80e1: // GL_BGRA
-                    format = GL_RED;
-                    switch (type) {
-                        case 0x8035: // GL_UNSIGNED_INT_8_8_8_8
-                            swizzlingOperations.push_back(BGRA2RGBA);
-                            swizzlingOperations.push_back(ENDIANNESS_SWAP);
-                        case 0x8367: // GL_UNSIGNED_INT_8_8_8_8_REV
-                            type = GL_UNSIGNED_BYTE; // /\ ts is basically BGRA2RGBA
-                        break;
-                    }
-                break;
-            }
-
-        case GL_RGBA:
-        case GL_RGBA8:
-            switch (format) {
-                case 0x80e1: // GL_BGRA
-                    format = GL_RGBA;
-                    switch (type) {
-                        case 0x8035: // GL_UNSIGNED_INT_8_8_8_8
-                            swizzlingOperations.push_back(BGRA2RGBA);
-                            swizzlingOperations.push_back(ENDIANNESS_SWAP);
-                        case 0x8367: // GL_UNSIGNED_INT_8_8_8_8_REV
-                            type = GL_UNSIGNED_BYTE; // /\ ts is basically BGRA2RGBA
-                        break;
-                    }
-                break;
-            }
-        break;
-
-        case 0x8c3a: // GL_R11F_G11F_B10F
-            format = GL_RGB;
-            type = GL_FLOAT;
-        break;
-
-        case GL_RGB16F:
-            format = GL_RGB;
-            type = GL_HALF_FLOAT;
-        break;
-
-        case GL_R16F:
-            format = GL_RED;
-            type = GL_HALF_FLOAT;
-        break;
-
-        case GL_R32F:
-            format = GL_RED;
-            type = GL_FLOAT;
-        break;
-
-        /* case GL_RGBA8:
-            type = GL_UNSIGNED_BYTE;
-        break; 
-    }
-
-    doSwizzling(target, swizzlingOperations);
-} */

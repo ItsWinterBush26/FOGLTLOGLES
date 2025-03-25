@@ -18,7 +18,7 @@ void OV_glRenderbufferStorage(
     GLsizei width,
     GLsizei height
 ) {
-    selectProperIFormat(internalformat);
+    fixStorageParams(internalformat);
     glRenderbufferStorage(target, internalformat, width, height);
 
     trackRenderbufferFormat(internalformat);
