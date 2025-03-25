@@ -117,7 +117,7 @@ void OV_glCopyTexSubImage2D(
         );
 
         glBlitFramebuffer(x, y, width+x, height+y, xoffset, yoffset, width+xoffset, height+yoffset, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-        glBindFB(GL_DRAW_FRAMEBUFFER, drawBuffer);
+        glBindFB(GL_DRAW_FRAMEBUFFER, currentDrawFramebuffer);
     }
 }
 

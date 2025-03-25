@@ -22,25 +22,7 @@
 #define GET_OVFUNC(type, name) name // reinterpret_cast<type>(FOGLTLOGLES::getFunctionAddress(#name))
 #endif
 
-inline GLuint drawBuffer = 0, readBuffer = 0;
-
-struct FramebufferColorInfo {
-    GLuint colorTargets[MAX_FBTARGETS];
-    GLuint colorObjects[MAX_FBTARGETS];
-    GLuint colorComponentType[MAX_FBTARGETS];
-    GLuint colorEncoding[MAX_FBTARGETS];
-
-    // if GL_TEXTURE
-    GLuint colorLevels[MAX_FBTARGETS];
-    GLuint colorLayers[MAX_FBTARGETS];
-};
-
-struct Framebuffer {
-    FramebufferColorInfo colorInfo;
-    GLenum virtualDrawbuffers[MAX_DRAWBUFFERS] = { GL_COLOR_ATTACHMENT0 };
-    GLenum physicalDrawbuffers[MAX_DRAWBUFFERS];
-    GLsizei bufferAmount = 1;
-};
+inline GLuint currentDrawFramebuffer = 0, currentReadDrawbuffer = 0;
 
 class FakeDepthFramebuffer {
 public:
@@ -90,7 +72,7 @@ public:
 
         glBlitFramebuffer(x, y, x + w, y + h, 0, 0, w, h, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
         
-        glBindFB(GL_DRAW_FRAMEBUFFER, drawBuffer);
+        glBindFB(GL_DRAW_FRAMEBUFFER, currentDrawFramebuffer);
     }
 
     void release(GLenum target, GLint level, GLint x, GLint y, GLsizei w, GLsizei h) {
@@ -109,9 +91,27 @@ public:
         );
 
         glBlitFramebuffer(0, 0, w, h, x, y, x + w, y + h, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-        GET_OVFUNC(PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer)(GL_DRAW_FRAMEBUFFER, drawBuffer);
-        GET_OVFUNC(PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer)(GL_READ_FRAMEBUFFER, readBuffer);
+        GET_OVFUNC(PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer)(GL_DRAW_FRAMEBUFFER, currentDrawFramebuffer);
+        GET_OVFUNC(PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer)(GL_READ_FRAMEBUFFER, currentReadDrawbuffer);
     }
+};
+
+struct FramebufferColorInfo {
+    GLuint colorTargets[MAX_FBTARGETS];
+    GLuint colorObjects[MAX_FBTARGETS];
+    GLuint colorComponentType[MAX_FBTARGETS];
+    GLuint colorEncoding[MAX_FBTARGETS];
+
+    // if GL_TEXTURE
+    GLuint colorLevels[MAX_FBTARGETS];
+    GLuint colorLayers[MAX_FBTARGETS];
+};
+
+struct Framebuffer {
+    FramebufferColorInfo colorInfo;
+    GLenum virtualDrawbuffers[MAX_DRAWBUFFERS] = { GL_COLOR_ATTACHMENT0 };
+    GLenum physicalDrawbuffers[MAX_DRAWBUFFERS];
+    GLsizei bufferAmount = 1;
 };
 
 inline std::shared_ptr<FakeDepthFramebuffer> fakeFramebuffer;
@@ -122,10 +122,10 @@ inline std::shared_ptr<Framebuffer> getFramebufferObject(GLenum target) {
     switch (target) {
         case GL_FRAMEBUFFER:
         case GL_DRAW_FRAMEBUFFER:
-            framebuffer = drawBuffer;
+            framebuffer = currentDrawFramebuffer;
             break;
         case GL_READ_FRAMEBUFFER:
-            framebuffer = readBuffer;
+            framebuffer = currentReadDrawbuffer;
             break;
     }
     
