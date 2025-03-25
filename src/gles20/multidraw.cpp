@@ -1,18 +1,19 @@
-#include "es/validation.h"
 #include "gles20/main.h"
 #include "main.h"
+#include "utils/log.h"
 
 #include <GLES2/gl2.h>
 
-void glMultiDrawArrays(GLenum mode, const GLint* first, const GLsizei* count, GLsizei drawcount);
-void glMultiDrawElements(GLenum mode, const GLsizei* count, GLenum type, const void* const* indices, GLsizei drawcount);
+void glMultiDrawArrays2(GLenum mode, const GLint* first, const GLsizei* count, GLsizei drawcount);
+void glMultiDrawElements2(GLenum mode, const GLsizei* count, GLenum type, const void* const* indices, GLsizei drawcount);
 
 void GLES20::registerMultiDrawEmulation() {
-    REGISTER(glMultiDrawArrays);
-    REGISTER(glMultiDrawElements);
+    LOGI("Using generic glMultiDrawArrays and glMultiDrawElements implementation.");
+    REGISTERREDIR(glMultiDrawArrays, glMultiDrawArrays2);
+    REGISTERREDIR(glMultiDrawElements, glMultiDrawElements2);
 }
 
-void glMultiDrawArrays(
+void glMultiDrawArrays2(
     GLenum mode,
     const GLint* first,
     const GLsizei* count,
@@ -25,7 +26,7 @@ void glMultiDrawArrays(
     }
 }
 
-void glMultiDrawElements(
+void glMultiDrawElements2(
     GLenum mode,
     const GLsizei* count,
     GLenum type,

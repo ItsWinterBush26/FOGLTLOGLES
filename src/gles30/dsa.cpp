@@ -162,14 +162,14 @@ void glNamedBufferData(GLuint buffer, GLsizeiptr size, const void* data, GLenum 
     BufferBindingSaver saver(GL_ARRAY_BUFFER);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferData(GL_ARRAY_BUFFER, size, data, usage);
-    LOGI("glNamedBufferData emulated: buffer=%u size=%zd usage=0x%x", buffer, size, usage);
+    LOGI("glNamedBufferData emulated: buffer=%u size=%ld usage=0x%x", buffer, size, usage);
 }
 
 void glNamedBufferSubData(GLuint buffer, GLintptr offset, GLsizeiptr size, const void* data) {
     BufferBindingSaver saver(GL_ARRAY_BUFFER);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
-    LOGI("glNamedBufferSubData emulated: buffer=%u offset=%zd size=%zd", buffer, offset, size);
+    LOGI("glNamedBufferSubData emulated: buffer=%u offset=%ld size=%ld", buffer, offset, size);
 }
 
 void glNamedFramebufferTexture(GLuint framebuffer, GLenum attachment, GLuint texture, GLint level) {

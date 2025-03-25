@@ -188,9 +188,9 @@ void OV_glBindFramebuffer(GLenum target, GLuint framebuffer) {
 
     switch (target) {
         case GL_FRAMEBUFFER:
-            currentReadDrawbuffer = currentDrawFramebuffer = framebuffer;
+            currentReadFramebuffer = currentDrawFramebuffer = framebuffer;
             break;
-        case GL_READ_FRAMEBUFFER: currentReadDrawbuffer = framebuffer; break;
+        case GL_READ_FRAMEBUFFER: currentReadFramebuffer = framebuffer; break;
         case GL_DRAW_FRAMEBUFFER: currentDrawFramebuffer = framebuffer; break;
     }
 }

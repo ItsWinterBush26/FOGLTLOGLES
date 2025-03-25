@@ -22,7 +22,7 @@
 #define GET_OVFUNC(type, name) name // reinterpret_cast<type>(FOGLTLOGLES::getFunctionAddress(#name))
 #endif
 
-inline GLuint currentDrawFramebuffer = 0, currentReadDrawbuffer = 0;
+inline GLuint currentDrawFramebuffer = 0, currentReadFramebuffer = 0;
 
 class FakeDepthFramebuffer {
 public:
@@ -38,10 +38,11 @@ public:
 
     FakeDepthFramebuffer() {
         glGenTextures(1, &framebufferTexture);
+        glGenFramebuffers(1, &drawFramebuffer);
+        glGenFramebuffers(1, &readFramebuffer);
 
-        auto glGenFB = GET_OVFUNC(PFNGLGENFRAMEBUFFERSPROC, glGenFramebuffers);
-        glGenFB(1, &drawFramebuffer);
-        glGenFB(1, &readFramebuffer);
+        GLint boundTexture;
+        glGetIntegerv(GL_TEXTURE_BINDING_2D, &boundTexture);
 
         glBindTexture(GL_TEXTURE_2D, framebufferTexture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -49,6 +50,7 @@ public:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+        glBindTexture(GL_TEXTURE_2D, boundTexture);
         if (!glGetError()) ready = true;
     }
 
@@ -59,40 +61,37 @@ public:
         glGetIntegerv(GL_TEXTURE_BINDING_2D, &boundTexture);
 
         glBindTexture(GL_TEXTURE_2D, framebufferTexture);
-        GET_OVFUNC(PFNGLTEXIMAGE2DPROC, glTexImage2D)(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, w, h, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, w, h, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, drawFramebuffer);
 
-        glBindTexture(GL_TEXTURE_2D, boundTexture);
-
-        auto glBindFB = GET_OVFUNC(PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer);
-        glBindFB(GL_DRAW_FRAMEBUFFER, drawFramebuffer);
-        GET_OVFUNC(PFNGLFRAMEBUFFERTEXTURE2DPROC, glFramebufferTexture2D)(
+        glFramebufferTexture2D(
             GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
             GL_TEXTURE_2D, framebufferTexture, 0
         );
 
         glBlitFramebuffer(x, y, x + w, y + h, 0, 0, w, h, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
         
-        glBindFB(GL_DRAW_FRAMEBUFFER, currentDrawFramebuffer);
+        glBindTexture(GL_TEXTURE_2D, boundTexture);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, currentDrawFramebuffer);
     }
 
     void release(GLenum target, GLint level, GLint x, GLint y, GLsizei w, GLsizei h) {
         if (!ready) return;
 
-        auto glGenFB = GET_OVFUNC(PFNGLGENFRAMEBUFFERSPROC, glGenFramebuffers);
-        glGenFB(1, &drawFramebuffer);
-        glGenFB(1, &readFramebuffer);
-
         GLint boundTexture;
         glGetIntegerv(getEnumBindingForTarget(target), &boundTexture);
 
-        GET_OVFUNC(PFNGLFRAMEBUFFERTEXTURE2DPROC, glFramebufferTexture2D)(
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, drawFramebuffer);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, readFramebuffer);
+
+        glFramebufferTexture2D(
             GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
             target, boundTexture, level
         );
 
         glBlitFramebuffer(0, 0, w, h, x, y, x + w, y + h, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-        GET_OVFUNC(PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer)(GL_DRAW_FRAMEBUFFER, currentDrawFramebuffer);
-        GET_OVFUNC(PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer)(GL_READ_FRAMEBUFFER, currentReadDrawbuffer);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, currentDrawFramebuffer);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, currentReadFramebuffer);
     }
 };
 
@@ -125,7 +124,7 @@ inline std::shared_ptr<Framebuffer> getFramebufferObject(GLenum target) {
             framebuffer = currentDrawFramebuffer;
             break;
         case GL_READ_FRAMEBUFFER:
-            framebuffer = currentReadDrawbuffer;
+            framebuffer = currentReadFramebuffer;
             break;
     }
     

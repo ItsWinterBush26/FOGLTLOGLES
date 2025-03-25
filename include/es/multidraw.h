@@ -3,9 +3,7 @@
 #include "utils/pointers.h"
 
 #include <GLES3/gl3.h>
-#include <algorithm>
 #include <memory>
-#include <vector>
 
 inline GLint getTypeSize(GLenum type) {
     switch (type) {

@@ -4,13 +4,12 @@
 #include "utils/log.h"
 
 #include <GLES3/gl3.h>
-#include <numeric>
 
 void glMultiDrawArrays3(GLenum mode, const GLint* first, const GLsizei* count, GLsizei drawcount);
 void glMultiDrawElements3(GLenum mode, const GLsizei* count, GLenum type, const void* const* indices, GLsizei drawcount);
 
 void GLES30::registerMultiDrawEmulation() {
-    LOGI("Enjoy a somewhat accelerated glMultiDrawArrays and glMultiDrawElements implementation!");
+    LOGI("Nevermind, enjoy a somewhat accelerated glMultiDrawArrays and glMultiDrawElements implementation!");
 
     REGISTERREDIR(glMultiDrawArrays, glMultiDrawArrays3);
     REGISTERREDIR(glMultiDrawElements, glMultiDrawElements3);
