@@ -21,7 +21,7 @@ void glMultiDrawArrays3(
     const GLsizei* count,
     GLsizei drawcount
 ) {
-    if (drawcount == 0) return;
+    if (drawcount <= 0) return;
 
     GLint mergedFirst = first[0];
     GLsizei mergedCount = count[0];
