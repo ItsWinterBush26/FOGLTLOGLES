@@ -1,5 +1,6 @@
 #pragma once
 
+#include "utils/pointers.h"
 #include <GLES3/gl32.h>
 #include <memory>
 
@@ -12,7 +13,7 @@ struct ProxyTexture {
     GLint internalFormat;
 };
 
-inline std::shared_ptr<ProxyTexture> boundProxyTexture = nullptr; // std::make_shared<ProxyTexture>();
+inline std::shared_ptr<ProxyTexture> boundProxyTexture = MakeAggregateShared<ProxyTexture>();
 
 inline bool isProxyTexture(GLenum target) {
     switch (target) {
