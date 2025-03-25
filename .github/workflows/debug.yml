@@ -20,15 +20,17 @@ jobs:
             arch-double: armeabi-v7a
     
     runs-on:
-      - nscloud-ubuntu-24.04-amd64-8x8-with-cache
-      - nscloud-git-mirror-5gb
+      ubuntu-latest
+      # - nscloud-ubuntu-24.04-amd64-8x8-with-cache
+      # - nscloud-git-mirror-5gb
       # - nscloud-cache-size-20gb
       # - nscloud-cache-tag-FOGLTLOGLES
     
     steps:
-    - uses: namespacelabs/nscloud-setup@v0
+    # - uses: namespacelabs/nscloud-setup@v0
     
-    - uses: namespacelabs/nscloud-checkout-action@v5
+    # - uses: namespacelabs/nscloud-checkout-action@v5
+    - uses: actions/checkout@v4
       with:
         submodules: true
         fetch-depth: 1
