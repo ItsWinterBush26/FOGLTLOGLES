@@ -9,10 +9,12 @@
 #include <string>
 
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length);
+void OV_glCompileShader(GLuint shader);
 void OV_glLinkProgram(GLuint program);
 
 void GLES20::registerShaderOverrides() {
     REGISTEROV(glShaderSource);
+    REGISTEROV(glCompileShader)
     REGISTEROV(glLinkProgram);
 }
 
@@ -44,22 +46,30 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* string
     }
 }
 
+void OV_glCompileShader(GLuint shader) {
+    glCompileShader(shader);
+
+    GLint success = 0;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+
+    if (success != GL_TRUE) {
+        ShaderConverter::invalidateCurrentShader();
+
+        throw std::runtime_error("Failed to compile shader!");
+    }
+}
+
 void OV_glLinkProgram(GLuint program) {
     glLinkProgram(program);
 
-    if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
-        GLint success = 0;
-        glGetProgramiv(program, GL_LINK_STATUS, &success);
-        
-        if (success != GL_TRUE) {
-            GLchar bufLog[4096] = { 0 };
-            GLint size = 0;
-            glGetProgramInfoLog(program, 4096, &size, bufLog);
-            
-            ShaderConverter::invalidateCurrentShader();
+    GLint success = 0;
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    if (success != GL_TRUE) {
+        GLchar bufLog[4096] = { 0 };
+        GLint size = 0;
+        glGetProgramInfoLog(program, 4096, &size, bufLog);
 
-            LOGI("Link error for program %u: %s", program, bufLog);
-            throw std::runtime_error("Failed to link program!");
-        }
+        LOGI("Link error for program %u: %s", program, bufLog);
+        throw std::runtime_error("Failed to link program!");
     }
 }
