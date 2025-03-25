@@ -50,10 +50,10 @@ jobs:
     - name: Install Ninja
       uses: seanmiddleditch/gha-setup-ninja@master
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-      with:
-        packages: 'ndk;28.0.13004108'
+    # - name: Setup Android SDK
+    #  uses: android-actions/setup-android@v3
+    #  with:
+    #    packages: 'ndk;28.0.13004108'
 
     - name: Build
       run: |
