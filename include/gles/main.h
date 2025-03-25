@@ -13,4 +13,5 @@ namespace GLES {
     const inline std::shared_ptr<GLESWrapper> wrapper = std::make_shared<GLESWrapper>();
 
     void registerBrandingOverride();
+    void registerTranslatedFunctions();
 }

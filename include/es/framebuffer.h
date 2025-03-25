@@ -114,7 +114,7 @@ struct Framebuffer {
     GLsizei bufferAmount = 1;
 };
 
-inline std::shared_ptr<FakeDepthFramebuffer> fakeFramebuffer;
+inline std::shared_ptr<FakeDepthFramebuffer> fakeDepthbuffer;
 inline std::unordered_map<GLuint, std::shared_ptr<Framebuffer>> boundFramebuffers;
 
 inline std::shared_ptr<Framebuffer> getFramebufferObject(GLenum target) {

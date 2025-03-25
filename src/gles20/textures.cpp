@@ -77,10 +77,10 @@ void OV_glTexSubImage2D(
     doSwizzling(target, ops);
 
     if (format == GL_DEPTH_COMPONENT) {
-        if (width == fakeFramebuffer->width
-            && height == fakeFramebuffer->height
-            && fakeFramebuffer->data == pixels) {
-            fakeFramebuffer->release(target, level, xOffset, yOffset, width, height);
+        if (width == fakeDepthbuffer->width
+            && height == fakeDepthbuffer->height
+            && fakeDepthbuffer->data == pixels) {
+            fakeDepthbuffer->release(target, level, xOffset, yOffset, width, height);
             return;
         }
     }
@@ -109,7 +109,7 @@ void OV_glCopyTexSubImage2D(
         glGetIntegerv(getEnumBindingForTarget(target), &boundTexture);
         
         auto glBindFB = GET_OVFUNC(PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer);
-        glBindFB(GL_DRAW_FRAMEBUFFER, fakeFramebuffer->drawFramebuffer);
+        glBindFB(GL_DRAW_FRAMEBUFFER, fakeDepthbuffer->drawFramebuffer);
         
         GET_OVFUNC(PFNGLFRAMEBUFFERTEXTURE2DPROC, glFramebufferTexture2D)(
             GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
