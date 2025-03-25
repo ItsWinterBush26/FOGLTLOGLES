@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(FOGLTOGLES VERSION 0.0.1 LANGUAGES C CXX)
+project(FOGLTOGLES LANGUAGES C CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -16,11 +16,9 @@ set(SPIRV_CROSS_ENABLE_C_API OFF)
 set(GLSLANG_TESTS OFF)
 ## set(ENABLE_HLSL OFF) ## fails on libshaderc_util
 set(BUILD_EXECUTABLE OFF)
-set(BUILD_LIBRARY_STATIC ON)
 
 add_subdirectory(deps/shaderc) 
 add_subdirectory(deps/spirv-cross)
-add_subdirectory(deps/glsl-parser)
 
 ######## MAIN PROJECT ########
 file(GLOB_RECURSE SOURCES
@@ -29,11 +27,12 @@ file(GLOB_RECURSE SOURCES
 	"src/*/*/*.cpp"
 )
 
-set(HEADER_DIRS "include")
+set(HEADER_DIRS "include" "build_info")
 file(GLOB_RECURSE HEADERS
 	"include/*.h"
 	"include/*/*.h"
 	"include/*/*/*'h"
+	"build_info/build_info.h"
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
@@ -74,7 +73,7 @@ set(DEPENDENCIES
 	${GLES2_DEP}
 	${GLES3_DEP}
 	${LOG_DEP}
-    ${DL_DEP}
+	${DL_DEP}
 	${CXX_STATIC_DEP}
 
 	# Static ShaderC
@@ -83,9 +82,6 @@ set(DEPENDENCIES
 	# Minimal static SPIRV-Cross
 	spirv-cross-core
 	spirv-cross-glsl
-
-	# Static glsl-parser
-	glsl-parser
 )
 
 # set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_OPTIONS -fopenmp)
@@ -96,3 +92,14 @@ target_link_libraries(
 message("Sources      : ${SOURCES}")
 message("Headers      : ${HEADERS}")
 message("Dependencies : ${DEPENDENCIES}")
+
+set(BUILD_INFO_DIR ${CMAKE_SOURCE_DIR}/build_info)
+
+add_custom_target(generateBuildInfo
+  ${CMAKE_COMMAND} -D SRC=${BUILD_INFO_DIR}/build_info.h.in
+                   -D DST=${BUILD_INFO_DIR}/build_info.h
+                   -D GIT_EXECUTABLE=${GIT_EXECUTABLE}
+                   -P ${BUILD_INFO_DIR}/GenerateBuildInfo.cmake
+)
+
+add_dependencies(${PROJECT_NAME} generateBuildInfo)

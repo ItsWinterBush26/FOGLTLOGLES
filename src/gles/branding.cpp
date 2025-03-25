@@ -1,3 +1,4 @@
+#include "build_info.h"
 #include "es/utils.h"
 #include "gl/glext.h"
 #include "gl/header.h"
@@ -29,7 +30,8 @@ void GLES::registerBrandingOverride() {
     );
 
     rendererString = string_format(
-        "FOGLTLOGLES v0.0.1 (on %s)", // TODO: implement versioning
+        "FOGLTLOGLES %s (on %s)", // TODO: implement versioning
+        RENDERER_VERSION,
         glGetString(GL_RENDERER)
     );
 

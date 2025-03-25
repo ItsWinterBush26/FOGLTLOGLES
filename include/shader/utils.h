@@ -6,7 +6,6 @@
 #include "utils/log.h"
 
 #include <GLES3/gl31.h>
-#include <glsl-parser/ast.h>
 #include <regex>
 
 inline void combineSources(GLsizei count, const GLchar *const* sources, const GLint* length, std::string& destination) {
@@ -19,18 +18,6 @@ inline void combineSources(GLsizei count, const GLchar *const* sources, const GL
            }
        }
    }
-}
-
-inline int getAstFriendlyTypeFromKind(shaderc_shader_kind kind) {
-    switch (kind) {
-        case shaderc_vertex_shader:
-            return glsl::astTU::kVertex;
-        case shaderc_fragment_shader:
-            return glsl::astTU::kFragment;
-        case shaderc_compute_shader:
-            return glsl::astTU::kCompute;
-        default: return glsl::astTU::kVertex;
-    }
 }
 
 inline shaderc_shader_kind getKindFromShader(GLuint shader) {
