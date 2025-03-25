@@ -27,6 +27,7 @@ void GLES20::registerTextureOverrides() {
 
     REGISTEROV(glTexImage2D);
     REGISTEROV(glTexSubImage2D);
+    REGISTEROV(glCopyTexSubImage2D);
     
     REGISTEROV(glTexParameterf);
     // REGISTEROV(glTexParameteri);

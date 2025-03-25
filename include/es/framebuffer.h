@@ -4,11 +4,7 @@
 #pragma once
 
 #include "es/texture.h"
-#include "gl/glext.h"
-#include "gl/header.h"
-#include "main.h"
 #include "utils/log.h"
-#include "utils/pointers.h"
 
 #include <GLES3/gl32.h>
 #include <memory>
@@ -23,7 +19,7 @@
 #endif
 
 #ifndef GET_OVFUNC
-#define GET_OVFUNC(type, name) reinterpret_cast<type>(FOGLTLOGLES::getFunctionAddress(#name))
+#define GET_OVFUNC(type, name) name // reinterpret_cast<type>(FOGLTLOGLES::getFunctionAddress(#name))
 #endif
 
 inline GLuint drawBuffer = 0, readBuffer = 0;
@@ -113,7 +109,7 @@ public:
         );
 
         glBlitFramebuffer(0, 0, w, h, x, y, x + w, y + h, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-        GET_OVFUNC(PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer)(GL_DRAW_BUFFER, drawBuffer);
+        GET_OVFUNC(PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer)(GL_DRAW_FRAMEBUFFER, drawBuffer);
         GET_OVFUNC(PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer)(GL_READ_FRAMEBUFFER, readBuffer);
     }
 };
@@ -269,13 +265,6 @@ inline void getFramebufferAttachmentParameter(std::shared_ptr<Framebuffer> frame
 inline void clearFramebuffer(GLenum buffer, GLint& drawBuffer) {
     auto framebuffer = getFramebufferObject(GL_DRAW_FRAMEBUFFER);
     if (framebuffer.get() != nullptr && buffer == GL_COLOR) {
-        /* for (GLsizei i = 0; i < framebuffer->bufferAmount; ++i) {
-            if (i == drawBuffer) {
-                drawBuffer = framebuffer->physicalDrawbuffers[i] - GL_COLOR_ATTACHMENT0;
-                break;
-            }
-        } */
-        
         GLenum attachment = getMapAttachment(framebuffer, GL_COLOR_ATTACHMENT0 + drawBuffer);
         drawBuffer = attachment - GL_COLOR_ATTACHMENT0;
     }
