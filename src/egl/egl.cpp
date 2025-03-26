@@ -53,5 +53,5 @@ inline void eglInit() {
     
     LOGI("Done initializing!");
 
-    real_eglGetProcAddress = reinterpret_cast<PFNEGLGETPROCADDRESSPROC>(dlsym(RTLD_NEXT, "eglGetProcAddress"));
+    real_eglGetProcAddress = reinterpret_cast<PFNEGLGETPROCADDRESSPROC>(dlsym(dlopen("libEGL.so", RTLD_LAZY), "eglGetProcAddress"));
 }

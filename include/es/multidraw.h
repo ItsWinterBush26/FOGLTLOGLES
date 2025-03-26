@@ -2,7 +2,6 @@
 
 #include "es/binding_saver.h"
 #include "main.h"
-#include "utils/pointers.h"
 
 #include <GLES3/gl3.h>
 #include <memory>
