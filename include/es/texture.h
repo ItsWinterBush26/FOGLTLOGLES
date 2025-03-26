@@ -14,26 +14,6 @@ inline void trackTextureFormat(GLint& internalFormat) {
     trackedTextures.insert({ boundTexture, internalFormat });
 }
 
-inline GLenum getEnumBindingForTarget(GLenum& target) {
-    switch (target) {
-        case GL_TEXTURE_2D: return GL_TEXTURE_BINDING_2D;
-        case GL_TEXTURE_2D_MULTISAMPLE: return GL_TEXTURE_BINDING_2D_MULTISAMPLE;
-        case GL_TEXTURE_2D_MULTISAMPLE_ARRAY: return GL_TEXTURE_BINDING_2D_MULTISAMPLE_ARRAY;
-        case GL_TEXTURE_3D: return GL_TEXTURE_BINDING_3D;
-        case GL_TEXTURE_2D_ARRAY: return GL_TEXTURE_BINDING_2D_ARRAY;
-        case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
-        case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
-        case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
-        case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
-        case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
-        case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
-        case GL_TEXTURE_CUBE_MAP: return GL_TEXTURE_BINDING_CUBE_MAP;
-        case GL_TEXTURE_CUBE_MAP_ARRAY: return GL_TEXTURE_BINDING_CUBE_MAP_ARRAY;
-        case GL_TEXTURE_BUFFER: return GL_TEXTURE_BUFFER_BINDING;
-        default: return 0;
-    }
-}
-
 inline void swizzleBGRA(GLenum& type, std::vector<SwizzleOperation>& ops) {
     switch (type) {
         case 0x8035: // GL_UNSIGNED_INT_8_8_8_8

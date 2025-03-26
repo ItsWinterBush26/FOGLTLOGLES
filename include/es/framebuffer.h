@@ -4,7 +4,6 @@
 #pragma once
 
 #include "es/binding_saver.h"
-#include "es/texture.h"
 #include "utils/log.h"
 
 #include <GLES3/gl32.h>
@@ -70,7 +69,7 @@ public:
         if (!ready) return;
 
         GLint boundTexture;
-        glGetIntegerv(getEnumBindingForTarget(target), &boundTexture);
+        glGetIntegerv(getBindingEnumOfTexture(target), &boundTexture);
 
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, drawFramebuffer);
         glBindFramebuffer(GL_READ_FRAMEBUFFER, readFramebuffer);

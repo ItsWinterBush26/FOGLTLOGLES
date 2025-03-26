@@ -1,5 +1,6 @@
 #pragma once
 
+#include "es/binding_saver.h"
 #include "utils/pointers.h"
 
 #include <GLES3/gl3.h>
@@ -14,25 +15,26 @@ inline GLint getTypeSize(GLenum type) {
     }
 }
 
-struct MDElementsBuffer {
+struct MDElementsBatcher {
     GLuint buffer;
 
     bool usable;
 
-    MDElementsBuffer() {
+    MDElementsBatcher() {
         glGenBuffers(1, &buffer);
 
-        if (!glGetError()) usable = true;
+        usable = (glGetError() == GL_NO_ERROR);
     }
 
-    ~MDElementsBuffer() {
+    ~MDElementsBatcher() {
         glDeleteBuffers(1, &buffer);
     }
 
     void batch(
         GLsizei totalCount, GLint typeSize,
         GLsizei primcount,
-        const GLsizei* count, const void* const* indices
+        const GLsizei* count, const void* const* indices,
+        SaveBoundedBuffer sbb
     ) {
         if (!usable) return;
 
@@ -44,12 +46,16 @@ struct MDElementsBuffer {
             if (!count[i]) continue;
 
             GLsizei dataSize = count[i] * typeSize;
-            glBufferSubData(GL_COPY_WRITE_BUFFER, offset, dataSize, indices[i]);
-            offset += dataSize;  
+            if (sbb.boundedBuffer != 0) {
+                glCopyBufferSubData(GL_ELEMENT_ARRAY_BUFFER, GL_COPY_WRITE_BUFFER, (GLintptr)indices[i], offset, dataSize);
+            } else {
+                glBufferSubData(GL_COPY_WRITE_BUFFER, offset, dataSize, indices[i]);
+            }
+            offset += dataSize;
         }
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
     }
 };
 
-inline std::shared_ptr<MDElementsBuffer> batcher = MakeAggregateShared<MDElementsBuffer>();
+inline std::shared_ptr<MDElementsBatcher> batcher = MakeAggregateShared<MDElementsBatcher>();

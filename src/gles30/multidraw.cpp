@@ -1,4 +1,5 @@
 #include "es/multidraw.h"
+#include "es/binding_saver.h"
 #include "gles30/main.h"
 #include "main.h"
 #include "utils/log.h"
@@ -53,14 +54,11 @@ void glMultiDrawElements3(
     if (typeSize == 0) return; // Unsupported type
     
     GLsizei totalCount = 0;
-    for (GLsizei i = 0; i < primcount; ++i) totalCount = count[i];
+    for (GLsizei i = 0; i < primcount; ++i) totalCount += count[i];
     if (totalCount == 0) return;
 
-    GLint currentBuffer = 0;
-    glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &currentBuffer);
+    SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
 
-    batcher->batch(totalCount, typeSize, primcount, count, indices);
+    batcher->batch(totalCount, typeSize, primcount, count, indices, sbb);
     glDrawElements(mode, totalCount, type, (void*) 0);
-
-    glBindBuffer(GL_COPY_WRITE_BUFFER, currentBuffer); // bind or reset
 }
