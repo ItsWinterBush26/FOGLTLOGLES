@@ -14,4 +14,5 @@ namespace GLES {
 
     void registerBrandingOverride();
     void registerTranslatedFunctions();
+    void registerNoErrorOverride();
 }

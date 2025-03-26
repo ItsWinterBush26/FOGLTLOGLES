@@ -1,6 +1,7 @@
 #pragma once
 
 #include "es/binding_saver.h"
+#include "main.h"
 #include "utils/pointers.h"
 
 #include <GLES3/gl3.h>
@@ -23,7 +24,7 @@ struct MDElementsBatcher {
     MDElementsBatcher() {
         glGenBuffers(1, &buffer);
 
-        usable = (glGetError() == GL_NO_ERROR);
+        usable = (GET_OVFUNC(PFNGLGETERRORPROC, glGetError)() == GL_NO_ERROR);
     }
 
     ~MDElementsBatcher() {

@@ -4,6 +4,7 @@
 #pragma once
 
 #include "es/binding_saver.h"
+#include "main.h"
 #include "utils/log.h"
 
 #include <GLES3/gl32.h>
@@ -44,7 +45,7 @@ public:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        ready = (glGetError() == GL_NO_ERROR);
+        ready = (GET_OVFUNC(PFNGLGETERRORPROC, glGetError)() == GL_NO_ERROR);
     }
 
     void store(GLint x, GLint y, GLsizei w, GLsizei h) {

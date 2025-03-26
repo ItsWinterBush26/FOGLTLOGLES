@@ -6,4 +6,5 @@ void GLES::GLESWrapper::init() {
 
     GLES::registerTranslatedFunctions();
     GLES::registerBrandingOverride();
+    // GLES::registerNoErrorOverride();
 }

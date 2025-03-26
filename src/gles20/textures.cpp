@@ -9,6 +9,7 @@
 #include "utils/pointers.h"
 
 #include <GLES2/gl2.h>
+#include <GLES3/gl3.h>
 
 void OV_glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels);
 void OV_glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels);
@@ -100,10 +101,10 @@ void OV_glCopyTexSubImage2D(
     GLint x, GLint y,
     GLsizei width, GLsizei height
 ) {
-    glGetError();
+    GET_OVFUNC(PFNGLGETERRORPROC, glGetError)();
     glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
 
-    if (glGetError() == GL_INVALID_OPERATION) {
+    if (GET_OVFUNC(PFNGLGETERRORPROC, glGetError)() == GL_INVALID_OPERATION) {
         fakeDepthbuffer->release(target, level, x, y, width, height);
     }
 }
