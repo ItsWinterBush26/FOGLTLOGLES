@@ -25,3 +25,7 @@ namespace FOGLTLOGLES {
 #ifndef REGISTERREDIR
 #define REGISTERREDIR(name, target) FOGLTLOGLES::registerFunction(#name, TO_FUNCPTR(target));
 #endif
+
+#ifndef GET_OVFUNC
+#define GET_OVFUNC(type, name) reinterpret_cast<type>(FOGLTLOGLES::getFunctionAddress(#name))
+#endif

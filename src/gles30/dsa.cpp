@@ -1,7 +1,10 @@
+#include "es/dsa.h"
+#include "es/utils.h"
 #include "gles30/main.h"
 #include "main.h"
 #include "utils/log.h"
 
+#include <GLES3/gl3.h>
 #include <GLES3/gl32.h>
 
 // Texture
@@ -23,16 +26,6 @@ void glVertexArrayAttribFormat(GLuint vaobj, GLuint attribindex, GLint size, GLe
 void glVertexArrayAttribBinding(GLuint vaobj, GLuint attribindex, GLuint bindingindex);
 void glEnableVertexArrayAttrib(GLuint vaobj, GLuint index);
 
-struct BindingState {
-    GLuint textureUnits[32] = {0};  // Assuming max 32 texture units
-    GLuint currentTextureUnit = 0;
-    GLuint buffer = 0;
-    GLuint vao = 0;
-    GLuint framebuffer = 0;
-};
-
-inline BindingState bindingState;
-
 void GLES30::registerDSAEmulation() {
     REGISTER(glTextureParameteri);
     REGISTER(glTextureParameterf);
@@ -45,100 +38,21 @@ void GLES30::registerDSAEmulation() {
     REGISTER(glVertexArrayAttribFormat);
     REGISTER(glVertexArrayAttribBinding);
     REGISTER(glEnableVertexArrayAttrib);
+
+    ESUtils::fakeExtensions.insert("ARB_direct_state_access");
 }
-
-// Helper to save and restore bindings
-class TextureBindingSaver {
-private:
-    GLint savedUnit;
-    GLint savedTexture;
-    GLenum target;
-
-public:
-    TextureBindingSaver(GLenum textureTarget) : target(textureTarget) {
-        glGetIntegerv(GL_ACTIVE_TEXTURE, &savedUnit);
-        glGetIntegerv(getBindingEnum(target), &savedTexture);
-    }
-
-    ~TextureBindingSaver() {
-        glActiveTexture(savedUnit);
-        glBindTexture(target, savedTexture);
-    }
-
-    static GLenum getBindingEnum(GLenum target) {
-        switch (target) {
-            case GL_TEXTURE_2D: return GL_TEXTURE_BINDING_2D;
-            case GL_TEXTURE_3D: return GL_TEXTURE_BINDING_3D;
-            case GL_TEXTURE_CUBE_MAP: return GL_TEXTURE_BINDING_CUBE_MAP;
-            case GL_TEXTURE_2D_ARRAY: return GL_TEXTURE_BINDING_2D_ARRAY;
-            default: return GL_TEXTURE_BINDING_2D;
-        }
-    }
-};
-
-class BufferBindingSaver {
-private:
-    GLint savedBuffer;
-    GLenum target;
-
-public:
-    BufferBindingSaver(GLenum bufferTarget) : target(bufferTarget) {
-        glGetIntegerv(getBindingEnum(target), &savedBuffer);
-    }
-
-    ~BufferBindingSaver() {
-        glBindBuffer(target, savedBuffer);
-    }
-
-    static GLenum getBindingEnum(GLenum target) {
-        switch (target) {
-            case GL_ARRAY_BUFFER: return GL_ARRAY_BUFFER_BINDING;
-            case GL_ELEMENT_ARRAY_BUFFER: return GL_ELEMENT_ARRAY_BUFFER_BINDING;
-            case GL_UNIFORM_BUFFER: return GL_UNIFORM_BUFFER_BINDING;
-            default: return GL_ARRAY_BUFFER_BINDING;
-        }
-    }
-};
-
-class VAOBindingSaver {
-private:
-    GLint savedVAO;
-
-public:
-    VAOBindingSaver() {
-        glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &savedVAO);
-    }
-
-    ~VAOBindingSaver() {
-        glBindVertexArray(savedVAO);
-    }
-};
-
-class FramebufferBindingSaver {
-private:
-    GLint savedFBO;
-
-public:
-    FramebufferBindingSaver() {
-        glGetIntegerv(GL_FRAMEBUFFER_BINDING, &savedFBO);
-    }
-
-    ~FramebufferBindingSaver() {
-        glBindFramebuffer(GL_FRAMEBUFFER, savedFBO);
-    }
-};
 
 void glTextureParameteri(GLuint texture, GLenum pname, GLint param) {
     TextureBindingSaver saver(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, pname, param);
+    GET_OVFUNC(PFNGLTEXPARAMETERIPROC, glTexParameteri)(GL_TEXTURE_2D, pname, param);
     LOGI("glTextureParameteri emulated: texture=%u pname=0x%x param=%d", texture, pname, param);
 }
 
 void glTextureParameterf(GLuint texture, GLenum pname, GLfloat param) {
     TextureBindingSaver saver(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameterf(GL_TEXTURE_2D, pname, param);
+    GET_OVFUNC(PFNGLTEXPARAMETERFPROC, glTexParameterf)(GL_TEXTURE_2D, pname, param);
     LOGI("glTextureParameterf emulated: texture=%u pname=0x%x param=%f", texture, pname, param);
 }
 
@@ -146,15 +60,19 @@ void glTextureStorage2D(GLuint texture, GLsizei levels, GLenum internalformat, G
     TextureBindingSaver saver(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexStorage2D(GL_TEXTURE_2D, levels, internalformat, width, height);
-    LOGI("glTextureStorage2D emulated: texture=%u levels=%d format=0x%x width=%d height=%d", 
-         texture, levels, internalformat, width, height);
+    LOGI("glTextureStorage2D emulated: texture=%u levels=%d format=0x%x width=%d height=%d", texture, levels, internalformat, width, height);
 }
 
-void glTextureSubImage2D(GLuint texture, GLint level, GLint xoffset, GLint yoffset, 
-                         GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels) {
+void glTextureSubImage2D(
+    GLuint texture, GLint level,
+    GLint xoffset, GLint yoffset, 
+    GLsizei width, GLsizei height,
+    GLenum format, GLenum type, 
+    const void* pixels
+) {
     TextureBindingSaver saver(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texture);
-    glTexSubImage2D(GL_TEXTURE_2D, level, xoffset, yoffset, width, height, format, type, pixels);
+    GET_OVFUNC(PFNGLTEXSUBIMAGE2DPROC, glTexSubImage2D)(GL_TEXTURE_2D, level, xoffset, yoffset, width, height, format, type, pixels);
     LOGI("glTextureSubImage2D emulated: texture=%u level=%d", texture, level);
 }
 
@@ -176,8 +94,7 @@ void glNamedFramebufferTexture(GLuint framebuffer, GLenum attachment, GLuint tex
     FramebufferBindingSaver saver;
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, texture, level);
-    LOGI("glNamedFramebufferTexture emulated: fbo=%u attachment=0x%x texture=%u level=%d", 
-         framebuffer, attachment, texture, level);
+    LOGI("glNamedFramebufferTexture emulated: fbo=%u attachment=0x%x texture=%u level=%d", framebuffer, attachment, texture, level);
 }
 
 void glVertexArrayVertexBuffer(GLuint vaobj, GLuint bindingindex, GLuint buffer, GLintptr offset, GLsizei stride) {
@@ -187,8 +104,12 @@ void glVertexArrayVertexBuffer(GLuint vaobj, GLuint bindingindex, GLuint buffer,
     LOGI("glVertexArrayVertexBuffer emulated: vaobj=%u bindingindex=%u buffer=%u", vaobj, bindingindex, buffer);
 }
 
-void glVertexArrayAttribFormat(GLuint vaobj, GLuint attribindex, GLint size, GLenum type, 
-                              GLboolean normalized, GLuint relativeoffset) {
+void glVertexArrayAttribFormat(
+    GLuint vaobj,
+    GLuint attribindex,
+    GLint size, GLenum type, 
+    GLboolean normalized, GLuint relativeoffset
+) {
     VAOBindingSaver saver;
     glBindVertexArray(vaobj);
     glVertexAttribFormat(attribindex, size, type, normalized, relativeoffset);

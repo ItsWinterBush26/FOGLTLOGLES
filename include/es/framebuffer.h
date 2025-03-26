@@ -18,10 +18,6 @@
 #define MAX_DRAWBUFFERS 8
 #endif
 
-#ifndef GET_OVFUNC
-#define GET_OVFUNC(type, name) name // reinterpret_cast<type>(FOGLTLOGLES::getFunctionAddress(#name))
-#endif
-
 inline GLuint currentDrawFramebuffer = 0, currentReadFramebuffer = 0;
 
 class FakeDepthFramebuffer {
