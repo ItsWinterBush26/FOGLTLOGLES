@@ -3,6 +3,7 @@
 #include "gles30/main.h"
 #include "main.h"
 #include "utils/log.h"
+#include "utils/pointers.h"
 
 #include <GLES3/gl3.h>
 
