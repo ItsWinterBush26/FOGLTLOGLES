@@ -59,4 +59,4 @@ struct MDElementsBatcher {
     }
 };
 
-inline std::shared_ptr<MDElementsBatcher> batcher = MakeAggregateShared<MDElementsBatcher>();
+inline std::shared_ptr<MDElementsBatcher> batcher;

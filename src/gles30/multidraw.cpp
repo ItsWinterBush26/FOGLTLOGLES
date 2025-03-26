@@ -14,6 +14,8 @@ void GLES30::registerMultiDrawEmulation() {
 
     REGISTERREDIR(glMultiDrawArrays, glMultiDrawArrays3);
     REGISTERREDIR(glMultiDrawElements, glMultiDrawElements3);
+
+    batcher = MakeAggregateShared<MDElementsBatcher>();
 }
 
 void glMultiDrawArrays3(
