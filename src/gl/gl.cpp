@@ -17,7 +17,7 @@ FunctionPtr glXGetProcAddress(const GLchar* pn) {
 }
 
 void initDebug() {
-    REGISTEROV(glDebugMessageCallback);
+    // REGISTEROV(glDebugMessageCallback);
 }
 
 inline std::pair<GLDEBUGPROC, const void*> previousRegisteredCallback;

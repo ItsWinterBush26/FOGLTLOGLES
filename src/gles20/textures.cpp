@@ -31,7 +31,7 @@ void GLES20::registerTextureOverrides() {
     REGISTEROV(glCopyTexSubImage2D);
     
     REGISTEROV(glTexParameterf);
-    // REGISTEROV(glTexParameteri);
+    REGISTEROV(glTexParameteri);
 
     REGISTEROV(glDeleteTextures);
 }
@@ -100,11 +100,21 @@ void OV_glCopyTexSubImage2D(
     GLint x, GLint y,
     GLsizei width, GLsizei height
 ) {
+    LOGI("glCopyTexSubImage2D: target=%u level=%i xoff=%i yoff=%i x=%i y=%i w=%u h=%u",
+        target, level,
+        xoffset, yoffset,
+        x, y, width, height
+    );
+
     glGetError();
     glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
 
-    if (glGetError() == GL_INVALID_OPERATION) {
+    GLenum error = glGetError();
+    if (error == GL_INVALID_OPERATION) {
+        LOGI("glCopyTexSubImage2D returned GL_INVALID_OPERATION!");
         fakeDepthbuffer->blitCurrentReadToFakeDraw(target, level, x, y, width, height);
+    } else {
+        LOGI("glCopyTexSubImage2D error code : %u", error);
     }
 }
 
