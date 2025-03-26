@@ -14,6 +14,18 @@ inline void trackTextureFormat(GLint& internalFormat) {
     trackedTextures.insert({ boundTexture, internalFormat });
 }
 
+inline bool isDepthTexture(GLenum target) {
+    switch (target) {
+        case GL_DEPTH_COMPONENT:
+        case GL_DEPTH_COMPONENT16:
+        case GL_DEPTH_COMPONENT24:
+        case GL_DEPTH_COMPONENT32F:
+            return true;
+    }
+
+    return false;
+}
+
 inline void swizzleBGRA(GLenum& type, std::vector<SwizzleOperation>& ops) {
     switch (type) {
         case 0x8035: // GL_UNSIGNED_INT_8_8_8_8

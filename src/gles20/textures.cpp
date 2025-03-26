@@ -13,6 +13,7 @@
 
 void OV_glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels);
 void OV_glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels);
+void OV_glCopyTexImage2D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border);
 void OV_glCopyTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height);
 
 void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param);
@@ -28,6 +29,7 @@ void GLES20::registerTextureOverrides() {
 
     REGISTEROV(glTexImage2D);
     REGISTEROV(glTexSubImage2D);
+    REGISTEROV(glCopyTexImage2D);
     REGISTEROV(glCopyTexSubImage2D);
     
     REGISTEROV(glTexParameterf);
@@ -70,14 +72,14 @@ void OV_glTexSubImage2D(
     GLenum target, GLint level, 
     GLint xOffset, GLint yOffset, 
     GLsizei width, GLsizei height, 
-    GLenum format, GLenum type, 
+    GLenum format, GLenum type,
     const void* pixels
 ) {
     std::vector<SwizzleOperation> ops;
     swizzleBGRA(type, ops);
     doSwizzling(target, ops);
 
-    if (format == GL_DEPTH_COMPONENT) {
+    if (isDepthTexture(format)) {
         if (width == fakeDepthbuffer->width && height == fakeDepthbuffer->height
             && fakeDepthbuffer->data == pixels) {
             fakeDepthbuffer->blitFakeReadToFakeDraw(target, level, xOffset, yOffset, width, height);
@@ -94,6 +96,28 @@ void OV_glTexSubImage2D(
     );
 }
 
+void OV_glCopyTexImage2D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border) {
+    if (isDepthTexture(target)) {
+        GLint texture;
+        glGetIntegerv( GL_TEXTURE_BINDING_2D, &texture);
+
+        glTexImage2D(
+            target, level, trackedTextures[texture],
+            width, height, border,
+            GL_DEPTH_COMPONENT, GL_UNSIGNED_INT,
+            nullptr
+        );
+
+        fakeDepthbuffer->blitCurrentReadToFakeDraw(target, level, x, y, width, height);
+    } else {
+        glCopyTexImage2D(
+            target,  level, internalformat,
+            x, y,
+            width, height, border
+        );
+    }
+}
+
 void OV_glCopyTexSubImage2D(
     GLenum target, GLint level,
     GLint xoffset, GLint yoffset,
@@ -106,15 +130,11 @@ void OV_glCopyTexSubImage2D(
         x, y, width, height
     );
 
-    glGetError();
-    glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
-
-    GLenum error = glGetError();
-    if (error == GL_INVALID_OPERATION) {
-        LOGI("glCopyTexSubImage2D returned GL_INVALID_OPERATION!");
+    if (isDepthTexture(target)) {
+        LOGI("Bound image is a depth texture, re-routing to FakeDepthFramebuffer");
         fakeDepthbuffer->blitCurrentReadToFakeDraw(target, level, x, y, width, height);
     } else {
-        LOGI("glCopyTexSubImage2D error code : %u", error);
+        glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
     }
 }
 

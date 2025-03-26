@@ -14,13 +14,13 @@ void OV_glReadPixels(
     GLsizei width, GLsizei height,
     GLenum format, GLenum type, void *pixels
 ) {
-    if (format == GL_DEPTH_COMPONENT) {
+    /* if (format == GL_DEPTH_COMPONENT) {
         fakeDepthbuffer->storeDepthToFakeDraw(x, y, width, height, pixels);
-    } else {
+    } else { */
         glReadPixels(
             x, y,
             width, height,
             format, type, pixels
         );
-    }
+    // }
 }
