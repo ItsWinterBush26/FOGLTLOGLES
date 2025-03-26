@@ -99,9 +99,9 @@ void OV_glTexSubImage2D(
 void OV_glCopyTexImage2D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border) {
     if (isDepthTexture(target)) {
         GLint texture;
-        glGetIntegerv( GL_TEXTURE_BINDING_2D, &texture);
+        glGetIntegerv(GL_TEXTURE_BINDING_2D, &texture);
 
-        glTexImage2D(
+        OV_glTexImage2D(
             target, level, trackedTextures[texture],
             width, height, border,
             GL_DEPTH_COMPONENT, GL_UNSIGNED_INT,
