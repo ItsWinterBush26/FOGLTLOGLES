@@ -104,20 +104,7 @@ void OV_glCopyTexSubImage2D(
     glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
 
     if (glGetError() == GL_INVALID_OPERATION) {
-        GLint boundTexture;
-
-        glGetIntegerv(getEnumBindingForTarget(target), &boundTexture);
-        
-        auto glBindFB = GET_OVFUNC(PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer);
-        glBindFB(GL_DRAW_FRAMEBUFFER, fakeDepthbuffer->drawFramebuffer);
-        
-        GET_OVFUNC(PFNGLFRAMEBUFFERTEXTURE2DPROC, glFramebufferTexture2D)(
-            GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-            target, boundTexture, level
-        );
-
-        glBlitFramebuffer(x, y, width+x, height+y, xoffset, yoffset, width+xoffset, height+yoffset, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-        glBindFB(GL_DRAW_FRAMEBUFFER, currentDrawFramebuffer);
+        fakeDepthbuffer->release(target, level, x, y, width, height);
     }
 }
 

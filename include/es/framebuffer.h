@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "es/binding_saver.h"
 #include "es/texture.h"
 #include "utils/log.h"
 
@@ -37,24 +38,20 @@ public:
         glGenFramebuffers(1, &drawFramebuffer);
         glGenFramebuffers(1, &readFramebuffer);
 
-        GLint boundTexture;
-        glGetIntegerv(GL_TEXTURE_BINDING_2D, &boundTexture);
+        SaveBoundedTexture sbt(GL_TEXTURE_2D);
 
         glBindTexture(GL_TEXTURE_2D, framebufferTexture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-        glBindTexture(GL_TEXTURE_2D, boundTexture);
-        if (!glGetError()) ready = true;
+        ready = (glGetError() == GL_NO_ERROR);
     }
 
     void store(GLint x, GLint y, GLsizei w, GLsizei h) {
         if (!ready) return;
 
-        GLint boundTexture;
-        glGetIntegerv(GL_TEXTURE_BINDING_2D, &boundTexture);
+        SaveBoundedTexture sbt(GL_TEXTURE_2D);
 
         glBindTexture(GL_TEXTURE_2D, framebufferTexture);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, w, h, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
@@ -66,8 +63,6 @@ public:
         );
 
         glBlitFramebuffer(x, y, x + w, y + h, 0, 0, w, h, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-        
-        glBindTexture(GL_TEXTURE_2D, boundTexture);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, currentDrawFramebuffer);
     }
 
@@ -85,7 +80,14 @@ public:
             target, boundTexture, level
         );
 
-        glBlitFramebuffer(0, 0, w, h, x, y, x + w, y + h, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+        glBlitFramebuffer(
+            0, 0,
+            w, h,
+            x, y,
+            x + w, y + h,
+            GL_DEPTH_BUFFER_BIT, GL_NEAREST
+        );
+
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, currentDrawFramebuffer);
         glBindFramebuffer(GL_READ_FRAMEBUFFER, currentReadFramebuffer);
     }

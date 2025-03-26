@@ -1,24 +1,10 @@
 #pragma once
 
-#include "es/texture.h"
+#include "es/binding_saver.h"
 
 #include <GLES3/gl3.h>
 
-struct TextureBindingSaver {
-    GLint savedUnit;
-    GLint savedTexture;
-    GLenum target;
-
-    TextureBindingSaver(GLenum textureTarget) : target(textureTarget) {
-        glGetIntegerv(GL_ACTIVE_TEXTURE, &savedUnit);
-        glGetIntegerv(getEnumBindingForTarget(target), &savedTexture);
-    }
-
-    ~TextureBindingSaver() {
-        glActiveTexture(savedUnit);
-        glBindTexture(target, savedTexture);
-    }
-};
+typedef SaveBoundedTexture TextureBindingSaver;
 
 struct BufferBindingSaver {
     GLint savedBuffer;
