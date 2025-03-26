@@ -9,7 +9,8 @@ inline bool envNoError = (getEnvironmentVar("LIBGL_NO_ERROR") == "1");
 GLenum OV_glGetError();
 
 void GLES::registerNoErrorOverride() {
-    REGISTEROV(glGetError);
+    // REGISTEROV(glGetError);
+    REGISTER(glGetError);
 }
 
 GLenum OV_glGetError() {
