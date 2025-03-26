@@ -10,7 +10,6 @@ GLenum OV_glGetError();
 
 void GLES::registerNoErrorOverride() {
     // REGISTEROV(glGetError);
-    REGISTER(glGetError);
 }
 
 GLenum OV_glGetError() {

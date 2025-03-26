@@ -78,10 +78,9 @@ void OV_glTexSubImage2D(
     doSwizzling(target, ops);
 
     if (format == GL_DEPTH_COMPONENT) {
-        if (width == fakeDepthbuffer->width
-            && height == fakeDepthbuffer->height
+        if (width == fakeDepthbuffer->width && height == fakeDepthbuffer->height
             && fakeDepthbuffer->data == pixels) {
-            fakeDepthbuffer->release(target, level, xOffset, yOffset, width, height);
+            fakeDepthbuffer->blitFakeReadToFakeDraw(target, level, xOffset, yOffset, width, height);
             return;
         }
     }
@@ -101,11 +100,11 @@ void OV_glCopyTexSubImage2D(
     GLint x, GLint y,
     GLsizei width, GLsizei height
 ) {
-    GET_OVFUNC(PFNGLGETERRORPROC, glGetError)();
+    glGetError();
     glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
 
-    if (GET_OVFUNC(PFNGLGETERRORPROC, glGetError)() == GL_INVALID_OPERATION) {
-        fakeDepthbuffer->release(target, level, x, y, width, height);
+    if (glGetError() == GL_INVALID_OPERATION) {
+        fakeDepthbuffer->blitCurrentReadToFakeDraw(target, level, x, y, width, height);
     }
 }
 

@@ -23,7 +23,7 @@ struct MDElementsBatcher {
     MDElementsBatcher() {
         glGenBuffers(1, &buffer);
 
-        usable = (GET_OVFUNC(PFNGLGETERRORPROC, glGetError)() == GL_NO_ERROR);
+        usable = (glGetError() == GL_NO_ERROR);
     }
 
     ~MDElementsBatcher() {

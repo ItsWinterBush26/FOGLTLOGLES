@@ -15,10 +15,7 @@ void OV_glReadPixels(
     GLenum format, GLenum type, void *pixels
 ) {
     if (format == GL_DEPTH_COMPONENT) {
-        fakeDepthbuffer->data = pixels;
-        fakeDepthbuffer->width = width;
-        fakeDepthbuffer->height = height;
-        fakeDepthbuffer->store(x, y, width, height);
+        fakeDepthbuffer->storeDepthToFakeDraw(x, y, width, height, pixels);
     } else {
         glReadPixels(
             x, y,
