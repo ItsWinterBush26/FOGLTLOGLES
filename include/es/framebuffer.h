@@ -221,6 +221,7 @@ struct FakeDepthFramebuffer {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         ready = (glGetError() == GL_NO_ERROR);
+        LOGI("FakeDepthFramebuffer: ready=%s", ready ? "true" : "false");
     }
 
     ~FakeDepthFramebuffer() {
@@ -263,6 +264,7 @@ struct FakeDepthFramebuffer {
 
     void blitCurrentReadToFakeDraw(GLenum target, GLint level, GLint x, GLint y, GLsizei w, GLsizei h) {
         if (!ready) return;
+        LOGI("blitCurrentReadToFakeDraw!");
 
         GLint boundTexture;
         glGetIntegerv(getBindingEnumOfTexture(target), &boundTexture);
