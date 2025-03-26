@@ -8,4 +8,5 @@ void GLES30::GLES30Wrapper::init() {
     // GLES30::registerDSAEmulation();
     GLES30::registerTextureOverrides();
     GLES30::registerMultiDrawEmulation();
+    GLES30::registerVertexAttribFunctions();
 }

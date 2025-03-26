@@ -15,4 +15,5 @@ namespace GLES30 {
     void registerDSAEmulation();
     void registerTextureOverrides();
     void registerMultiDrawEmulation();
+    void registerVertexAttribFunctions();
 }
