@@ -19,7 +19,6 @@
 
 #include "gles30/main.h"
 #include "main.h"
-#include "utils/log.h"
 
 #include <GLES3/gl3.h>
 
@@ -182,19 +181,19 @@ void glVertexAttrib1sv(GLuint index, const GLshort *v) {
 void glVertexAttrib1dv(GLuint index, const GLdouble *v) {
     glVertexAttrib1d(index, v[0]);
 }
- 
+
 void glVertexAttribI1iv(GLuint index, const GLint *v) {
     glVertexAttribI1i(index, v[0]);
 }
- 
+
 void glVertexAttribI1uiv(GLuint index, const GLuint *v) {
     glVertexAttribI1ui(index, v[0]);
 }
- 
+
 void glVertexAttrib2fv(GLuint index, const GLfloat *v) {
     glVertexAttrib2f(index, v[0], v[1]);
 }
- 
+
 void glVertexAttrib2sv(GLuint index, const GLshort *v) {
     glVertexAttrib2s(index, v[0], v[1]);
 }
@@ -202,7 +201,7 @@ void glVertexAttrib2sv(GLuint index, const GLshort *v) {
 void glVertexAttrib2dv(GLuint index, const GLdouble *v) {
     glVertexAttrib2d(index, v[0], v[1]);
 }
- 
+
 void glVertexAttribI2iv(GLuint index, const GLint *v) {
     glVertexAttribI2i(index, v[0], v[1]);
 }
@@ -381,25 +380,25 @@ void glVertexAttribI4uiv(GLuint index, const GLuint *v) {
 /*  -------------------------------
     Double-Precision Vector Versions (L*)
     -------------------------------
-    Not Supported in ES, cast to GLfloat
+    Not Supported in ES, use our implementation: glVertexAttribL*d(...)
 */
 void glVertexAttribL1dv(GLuint index, const GLdouble *v) {
-    LOGI("glVertexAttribL1dv is not yet implemented!");
+    glVertexAttribL1d(index, v[0]);
 }
  
 void glVertexAttribL2dv(GLuint index, const GLdouble *v) {
-    LOGI("glVertexAttribL2dv is not yet implemented!");
+    glVertexAttribL2d(index, v[0], v[1]);
 }
  
 void glVertexAttribL3dv(GLuint index, const GLdouble *v) {
-    LOGI("glVertexAttribL3dv is not yet implemented!");
+    glVertexAttribL3d(index, v[0], v[1], v[2]);
 }
  
 void glVertexAttribL4dv(GLuint index, const GLdouble *v) {
-    LOGI("glVertexAttribL4dv is not yet implemented!");
+    glVertexAttribL4d(index, v[0], v[1], v[2], v[3]);
 }
  
-/* -------------------------------
+/*  -------------------------------
     Packed Attribute Versions (glVertexAttribP*ui)
     -------------------------------
     These functions are not available in OpenGL ES 3.2 but can be
@@ -525,5 +524,10 @@ void GLES30::registerVertexAttribFunctions() {
     REGISTER(glVertexAttribP2ui);
     REGISTER(glVertexAttribP3ui);
     REGISTER(glVertexAttribP4ui);
+
+    REGISTER(glVertexAttribL1dv);
+    REGISTER(glVertexAttribL2dv);
+    REGISTER(glVertexAttribL3dv);
+    REGISTER(glVertexAttribL4dv);
 }
  
