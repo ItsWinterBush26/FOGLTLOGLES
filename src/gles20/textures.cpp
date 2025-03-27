@@ -97,7 +97,7 @@ void OV_glCopyTexImage2D(GLenum target, GLint level, GLenum internalformat, GLin
         OV_glTexImage2D(
             target, level, trackedStates->textureInternalFormats[trackedStates->boundTextures[GL_TEXTURE_2D]],
             width, height, border,
-            GL_DEPTH_COMPONENT, GL_UNSIGNED_INT,
+            GL_DEPTH_COMPONENT32F, GL_FLOAT,
             nullptr
         );
 
@@ -127,6 +127,7 @@ void OV_glCopyTexSubImage2D(
         // LOGI("Bound image is a depth texture, re-routing to FakeDepthFramebuffer");
         fakeDepthbuffer->blitCurrentReadToFakeDraw(target, level, x, y, width, height);
     } else {
+        glGetError();
         glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
         if (glGetError() == GL_INVALID_OPERATION) {
             // LOGI("glCopyTexSubImage2D failed with GL_INVALID_OPERATION. Re-routing to FakeDepthFramebuffer");
