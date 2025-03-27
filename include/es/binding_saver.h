@@ -19,12 +19,12 @@ struct SaveBoundedTexture {
     GLenum textureType;
 
     SaveBoundedTexture(GLenum textureType) : textureType(textureType) {
-        activeTexture = trackedStates->activeTexture;
+        // activeTexture = trackedStates->activeTexture;
         boundedTexture = trackedStates->boundTextures[textureType];
     }
 
     ~SaveBoundedTexture() {
-        OV_glActiveTexture(activeTexture);
+        // OV_glActiveTexture(activeTexture);
         OV_glBindTexture(textureType, boundedTexture);
     }
 };
