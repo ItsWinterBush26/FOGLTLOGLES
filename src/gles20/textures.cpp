@@ -124,11 +124,11 @@ void OV_glCopyTexSubImage2D(
     GLint x, GLint y,
     GLsizei width, GLsizei height
 ) {
-    LOGI("glCopyTexSubImage2D: target=%u level=%i xoff=%i yoff=%i x=%i y=%i w=%u h=%u",
+    /* LOGI("glCopyTexSubImage2D: target=%u level=%i xoff=%i yoff=%i x=%i y=%i w=%u h=%u",
         target, level,
         xoffset, yoffset,
         x, y, width, height
-    );
+    ); */
 
     GLint texture;
     glGetIntegerv(GL_TEXTURE_BINDING_2D, &texture);
