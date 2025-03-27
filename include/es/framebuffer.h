@@ -264,8 +264,7 @@ struct FakeDepthFramebuffer {
 
     void blitCurrentReadToFakeDraw(GLenum target, GLint level, GLint x, GLint y, GLsizei w, GLsizei h) {
         if (!ready) return;
-        LOGI("blitCurrentReadToFakeDraw!");
-
+        
         GLint boundTexture;
         glGetIntegerv(getBindingEnumOfTexture(target), &boundTexture);
 
