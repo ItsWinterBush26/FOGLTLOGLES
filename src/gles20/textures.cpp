@@ -1,15 +1,15 @@
 #include "es/framebuffer.h"
-#include "es/swizzling.h"
-#include "gles20/main.h"
 #include "es/proxy.h"
+#include "es/state_tracking.h"
+#include "es/swizzling.h"
 #include "es/texture.h"
 #include "es/texparam.h"
+#include "gles20/main.h"
 #include "main.h"
 #include "utils/log.h"
 #include "utils/pointers.h"
 
 #include <GLES2/gl2.h>
-#include <GLES3/gl3.h>
 
 void OV_glTexImage2D(GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void* pixels);
 void OV_glTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void* pixels);
@@ -18,8 +18,6 @@ void OV_glCopyTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yof
 
 void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param);
 void OV_glTexParameteri(GLenum target, GLenum pname, GLint param);
-
-void OV_glDeleteTextures(GLsizei n, const GLuint *textures);
 
 inline GLint maxTextureSize = 0;
 
@@ -34,8 +32,6 @@ void GLES20::registerTextureOverrides() {
     
     REGISTEROV(glTexParameterf);
     REGISTEROV(glTexParameteri);
-
-    REGISTEROV(glDeleteTextures);
 }
 
 void OV_glTexImage2D(
@@ -98,11 +94,8 @@ void OV_glTexSubImage2D(
 
 void OV_glCopyTexImage2D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border) {
     if (isDepthFormat(internalformat)) {
-        GLint texture;
-        glGetIntegerv(GL_TEXTURE_BINDING_2D, &texture);
-
         OV_glTexImage2D(
-            target, level, trackedTextures[texture],
+            target, level, trackedStates->textureInternalFormats[trackedStates->boundTextures[target]],
             width, height, border,
             GL_DEPTH_COMPONENT, GL_UNSIGNED_INT,
             nullptr
@@ -129,11 +122,8 @@ void OV_glCopyTexSubImage2D(
         xoffset, yoffset,
         x, y, width, height
     ); */
-
-    GLint texture;
-    glGetIntegerv(GL_TEXTURE_BINDING_2D, &texture);
     
-    if (isDepthFormat(trackedTextures[texture])) {
+    if (isDepthFormat(trackedStates->textureInternalFormats[trackedStates->boundTextures[target]])) {
         // LOGI("Bound image is a depth texture, re-routing to FakeDepthFramebuffer");
         fakeDepthbuffer->blitCurrentReadToFakeDraw(target, level, x, y, width, height);
     } else {
@@ -158,12 +148,4 @@ void OV_glTexParameteri(GLenum target, GLenum pname, GLint param) {
 
     selectProperTexParami(target, pname, param);
     glTexParameteri(target, pname, param);
-}
-
-void OV_glDeleteTextures(GLsizei n, const GLuint *textures) {
-    glDeleteTextures(n, textures);
-
-    for (GLint i = 0; i < n; ++i) {
-        trackedTextures.erase(textures[i]);
-    }
 }

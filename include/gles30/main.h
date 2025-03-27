@@ -12,7 +12,6 @@ namespace GLES30 {
     const inline std::shared_ptr<GLES30Wrapper> wrapper = std::make_shared<GLES30Wrapper>();
 
     void registerTranslatedFunctions();
-    void registerDSAEmulation();
     void registerTextureOverrides();
     void registerMultiDrawEmulation();
     void registerVertexAttribFunctions();

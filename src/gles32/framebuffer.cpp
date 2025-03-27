@@ -2,8 +2,7 @@
 // https://github.com/artdeell/LTW/blob/master/ltw/src/main/tinywrapper/framebuffer.c
 
 #include "es/framebuffer.h"
-#include "es/renderbuffer.h"
-#include "es/texture.h"
+#include "es/state_tracking.h"
 #include "es/utils.h"
 #include "gles32/main.h"
 #include "main.h"
@@ -22,7 +21,6 @@ void OV_glFramebufferTextureLayer(GLenum target, GLenum attachment, GLuint textu
 void OV_glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
 
 void OV_glGenFramebuffers(GLsizei n, GLuint* framebuffers);
-void OV_glBindFramebuffer(GLenum target, GLuint framebuffer);
 
 void OV_glGetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, GLenum pname, GLint* params);
 GLenum OV_glCheckFramebufferStatus(GLenum target);
@@ -40,7 +38,6 @@ void GLES32::registerFramebufferOverrides() {
     REGISTEROV(glFramebufferRenderbuffer);
 
     REGISTEROV(glGenFramebuffers);
-    REGISTEROV(glBindFramebuffer);
 
     REGISTEROV(glGetFramebufferAttachmentParameteriv);
     REGISTEROV(glCheckFramebufferStatus);
@@ -111,7 +108,7 @@ void OV_glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarge
         framebuffer->colorInfo.colorObjects[attachmentIndex] = texture;
         framebuffer->colorInfo.colorLevels[attachmentIndex] = level;
 
-        GLint textureFormat = trackedTextures[texture];
+        GLenum textureFormat = trackedStates->textureInternalFormats[texture];
         framebuffer->colorInfo.colorComponentType[attachmentIndex] = getComponentTypeFromFormat(textureFormat);
         framebuffer->colorInfo.colorEncoding[attachmentIndex] = isSRGBFormat(textureFormat) ? GL_SRGB : GL_LINEAR;
     }
@@ -141,7 +138,7 @@ void OV_glFramebufferTextureLayer(GLenum target, GLenum attachment, GLuint textu
         framebuffer->colorInfo.colorLevels[attachmentIndex] = level;
         framebuffer->colorInfo.colorLayers[attachmentIndex] = layer;
         
-        GLint textureFormat = trackedTextures[texture];
+        GLenum textureFormat = trackedStates->textureInternalFormats[texture];
         framebuffer->colorInfo.colorComponentType[attachmentIndex] = getComponentTypeFromFormat(textureFormat);
         framebuffer->colorInfo.colorEncoding[attachmentIndex] = isSRGBFormat(textureFormat) ? GL_SRGB : GL_LINEAR;
     }
@@ -167,7 +164,7 @@ void OV_glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum rende
         framebuffer->colorInfo.colorTargets[attachmentIndex] = renderbuffertarget;
         framebuffer->colorInfo.colorObjects[attachmentIndex] = renderbuffer;
         
-        GLint renderbufferFormat = trackedRenderbuffers[renderbuffer];
+        GLenum renderbufferFormat = trackedStates->renderbufferInternalFormats[renderbuffer];
         framebuffer->colorInfo.colorComponentType[attachmentIndex] = getComponentTypeFromFormat(renderbufferFormat);
         framebuffer->colorInfo.colorEncoding[attachmentIndex] = isSRGBFormat(renderbufferFormat) ? GL_SRGB : GL_LINEAR;
     }
@@ -180,18 +177,6 @@ void OV_glGenFramebuffers(GLsizei n, GLuint* framebuffers) {
 
     for (GLsizei i = 0; i < n; ++i) {
         boundFramebuffers.insert({ framebuffers[i], std::make_shared<Framebuffer>() });
-    }
-}
-
-void OV_glBindFramebuffer(GLenum target, GLuint framebuffer) {
-    glBindFramebuffer(target, framebuffer);
-
-    switch (target) {
-        case GL_FRAMEBUFFER:
-            currentReadFramebuffer = currentDrawFramebuffer = framebuffer;
-            break;
-        case GL_READ_FRAMEBUFFER: currentReadFramebuffer = framebuffer; break;
-        case GL_DRAW_FRAMEBUFFER: currentDrawFramebuffer = framebuffer; break;
     }
 }
 

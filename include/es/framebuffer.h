@@ -4,6 +4,8 @@
 #pragma once
 
 #include "es/binding_saver.h"
+#include "es/state_tracking.h"
+#include "gles20/texture_tracking.h"
 #include "utils/log.h"
 
 #include <GLES3/gl32.h>
@@ -17,8 +19,6 @@
 #ifndef MAX_DRAWBUFFERS
 #define MAX_DRAWBUFFERS 8
 #endif
-
-inline GLuint currentDrawFramebuffer = 0, currentReadFramebuffer = 0;
 
 struct FramebufferColorInfo {
     GLuint colorTargets[MAX_FBTARGETS];
@@ -48,10 +48,10 @@ inline std::shared_ptr<Framebuffer> getFramebufferObject(GLenum target) {
     switch (target) {
         case GL_FRAMEBUFFER:
         case GL_DRAW_FRAMEBUFFER:
-            framebuffer = currentDrawFramebuffer;
+            framebuffer = trackedStates->boundDrawFramebuffer;
             break;
         case GL_READ_FRAMEBUFFER:
-            framebuffer = currentReadFramebuffer;
+            framebuffer = trackedStates->boundReadFramebuffer;
             break;
     }
     
@@ -214,7 +214,7 @@ struct FakeDepthFramebuffer {
 
         SaveBoundedTexture sbt(GL_TEXTURE_2D);
 
-        glBindTexture(GL_TEXTURE_2D, drawFramebufferTexture);
+        OV_glBindTexture(GL_TEXTURE_2D, drawFramebufferTexture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -238,14 +238,16 @@ struct FakeDepthFramebuffer {
 
         SaveBoundedTexture sbt(GL_TEXTURE_2D);
 
-        glBindTexture(GL_TEXTURE_2D, drawFramebufferTexture);
+        OV_glBindTexture(GL_TEXTURE_2D, drawFramebufferTexture);
         glTexImage2D(
             GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F,
             w, h, 0,
             GL_DEPTH_COMPONENT, GL_FLOAT, nullptr
         );
 
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, drawFramebuffer);
+        SaveBoundedFramebuffer sbf1(GL_DRAW_FRAMEBUFFER);
+        OV_glBindFramebuffer(GL_DRAW_FRAMEBUFFER, drawFramebuffer);
+
         glFramebufferTexture2D(
             GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
             GL_TEXTURE_2D, drawFramebufferTexture, 0
@@ -258,21 +260,16 @@ struct FakeDepthFramebuffer {
             w, h,
             GL_DEPTH_BUFFER_BIT, GL_NEAREST
         );
-
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, currentDrawFramebuffer);
     }
 
     void blitCurrentReadToFakeDraw(GLenum target, GLint level, GLint x, GLint y, GLsizei w, GLsizei h) {
         if (!ready) return;
         
-        GLint boundTexture;
-        glGetIntegerv(getBindingEnumOfTexture(target), &boundTexture);
-
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, drawFramebuffer);
+        SaveBoundedFramebuffer sbf1(GL_DRAW_FRAMEBUFFER);
 
         glFramebufferTexture2D(
             GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target,
-            boundTexture, level
+            trackedStates->boundTextures[target], level
         );
 
         glBlitFramebuffer(
@@ -282,22 +279,20 @@ struct FakeDepthFramebuffer {
             x + w, y + h,
             GL_DEPTH_BUFFER_BIT, GL_NEAREST
         );
-
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, currentDrawFramebuffer);
     }
 
     void blitFakeReadToFakeDraw(GLenum target, GLint level, GLint x, GLint y, GLsizei w, GLsizei h) {
         if (!ready) return;
 
-        GLint boundTexture;
-        glGetIntegerv(getBindingEnumOfTexture(target), &boundTexture);
+        SaveBoundedFramebuffer sbf1(GL_DRAW_FRAMEBUFFER);
+        OV_glBindFramebuffer(GL_DRAW_FRAMEBUFFER, drawFramebuffer);
 
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, drawFramebuffer);
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, readFramebuffer);
+        SaveBoundedFramebuffer sbf2(GL_READ_FRAMEBUFFER);
+        OV_glBindFramebuffer(GL_READ_FRAMEBUFFER, readFramebuffer);
 
         glFramebufferTexture2D(
             GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target,
-            boundTexture, level
+            trackedStates->boundTextures[target], level
         );
 
         glBlitFramebuffer(
@@ -307,8 +302,5 @@ struct FakeDepthFramebuffer {
             x + w, y + h,
             GL_DEPTH_BUFFER_BIT, GL_NEAREST
         );
-
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, currentDrawFramebuffer);
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, currentReadFramebuffer);
     }
 };

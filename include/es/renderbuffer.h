@@ -1,14 +1,11 @@
 #pragma once
 
-#include <GLES2/gl2.h>
-#include <unordered_map>
+#include "es/state_tracking.h"
 
-inline std::unordered_map<GLenum, GLint> trackedRenderbuffers;
+#include <GLES2/gl2.h>
 
 inline void trackRenderbufferFormat(GLenum& internalFormat) {
-    GLint boundRenderbuffer;
-    glGetIntegerv(GL_RENDERBUFFER_BINDING, &boundRenderbuffer);
-    trackedRenderbuffers.insert({ boundRenderbuffer, internalFormat });
+    trackedStates->renderbufferInternalFormats.insert({ trackedStates->boundRenderbuffer, internalFormat });
 }
 
 inline void fixStorageParams(GLenum& internalFormat) {

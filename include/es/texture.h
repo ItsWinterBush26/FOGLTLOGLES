@@ -1,17 +1,13 @@
 #pragma once
 
+#include "es/state_tracking.h"
 #include "es/swizzling.h"
 
 #include <GLES3/gl32.h>
 #include <unordered_map>
 
-// texture, internal format
-inline std::unordered_map<GLint, GLint> trackedTextures;
-
 inline void trackTextureFormat(GLint& internalFormat) {
-    GLint boundTexture;
-    glGetIntegerv(GL_TEXTURE_BINDING_2D, &boundTexture);
-    trackedTextures.insert({ boundTexture, internalFormat });
+    trackedStates->textureInternalFormats.insert({ trackedStates->boundTextures[GL_TEXTURE_2D], internalFormat });
 }
 
 inline bool isDepthFormat(GLenum format) {
