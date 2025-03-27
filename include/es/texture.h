@@ -14,11 +14,12 @@ inline void trackTextureFormat(GLint& internalFormat) {
     trackedTextures.insert({ boundTexture, internalFormat });
 }
 
-inline bool isDepthTexture(GLenum target) {
-    switch (target) {
+inline bool isDepthFormat(GLenum format) {
+    switch (format) {
         case GL_DEPTH_COMPONENT:
         case GL_DEPTH_COMPONENT16:
         case GL_DEPTH_COMPONENT24:
+        case 0x81a7: // GL_DEPTH_COMPONENT_32 (this ones an edge case)
         case GL_DEPTH_COMPONENT32F:
             return true;
     }
