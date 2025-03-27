@@ -225,7 +225,7 @@ struct FakeDepthFramebuffer {
     }
 
     ~FakeDepthFramebuffer() {
-        glDeleteTextures(1, &drawFramebufferTexture);
+        OV_glDeleteTextures(1, &drawFramebufferTexture);
         glDeleteFramebuffers(1, &drawFramebuffer);
         glDeleteFramebuffers(1, &readFramebuffer);
     }
@@ -266,6 +266,7 @@ struct FakeDepthFramebuffer {
         if (!ready) return;
         
         SaveBoundedFramebuffer sbf1(GL_DRAW_FRAMEBUFFER);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, drawFramebuffer);
 
         glFramebufferTexture2D(
             GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target,
