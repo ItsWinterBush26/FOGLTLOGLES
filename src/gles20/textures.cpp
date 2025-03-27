@@ -79,7 +79,7 @@ void OV_glTexSubImage2D(
     swizzleBGRA(type, ops);
     doSwizzling(target, ops);
 
-    if (isDepthTexture(format)) {
+    if (isDepthFormat(format)) {
         if (width == fakeDepthbuffer->width && height == fakeDepthbuffer->height
             && fakeDepthbuffer->data == pixels) {
             fakeDepthbuffer->blitFakeReadToFakeDraw(target, level, xOffset, yOffset, width, height);
