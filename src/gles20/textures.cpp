@@ -138,7 +138,7 @@ void OV_glCopyTexSubImage2D(
         fakeDepthbuffer->blitCurrentReadToFakeDraw(target, level, x, y, width, height);
     } else {
         glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
-        if (eglGetError() == GL_INVALID_OPERATION) {
+        if (glGetError() == GL_INVALID_OPERATION) {
             LOGI("glCopyTexSubImage2D failed with GL_INVALID_OPERATION. Re-routing to FakeDepthFramebuffer");
         
             fakeDepthbuffer->blitCurrentReadToFakeDraw(target, level, x, y, width, height);
