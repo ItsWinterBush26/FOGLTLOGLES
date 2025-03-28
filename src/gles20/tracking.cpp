@@ -39,21 +39,21 @@ void OV_glBindFramebuffer(GLenum target, GLuint framebuffer) {
 void OV_glBindTexture(GLenum target, GLuint texture) {
     glBindTexture(target, texture);
 
-    trackedStates->boundTextures[target] = texture;
+    trackedStates->textureUnits[trackedStates->activeTextureUnit].boundTextures[target] = texture;
 }
 
 void OV_glDeleteTextures(GLsizei n, const GLuint *textures) {
     glDeleteTextures(n, textures);
 
     for (GLsizei i = 0; i < n; ++i) {
-        trackedStates->textureInternalFormats.erase(textures[i]);
+        trackedStates->textureUnits[trackedStates->activeTextureUnit].textureInternalFormats.erase(textures[i]);
     }
 }
 
 void OV_glActiveTexture(GLuint texture) {
     glActiveTexture(texture);
 
-    trackedStates->activeTexture = texture;
+    trackedStates->activeTextureUnit = texture;
 }
 
 void OV_glBindBuffer(GLenum target, GLuint buffer) {

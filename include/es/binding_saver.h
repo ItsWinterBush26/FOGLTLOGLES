@@ -15,16 +15,16 @@
 
 struct SaveBoundedTexture {
     GLuint boundedTexture;
-    GLuint activeTexture;
+    GLuint activeTextureUnit;
     GLenum textureType;
 
     SaveBoundedTexture(GLenum textureType) : textureType(textureType) {
-        // activeTexture = trackedStates->activeTexture;
-        boundedTexture = trackedStates->boundTextures[textureType];
+        activeTextureUnit = trackedStates->activeTextureUnit;
+        boundedTexture = trackedStates->textureUnits[trackedStates->activeTextureUnit].boundTextures[textureType];
     }
 
     ~SaveBoundedTexture() {
-        // OV_glActiveTexture(activeTexture);
+        OV_glActiveTexture(activeTextureUnit);
         OV_glBindTexture(textureType, boundedTexture);
     }
 };

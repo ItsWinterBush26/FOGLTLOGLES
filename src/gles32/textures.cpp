@@ -1,5 +1,6 @@
 #include "es/framebuffer.h"
 #include "es/proxy.h"
+#include "es/state_tracking.h"
 #include "gles20/framebuffer_tracking.h"
 #include "gles30/read_pixels.h"
 #include "gles32/main.h"
@@ -34,7 +35,7 @@ void glGetTexImage(GLenum target, GLint level, GLenum format, GLenum type, void*
         GL_READ_FRAMEBUFFER,
         GL_COLOR_ATTACHMENT0,
         target,
-        trackedStates->boundTextures[target],
+        trackedStates->textureUnits[trackedStates->activeTextureUnit].boundTextures[target],
         level
     );
 

@@ -7,20 +7,26 @@
 #include <unordered_map>
 #include <utility>
 
+struct TextureStates {
+    // Type, Texture
+    std::unordered_map<GLenum, GLuint> boundTextures;
+
+    // Texture, Internal Format
+    std::unordered_map<GLuint, GLenum> textureInternalFormats;
+};
+
 struct TrackedStates {
-    GLuint activeTexture;
+    GLuint activeTextureUnit;
+
+    // Unit, TextureStates
+    // Unit is GL_TEXTUREi, where i is 0 to max texture units
+    std::unordered_map<GLuint, TextureStates> textureUnits;
     
     GLuint boundReadFramebuffer;
     GLuint boundDrawFramebuffer;
 
     // Type, Framebuffer
     std::pair<GLenum, GLuint> recentlyBoundFramebuffer; // (either read or draw) (or both? GL_FRAMEBUFFER)
-
-    // Type, Texture
-    std::unordered_map<GLenum, GLuint> boundTextures;
-
-    // Texture, Internal Format
-    std::unordered_map<GLuint, GLenum> textureInternalFormats;
 
     GLuint boundRenderbuffer;
 
