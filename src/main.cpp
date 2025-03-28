@@ -1,3 +1,4 @@
+#include "build_info.h"
 #include "main.h"
 #include "es/utils.h"
 #include "gles/main.h"
@@ -46,4 +47,5 @@ void FOGLTLOGLES::init() {
     if (ESUtils::version.first >= 3 && ESUtils::version.second == 2) GLES32::wrapper->init();
 
     ShaderConverter::Cache::init();
+    LOGI("Using FOGLTLOGLES v%s", RENDERER_VERSION);
 }
