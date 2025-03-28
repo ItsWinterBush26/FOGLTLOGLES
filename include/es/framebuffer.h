@@ -41,21 +41,20 @@ struct Framebuffer {
 struct FakeDepthFramebuffer;
 
 inline std::shared_ptr<FakeDepthFramebuffer> fakeDepthbuffer;
-inline std::unordered_map<GLuint, std::shared_ptr<Framebuffer>> boundFramebuffers;
 
 inline std::shared_ptr<Framebuffer> getFramebufferObject(GLenum target) {
     GLuint framebuffer = 0;
     switch (target) {
         case GL_FRAMEBUFFER:
         case GL_DRAW_FRAMEBUFFER:
-            framebuffer = trackedStates->boundDrawFramebuffer;
+            framebuffer = trackedStates->framebufferState.boundDrawFramebuffer;
             break;
         case GL_READ_FRAMEBUFFER:
-            framebuffer = trackedStates->boundReadFramebuffer;
+            framebuffer = trackedStates->framebufferState.boundReadFramebuffer;
             break;
     }
     
-    return boundFramebuffers[framebuffer];
+    return trackedStates->framebufferState.trackedFramebuffers[framebuffer];
 }
 
 inline GLuint getAttachmentIndex(GLenum attachment) {
@@ -83,7 +82,7 @@ inline GLenum getMapAttachment(std::shared_ptr<Framebuffer> framebuffer, GLenum 
 
     for (GLsizei i = 0; i < framebuffer->bufferAmount; ++i) {
         if (framebuffer->virtualDrawbuffers[i] == attachment) {
-            return attachment;
+            return i + GL_COLOR_ATTACHMENT0;
         }
     }
 
@@ -237,8 +236,8 @@ struct FakeDepthFramebuffer {
         data = pxs;
 
         SaveBoundedTexture sbt(GL_TEXTURE_2D);
-
         OV_glBindTexture(GL_TEXTURE_2D, drawFramebufferTexture);
+
         glTexImage2D(
             GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F,
             w, h, 0,

@@ -11,6 +11,8 @@
 
 void GLES20::registerTrackingFunctions() {
     REGISTEROV(glBindFramebuffer);
+    REGISTEROV(glGenFramebuffers);
+    REGISTEROV(glDeleteFramebuffers); // deleting tracked framebuffers
 
     REGISTEROV(glBindTexture);
     REGISTEROV(glDeleteTextures); // deleting tracked iformat
@@ -27,13 +29,30 @@ void OV_glBindFramebuffer(GLenum target, GLuint framebuffer) {
 
     switch (target) {
         case GL_FRAMEBUFFER:
-            trackedStates->boundReadFramebuffer = trackedStates->boundDrawFramebuffer = framebuffer;
+            trackedStates->framebufferState.boundReadFramebuffer = trackedStates->framebufferState.boundDrawFramebuffer = framebuffer;
             break;
-        case GL_READ_FRAMEBUFFER: trackedStates->boundReadFramebuffer = framebuffer; break;
-        case GL_DRAW_FRAMEBUFFER: trackedStates->boundDrawFramebuffer = framebuffer; break;
+        case GL_READ_FRAMEBUFFER: trackedStates->framebufferState.boundReadFramebuffer = framebuffer; break;
+        case GL_DRAW_FRAMEBUFFER: trackedStates->framebufferState.boundDrawFramebuffer = framebuffer; break;
     }
 
-    trackedStates->recentlyBoundFramebuffer = std::make_pair(target, framebuffer);
+    trackedStates->framebufferState.recentlyBoundFramebuffer = std::make_pair(target, framebuffer);
+}
+
+
+void OV_glGenFramebuffers(GLsizei n, GLuint* framebuffers) {
+    glGenFramebuffers(n, framebuffers);
+
+    for (GLsizei i = 0; i < n; ++i) {
+        trackedStates->framebufferState.trackedFramebuffers.insert({ framebuffers[i], std::make_shared<Framebuffer>() });
+    }
+}
+
+void OV_glDeleteFramebuffers(GLsizei n, const GLuint* framebuffers) {
+    glDeleteFramebuffers(n, framebuffers);
+
+    for (GLsizei i = 0; i < n; ++i) {
+        trackedStates->framebufferState.trackedFramebuffers.erase(framebuffers[i]);
+    }
 }
 
 void OV_glBindTexture(GLenum target, GLuint texture) {

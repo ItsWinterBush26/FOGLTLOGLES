@@ -20,8 +20,6 @@ void OV_glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarge
 void OV_glFramebufferTextureLayer(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer);
 void OV_glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
 
-void OV_glGenFramebuffers(GLsizei n, GLuint* framebuffers);
-
 void OV_glGetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, GLenum pname, GLint* params);
 GLenum OV_glCheckFramebufferStatus(GLenum target);
 
@@ -36,8 +34,6 @@ void GLES32::registerFramebufferOverrides() {
     REGISTEROV(glFramebufferTexture2D);
     REGISTEROV(glFramebufferTextureLayer);
     REGISTEROV(glFramebufferRenderbuffer);
-
-    REGISTEROV(glGenFramebuffers);
 
     REGISTEROV(glGetFramebufferAttachmentParameteriv);
     REGISTEROV(glCheckFramebufferStatus);
@@ -170,14 +166,6 @@ void OV_glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum rende
     }
 
     rebindFramebuffer(target, framebuffer, attachment);
-}
-
-void OV_glGenFramebuffers(GLsizei n, GLuint* framebuffers) {
-    glGenFramebuffers(n, framebuffers);
-
-    for (GLsizei i = 0; i < n; ++i) {
-        boundFramebuffers.insert({ framebuffers[i], std::make_shared<Framebuffer>() });
-    }
 }
 
 void OV_glGetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, GLenum pname, GLint* params) {
