@@ -74,7 +74,7 @@ struct TrackedStates {
     }
 };
 
-inline std::shared_ptr<TrackedStates> trackedStates = MakeAggregateShared<TrackedStates>();
+inline std::shared_ptr<TrackedStates> trackedStates;
 
 struct FramebufferColorInfo {
     GLuint colorTargets[MAX_FBTARGETS];

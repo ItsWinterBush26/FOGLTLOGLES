@@ -22,6 +22,8 @@ void GLES20::registerTrackingFunctions() {
 
     REGISTEROV(glBindRenderbuffer);
     REGISTEROV(glDeleteRenderbuffers); // deleting tracked iformat
+
+    trackedStates = std::make_shared<TrackedStates>();
 }
 
 void OV_glBindFramebuffer(GLenum target, GLuint framebuffer) {
