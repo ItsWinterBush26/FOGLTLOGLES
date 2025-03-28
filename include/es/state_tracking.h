@@ -18,7 +18,7 @@
 
 struct Framebuffer;
 
-struct TextureStates {
+struct TextureStates : public std::enable_shared_from_this<TextureStates> {
     // Type, Texture
     XXHASH_MAP_BI(GLenum, GLuint) boundTextures;
 
@@ -43,6 +43,7 @@ struct FramebufferStates {
 
 struct TrackedStates {
     GLuint activeTextureUnit;
+    TextureStates* activeTextureState;
 
     // Unit, TextureStates
     // Unit is GL_TEXTUREi, where i is 0 to max texture units
@@ -60,7 +61,6 @@ struct TrackedStates {
 };
 
 inline std::shared_ptr<TrackedStates> trackedStates = MakeAggregateShared<TrackedStates>();
-
 
 struct FramebufferColorInfo {
     GLuint colorTargets[MAX_FBTARGETS];

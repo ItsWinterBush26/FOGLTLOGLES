@@ -243,7 +243,7 @@ struct FakeDepthFramebuffer {
 
         glFramebufferTexture2D(
             GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target,
-            trackedStates->textureUnits[trackedStates->activeTextureUnit].boundTextures[target], level
+            trackedStates->activeTextureState->boundTextures[target], level
         );
 
         glBlitFramebuffer(
@@ -266,7 +266,7 @@ struct FakeDepthFramebuffer {
 
         glFramebufferTexture2D(
             GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target,
-            trackedStates->textureUnits[trackedStates->activeTextureUnit].boundTextures[target], level
+            trackedStates->activeTextureState->boundTextures[target], level
         );
 
         glBlitFramebuffer(

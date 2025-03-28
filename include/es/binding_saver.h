@@ -13,18 +13,27 @@
 
 // PROGRESS: PARTIAL
 
+struct SaveActiveTextureUnit {
+    GLuint activeTextureUnit;
+
+    SaveActiveTextureUnit() {
+        activeTextureUnit = trackedStates->activeTextureUnit;
+    }
+
+    ~SaveActiveTextureUnit() {
+        OV_glActiveTexture(activeTextureUnit);
+    }
+};
+
 struct SaveBoundedTexture {
     GLuint boundedTexture;
-    GLuint activeTextureUnit;
     GLenum textureType;
 
     SaveBoundedTexture(GLenum textureType) : textureType(textureType) {
-        activeTextureUnit = trackedStates->activeTextureUnit;
-        boundedTexture = trackedStates->textureUnits[trackedStates->activeTextureUnit].boundTextures[textureType];
+        boundedTexture = trackedStates->activeTextureState->boundTextures[textureType];
     }
 
     ~SaveBoundedTexture() {
-        OV_glActiveTexture(activeTextureUnit);
         OV_glBindTexture(textureType, boundedTexture);
     }
 };
