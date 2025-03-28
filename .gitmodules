@@ -8,3 +8,6 @@
 	url = https://github.com/KhronosGroup/SPIRV-Cross
 	shallow = true
 
+[submodule "deps/xxHash"]
+	path = deps/xxHash
+	url = https://github.com/Cyan4973/xxHash
