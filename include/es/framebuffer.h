@@ -12,32 +12,6 @@
 #include <memory>
 #include <unordered_map>
 
-#ifndef MAX_FBTARGETS
-#define MAX_FBTARGETS 8
-#endif
-
-#ifndef MAX_DRAWBUFFERS
-#define MAX_DRAWBUFFERS 8
-#endif
-
-struct FramebufferColorInfo {
-    GLuint colorTargets[MAX_FBTARGETS];
-    GLuint colorObjects[MAX_FBTARGETS];
-    GLuint colorComponentType[MAX_FBTARGETS];
-    GLuint colorEncoding[MAX_FBTARGETS];
-
-    // if GL_TEXTURE
-    GLuint colorLevels[MAX_FBTARGETS];
-    GLuint colorLayers[MAX_FBTARGETS];
-};
-
-struct Framebuffer {
-    FramebufferColorInfo colorInfo;
-    GLenum virtualDrawbuffers[MAX_DRAWBUFFERS] = { GL_COLOR_ATTACHMENT0 };
-    GLenum physicalDrawbuffers[MAX_DRAWBUFFERS];
-    GLsizei bufferAmount = 1;
-};
-
 struct FakeDepthFramebuffer;
 
 inline std::shared_ptr<FakeDepthFramebuffer> fakeDepthbuffer;

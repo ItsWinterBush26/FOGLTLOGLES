@@ -1,6 +1,5 @@
 #pragma once
 
-#include "es/framebuffer.h"
 #include "utils/pointers.h"
 
 #include <GLES3/gl3.h>
@@ -8,7 +7,15 @@
 #include <unordered_map>
 #include <utility>
 
-struct Framebuffer; // implementation in "es/framebuffer.h"
+#ifndef MAX_FBTARGETS
+#define MAX_FBTARGETS 8
+#endif
+
+#ifndef MAX_DRAWBUFFERS
+#define MAX_DRAWBUFFERS 8
+#endif
+
+struct Framebuffer;
 
 struct TextureStates {
     // Type, Texture
@@ -26,7 +33,7 @@ struct FramebufferStates {
     std::pair<GLenum, GLuint> recentlyBoundFramebuffer; // (either read or draw) (or both? GL_FRAMEBUFFER)
 
     // Framebuffer, Framebuffer struct
-    //  /\ 
+    //     | |
     // since we are using the framebuffer object
     // we need to make sure it gets erased here
     std::unordered_map<GLuint, std::shared_ptr<Framebuffer>> trackedFramebuffers;
@@ -52,3 +59,22 @@ struct TrackedStates {
 };
 
 inline std::shared_ptr<TrackedStates> trackedStates = MakeAggregateShared<TrackedStates>();
+
+
+struct FramebufferColorInfo {
+    GLuint colorTargets[MAX_FBTARGETS];
+    GLuint colorObjects[MAX_FBTARGETS];
+    GLuint colorComponentType[MAX_FBTARGETS];
+    GLuint colorEncoding[MAX_FBTARGETS];
+
+    // if GL_TEXTURE
+    GLuint colorLevels[MAX_FBTARGETS];
+    GLuint colorLayers[MAX_FBTARGETS];
+};
+
+struct Framebuffer {
+    FramebufferColorInfo colorInfo;
+    GLenum virtualDrawbuffers[MAX_DRAWBUFFERS] = { GL_COLOR_ATTACHMENT0 };
+    GLenum physicalDrawbuffers[MAX_DRAWBUFFERS];
+    GLsizei bufferAmount = 1;
+};

@@ -50,11 +50,11 @@ struct SaveBoundedFramebuffer {
         switch (framebufferType) {
             case GL_FRAMEBUFFER:
             case GL_DRAW_FRAMEBUFFER:
-                boundedFramebuffer = trackedStates->boundDrawFramebuffer;
+                boundedFramebuffer = trackedStates->framebufferState.boundDrawFramebuffer;
             break;
 
             case GL_READ_FRAMEBUFFER:
-                boundedFramebuffer = trackedStates->boundReadFramebuffer;
+                boundedFramebuffer = trackedStates->framebufferState.boundReadFramebuffer;
             break;
         }
     }
