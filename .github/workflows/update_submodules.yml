@@ -3,7 +3,7 @@ name: Update Submodules
 on:
 	schedule:
 		# Runs every Monday at 00:00 UTC
-		- cron: "0 0 * * 1"
+    - cron: '0 0 * * 1'
 	workflow_dispatch:
 
 permissions:
@@ -19,7 +19,7 @@ jobs:
 				with:
 					fetch-depth: 1
 					submodules: true
-
+   
 			- name: Git config
 				run: |
 					git config --global user.name 'github-actions[bot]'
