@@ -1,7 +1,7 @@
 #pragma once
 
 #include "es/binding_saver.h"
-#include "main.h"
+#include "gles20/buffer_tracking.h"
 
 #include <GLES3/gl3.h>
 #include <memory>
@@ -38,7 +38,7 @@ struct MDElementsBatcher {
     ) {
         if (!usable) return;
 
-        glBindBuffer(GL_COPY_WRITE_BUFFER, buffer);
+        OV_glBindBuffer(GL_COPY_WRITE_BUFFER, buffer);
         glBufferData(GL_COPY_WRITE_BUFFER, totalCount * typeSize, nullptr, GL_STREAM_DRAW);
 
         GLsizei offset = 0;
@@ -54,7 +54,7 @@ struct MDElementsBatcher {
             offset += dataSize;
         }
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
+        OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
     }
 };
 
