@@ -1,6 +1,7 @@
 #pragma once
 
 #include "utils/pointers.h"
+#include "utils/xxhash_map.h"
 
 #include <GLES3/gl3.h>
 #include <memory>
@@ -19,10 +20,10 @@ struct Framebuffer;
 
 struct TextureStates {
     // Type, Texture
-    std::unordered_map<GLenum, GLuint> boundTextures;
+    XXHASH_MAP_BI(GLenum, GLuint) boundTextures;
 
     // Texture, Internal Format
-    std::unordered_map<GLuint, GLenum> textureInternalFormats;
+    XXHASH_MAP_BI(GLuint, GLenum) textureInternalFormats;
 };
 
 struct FramebufferStates {
@@ -36,7 +37,7 @@ struct FramebufferStates {
     //     | |
     // since we are using the framebuffer object
     // we need to make sure it gets erased here
-    std::unordered_map<GLuint, std::shared_ptr<Framebuffer>> trackedFramebuffers;
+    XXHASH_MAP_BI(GLuint, std::shared_ptr<Framebuffer>) trackedFramebuffers;
 
 };
 
@@ -45,17 +46,17 @@ struct TrackedStates {
 
     // Unit, TextureStates
     // Unit is GL_TEXTUREi, where i is 0 to max texture units
-    std::unordered_map<GLuint, TextureStates> textureUnits;
+    XXHASH_MAP_BI(GLuint, TextureStates) textureUnits;
 
     FramebufferStates framebufferState;
     
     GLuint boundRenderbuffer;
 
     // Renderbuffer, Internal Format
-    std::unordered_map<GLuint, GLenum> renderbufferInternalFormats;
+    XXHASH_MAP_BI(GLuint, GLenum) renderbufferInternalFormats;
 
     // Type, Buffer
-    std::unordered_map<GLenum, GLuint> boundBuffers;
+    XXHASH_MAP_BI(GLenum, GLuint) boundBuffers;
 };
 
 inline std::shared_ptr<TrackedStates> trackedStates = MakeAggregateShared<TrackedStates>();
