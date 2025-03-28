@@ -1,5 +1,6 @@
 #pragma once
 
+#include "utils/log.h"
 #include "utils/pointers.h"
 #include "utils/xxhash_map.h"
 
@@ -42,7 +43,7 @@ struct FramebufferStates {
 };
 
 struct TrackedStates {
-    GLuint activeTextureUnit;
+    GLuint activeTextureUnit = GL_TEXTURE0;
     TextureStates* activeTextureState;
 
     // Unit, TextureStates
@@ -58,6 +59,19 @@ struct TrackedStates {
 
     // Type, Buffer
     XXHASH_MAP_BI(GLenum, GLuint) boundBuffers;
+
+    TrackedStates() {
+        GLint maxTextureUnits;
+        glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
+        textureUnits.reserve(maxTextureUnits);
+        LOGI("Reserving %i texture units", maxTextureUnits);
+
+        activeTextureState = &textureUnits[GL_TEXTURE0];
+    }
+
+    ~TrackedStates() {
+        activeTextureState = nullptr;
+    }
 };
 
 inline std::shared_ptr<TrackedStates> trackedStates = MakeAggregateShared<TrackedStates>();
