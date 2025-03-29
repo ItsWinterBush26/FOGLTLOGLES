@@ -1,6 +1,6 @@
 #pragma once
 
-#include "xxhash.h"
+// #include "xxhash.h"
 
 #include <cstdint>
 
@@ -8,11 +8,12 @@ template<typename K>
 class XXHasher {
 public:
     size_t operator()(const K& key) const {
-#if INTPTR_MAX == INT32_MAX
+        return key; // LLVM method 💀
+/* #if INTPTR_MAX == INT32_MAX
         return XXH32(&key, sizeof(K), 0);
 #else
         return XXH64(&key, sizeof(K), 0);
-#endif
+#endif */
     }
 };
 
