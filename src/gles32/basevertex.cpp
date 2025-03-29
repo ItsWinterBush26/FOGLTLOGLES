@@ -17,9 +17,43 @@ void glMultiDrawElementsBaseVertex(
     GLsizei drawcount,
     const GLint* basevertex
 ) {
-    if (drawcount == 0) return;
+    if (drawcount <= 0) return;
 
-    for(GLsizei i = 0; i < drawcount; i++) {
-        if (count[i] > 0) glDrawElementsBaseVertex(mode, count[i], type, indices[i], basevertex[i]);
+    GLint typeSize = getTypeSize(type);
+    if (typeSize == 0) return; // Unsupported type
+    
+    SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
+    
+    // Group by basevertex value
+    GLint lastBaseVertex = basevertex[0];
+    GLsizei startIdx = 0;
+    
+    for (GLsizei i = 1; i <= drawcount; ++i) {
+        // Process batch when basevertex changes or at the end
+        if (i == drawcount || basevertex[i] != lastBaseVertex) {
+            // Calculate total count for this batch
+            GLsizei batchTotalCount = 0;
+            for (GLsizei j = startIdx; j < i; ++j) {
+                batchTotalCount += count[j];
+            }
+            
+            if (batchTotalCount > 0) {
+                // Combine all indices
+                batcher->batch(
+                    batchTotalCount, typeSize,
+                    i - startIdx,
+                    count + startIdx, indices + startIdx,
+                    sbb
+                );
+                
+                glDrawElementsBaseVertex(mode, batchTotalCount, type, (void*)0, lastBaseVertex);
+            }
+            
+            // Start new batch
+            if (i < drawcount) {
+                lastBaseVertex = basevertex[i];
+                startIdx = i;
+            }
+        }
     }
 }
