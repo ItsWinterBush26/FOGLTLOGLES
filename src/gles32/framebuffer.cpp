@@ -104,7 +104,7 @@ void OV_glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarge
         framebuffer->colorInfo.colorObjects[attachmentIndex] = texture;
         framebuffer->colorInfo.colorLevels[attachmentIndex] = level;
 
-        GLenum textureFormat = trackedStates->activeTextureState->textureInternalFormats[texture];
+        GLenum textureFormat = trackedStates->activeTextureState.textureInternalFormats[texture];
         framebuffer->colorInfo.colorComponentType[attachmentIndex] = getComponentTypeFromFormat(textureFormat);
         framebuffer->colorInfo.colorEncoding[attachmentIndex] = isSRGBFormat(textureFormat) ? GL_SRGB : GL_LINEAR;
     }
@@ -134,7 +134,7 @@ void OV_glFramebufferTextureLayer(GLenum target, GLenum attachment, GLuint textu
         framebuffer->colorInfo.colorLevels[attachmentIndex] = level;
         framebuffer->colorInfo.colorLayers[attachmentIndex] = layer;
         
-        GLenum textureFormat = trackedStates->activeTextureState->textureInternalFormats[texture];
+        GLenum textureFormat = trackedStates->activeTextureState.textureInternalFormats[texture];
         framebuffer->colorInfo.colorComponentType[attachmentIndex] = getComponentTypeFromFormat(textureFormat);
         framebuffer->colorInfo.colorEncoding[attachmentIndex] = isSRGBFormat(textureFormat) ? GL_SRGB : GL_LINEAR;
     }

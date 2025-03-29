@@ -95,7 +95,7 @@ void OV_glTexSubImage2D(
 void OV_glCopyTexImage2D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border) {
     if (isDepthFormat(internalformat)) {
         OV_glTexImage2D(
-            target, level, trackedStates->activeTextureState->textureInternalFormats[trackedStates->activeTextureState->boundTextures[GL_TEXTURE_2D]],
+            target, level, trackedStates->activeTextureState.getTextureInternalFormat(GL_TEXTURE_2D),
             width, height, border,
             GL_DEPTH_COMPONENT32F, GL_FLOAT,
             nullptr
@@ -123,7 +123,7 @@ void OV_glCopyTexSubImage2D(
         x, y, width, height
     ); */
     
-    if (isDepthFormat(trackedStates->activeTextureState->textureInternalFormats[trackedStates->activeTextureState->boundTextures[GL_TEXTURE_2D]])) {
+    if (isDepthFormat(trackedStates->activeTextureState.getTextureInternalFormat(GL_TEXTURE_2D))) {
         // LOGI("Bound image is a depth texture, re-routing to FakeDepthFramebuffer");
         fakeDepthbuffer->blitCurrentReadToFakeDraw(target, level, x, y, width, height);
     } else {

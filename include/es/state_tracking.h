@@ -19,12 +19,23 @@
 
 struct Framebuffer;
 
-struct TextureStates : public std::enable_shared_from_this<TextureStates> {
+struct TextureStates {
+    std::pair<GLenum, GLuint> recentlyBoundTexture;
+
     // Type, Texture
     FAST_MAP_BI(GLenum, GLuint) boundTextures;
 
     // Texture, Internal Format
     FAST_MAP_BI(GLuint, GLenum) textureInternalFormats;
+
+    void bindTextureToTarget(GLenum target, GLuint texture) {
+        boundTextures[target] = texture;
+        recentlyBoundTexture = std::make_pair(target, texture);
+    }
+
+    GLenum getTextureInternalFormat(GLenum target) {
+        return textureInternalFormats[boundTextures[target]];
+    }
 };
 
 struct FramebufferStates {
@@ -44,7 +55,7 @@ struct FramebufferStates {
 
 struct TrackedStates {
     GLuint activeTextureUnit = GL_TEXTURE0;
-    TextureStates* activeTextureState;
+    TextureStates activeTextureState;
 
     // Unit, TextureStates
     // Unit is GL_TEXTUREi, where i is 0 to max texture units
@@ -66,11 +77,12 @@ struct TrackedStates {
         textureUnits.reserve(maxTextureUnits);
         LOGI("Reserving %i texture units", maxTextureUnits);
 
-        activeTextureState = &textureUnits[GL_TEXTURE0];
+        activeTextureState = textureUnits[GL_TEXTURE0];
     }
 
-    ~TrackedStates() {
-        activeTextureState = nullptr;
+    void setActiveTextureUnit(GLuint unit) {
+        activeTextureUnit = unit;
+        activeTextureState = textureUnits[unit];
     }
 };
 
