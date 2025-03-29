@@ -2,7 +2,7 @@
 
 #include "utils/log.h"
 #include "utils/pointers.h"
-#include "utils/xxhash_map.h"
+#include "utils/fast_map.h"
 
 #include <GLES3/gl3.h>
 #include <memory>
@@ -21,10 +21,10 @@ struct Framebuffer;
 
 struct TextureStates : public std::enable_shared_from_this<TextureStates> {
     // Type, Texture
-    XXHASH_MAP_BI(GLenum, GLuint) boundTextures;
+    FAST_MAP_BI(GLenum, GLuint) boundTextures;
 
     // Texture, Internal Format
-    XXHASH_MAP_BI(GLuint, GLenum) textureInternalFormats;
+    FAST_MAP_BI(GLuint, GLenum) textureInternalFormats;
 };
 
 struct FramebufferStates {
@@ -38,7 +38,7 @@ struct FramebufferStates {
     //     | |
     // since we are using the framebuffer object
     // we need to make sure it gets erased here
-    XXHASH_MAP_BI(GLuint, std::shared_ptr<Framebuffer>) trackedFramebuffers;
+    FAST_MAP_BI(GLuint, std::shared_ptr<Framebuffer>) trackedFramebuffers;
 
 };
 
@@ -48,17 +48,17 @@ struct TrackedStates {
 
     // Unit, TextureStates
     // Unit is GL_TEXTUREi, where i is 0 to max texture units
-    XXHASH_MAP_BI(GLuint, TextureStates) textureUnits;
+    FAST_MAP_BI(GLuint, TextureStates) textureUnits;
 
     FramebufferStates framebufferState;
     
     GLuint boundRenderbuffer;
 
     // Renderbuffer, Internal Format
-    XXHASH_MAP_BI(GLuint, GLenum) renderbufferInternalFormats;
+    FAST_MAP_BI(GLuint, GLenum) renderbufferInternalFormats;
 
     // Type, Buffer
-    XXHASH_MAP_BI(GLenum, GLuint) boundBuffers;
+    FAST_MAP_BI(GLenum, GLuint) boundBuffers;
 
     TrackedStates() {
         GLint maxTextureUnits;

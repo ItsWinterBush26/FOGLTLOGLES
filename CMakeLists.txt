@@ -15,13 +15,9 @@ set(SPIRV_CROSS_CLI OFF)
 set(SPIRV_CROSS_ENABLE_C_API OFF)
 set(GLSLANG_TESTS OFF)
 ## set(ENABLE_HLSL OFF) ## fails on libshaderc_util
-set(XXHASH_BUNDLED_MODE ON)
-set(XXHASH_BUILD_ENABLE_INLINE_API ON)
-set(XXHASH_BUILD_XXHSUM OFF)
 
 add_subdirectory(deps/shaderc) 
 add_subdirectory(deps/spirv-cross)
-# add_subdirectory(deps/xxHash/cmake_unofficial build EXCLUDE_FROM_ALL)
 
 ######## MAIN PROJECT ########
 file(GLOB_RECURSE SOURCES
@@ -30,13 +26,12 @@ file(GLOB_RECURSE SOURCES
 	"src/*/*/*.cpp"
 )
 
-set(HEADER_DIRS "include" "build_info" "deps/xxHash")
+set(HEADER_DIRS "include" "build_info")
 file(GLOB_RECURSE HEADERS
 	"include/*.h"
 	"include/*/*.h"
 	"include/*/*/*'h"
 	"build_info/build_info.h"
-	"deps/xxHash/xxhash.h"
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
@@ -107,5 +102,3 @@ add_custom_target(generateBuildInfo
 )
 
 add_dependencies(${PROJECT_NAME} generateBuildInfo)
-add_compile_definitions(XXH_VECTOR=XXH_NEON)
-add_compile_definitions(XXH_INLINE_ALL)

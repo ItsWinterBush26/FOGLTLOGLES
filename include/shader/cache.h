@@ -2,7 +2,7 @@
 
 #include "utils/env.h"
 #include "utils/log.h"
-#include "utils/xxhash_map.h"
+#include "utils/fast_map.h"
 
 #include <filesystem>
 #include <fstream>
@@ -11,7 +11,7 @@
 #include <unordered_map>
 
 // key is hash, value is path
-inline XXHASH_MAP_BI(size_t, std::string) shaderCache;
+inline FAST_MAP_BI(size_t, std::string) shaderCache;
 
 inline const std::string CACHE_DIRECTORY = getEnvironmentVar("MESA_GLSL_CACHE_DIR") + "/converted";
 
@@ -65,13 +65,7 @@ namespace ShaderConverter::Cache {
     }
 
     inline size_t getHash(std::string& key) {
-#if INTPTR_MAX == INT32_MAX
-        return XXH32(key.data(), key.size(), 0);
-#else
-        return XXH64(key.data(), key.size(), 0);
-#endif
-
-        // return std::hash<std::string>{}(key);
+        return std::hash<std::string>{}(key);
     }
 
     inline void init() {
