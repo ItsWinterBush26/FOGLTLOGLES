@@ -55,7 +55,7 @@ struct FramebufferStates {
 
 struct TrackedStates {
     GLuint activeTextureUnit = GL_TEXTURE0;
-    TextureStates activeTextureState;
+    TextureStates* activeTextureState;
 
     // Unit, TextureStates
     // Unit is GL_TEXTUREi, where i is 0 to max texture units
@@ -77,12 +77,12 @@ struct TrackedStates {
         textureUnits.reserve(maxTextureUnits);
         LOGI("Reserving %i texture units", maxTextureUnits);
 
-        activeTextureState = textureUnits[GL_TEXTURE0];
+        activeTextureState = &textureUnits[GL_TEXTURE0];
     }
 
     void setActiveTextureUnit(GLuint unit) {
         activeTextureUnit = unit;
-        activeTextureState = textureUnits[unit];
+        activeTextureState = &textureUnits[unit];
     }
 };
 

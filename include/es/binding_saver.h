@@ -30,7 +30,7 @@ struct SaveBoundedTexture {
     GLenum textureType;
 
     SaveBoundedTexture(GLenum textureType) : textureType(textureType) {
-        boundedTexture = trackedStates->activeTextureState.boundTextures[textureType];
+        boundedTexture = trackedStates->activeTextureState->boundTextures[textureType];
     }
 
     ~SaveBoundedTexture() {

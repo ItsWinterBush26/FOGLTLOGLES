@@ -7,7 +7,7 @@
 #include <unordered_map>
 
 inline void trackTextureFormat(GLint& internalFormat) {
-    trackedStates->activeTextureState.textureInternalFormats.insert({ trackedStates->activeTextureState.boundTextures[GL_TEXTURE_2D], internalFormat });
+    trackedStates->activeTextureState->textureInternalFormats.insert({ trackedStates->activeTextureState->boundTextures[GL_TEXTURE_2D], internalFormat });
 }
 
 inline bool isDepthFormat(GLenum format) {

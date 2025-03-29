@@ -35,7 +35,7 @@ void glGetTexImage(GLenum target, GLint level, GLenum format, GLenum type, void*
         GL_READ_FRAMEBUFFER,
         GL_COLOR_ATTACHMENT0,
         target,
-        trackedStates->activeTextureState.boundTextures[target],
+        trackedStates->activeTextureState->boundTextures[target],
         level
     );
 

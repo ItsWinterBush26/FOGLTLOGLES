@@ -60,14 +60,14 @@ void OV_glDeleteFramebuffers(GLsizei n, const GLuint* framebuffers) {
 void OV_glBindTexture(GLenum target, GLuint texture) {
     glBindTexture(target, texture);
 
-    trackedStates->activeTextureState.bindTextureToTarget(target, texture);
+    trackedStates->activeTextureState->bindTextureToTarget(target, texture);
 }
 
 void OV_glDeleteTextures(GLsizei n, const GLuint *textures) {
     glDeleteTextures(n, textures);
 
     for (GLsizei i = 0; i < n; ++i) {
-        trackedStates->activeTextureState.textureInternalFormats.erase(textures[i]);
+        trackedStates->activeTextureState->textureInternalFormats.erase(textures[i]);
     }
 }
 
