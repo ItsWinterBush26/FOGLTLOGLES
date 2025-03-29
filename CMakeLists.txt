@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.10)
 
 project(FOGLTOGLES LANGUAGES C CXX)
 
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ######## DEPENDENCIES ########
@@ -20,6 +24,34 @@ add_subdirectory(deps/shaderc)
 add_subdirectory(deps/spirv-cross)
 
 ######## MAIN PROJECT ########
+set(COMMON_FLAGS
+    -Wall
+    -Wextra
+    -Wpedantic
+    -pipe
+)
+
+set(RELEASE_FLAGS
+    -Ofast
+    -flto
+    -ffast-math
+    -fomit-frame-pointer
+    -ffunction-sections
+    -fdata-sections
+    -fno-rtti
+    -fvisibility=hidden
+    -fvisibility-inlines-hidden
+    -DNDEBUG
+)
+
+set(DEBUG_FLAGS
+    -Og
+    -g3
+    -ggdb
+    -fno-omit-frame-pointer
+    -D_GLIBCXX_DEBUG
+)
+
 file(GLOB_RECURSE SOURCES
 	"src/*.cpp"
 	"src/*/*.cpp"
@@ -50,9 +82,26 @@ target_include_directories(
 
 ######## EXTRA ########
 if(CMAKE_BUILD_TYPE MATCHES Release)
-  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-	COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${PROJECT_NAME}>
-	COMMENT "Stripping symbols from ${PROJECT_NAME}")
+    string(REPLACE ";" " " RELEASE_FLAGS_STR "${RELEASE_FLAGS}")
+    string(REPLACE ";" " " COMMON_FLAGS_STR "${COMMON_FLAGS}")
+    
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${COMMON_FLAGS_STR} ${RELEASE_FLAGS_STR}")
+    
+    # Enable link-time optimization
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+    
+    # Add linker optimizations
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Wl,--gc-sections -Wl,--as-needed")
+    
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${PROJECT_NAME}>
+        COMMENT "Stripping symbols from ${PROJECT_NAME}"
+    )
+else()
+    string(REPLACE ";" " " DEBUG_FLAGS_STR "${DEBUG_FLAGS}")
+    string(REPLACE ";" " " COMMON_FLAGS_STR "${COMMON_FLAGS}")
+    
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${COMMON_FLAGS_STR} ${DEBUG_FLAGS_STR}")
 endif()
 
 ######## DEPENDENCIES ########
@@ -95,10 +144,10 @@ message("Dependencies : ${DEPENDENCIES}")
 set(BUILD_INFO_DIR ${CMAKE_SOURCE_DIR}/build_info)
 
 add_custom_target(generateBuildInfo
-  ${CMAKE_COMMAND} -D SRC=${BUILD_INFO_DIR}/build_info.h.in
-                   -D DST=${BUILD_INFO_DIR}/build_info.h
-                   -D GIT_EXECUTABLE=${GIT_EXECUTABLE}
-                   -P ${BUILD_INFO_DIR}/GenerateBuildInfo.cmake
+    ${CMAKE_COMMAND} -D SRC=${BUILD_INFO_DIR}/build_info.h.in
+                     -D DST=${BUILD_INFO_DIR}/build_info.h
+                     -D GIT_EXECUTABLE=${GIT_EXECUTABLE}
+                     -P ${BUILD_INFO_DIR}/GenerateBuildInfo.cmake
 )
 
 add_dependencies(${PROJECT_NAME} generateBuildInfo)
