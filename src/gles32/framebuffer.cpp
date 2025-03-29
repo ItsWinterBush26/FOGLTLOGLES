@@ -47,7 +47,7 @@ void glDrawBuffer(GLenum buffer) {
 
 void OV_glDrawBuffers(GLsizei n, const GLenum* buffers) {
     auto framebuffer = getFramebufferObject(GL_DRAW_FRAMEBUFFER);
-    if (framebuffer.get() == nullptr) {
+    if (!framebuffer) {
         glDrawBuffers(n, buffers);
         return;
     }
@@ -86,9 +86,9 @@ void OV_glClearBufferuiv(GLenum buffer, GLint drawbuffer, const GLuint* value) {
 
 void OV_glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level) {
     auto framebuffer = getFramebufferObject(target);
-    GLuint attachmentIndex = getAttachmentIndex(attachment);
+    GLint attachmentIndex = getAttachmentIndex(attachment);
 
-    if (framebuffer.get() == nullptr || attachmentIndex == -1) {
+    if (!framebuffer || attachmentIndex == -1) {
         glFramebufferTexture2D(target, attachment, textarget, texture, level);
         return;
     }
@@ -114,9 +114,9 @@ void OV_glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarge
 
 void OV_glFramebufferTextureLayer(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer) {
     auto framebuffer = getFramebufferObject(target);
-    GLuint attachmentIndex = getAttachmentIndex(attachment);
+    GLint attachmentIndex = getAttachmentIndex(attachment);
 
-    if (framebuffer.get() == nullptr || attachmentIndex == -1) {
+    if (!framebuffer || attachmentIndex == -1) {
         glFramebufferTextureLayer(target, attachment, texture, level, layer);
         return;
     }
@@ -144,9 +144,9 @@ void OV_glFramebufferTextureLayer(GLenum target, GLenum attachment, GLuint textu
 
 void OV_glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer) {
     auto framebuffer = getFramebufferObject(target);
-    GLuint attachmentIndex = getAttachmentIndex(attachment);
+    GLint attachmentIndex = getAttachmentIndex(attachment);
 
-    if (framebuffer.get() == nullptr || attachmentIndex == -1) {
+    if (!framebuffer || attachmentIndex == -1) {
         glFramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer);
         return;
     }
@@ -170,9 +170,9 @@ void OV_glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum rende
 
 void OV_glGetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, GLenum pname, GLint* params) {
     auto framebuffer = getFramebufferObject(target);
-    GLuint attachmentIndex = getAttachmentIndex(attachment);
+    GLint attachmentIndex = getAttachmentIndex(attachment);
 
-    if (framebuffer.get() == nullptr || attachmentIndex == -1) {
+    if (!framebuffer || attachmentIndex == -1) {
         glGetFramebufferAttachmentParameteriv(target, attachment, pname, params);
         return;
     }

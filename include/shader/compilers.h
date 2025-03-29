@@ -11,23 +11,9 @@ inline shaderc::CompileOptions generateGLSL2SPVOptions(int glslVersion) {
     options.SetTargetEnvironment(shaderc_target_env_opengl, glslVersion);
     options.SetOptimizationLevel(shaderc_optimization_level_performance);
     options.SetVulkanRulesRelaxed(true);
-    
+
     options.SetAutoMapLocations(true);
     
-    return options;
-}
-
-inline shaderc::CompileOptions generateESSL2SPVOptions(int esslVersion) {
-    shaderc::CompileOptions options;
-    options.SetGenerateDebugInfo();
-    options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_0);
-    options.SetSourceLanguage(shaderc_source_language_glsl);
-    options.SetForcedVersionProfile(esslVersion, shaderc_profile_es);
-    options.SetOptimizationLevel(shaderc_optimization_level_performance);
-    
-    options.SetAutoMapLocations(true);
-    options.SetAutoBindUniforms(true);
-
     return options;
 }
 

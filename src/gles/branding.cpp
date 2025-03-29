@@ -79,7 +79,7 @@ void OV_glGetIntegerv(GLenum pname, int* v) {
 const GLubyte* OV_glGetStringi(GLenum pname, int index) {
     switch (pname) {
         case GL_EXTENSIONS:
-            if (index < 0 || index >= ESUtils::fakeExtensions.size()) return nullptr;
+            if (index < 0 || static_cast<size_t>(index) >= ESUtils::fakeExtensions.size()) return nullptr;
             {
                 auto it = ESUtils::fakeExtensions.begin();
                 std::advance(it, index);

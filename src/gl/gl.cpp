@@ -4,7 +4,6 @@
 
 #include <mutex>
 #include <GLES3/gl32.h>
-#include <utility>
 
 inline std::once_flag initDebugFlag;
 
@@ -17,10 +16,8 @@ FunctionPtr glXGetProcAddress(const GLchar* pn) {
 }
 
 void initDebug() {
-    // REGISTEROV(glDebugMessageCallback);
+    REGISTEROV(glDebugMessageCallback);
 }
-
-inline std::pair<GLDEBUGPROC, const void*> previousRegisteredCallback;
 
 void customDebugCallback(
     GLenum source,
@@ -33,16 +30,9 @@ void customDebugCallback(
 ) {
     LOGD("[GL DEBUG] Source: %u, Type: %u, ID: %u, Severity: %u", source, type, id, severity);
     LOGD("[GL DEBUG] Message: %s", message);
-
-    previousRegisteredCallback.first(
-        source, type, id, severity, length, message, previousRegisteredCallback.second
-    );
 }
 
 void OV_glDebugMessageCallback(GLDEBUGPROC callback, const void* userParam) {
     LOGI("Intercepted glDebugMessageCallback!");
-    previousRegisteredCallback = std::make_pair(callback, userParam);
-
-    callback = customDebugCallback;
-    glDebugMessageCallback(callback, userParam);
+    glDebugMessageCallback(customDebugCallback, userParam);
 }

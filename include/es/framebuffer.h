@@ -31,7 +31,7 @@ inline std::shared_ptr<Framebuffer> getFramebufferObject(GLenum target) {
     return trackedStates->framebufferState.trackedFramebuffers[framebuffer];
 }
 
-inline GLuint getAttachmentIndex(GLenum attachment) {
+inline GLint getAttachmentIndex(GLenum attachment) {
     switch (attachment) {
         case GL_NONE:
         case GL_DEPTH_ATTACHMENT:
@@ -64,7 +64,7 @@ inline GLenum getMapAttachment(std::shared_ptr<Framebuffer> framebuffer, GLenum 
 }
 
 inline void rebindFramebuffer(GLenum target, std::shared_ptr<Framebuffer> framebuffer, GLenum virtualAttachment) {
-    GLuint virtualIndex = getAttachmentIndex(virtualAttachment);
+    GLint virtualIndex = getAttachmentIndex(virtualAttachment);
     if (virtualIndex == -1) return;
 
     GLenum physicalAttachment = getMapAttachment(framebuffer, virtualAttachment);
@@ -108,7 +108,7 @@ inline void rebindFramebuffer(GLenum target, std::shared_ptr<Framebuffer> frameb
     }
 }
 
-inline void getFramebufferAttachmentParameter(std::shared_ptr<Framebuffer> framebuffer, GLuint attachmentIndex, GLenum pname, GLint* params) {
+inline void getFramebufferAttachmentParameter(std::shared_ptr<Framebuffer> framebuffer, GLint attachmentIndex, GLenum pname, GLint* params) {
     GLenum framebufferTarget = framebuffer->colorInfo.colorTargets[attachmentIndex];
     GLenum targetObjectType = getAttachmentObjectType(framebufferTarget);
     
