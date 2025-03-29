@@ -1,3 +1,5 @@
+#include "es/multidraw.h"
+#include "es/binding_saver.h"
 #include "gles32/main.h"
 #include "main.h"
 
