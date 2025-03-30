@@ -23,17 +23,5 @@ void glMultiDrawElementsBaseVertex(
     GLsizei drawcount,
     const GLint* basevertex
 ) {
-    if (drawcount <= 0) return;
-
-    GLint typeSize = getTypeSize(type);
-    if (typeSize == 0) return; // Unsupported type
-
-    GLsizei totalCount = 0;
-    for (GLsizei i = 0; i < drawcount; ++i) totalCount += counts[i];
-    if (totalCount == 0) return;
-
-    SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
-    batcher->prepareBatch(counts, totalCount, typeSize, drawcount, indices, sbb);
-    
-    glDrawElementsBaseVertex(mode, totalCount, type, (void*)0, basevertex[0]); // Use basevertex[0] as the base
+    batcher->batchAndDraw(mode, counts, type, indices, drawcount, basevertex);
 }
