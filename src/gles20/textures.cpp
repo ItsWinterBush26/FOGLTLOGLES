@@ -124,18 +124,18 @@ void OV_glCopyTexSubImage2D(
         x, y, width, height
     ); */
     
-    if (isDepthFormat(trackedStates->activeTextureState->getTextureInternalFormat(GL_TEXTURE_2D))) {
+    /* if (isDepthFormat(trackedStates->activeTextureState->getTextureInternalFormat(GL_TEXTURE_2D))) {
         // LOGI("Bound image is a depth texture, re-routing to FakeDepthFramebuffer");
         fakeDepthbuffer->blitCurrentReadToFakeDraw(target, level, x, y, width, height);
         return;
-    } // else {
-        // glGetError();
-    glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
-        /* if (glGetError() == GL_INVALID_OPERATION) {
+    } else { */
+        glGetError();
+        glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
+        if (glGetError() == GL_INVALID_OPERATION) {
             // LOGI("glCopyTexSubImage2D failed with GL_INVALID_OPERATION. Re-routing to FakeDepthFramebuffer");
         
             fakeDepthbuffer->blitCurrentReadToFakeDraw(target, level, x, y, width, height);
-        } */
+        }
     // }
 }
 
