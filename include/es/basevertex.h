@@ -7,6 +7,7 @@
 #include <vector>
 #include <cstring>
 #include <memory>
+#include <algorithm>
 
 inline GLint getTypeSize(GLenum type) {
     switch (type) {
@@ -17,23 +18,49 @@ inline GLint getTypeSize(GLenum type) {
     }
 }
 
-template <typename T>
-inline void adjustAndCopy(const T* src, T* dst, GLsizei count, int base) {
-    for (GLsizei i = 0; i < count; ++i)
-        dst[i] = src[i] + static_cast<T>(base);
+inline GLuint getMaxIndex(GLenum type) {
+    switch (type) {
+        case GL_UNSIGNED_BYTE:  return 0xFF;
+        case GL_UNSIGNED_SHORT: return 0xFFFF;
+        case GL_UNSIGNED_INT:   return 0xFFFFFFFF;
+        default:                return 0;
+    }
 }
 
+template <typename T>
+inline bool copyIndices(std::vector<T>& dst, GLuint& dstOffset, 
+                   const T* src, GLsizei count) {
+        if (dstOffset + count > dst.size()) {
+            return false;
+        }
+        
+        std::memcpy(&dst[dstOffset], src, count * sizeof(T));
+        dstOffset += count;
+        return true;
+    }
+
+template <typename T>
+inline bool addRestartIndex(std::vector<T>& dst, GLuint& dstOffset, T restartVal) {
+        if (dstOffset >= dst.size()) {
+            return false;
+        }
+        
+        dst[dstOffset] = restartVal;
+        dstOffset++;
+        return true;
+    }
+
 struct MDElementsBaseVertexBatcher {
-    GLuint buffer;
+    GLuint indexBuffer;
     bool usable;
 
     MDElementsBaseVertexBatcher() {
-        glGenBuffers(1, &buffer);
+        glGenBuffers(1, &indexBuffer);
         usable = (glGetError() == GL_NO_ERROR);
     }
 
     ~MDElementsBaseVertexBatcher() {
-        glDeleteBuffers(1, &buffer);
+        glDeleteBuffers(1, &indexBuffer);
     }
 
     void batchAndDraw(
@@ -44,12 +71,15 @@ struct MDElementsBaseVertexBatcher {
         GLsizei drawcount,
         const GLint* basevertex
     ) {
+        // Basic validation
         if (!usable) return;
-        if (drawcount <= 0) return;
+        if (!counts || !indices || !basevertex || drawcount <= 0) return;
+        
         const GLint typeSize = getTypeSize(type);
         if (typeSize == 0) return;
         
-        if (drawcount <= 32) {
+        // For small batch counts, just use multiple direct draw calls
+        if (drawcount <= 4) {
             for (GLsizei i = 0; i < drawcount; ++i) {
                 if (counts[i] <= 0) continue;
                 glDrawElementsBaseVertex(mode, counts[i], type, indices[i], basevertex[i]);
@@ -57,70 +87,154 @@ struct MDElementsBaseVertexBatcher {
             return;
         }
         
+        // Calculate total indices including the primitive restart markers
         GLsizei totalIndices = 0;
-        for (GLsizei i = 0; i < drawcount; ++i) totalIndices += counts[i];
-        
-        const GLsizei newTotalIndices = totalIndices + (drawcount - 1);
-        GLuint restartIndex = 0;
-        switch (type) {
-            case GL_UNSIGNED_BYTE:  restartIndex = 0xFF; break;
-            case GL_UNSIGNED_SHORT: restartIndex = 0xFFFF; break;
-            case GL_UNSIGNED_INT:   restartIndex = 0xFFFFFFFF; break;
-            default: return;
+        for (GLsizei i = 0; i < drawcount; ++i) {
+            totalIndices += counts[i];
         }
         
-        std::vector<char> cpuBuffer(newTotalIndices * typeSize);
-        GLsizei dstOffset = 0;
-        for (GLsizei i = 0; i < drawcount; ++i) {
-            const GLsizei counti = counts[i];
-            if (counti > 0) {
-                const char* src = reinterpret_cast<const char*>(indices[i]);
-                switch (type) {
-                    case GL_UNSIGNED_BYTE: {
-                        const GLubyte* srcIndices = reinterpret_cast<const GLubyte*>(src);
-                        GLubyte* dest = reinterpret_cast<GLubyte*>(cpuBuffer.data()) + dstOffset;
-                        adjustAndCopy<GLubyte>(srcIndices, dest, counti, basevertex[i]);
-                        break;
+        // Add space for primitive restart indices
+        const GLsizei newTotalIndices = totalIndices + (drawcount - 1);
+        
+        // Process based on index type
+        switch (type) {
+            case GL_UNSIGNED_BYTE: {
+                std::vector<GLubyte> combinedIndices(newTotalIndices);
+                GLuint offset = 0;
+                GLubyte restartIndex = 0xFF;
+                
+                for (GLsizei i = 0; i < drawcount; ++i) {
+                    if (counts[i] <= 0) continue;
+                    
+                    // Get the source indices
+                    const GLubyte* srcIndices = static_cast<const GLubyte*>(indices[i]);
+                    
+                    // Batch of indices for this draw call
+                    for (GLsizei j = 0; j < counts[i]; ++j) {
+                        // Add the basevertex offset
+                        GLint adjustedIndex = srcIndices[j] + basevertex[i];
+                        
+                        // Clamp to valid range
+                        adjustedIndex = std::max(0, std::min(adjustedIndex, 255));
+                        
+                        combinedIndices[offset++] = static_cast<GLubyte>(adjustedIndex);
                     }
-                    case GL_UNSIGNED_SHORT: {
-                        const GLushort* srcIndices = reinterpret_cast<const GLushort*>(src);
-                        GLushort* dest = reinterpret_cast<GLushort*>(cpuBuffer.data()) + (dstOffset / 2);
-                        adjustAndCopy<GLushort>(srcIndices, dest, counti, basevertex[i]);
-                        break;
-                    }
-                    case GL_UNSIGNED_INT: {
-                        const GLuint* srcIndices = reinterpret_cast<const GLuint*>(src);
-                        GLuint* dest = reinterpret_cast<GLuint*>(cpuBuffer.data()) + (dstOffset / 4);
-                        adjustAndCopy<GLuint>(srcIndices, dest, counti, basevertex[i]);
-                        break;
+                    
+                    // Add primitive restart index between draws
+                    if (i < drawcount - 1) {
+                        combinedIndices[offset++] = restartIndex;
                     }
                 }
-                dstOffset += counti * typeSize;
+                
+                // Upload combined indices
+                SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
+                OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, offset * sizeof(GLubyte), 
+                           combinedIndices.data(), GL_STREAM_DRAW);
+                
+                // Draw with primitive restart
+                glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+                glDrawElements(mode, offset, type, nullptr);
+                glDisable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+                break;
             }
             
-            if (i < drawcount - 1) {
-                switch (type) {
-                    case GL_UNSIGNED_BYTE:
-                        reinterpret_cast<GLubyte*>(cpuBuffer.data())[dstOffset] = static_cast<GLubyte>(restartIndex);
-                        break;
-                    case GL_UNSIGNED_SHORT:
-                        reinterpret_cast<GLushort*>(cpuBuffer.data())[(dstOffset / 2)] = static_cast<GLushort>(restartIndex);
-                        break;
-                    case GL_UNSIGNED_INT:
-                        reinterpret_cast<GLuint*>(cpuBuffer.data())[(dstOffset / 4)] = static_cast<GLuint>(restartIndex);
-                        break;
+            case GL_UNSIGNED_SHORT: {
+                std::vector<GLushort> combinedIndices(newTotalIndices);
+                GLuint offset = 0;
+                GLushort restartIndex = 0xFFFF;
+                
+                for (GLsizei i = 0; i < drawcount; ++i) {
+                    if (counts[i] <= 0) continue;
+                    
+                    // Get the source indices
+                    const GLushort* srcIndices = static_cast<const GLushort*>(indices[i]);
+                    
+                    // Batch of indices for this draw call
+                    for (GLsizei j = 0; j < counts[i]; ++j) {
+                        // Add the basevertex offset
+                        GLint adjustedIndex = srcIndices[j] + basevertex[i];
+                        
+                        // Clamp to valid range
+                        adjustedIndex = std::max(0, std::min(adjustedIndex, 65535));
+                        
+                        combinedIndices[offset++] = static_cast<GLushort>(adjustedIndex);
+                    }
+                    
+                    // Add primitive restart index between draws
+                    if (i < drawcount - 1) {
+                        combinedIndices[offset++] = restartIndex;
+                    }
                 }
-                dstOffset += typeSize;
+                
+                // Upload combined indices
+                SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
+                OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, offset * sizeof(GLushort), 
+                           combinedIndices.data(), GL_STREAM_DRAW);
+                
+                // Draw with primitive restart
+                glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+                glDrawElements(mode, offset, type, nullptr);
+                glDisable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+                break;
             }
+            
+            case GL_UNSIGNED_INT: {
+                std::vector<GLuint> combinedIndices(newTotalIndices);
+                GLuint offset = 0;
+                GLuint restartIndex = 0xFFFFFFFF;
+                
+                for (GLsizei i = 0; i < drawcount; ++i) {
+                    if (counts[i] <= 0) continue;
+                    
+                    // Get the source indices
+                    const GLuint* srcIndices = static_cast<const GLuint*>(indices[i]);
+                    
+                    // Batch of indices for this draw call
+                    for (GLsizei j = 0; j < counts[i]; ++j) {
+                        // Add the basevertex offset safely
+                        GLint baseVal = basevertex[i];
+                        GLuint srcVal = srcIndices[j];
+                        
+                        // Handle overflow/underflow for negative basevertex
+                        GLuint adjustedIndex;
+                        if (baseVal < 0 && static_cast<GLuint>(-baseVal) > srcVal) {
+                            adjustedIndex = 0; // Clamp to 0 if would underflow
+                        } else {
+                            adjustedIndex = srcVal + baseVal;
+                        }
+                        
+                        combinedIndices[offset++] = adjustedIndex;
+                    }
+                    
+                    // Add primitive restart index between draws
+                    if (i < drawcount - 1) {
+                        combinedIndices[offset++] = restartIndex;
+                    }
+                }
+                
+                // Upload combined indices
+                SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
+                OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, offset * sizeof(GLuint), 
+                           combinedIndices.data(), GL_STREAM_DRAW);
+                
+                // Draw with primitive restart
+                glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+                glDrawElements(mode, offset, type, nullptr);
+                glDisable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+                break;
+            }
+            
+            default:
+                // Unsupported type, fall back to individual calls
+                for (GLsizei i = 0; i < drawcount; ++i) {
+                    if (counts[i] <= 0) continue;
+                    glDrawElementsBaseVertex(mode, counts[i], type, indices[i], basevertex[i]);
+                }
+                break;
         }
-        
-        SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
-        OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, cpuBuffer.size(), cpuBuffer.data(), GL_STREAM_DRAW);
-
-        glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
-        glDrawElements(mode, newTotalIndices, type, (void*)0);
-        glDisable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
     }
 };
 
