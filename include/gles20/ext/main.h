@@ -17,5 +17,4 @@ namespace GLES20Ext {
     void register_EXT_buffer_storage();
     void register_OES_mapbuffer();
     void register_EXT_blend_func_extended();
-    void register_EXT_draw_elements_base_vertex();
 }
