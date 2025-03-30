@@ -114,7 +114,7 @@ struct MDElementsBaseVertexBatcher {
             }
         }
         
-        SaveBoundedBuffer sbb(GL_COPY_WRITE_BUFFER);
+        SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
         OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, cpuBuffer.size(), cpuBuffer.data(), GL_STREAM_DRAW);
 
