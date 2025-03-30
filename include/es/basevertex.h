@@ -23,15 +23,16 @@ inline void adjustAndCopy(const T* src, T* dst, GLsizei count, int base) {
         dst[i] = src[i] + static_cast<T>(base);
 }
 
-struct MDElementsBatcher {
+struct MDElementsBaseVertexBatcher {
     GLuint buffer;
     bool usable;
-    MDElementsBatcher() {
+
+    MDElementsBaseVertexBatcher() {
         glGenBuffers(1, &buffer);
         usable = (glGetError() == GL_NO_ERROR);
     }
 
-    ~MDElementsBatcher() {
+    ~MDElementsBaseVertexBatcher() {
         glDeleteBuffers(1, &buffer);
     }
 
@@ -126,4 +127,4 @@ struct MDElementsBatcher {
     }
 };
 
-std::shared_ptr<MDElementsBatcher> batcher;
+std::shared_ptr<MDElementsBaseVertexBatcher> batcher;
