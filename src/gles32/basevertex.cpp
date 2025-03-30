@@ -1,4 +1,4 @@
-#include "es/basevertex.h"
+// #include "es/basevertex.h"
 #include "gles32/main.h"
 #include "main.h"
 #include "utils/pointers.h"
@@ -12,7 +12,7 @@ void glMultiDrawElementsBaseVertex(GLenum mode, const GLsizei* count, GLenum typ
 void GLES32::registerBaseVertexFunction() {
     REGISTER(glMultiDrawElementsBaseVertex);
 
-    batcher = MakeAggregateShared<MDElementsBaseVertexBatcher>();
+    // batcher = MakeAggregateShared<MDElementsBaseVertexBatcher>();
 }
 
 void glMultiDrawElementsBaseVertex(
@@ -25,14 +25,14 @@ void glMultiDrawElementsBaseVertex(
 ) {
     if (drawcount <= 0) return;
 
-    if (drawcount < 24) {
-        for (GLsizei i = 0; i < drawcount; i++) {
-            if (count[i] > 0) glDrawElementsBaseVertex(mode, count[i], type, indices[i], basevertex[i]);
-        }
-        return;
+    // if (drawcount < 24) {
+    for (GLsizei i = 0; i < drawcount; i++) {
+        if (count[i] > 0) glDrawElementsBaseVertex(mode, count[i], type, indices[i], basevertex[i]);
     }
+        // return;
+    // }
 
-    GLsizei totalIndices = 0;
+    /* GLsizei totalIndices = 0;
     for (GLsizei i = 0; i < drawcount; i++) {
         totalIndices += count[i];
     }
@@ -62,5 +62,5 @@ void glMultiDrawElementsBaseVertex(
         default:
             // Unsupported type
             break;
-    }
+    } */
 }
