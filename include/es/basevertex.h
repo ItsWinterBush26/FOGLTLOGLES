@@ -127,4 +127,4 @@ struct MDElementsBaseVertexBatcher {
     }
 };
 
-std::shared_ptr<MDElementsBaseVertexBatcher> batcher;
+inline std::shared_ptr<MDElementsBaseVertexBatcher> batcher;
