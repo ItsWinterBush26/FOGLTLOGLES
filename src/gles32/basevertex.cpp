@@ -9,7 +9,7 @@
 void glMultiDrawElementsBaseVertex(GLenum mode, const GLsizei* count, GLenum type, const void* const* indices, GLsizei drawcount, const GLint* basevertex);
 
 void GLES32::registerBaseVertexFunction() {
-    REGISTER(glMultiDrawElementsBaseVertex);
+    // REGISTER(glMultiDrawElementsBaseVertex);
 }
 
 void glMultiDrawElementsBaseVertex(
@@ -70,7 +70,6 @@ void glMultiDrawElementsBaseVertex(
             
             // Clean up
             glDeleteBuffers(1, &tempBuffer);
-            sbb.restore();
         }
         
         // Move to next group
