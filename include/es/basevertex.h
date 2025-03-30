@@ -115,12 +115,9 @@ struct MDElementsBaseVertexBatcher {
         }
         
         SaveBoundedBuffer sbb(GL_COPY_WRITE_BUFFER);
-        OV_glBindBuffer(GL_COPY_WRITE_BUFFER, buffer);
-        glBufferData(GL_COPY_WRITE_BUFFER, cpuBuffer.size(), cpuBuffer.data(), GL_STREAM_DRAW);
-
-        SaveBoundedBuffer sbb2(GL_ELEMENT_ARRAY_BUFFER);
         OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
-        
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, cpuBuffer.size(), cpuBuffer.data(), GL_STREAM_DRAW);
+
         glEnable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
         glDrawElements(mode, newTotalIndices, type, (void*)0);
         glDisable(GL_PRIMITIVE_RESTART_FIXED_INDEX);
