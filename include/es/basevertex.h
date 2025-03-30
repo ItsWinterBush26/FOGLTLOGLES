@@ -1,6 +1,7 @@
 #pragma once
 
 #include "es/binding_saver.h"
+#include "gles20/buffer_tracking.h"
 #include <GLES3/gl32.h>
 #include <memory>
 
@@ -20,10 +21,15 @@ struct MDElementsBaseVertexBatcher {
         glGenBuffers(1, &buffer);
     }
 
+    ~MDElementsBaseVertexBatcher() {
+        glDeleteBuffers(1, &buffer);
+    }
+
     template<typename T>
     void batch(GLenum mode, GLenum type, std::vector<T>& mergedIndices, GLsizei totalIndices) {
         SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
 
+        OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER,
             mergedIndices.size() * sizeof(T),
             mergedIndices.data(),
