@@ -52,6 +52,11 @@ void glMultiDrawElements3(
     GLsizei primcount
 ) {
     if (primcount <= 0) return;
+    if (primcount > 32) {
+        for (GLsizei i = 0; i < primcount; ++i) {
+            if (count[i] > 0) glDrawElements(mode, count[i], type, indices[i]);
+        }
+    }
 
     GLint typeSize = getTypeSize(type);
     if (typeSize == 0) return; // Unsupported type
