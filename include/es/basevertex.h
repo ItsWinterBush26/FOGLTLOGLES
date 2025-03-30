@@ -45,6 +45,8 @@ template<typename T>
 inline void mergeIndices(const GLsizei* count, const void* const* indices, GLsizei drawcount, const GLint* basevertex, std::vector<T>& mergedIndices, GLsizei totalIndices) {
     mergedIndices.reserve(totalIndices);
     for (GLsizei i = 0; i < drawcount; i++) {
+        if (!indices[i]) continue;
+        
         // indices[i] is a pointer to T elements.
         const T* idx = static_cast<const T*>(indices[i]);
         for (GLsizei j = 0; j < count[i]; j++) {
