@@ -130,9 +130,15 @@ set(DEPENDENCIES
 	# Minimal static SPIRV-Cross
 	spirv-cross-core
 	spirv-cross-glsl
+
+    # Static OpenMP
+
+	# OpenMP static
+	-fopenmp
+	-static-openmp
 )
 
-# set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_OPTIONS -fopenmp)
+set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_OPTIONS -fopenmp)
 target_link_libraries(
 	${PROJECT_NAME} PRIVATE ${DEPENDENCIES}
 )

@@ -5,6 +5,8 @@
 
 #include <GLES3/gl3.h>
 #include <memory>
+#include <omp.h>
+#include <vector>
 
 inline GLint getTypeSize(GLenum type) {
     switch (type) {
@@ -41,17 +43,26 @@ struct MDElementsBatcher {
         OV_glBindBuffer(GL_COPY_WRITE_BUFFER, buffer);
         glBufferData(GL_COPY_WRITE_BUFFER, totalCount * typeSize, nullptr, GL_STREAM_DRAW);
 
-        GLsizei offset = 0;
+        std::vector<GLsizei> offsets(primcount);
+        GLsizei runningOffset = 0;
+        for (GLsizei i = 0; i < primcount; ++i) {
+            offsets[i] = runningOffset;
+            runningOffset += count[i] * typeSize;
+        }
+
+        #pragma omp parallel for \
+            if(primcount > 128) \
+            schedule(static, 1) \
+            num_threads(std::min(8, std::max(1, primcount / 64))) // scale threads
         for (GLsizei i = 0; i < primcount; ++i) {
             if (!count[i]) continue;
 
             GLsizei dataSize = count[i] * typeSize;
             if (sbb.boundedBuffer != 0) {
-                glCopyBufferSubData(GL_ELEMENT_ARRAY_BUFFER, GL_COPY_WRITE_BUFFER, (GLintptr)indices[i], offset, dataSize);
+                glCopyBufferSubData(GL_ELEMENT_ARRAY_BUFFER, GL_COPY_WRITE_BUFFER, (GLintptr)indices[i], offsets[i], dataSize);
             } else {
-                glBufferSubData(GL_COPY_WRITE_BUFFER, offset, dataSize, indices[i]);
+                glBufferSubData(GL_COPY_WRITE_BUFFER, offsets[i], dataSize, indices[i]);
             }
-            offset += dataSize;
         }
 
         OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);

@@ -2,8 +2,11 @@
 
 #include "es/binding_saver.h"
 #include "gles20/buffer_tracking.h"
+
 #include <GLES3/gl32.h>
 #include <memory>
+#include <omp.h>
+#include <vector>
 
 inline GLint getTypeSize(GLenum type) {
     switch (type) {
@@ -17,41 +20,50 @@ inline GLint getTypeSize(GLenum type) {
 struct MDElementsBaseVertexBatcher {
     GLuint buffer;
 
+    bool usable;
+
     MDElementsBaseVertexBatcher() {
         glGenBuffers(1, &buffer);
+
+        usable = (glGetError() == GL_NO_ERROR);
     }
 
     ~MDElementsBaseVertexBatcher() {
         glDeleteBuffers(1, &buffer);
     }
 
-    template<typename T>
-    void batch(GLenum mode, GLenum type, std::vector<T>& mergedIndices, GLsizei totalIndices) {
-        SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
+    void prepareBatch(
+        const GLsizei* counts,
+        GLsizei totalCount,
+        GLsizei typeSize,
+        GLsizei drawcount,
+        const void* const* indices,
+        SaveBoundedBuffer& sbb
+    ) {
+        OV_glBindBuffer(GL_COPY_WRITE_BUFFER, buffer);
+        glBufferData(GL_COPY_WRITE_BUFFER, totalCount * typeSize, nullptr, GL_STREAM_DRAW);
+
+        std::vector<GLsizei> offsets(drawcount);
+        GLsizei runningOffset = 0;
+        for (GLsizei i = 0; i < drawcount; ++i) {
+            offsets[i] = runningOffset;
+            runningOffset += counts[i] * typeSize;
+        }
+
+        #pragma omp parallel for if (drawcount > 128) schedule(static, 1) num_threads(std::min(omp_get_max_threads(), std::max(1, drawcount / 64)))
+        for (GLsizei i = 0; i < drawcount; ++i) {
+            if (!counts[i]) continue;
+
+            GLsizei dataSize = counts[i] * typeSize;
+            if (sbb.boundedBuffer != 0) {
+                glCopyBufferSubData(GL_ELEMENT_ARRAY_BUFFER, GL_COPY_WRITE_BUFFER, reinterpret_cast<GLintptr>(indices[i]), offsets[i], dataSize);
+            } else {
+                glBufferSubData(GL_COPY_WRITE_BUFFER, offsets[i], dataSize, indices[i]);
+            }
+        }
 
         OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-            mergedIndices.size() * sizeof(T),
-            mergedIndices.data(),
-            GL_STATIC_DRAW);
-
-        glDrawElements(mode, totalIndices, type, nullptr);
     }
 };
 
 inline std::shared_ptr<MDElementsBaseVertexBatcher> batcher;
-
-template<typename T>
-inline void mergeIndices(const GLsizei* count, const void* const* indices, GLsizei drawcount, const GLint* basevertex, std::vector<T>& mergedIndices, GLsizei totalIndices) {
-    mergedIndices.reserve(totalIndices);
-    for (GLsizei i = 0; i < drawcount; i++) {
-        if (!indices[i]) continue;
-        
-        // indices[i] is a pointer to T elements.
-        const T* idx = static_cast<const T*>(indices[i]);
-        for (GLsizei j = 0; j < count[i]; j++) {
-            // Adjust each index by the corresponding basevertex.
-            mergedIndices.push_back(idx[j] + static_cast<T>(basevertex[i]));
-        }
-    }
-}
