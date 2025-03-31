@@ -39,21 +39,56 @@ struct MDElementsBatcher {
         SaveBoundedBuffer sbb
     ) {
         if (!usable) return;
+        int threadSize = std::min(omp_get_max_thread(), std::max(1, primcount / 64));
 
         OV_glBindBuffer(GL_COPY_WRITE_BUFFER, buffer);
         glBufferData(GL_COPY_WRITE_BUFFER, totalCount * typeSize, nullptr, GL_STREAM_DRAW);
 
         std::vector<GLsizei> offsets(primcount);
-        GLsizei runningOffset = 0;
-        for (GLsizei i = 0; i < primcount; ++i) {
-            offsets[i] = runningOffset;
-            runningOffset += count[i] * typeSize;
+        if (primcount < 5000) {
+            GLsizei runningOffset = 0;
+            for (GLsizei i = 0; i < primcount; ++i) {
+                offsets[i] = runningOffset;
+                runningOffset += count[i] * typeSize;
+            }
+        } else {
+            std::vector<GLsizei> localSums(threadSize, 0);
+
+            #pragma omp parallel num_threads(threadSize)
+            {
+                int threadID = omp_get_thread_num();
+                int start = (primcount * threadID) / threadSize;
+                int end = (primcount * (threadID + 1)) / threadSize;
+
+                GLsizei localSum = 0;
+
+                #pragma omp for schedule(static)
+                for (int i = 0; i < primcount; ++i) {
+                    offsets[i] = localSum;
+                    localSum += count[i] * typeSize;
+                }
+
+                localSums[threadID] = localSum;
+
+                #pragma omp barrier  // Ensure all threads finish their local sums
+
+                GLsizei globalOffset = 0;
+                for (int j = 0; j < threadID; ++j) {
+                    globalOffset += localSums[j];
+                }
+
+                #pragma omp for schedule(static)
+                for (int i = 0; i < primcount; ++i) {
+                    offsets[i] += globalOffset;
+                }
+            }
         }
+
 
         #pragma omp parallel for \
             if(primcount > 128) \
-            schedule(static, 1) \
-            num_threads(std::min(8, std::max(1, primcount / 64))) // scale threads
+            schedule(static, primcount / threadSize) \
+            num_threads(threadSize) // scale threads
         for (GLsizei i = 0; i < primcount; ++i) {
             if (!count[i]) continue;
 
