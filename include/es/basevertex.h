@@ -70,6 +70,8 @@ struct MDElementsBaseVertexBatcher {
                                               drawcount * sizeof(indirect_pass_t),
                                               GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
         if (!mappedBuffer) return;
+        indirect_pass_t* commands = static_cast<indirect_pass_t*>(mappedBuffer);
+
 
         GLsizei uniqueDrawcount = 0;
     indirect_pass_t lastCommand = {};  // Initialize to zero, this will be compared against incoming commands
@@ -79,7 +81,7 @@ struct MDElementsBaseVertexBatcher {
     for (GLsizei i = 0; i < drawcount; ++i) {
         uintptr_t indicesPtr = reinterpret_cast<uintptr_t>(indices[i]);
         indirect_pass_t command = {
-            counts[i],
+            static_cast<GLuint>(counts[i]),
             1, // instanceCount is always 1
             static_cast<GLuint>(indicesPtr / typeSize),
             basevertex[i],
