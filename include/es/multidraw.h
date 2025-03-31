@@ -58,7 +58,7 @@ struct MDElementsBatcher {
                 GLsizei dataSize = count[i] * typeSize;
             
                 if (sbb.boundedBuffer != 0) {
-                    glCopyBufferSubData(GL_ELEMENT_ARRAY_BUFFER, GL_COPY_WRITE_BUFFER, (GLintptr)indices[i], offset, dataSize)    
+                    glCopyBufferSubData(GL_ELEMENT_ARRAY_BUFFER, GL_COPY_WRITE_BUFFER, (GLintptr)indices[i], offset, dataSize);    
                 } else {
                     glBufferSubData(GL_COPY_WRITE_BUFFER, offset, dataSize, indices[i]);
                 }
