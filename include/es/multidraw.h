@@ -46,19 +46,24 @@ struct MDElementsBatcher {
 
         GLsizei offset = 0;
         #pragma omp parallel for \
-            if(drawcount > 256) \
+            if(primcount > 256) \
             schedule(static, 1) \
-            reduction(+:offset)
+            reduction(+:offset) \
+            ordered
         for (GLsizei i = 0; i < primcount; ++i) {
             if (!count[i]) continue;
-
-            GLsizei dataSize = count[i] * typeSize;
-            if (sbb.boundedBuffer != 0) {
-                glCopyBufferSubData(GL_ELEMENT_ARRAY_BUFFER, GL_COPY_WRITE_BUFFER, (GLintptr)indices[i], offset, dataSize);
-            } else {
-                glBufferSubData(GL_COPY_WRITE_BUFFER, offset, dataSize, indices[i]);
+            #pragma omp ordered
+            {
+                GLsizei dataSize = count[i] * typeSize;
+            
+                if (sbb.boundedBuffer != 0) {
+                    glCopyBufferSubData(GL_ELEMENT_ARRAY_BUFFER, GL_COPY_WRITE_BUFFER, (GLintptr)indices[i], offset, dataSize)    
+                } else {
+                    glBufferSubData(GL_COPY_WRITE_BUFFER, offset, dataSize, indices[i]);
+                }
+            
+                offset += dataSize;
             }
-            offset += dataSize;
         }
 
         OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
