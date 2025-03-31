@@ -15,6 +15,11 @@ void GLES32::registerBaseVertexFunction() {
     // batcher = MakeAggregateShared<MDElementsBaseVertexBatcher>();
 }
 
+template<typename T>
+inline uint32_t getIndex(const void* const* indices, GLsizei i, GLsizei j, GLint base) {
+    return reinterpret_cast<const T*>(indices[i])[j] + base;
+}
+
 void glMultiDrawElementsBaseVertex(
     GLenum mode,
     const GLsizei* count,
@@ -57,18 +62,18 @@ void glMultiDrawElementsBaseVertex(
         for (GLsizei j = 0; j < count[i]; ++j) {
             uint32_t index = 0;
             switch (type) {
-                case GL_UNSIGNED_INT: {
-                    index = static_cast<uint32_t>(indices[i][j]) + base;
+                case GL_UNSIGNED_INT:
+                    index = getIndex<uint32_t>(indices, i, j, base);
                     break;
-                }
-                case GL_UNSIGNED_SHORT: {
-                    index = static_cast<uint32_t>(indices[i][j]) + base;
+                
+                case GL_UNSIGNED_SHORT:
+                    index = getIndex<uint16_t>(indices, i, j, base);
                     break;
-                }
-                case GL_UNSIGNED_BYTE: {
-                    index = static_cast<uint32_t>(indices[i][j]) + base;
+                
+                case GL_UNSIGNED_BYTE:
+                    index = getIndex<uint8_t>(indices, i, j, base);
                     break;
-                }
+                
                 default:
                     // Unsupported index type.
                     break;
