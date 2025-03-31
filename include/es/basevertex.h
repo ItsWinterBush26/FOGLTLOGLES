@@ -88,7 +88,7 @@ struct MDElementsBaseVertexBatcher {
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
 
         // Execute batched indirect draw
-        #pragma omp parallel for schedule(static, 4)
+        #pragma omp parallel for schedule(static, 4) ordered
         for (GLsizei i = 0; i < drawcount; ++i) {
             #pragma omp ordered
             {
