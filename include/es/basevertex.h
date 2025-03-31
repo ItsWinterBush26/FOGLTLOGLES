@@ -73,20 +73,23 @@ struct MDElementsBaseVertexBatcher {
     ) {
         // Basic validation
         if (!usable) return;
-        if (!counts || !indices || !basevertex || drawcount <= 0) return;
+        // if (!counts || !indices || !basevertex || drawcount <= 0) return;
         
-        const GLint typeSize = getTypeSize(type);
-        if (typeSize == 0) return;
+        // const GLint typeSize = getTypeSize(type);
+        // if (typeSize == 0) return;
         
         // For small batch counts, just use multiple direct draw calls
-        if (drawcount <= 4) {
-            for (GLsizei i = 0; i < drawcount; ++i) {
-                if (counts[i] <= 0) continue;
-                glDrawElementsBaseVertex(mode, counts[i], type, indices[i], basevertex[i]);
-            }
-            return;
+        // if (drawcount <= 4) {
+        #pragma omp parallel for \
+            schedule(static, 1) \
+            num_threads(std::min(8, std::max(1, drawcount / 64))) // scale threads
+        for (GLsizei i = 0; i < drawcount; ++i) {
+            if (counts[i] < 1) continue;
+            glDrawElementsBaseVertex(mode, counts[i], type, indices[i], basevertex[i]);
         }
-        
+            // return;
+        // }
+        /*
         // Calculate total indices including the primitive restart markers
         GLsizei totalIndices = 0;
         for (GLsizei i = 0; i < drawcount; ++i) {
@@ -235,6 +238,7 @@ struct MDElementsBaseVertexBatcher {
                 }
                 break;
         }
+        */
     }
 };
 
