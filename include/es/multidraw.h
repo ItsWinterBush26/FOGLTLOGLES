@@ -39,7 +39,7 @@ struct MDElementsBatcher {
         SaveBoundedBuffer sbb
     ) {
         if (!usable) return;
-        int threadSize = std::min(omp_get_max_threads(), std::max(1, primcount / 64));
+        int threadSize = std::min(omp_get_max_threads(), std::max(1, primcount / 128));
 
         OV_glBindBuffer(GL_COPY_WRITE_BUFFER, buffer);
         glBufferData(GL_COPY_WRITE_BUFFER, totalCount * typeSize, nullptr, GL_STREAM_DRAW);
@@ -47,8 +47,9 @@ struct MDElementsBatcher {
         GLsizei offset = 0;
         #pragma omp parallel for \
             if(primcount > 256) \
-            schedule(static, 1) \
+            schedule(static, primcount / threadSize) \
             reduction(+:offset) \
+            num_threads(threadSize) \
             ordered
         for (GLsizei i = 0; i < primcount; ++i) {
             if (!count[i]) continue;
