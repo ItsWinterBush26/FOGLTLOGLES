@@ -45,7 +45,7 @@ struct MDElementsBaseVertexBatcher {
         glDeleteBuffers(2, indirectBuffers);
     }
 
-    void batchAndDraw(
+    void batch(
         GLenum mode,
         const GLsizei* counts,
         GLenum type,
@@ -88,7 +88,13 @@ struct MDElementsBaseVertexBatcher {
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
 
         // Execute batched indirect draw
-        glMultiDrawElementsIndirect(mode, type, nullptr, drawcount, 0);
+        #pragma omp parallel for schedule(static, 4)
+        for (GLsizei i = 0; i < drawcount; ++i) {
+            #pragma omp ordered
+            {
+                glDrawElementsIndirect(mode, type, reinterpret_cast<const void*>(i * sizeof(indirect_pass_t)));
+            }
+        }
     }
 };
 
