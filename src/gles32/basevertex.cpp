@@ -58,18 +58,15 @@ void glMultiDrawElementsBaseVertex(
             uint32_t index = 0;
             switch (type) {
                 case GL_UNSIGNED_INT: {
-                    const uint32_t* u32 = reinterpret_cast<const uint32_t*>(indices[i]);
-                    index = u32[j] + base;
+                    index = static_cast<uint32_t>(indices[i][j]) + base;
                     break;
                 }
                 case GL_UNSIGNED_SHORT: {
-                    const uint16_t* u16 = reinterpret_cast<const uint16_t*>(indices[i]);
-                    index = static_cast<uint32_t>(u16[j]) + base;
+                    index = static_cast<uint32_t>(indices[i][j]) + base;
                     break;
                 }
                 case GL_UNSIGNED_BYTE: {
-                    const uint8_t* u8 = reinterpret_cast<const uint8_t*>(indices[i]);
-                    index = static_cast<uint32_t>(u8[j]) + base;
+                    index = static_cast<uint32_t>(indices[i][j]) + base;
                     break;
                 }
                 default:
