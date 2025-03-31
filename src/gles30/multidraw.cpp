@@ -6,6 +6,7 @@
 #include "utils/pointers.h"
 
 #include <GLES3/gl3.h>
+#include <omp.h>
 
 void glMultiDrawArrays3(GLenum mode, const GLint* first, const GLsizei* count, GLsizei drawcount);
 void glMultiDrawElements3(GLenum mode, const GLsizei* count, GLenum type, const void* const* indices, GLsizei drawcount);
@@ -56,12 +57,20 @@ void glMultiDrawElements3(
         for (GLsizei i = 0; i < primcount; ++i) {
             if (count[i] > 0) glDrawElements(mode, count[i], type, indices[i]);
         }
+        return;
     }
+
+    GLsizei threadNum = std::min(omp_get_max_threads(), std::max(1, primcount / 64));
 
     GLint typeSize = getTypeSize(type);
     if (typeSize == 0) return; // Unsupported type
     
     GLsizei totalCount = 0;
+    #pragma omp parallel for \
+        if(primcount > 512) \
+        schedule(static, primcount / threadNum) \
+        num_threads(threadNum) \
+        reduction(+:totalCount)
     for (GLsizei i = 0; i < primcount; ++i) totalCount += count[i];
     if (totalCount == 0) return;
 
