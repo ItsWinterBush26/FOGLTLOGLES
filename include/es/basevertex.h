@@ -71,30 +71,35 @@ struct MDElementsBaseVertexBatcher {
                                               GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
         if (!mappedBuffer) return;
 
-        // Populate commands in parallel
-        indirect_pass_t* commands = static_cast<indirect_pass_t*>(mappedBuffer);
-        
-        #pragma omp parallel for schedule(static, 4)
-        for (GLsizei i = 0; i < drawcount; ++i) {
-            uintptr_t indicesPtr = reinterpret_cast<uintptr_t>(indices[i]);
-            commands[i].count = counts[i];
-            commands[i].instanceCount = 1;
-            commands[i].firstIndex = static_cast<GLuint>(indicesPtr / typeSize);
-            commands[i].baseVertex = basevertex[i];
-            commands[i].reservedMustBeZero = 0;
-        }
+        GLsizei uniqueDrawcount = 0;
+    indirect_pass_t lastCommand = {};  // Initialize to zero, this will be compared against incoming commands
 
-        // Unmap
-        glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
+    // Populate commands with deduplication
+    #pragma omp parallel for schedule(static, 4) reduction(+:uniqueDrawcount) private(lastCommand)
+    for (GLsizei i = 0; i < drawcount; ++i) {
+        uintptr_t indicesPtr = reinterpret_cast<uintptr_t>(indices[i]);
+        indirect_pass_t command = {
+            counts[i],
+            1, // instanceCount is always 1
+            static_cast<GLuint>(indicesPtr / typeSize),
+            basevertex[i],
+            0 // reservedMustBeZero
+        };
 
-        // Execute batched indirect draw
-        // #pragma omp parallel for schedule(static, 4) ordered
-        for (GLsizei i = 0; i < drawcount; ++i) {
-            /* #pragma omp ordered
-            { */
-                glDrawElementsIndirect(mode, type, reinterpret_cast<const void*>(i * sizeof(indirect_pass_t)));
-            // }
+        // If the current command is different from the last one, add it
+        if (memcmp(&command, &lastCommand, sizeof(indirect_pass_t)) != 0) {
+            commands[uniqueDrawcount++] = command;
+            lastCommand = command;  // Update the last command
         }
+    }
+
+    // Unmap
+    glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
+
+    // Execute batched indirect draw with deduplication
+    for (GLsizei i = 0; i < uniqueDrawcount; ++i) {
+        glDrawElementsIndirect(mode, type, reinterpret_cast<const void*>(i * sizeof(indirect_pass_t)));
+    }
     }
 };
 
