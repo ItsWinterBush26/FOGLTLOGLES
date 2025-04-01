@@ -58,38 +58,33 @@ struct MDElementsBaseVertexBatcher {
         if (typeSize == 0) return;
         if (trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER] == 0) return;
 
-        std::vector<indirect_pass_t> commands; // Accumulate all commands here.
+        indirect_pass_t current = {
+            static_cast<GLuint>(counts[0]),
+            1,
+            static_cast<GLuint>(reinterpret_cast<uintptr_t>(indices[0]) / getTypeSize(type)),
+            basevertex[0],
+            0
+        };
 
-indirect_pass_t current = {
-    static_cast<GLuint>(counts[0]),
-    1,
-    static_cast<GLuint>(reinterpret_cast<uintptr_t>(indices[0]) / getTypeSize(type)),
-    basevertex[0],
-    0
-};
-
-for (GLsizei i = 1; i < drawcount; ++i) {
-    GLuint nextFirstIndex = static_cast<GLuint>(reinterpret_cast<uintptr_t>(indices[i]) / getTypeSize(type));
-
-    // Check if current command can be merged with the next one
-    if (current.firstIndex + current.count == nextFirstIndex && current.baseVertex == basevertex[i]) {
-        current.count += static_cast<GLuint>(counts[i]);
-    } else {
-        commands.push_back(current); // Push the current command
-        current.count = static_cast<GLuint>(counts[i]);
-        current.firstIndex = nextFirstIndex;
-        current.baseVertex = basevertex[i];
-    }
-}
-commands.push_back(current); // Push the last command
-
-SaveBoundedBuffer sbb(GL_DRAW_INDIRECT_BUFFER);
-OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffer);
-glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(indirect_pass_t) * commands.size(), commands.data(), GL_STREAM_DRAW);
+        SaveBoundedBuffer sbb(GL_DRAW_INDIRECT_BUFFER);
+        OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffer);
         
-        for (GLint i = 0; i < commands.size(); ++i) {
-            glDrawElementsIndirect(mode, type, reinterpret_cast<const void*>(i * sizeof(indirect_pass_t)));
+        for (GLsizei i = 1; i < drawcount; ++i) {
+            GLuint nextFirstIndex = static_cast<GLuint>(reinterpret_cast<uintptr_t>(indices[i]) / getTypeSize(type));
+
+             if (current.firstIndex + current.count == nextFirstIndex && current.baseVertex == basevertex[i]) {
+                current.count += static_cast<GLuint>(counts[i]);
+            } else {
+                glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(indirect_pass_t), &current, GL_STREAM_DRAW);
+                glDrawElementsIndirect(mode, type, reinterpret_cast<const void*>(0));
+
+                current.count = static_cast<GLuint>(counts[i]);
+                current.firstIndex = nextFirstIndex;
+                current.baseVertex = basevertex[i];
+            }
         }
+        glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(indirect_pass_t), &current, GL_STREAM_DRAW);
+        glDrawElementsIndirect(mode, type, reinterpret_cast<const void*>(0));
     }
 };
 
