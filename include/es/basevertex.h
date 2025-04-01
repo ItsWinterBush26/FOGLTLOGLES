@@ -78,7 +78,7 @@ struct MDElementsBaseVertexBatcher {
         // glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
         SaveBoundedBuffer sbb(GL_DRAW_INDIRECT_BUFFER);
         OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffer);
-        glBufferData(GL_DRAW_INDIRECT_BUFFER, (long) sizeof(indirect_pass_t) * drawcount, commands, GL_STREAM_DRAW);
+        glBufferData(GL_DRAW_INDIRECT_BUFFER, static_cast<long>(drawcount * sizeof(indirect_pass_t)), static_cast<const void*>(commands.data()), GL_STREAM_DRAW);
 
         for (GLsizei i = 0; i < drawcount; ++i) {
             glDrawElementsIndirect(mode, type, reinterpret_cast<const void*>(i * sizeof(indirect_pass_t)));
