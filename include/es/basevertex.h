@@ -35,7 +35,7 @@ struct MDElementsBaseVertexBatcher {
         glGenBuffers(1, &indirectBuffer);
 
         SaveBoundedBuffer sbb(GL_DRAW_INDIRECT_BUFFER);
-        OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffers);
+        OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffer);
         glBufferData(GL_DRAW_INDIRECT_BUFFER, 512 * sizeof(indirect_pass_t), nullptr, GL_STREAM_DRAW);
     }
 
@@ -64,7 +64,7 @@ struct MDElementsBaseVertexBatcher {
         );
         
         if (!mappedBuffer) return; */
-        indirect_pass_t* commands[drawcount]; // = static_cast<indirect_pass_t*>(mappedBuffer)
+        std::array<indirect_pass_t*, drawcount> commands; // = static_cast<indirect_pass_t*>(mappedBuffer)
         
         #pragma omp parallel for schedule(static, drawcount / omp_get_max_threads()) num_threads(omp_get_max_threads())
         for (GLsizei i = 0; i < drawcount; ++i) {
