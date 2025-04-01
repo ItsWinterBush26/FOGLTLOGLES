@@ -76,15 +76,16 @@ struct MDElementsBaseVertexBatcher {
                 current.count += static_cast<GLuint>(counts[i]);
             } else {
                 glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(indirect_pass_t), &current, GL_STREAM_DRAW);
-                glDrawElementsIndirect(mode, type, reinterpret_cast<const void*>(0));
+                glDrawElementsIndirect(mode, type, nullptr);
 
                 current.count = static_cast<GLuint>(counts[i]);
                 current.firstIndex = nextFirstIndex;
                 current.baseVertex = basevertex[i];
             }
         }
+        
         glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(indirect_pass_t), &current, GL_STREAM_DRAW);
-        glDrawElementsIndirect(mode, type, reinterpret_cast<const void*>(0));
+        glDrawElementsIndirect(mode, type, nullptr);
     }
 };
 
