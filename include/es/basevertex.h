@@ -58,32 +58,32 @@ struct MDElementsBaseVertexBatcher {
         if (typeSize == 0) return;
         if (trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER] == 0) return;
 
-        GLuint totalCount;
-        GLuint totalFirstIndex;
-        GLint totalBaseVertex;
-        
-        #pragma omp parallel for schedule(static, 2) num_threads(4) if(drawcount > 256) \
-            reduction(+:totalCount) \
-            reduction(+:totalFirstIndex) \
-            reduction(+:totalBaseVertex)
-        for (GLsizei i = 0; i < drawcount; ++i) {
-            totalCount += static_cast<GLuint>(counts[i]);
-            totalFirstIndex += static_cast<GLuint>(reinterpret_cast<uintptr_t>(indices[i]) / typeSize);
-            totalBaseVertex += basevertex[i];
-        }
-
-        indirect_pass_t command = {
-            totalCount,
+        indirect_pass_t current = {
+            static_cast<GLuint>(counts[0]),
             1,
-            totalFirstIndex,
-            totalBaseVertex,
+            static_cast<GLuint>(reinterpret_cast<uintptr_t>(indices[0]) / getTypeSize(type)),
+            basevertex[0],
             0
         };
-        
+
         SaveBoundedBuffer sbb(GL_DRAW_INDIRECT_BUFFER);
         OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffer);
-        glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(indirect_pass_t), &command, GL_STREAM_DRAW);
+        
+        for (GLsizei i = 1; i < drawcount; ++i) {
+            GLuint nextFirstIndex = static_cast<GLuint>(reinterpret_cast<uintptr_t>(indices[i]) / getTypeSize(type));
 
+             if (current.firstIndex + current.count == nextFirstIndex && current.baseVertex == basevertex[i]) {
+                current.count += static_cast<GLuint>(counts[i]);
+            } else {
+                glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(indirect_pass_t), &current, GL_STREAM_DRAW);
+                glDrawElementsIndirect(mode, type, reinterpret_cast<const void*>(0));
+
+                current.count = static_cast<GLuint>(counts[i]);
+                current.firstIndex = nextFirstIndex;
+                current.baseVertex = basevertex[i];
+            }
+        }
+        glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(indirect_pass_t), &current, GL_STREAM_DRAW);
         glDrawElementsIndirect(mode, type, reinterpret_cast<const void*>(0));
     }
 };
