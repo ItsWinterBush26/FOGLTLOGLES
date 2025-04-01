@@ -73,11 +73,11 @@ struct MDElementsBaseVertexBatcher {
         indirect_pass_t* commands = static_cast<indirect_pass_t*>(mappedBuffer);
 
 
-        GLsizei uniqueDrawcount = 0;
-    indirect_pass_t lastCommand = {};  // Initialize to zero, this will be compared against incoming commands
+        // GLsizei uniqueDrawcount = 0;
+    // indirect_pass_t lastCommand = {};  // Initialize to zero, this will be compared against incoming commands
 
-    // Populate commands with deduplication
-    #pragma omp parallel for schedule(static, 4) reduction(+:uniqueDrawcount) private(lastCommand)
+    // Populate commands with ~~deduplication~~ (no more dedupe)
+    #pragma omp parallel for schedule(static, drawcount / omp_get_max_threads()) reduction(+:uniqueDrawcount) num_threads(omp_get_max_threads())
     for (GLsizei i = 0; i < drawcount; ++i) {
         uintptr_t indicesPtr = reinterpret_cast<uintptr_t>(indices[i]);
         indirect_pass_t command = {
@@ -88,18 +88,20 @@ struct MDElementsBaseVertexBatcher {
             0 // reservedMustBeZero
         };
 
+        commands[i] = command;
+
         // If the current command is different from the last one, add it
-        if (memcmp(&command, &lastCommand, sizeof(indirect_pass_t)) != 0) {
+        /* if (memcmp(&command, &lastCommand, sizeof(indirect_pass_t)) != 0) {
             commands[uniqueDrawcount++] = command;
             lastCommand = command;  // Update the last command
-        }
+        } */
     }
 
     // Unmap
     glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
 
     // Execute batched indirect draw with deduplication
-    for (GLsizei i = 0; i < uniqueDrawcount; ++i) {
+    for (GLsizei i = 0; i < drawcount; ++i) {
         glDrawElementsIndirect(mode, type, reinterpret_cast<const void*>(i * sizeof(indirect_pass_t)));
     }
     }
