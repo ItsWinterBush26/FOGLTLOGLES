@@ -1,6 +1,7 @@
 #pragma once
 
 #include "es/binding_saver.h"
+#include "es/state_tracking.h"
 #include "gles20/buffer_tracking.h"
 
 #include <GLES3/gl32.h>
@@ -28,21 +29,18 @@ struct indirect_pass_t {
 };
 
 struct MDElementsBaseVertexBatcher {
-    GLuint indirectBuffers[2]; // Double buffering
-    int currentBuffer = 0;     // Buffer swap index
-
+    GLuint indirectBuffer;
+    
     MDElementsBaseVertexBatcher() {
-        glGenBuffers(2, indirectBuffers);
+        glGenBuffers(1, &indirectBuffer);
 
         SaveBoundedBuffer sbb(GL_DRAW_INDIRECT_BUFFER);
-        for (int i = 0; i < 2; i++) {
-            OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffers[i]);
-            glBufferData(GL_DRAW_INDIRECT_BUFFER, 512 * sizeof(indirect_pass_t), nullptr, GL_STREAM_DRAW);
-        }
+        OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffers);
+        glBufferData(GL_DRAW_INDIRECT_BUFFER, 512 * sizeof(indirect_pass_t), nullptr, GL_STREAM_DRAW);
     }
 
     ~MDElementsBaseVertexBatcher() {
-        glDeleteBuffers(2, indirectBuffers);
+        glDeleteBuffers(1, &indirectBuffer);
     }
 
     void batch(
@@ -58,60 +56,36 @@ struct MDElementsBaseVertexBatcher {
         GLint typeSize = getTypeSize(type);
         if (typeSize == 0) return;
 
-        // Swap buffers
-        currentBuffer = (currentBuffer + 1) % 2;
-        GLuint buffer = indirectBuffers[currentBuffer];
-
+        if (trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER_BINDING] == 0) return;
+        /* void* mappedBuffer = glMapBufferRange(
+            GL_DRAW_INDIRECT_BUFFER, 0, 
+            drawcount * sizeof(indirect_pass_t),
+            GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT
+        );
+        
+        if (!mappedBuffer) return; */
+        indirect_pass_t* commands[drawcount]; // = static_cast<indirect_pass_t*>(mappedBuffer)
+        
+        #pragma omp parallel for schedule(static, drawcount / omp_get_max_threads()) num_threads(omp_get_max_threads())
+        for (GLsizei i = 0; i < drawcount; ++i) {
+            commands[i] = {
+                static_cast<GLuint>(counts[i]),
+                1, // instanceCount is always 1
+                static_cast<GLuint>(reinterpret_cast<uintptr_t>(indices[i]) / typeSize),   
+                basevertex[i], 
+                0 // reservedMustBeZero
+            };
+        }
+        
+        // glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
         SaveBoundedBuffer sbb(GL_DRAW_INDIRECT_BUFFER);
-        OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, buffer);
+        OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffer);
+        glBufferData(GL_DRAW_INDIRECT_BUFFER, (long) sizeof(indirect_pass_t) * drawcount, commands, GL_STREAM_DRAW);
 
-        // Map with invalidation to prevent stalls
-        void* mappedBuffer = glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 
-                                              drawcount * sizeof(indirect_pass_t),
-                                              GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-        if (!mappedBuffer) return;
-        indirect_pass_t* commands = static_cast<indirect_pass_t*>(mappedBuffer);
-
-
-        // GLsizei uniqueDrawcount = 0;
-    // indirect_pass_t lastCommand = {};  // Initialize to zero, this will be compared against incoming commands
-
-    // Populate commands with ~~deduplication~~ (no more dedupe)
-    #pragma omp parallel for schedule(static, drawcount / omp_get_max_threads()) num_threads(omp_get_max_threads())
-    for (GLsizei i = 0; i < drawcount; ++i) {
-        // uintptr_t indicesPtr = reinterpret_cast<uintptr_t>(indices[i]);
-        /*indirect_pass_t command = {
-            static_cast<GLuint>(counts[i]),
-            1, // instanceCount is always 1
-            static_cast<GLuint>(indicesPtr / typeSize),
-            basevertex[i],
-            0 // reservedMustBeZero
-        }; */
-
-        commands[i] = {
-            static_cast<GLuint>(counts[i]),
-            1, // instanceCount is always 1
-            static_cast<GLuint>(reinterpret_cast<uintptr_t>(indices[i]) / typeSize),
-            basevertex[i],
-            0 // reservedMustBeZero
-        };
-
-        // If the current command is different from the last one, add it
-        /* if (memcmp(&command, &lastCommand, sizeof(indirect_pass_t)) != 0) {
-            commands[uniqueDrawcount++] = command;
-            lastCommand = command;  // Update the last command
-        } */
-    }
-
-    // Unmap
-    glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
-
-    // Execute batched indirect draw with deduplication
-    for (GLsizei i = 0; i < drawcount; ++i) {
-        glDrawElementsIndirect(mode, type, reinterpret_cast<const void*>(i * sizeof(indirect_pass_t)));
-    }
+        for (GLsizei i = 0; i < drawcount; ++i) {
+            glDrawElementsIndirect(mode, type, reinterpret_cast<const void*>(i * sizeof(indirect_pass_t)));
+        }
     }
 };
 
-// Inline global shared pointer
 inline std::shared_ptr<MDElementsBaseVertexBatcher> batcher;
