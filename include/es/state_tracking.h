@@ -68,6 +68,7 @@ struct TrackedStates {
     FAST_MAP_BI(GLuint, GLenum) renderbufferInternalFormats;
 
     // Type, Buffer
+    // NOTE: Type is NOT a binding enum
     FAST_MAP_BI(GLenum, GLuint) boundBuffers;
 
     TrackedStates() {
