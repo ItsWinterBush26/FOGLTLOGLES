@@ -54,7 +54,7 @@ struct MDElementsBaseVertexBatcher {
         GLint typeSize = getTypeSize(type);
         if (typeSize == 0) return;
 
-        if (trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER_BINDING] == 0) return;
+        if (trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER] == 0) return;
         /* void* mappedBuffer = glMapBufferRange(
             GL_DRAW_INDIRECT_BUFFER, 0, 
             drawcount * sizeof(indirect_pass_t),
