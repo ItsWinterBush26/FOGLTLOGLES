@@ -58,25 +58,33 @@ struct MDElementsBaseVertexBatcher {
         if (typeSize == 0) return;
         if (trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER] == 0) return;
 
-        std::vector<indirect_pass_t> commands(drawcount);
-        #pragma omp parallel for schedule(static, 2) num_threads(4) if(drawcount > 256)
+        GLuint totalCount;
+        GLuint totalFirstIndex;
+        GLint totalBaseVertex;
+        
+        #pragma omp parallel for schedule(static, 2) num_threads(4) if(drawcount > 256) \
+            reduction(+:totalCount) \
+            reduction(+:totalFirstIndex) \
+            reduction(+:totalBaseVertex)
         for (GLsizei i = 0; i < drawcount; ++i) {
-            indirect_pass_t* command = &commands[i];
-             
-            command->count = static_cast<GLuint>(counts[i]);
-            // command->instanceCount = 1, // instanceCount is always 1
-            command->firstIndex = static_cast<GLuint>(reinterpret_cast<uintptr_t>(indices[i]) / typeSize);
-            command->baseVertex = basevertex[i];
-            // command->reservedMustBeZero = 0; // reservedMustBeZero
+            totalCount += static_cast<GLuint>(counts[i]);
+            totalFirstIndex += static_cast<GLuint>(reinterpret_cast<uintptr_t>(indices[i]) / typeSize);
+            totalBaseVertex += basevertex[i];
         }
+
+        indirect_pass_t command = {
+            totalCount,
+            1,
+            totalFirstIndex,
+            totalBaseVertex,
+            0
+        };
         
         SaveBoundedBuffer sbb(GL_DRAW_INDIRECT_BUFFER);
         OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffer);
-        glBufferData(GL_DRAW_INDIRECT_BUFFER, static_cast<long>(drawcount * sizeof(indirect_pass_t)), static_cast<const void*>(commands.data()), GL_STREAM_DRAW);
+        glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(indirect_pass_t), &command, GL_STREAM_DRAW);
 
-        for (GLsizei i = 0; i < drawcount; ++i) {
-            glDrawElementsIndirect(mode, type, reinterpret_cast<const void*>(i * sizeof(indirect_pass_t)));
-        }
+        glDrawElementsIndirect(mode, type, reinterpret_cast<const void*>(0));
     }
 };
 
