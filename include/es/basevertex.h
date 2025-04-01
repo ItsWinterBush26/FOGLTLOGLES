@@ -63,17 +63,17 @@ struct MDElementsBaseVertexBatcher {
 
              if (current.firstIndex + current.count == nextFirstIndex && current.baseVertex == basevertex[i]) {
                 current.count += counts[i];
-                LOGI("Merged!");
+                // LOGI("Merged!");
             } else {
-                glDrawElementsBaseVertex(mode, current.count, type, reinterpret_cast<const void*>(current.firstIndex), current.baseVertex);
+                glDrawElementsBaseVertex(mode, current.count, type, reinterpret_cast<const void*>(current.firstIndex * typeSize), current.baseVertex);
 
                 current.count = counts[i];
-                current.firstIndex = nextFirstIndex * typeSize;
+                current.firstIndex = nextFirstIndex;
                 current.baseVertex = basevertex[i];
             }
         }
 
-        glDrawElementsBaseVertex(mode, current.count, type, reinterpret_cast<const void*>(current.firstIndex), current.baseVertex);
+        glDrawElementsBaseVertex(mode, current.count, type, reinterpret_cast<const void*>(current.firstIndex * typeSize), current.baseVertex);
     }
 };
 
