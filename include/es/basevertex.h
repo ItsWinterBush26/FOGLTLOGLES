@@ -5,11 +5,9 @@
 #include "gles20/buffer_tracking.h"
 
 #include <GLES3/gl32.h>
-#include <vector>
-#include <cstring>
 #include <memory>
-#include <algorithm>
 #include <omp.h>
+#include <vector>
 
 inline GLint getTypeSize(GLenum type) {
     switch (type) {
@@ -22,7 +20,7 @@ inline GLint getTypeSize(GLenum type) {
 
 struct indirect_pass_t {
     GLuint count;
-    GLuint instanceCount;
+    GLuint instanceCount = 1;
     GLuint firstIndex;
     GLint baseVertex;
     GLuint reservedMustBeZero;
@@ -34,9 +32,9 @@ struct MDElementsBaseVertexBatcher {
     MDElementsBaseVertexBatcher() {
         glGenBuffers(1, &indirectBuffer);
 
-        SaveBoundedBuffer sbb(GL_DRAW_INDIRECT_BUFFER);
+        /* SaveBoundedBuffer sbb(GL_DRAW_INDIRECT_BUFFER);
         OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffer);
-        glBufferData(GL_DRAW_INDIRECT_BUFFER, 512 * sizeof(indirect_pass_t), nullptr, GL_STREAM_DRAW);
+        glBufferData(GL_DRAW_INDIRECT_BUFFER, 512 * sizeof(indirect_pass_t), nullptr, GL_STREAM_DRAW); */
     }
 
     ~MDElementsBaseVertexBatcher() {
@@ -60,21 +58,21 @@ struct MDElementsBaseVertexBatcher {
         /* void* mappedBuffer = glMapBufferRange(
             GL_DRAW_INDIRECT_BUFFER, 0, 
             drawcount * sizeof(indirect_pass_t),
-            GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT
-        );
-        
-        if (!mappedBuffer) return; */
-        std::array<indirect_pass_t*, drawcount> commands; // = static_cast<indirect_pass_t*>(mappedBuffer)
+            GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_
+        if (!mappedBuffer) return */
+
+        std::vector<indirect_pass_t> commands;
+        commands.reserve(drawcount); // = static_cast<indirect_pass_t*>(mappedBuffer)
         
         #pragma omp parallel for schedule(static, drawcount / omp_get_max_threads()) num_threads(omp_get_max_threads())
         for (GLsizei i = 0; i < drawcount; ++i) {
-            commands[i] = {
-                static_cast<GLuint>(counts[i]),
-                1, // instanceCount is always 1
-                static_cast<GLuint>(reinterpret_cast<uintptr_t>(indices[i]) / typeSize),   
-                basevertex[i], 
-                0 // reservedMustBeZero
-            };
+            indirect_pass_t* command = &commands[i];
+             
+            command->count = static_cast<GLuint>(counts[i]);
+            // command->instanceCount = 1, // instanceCount is always 1
+            command->firstIndex = static_cast<GLuint>(reinterpret_cast<uintptr_t>(indices[i]) / typeSize);
+            command->baseVertex = basevertex[i];
+            // command->reservedMustBeZero = 0; // reservedMustBeZero
         }
         
         // glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);

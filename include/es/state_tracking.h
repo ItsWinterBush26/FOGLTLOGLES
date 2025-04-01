@@ -1,7 +1,6 @@
 #pragma once
 
 #include "utils/log.h"
-#include "utils/pointers.h"
 #include "utils/fast_map.h"
 
 #include <GLES3/gl3.h>
