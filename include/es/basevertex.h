@@ -75,7 +75,7 @@ struct MDElementsBaseVertexBatcher {
         OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffer);
         glBufferData(GL_DRAW_INDIRECT_BUFFER, static_cast<long>(drawcount * sizeof(indirect_pass_t)), static_cast<const void*>(commands.data()), GL_STREAM_DRAW);
 
-        // #pragma omp parallel for num_threads(2)
+        #pragma omp parallel for num_threads(2)
         for (GLsizei i = 0; i < drawcount; ++i) {
             glDrawElementsIndirect(mode, type, reinterpret_cast<const void*>(i * sizeof(indirect_pass_t)));
         }
