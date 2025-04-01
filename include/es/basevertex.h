@@ -50,23 +50,16 @@ struct MDElementsBaseVertexBatcher {
         const GLint* basevertex
     ) {
         if (drawcount <= 0) return;
+        /* if (drawcount > 128) {
+
+        } */
         
         GLint typeSize = getTypeSize(type);
         if (typeSize == 0) return;
-
         if (trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER] == 0) return;
-        /* void* mappedBuffer = glMapBufferRange(
-            GL_DRAW_INDIRECT_BUFFER, 0, 
-            drawcount * sizeof(indirect_pass_t),
-            GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_
-        if (!mappedBuffer) return */
-
-        /* std::vector<indirect_pass_t> commands;
-        commands.reserve(drawcount); // = static_cast<indirect_pass_t*>(mappedBuffer)
-        */
 
         std::vector<indirect_pass_t> commands(drawcount);
-        #pragma omp parallel for schedule(static, drawcount / omp_get_max_threads()) num_threads(omp_get_max_threads())
+        #pragma omp parallel for schedule(static, 2) num_threads(3) if(drawcount > 256)
         for (GLsizei i = 0; i < drawcount; ++i) {
             indirect_pass_t* command = &commands[i];
              
@@ -78,11 +71,11 @@ struct MDElementsBaseVertexBatcher {
         }
         commands.shrink_to_fit();
         
-        // glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
         SaveBoundedBuffer sbb(GL_DRAW_INDIRECT_BUFFER);
         OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, indirectBuffer);
         glBufferData(GL_DRAW_INDIRECT_BUFFER, static_cast<long>(drawcount * sizeof(indirect_pass_t)), static_cast<const void*>(commands.data()), GL_STREAM_DRAW);
 
+        // #pragma omp parallel for num_threads(2)
         for (GLsizei i = 0; i < drawcount; ++i) {
             glDrawElementsIndirect(mode, type, reinterpret_cast<const void*>(i * sizeof(indirect_pass_t)));
         }
