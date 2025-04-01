@@ -77,18 +77,24 @@ struct MDElementsBaseVertexBatcher {
     // indirect_pass_t lastCommand = {};  // Initialize to zero, this will be compared against incoming commands
 
     // Populate commands with ~~deduplication~~ (no more dedupe)
-    #pragma omp parallel for schedule(static, drawcount / omp_get_max_threads()) reduction(+:uniqueDrawcount) num_threads(omp_get_max_threads())
+    #pragma omp parallel for schedule(static, drawcount / omp_get_max_threads()) num_threads(omp_get_max_threads())
     for (GLsizei i = 0; i < drawcount; ++i) {
-        uintptr_t indicesPtr = reinterpret_cast<uintptr_t>(indices[i]);
-        indirect_pass_t command = {
+        // uintptr_t indicesPtr = reinterpret_cast<uintptr_t>(indices[i]);
+        /*indirect_pass_t command = {
             static_cast<GLuint>(counts[i]),
             1, // instanceCount is always 1
             static_cast<GLuint>(indicesPtr / typeSize),
             basevertex[i],
             0 // reservedMustBeZero
-        };
+        }; */
 
-        commands[i] = command;
+        commands[i] = {
+            static_cast<GLuint>(counts[i]),
+            1, // instanceCount is always 1
+            static_cast<GLuint>(reinterpret_cast<uintptr_t>(indices[i]) / typeSize),
+            basevertex[i],
+            0 // reservedMustBeZero
+        };
 
         // If the current command is different from the last one, add it
         /* if (memcmp(&command, &lastCommand, sizeof(indirect_pass_t)) != 0) {
