@@ -45,15 +45,16 @@ struct MDElementsBaseVertexBatcher {
         if (typeSize == 0) return;
 
         GLsizei totalCount = 0;
-        #pragma omp parallel for reduction(+:totalCount)
+        #pragma omp parallel for reduction(inscan, +:totalCount) lastprivate(totalCount)
         for (GLsizei i = 0; i < drawcount; ++i) {
             totalCount += counts[i];
         }
 
         std::vector<GLuint> combinedIndices(totalCount);
 
+        GLsizei offset = 0;
         #pragma omp parallel for reduction(inscan, +:offset) lastprivate(offset)
-        for (GLsizei i = 0, offset = 0; i < drawcount; ++i) {
+        for (GLsizei i = 0; i < drawcount; ++i) {
             // Save the current offset; this is where our data should be written.
             GLsizei currentOffset = offset;
             // Increment offset by the number of indices in this draw.
