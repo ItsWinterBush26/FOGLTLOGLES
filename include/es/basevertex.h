@@ -45,7 +45,7 @@ struct MDElementsBaseVertexBatcher {
         if (typeSize == 0) return;
 
         GLsizei totalCount = 0;
-        #pragma omp parallel for reduction(inscan, +:totalCount)
+        #pragma omp parallel for reduction(+:totalCount)
         for (GLsizei i = 0; i < drawcount; ++i) {
             totalCount += counts[i];
         }
