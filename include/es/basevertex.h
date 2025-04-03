@@ -30,34 +30,33 @@ inline void draw(
 ) {
     std::vector<T> combinedIndices(totalCount);
 
-        GLsizei offset = 0;
-        #pragma omp parallel for reduction(inscan, +:offset)
-        for (GLsizei i = 0; i < drawcount; ++i) {
-            // Save the current offset; this is where our data should be written.
-            GLsizei currentOffset = offset;
-            // Increment offset by the number of indices in this draw.
-            offset += counts[i];
-            // The scan directive ensures that each iteration sees the correct prefix sum.
-            #pragma omp scan inclusive(offset)
-            {
-                // Cast the pointer to the correct type.
-                const T* idxData = reinterpret_cast<const T*>(indices[i]);
-                for (GLsizei j = 0; j < counts[i]; ++j) {
-                    // Adjust each index by the corresponding basevertex.
-                    combinedIndices[currentOffset + j] = idxData[j] + basevertex[i];
-                }
+    GLsizei offset = 0;
+    #pragma omp parallel for reduction(inscan, +:offset)
+    for (GLsizei i = 0; i < drawcount; ++i) {
+        // Save the current offset; this is where our data should be written.
+        GLsizei currentOffset = offset;
+        // Increment offset by the number of indices in this draw.
+        offset += counts[i];
+        // The scan directive ensures that each iteration sees the correct prefix sum.
+        #pragma omp scan inclusive(offset)
+        {
+            // Cast the pointer to the correct type.
+            const T* idxData = reinterpret_cast<const T*>(indices[i]);
+            for (GLsizei j = 0; j < counts[i]; ++j) {
+                // Adjust each index by the corresponding basevertex.
+                combinedIndices[currentOffset + j] = idxData[j] + basevertex[i];
             }
         }
+    }
 
-        OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                     combinedIndices.size() * sizeof(T),
-                     combinedIndices.data(),
-                     GL_STATIC_DRAW);
+    OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 combinedIndices.size() * sizeof(T),
+                 combinedIndices.data(),
+                 GL_STATIC_DRAW);
 
-        // Since the indices are pre-adjusted, we pass 0 as the base vertex.
-        glDrawElementsBaseVertex(mode, totalCount, type, 0, 0);
-
+    // Since the indices are pre-adjusted, we pass 0 as the base vertex.
+    glDrawElementsBaseVertex(mode, totalCount, type, 0, 0);
 }
 
 struct MDElementsBaseVertexBatcher {
