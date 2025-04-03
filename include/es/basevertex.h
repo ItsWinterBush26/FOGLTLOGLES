@@ -78,7 +78,7 @@ struct MDElementsBaseVertexBatcher {
                      GL_STATIC_DRAW);
 
         // Since the indices are pre-adjusted, we pass 0 as the base vertex.
-        glDrawElementsBaseVertex(mode, totalCount, type, 0, 0);
+        glDrawElementsBaseVertex(mode, totalCount, GL_UNSIGNED_INT, 0, 0);
     }
 };
 
