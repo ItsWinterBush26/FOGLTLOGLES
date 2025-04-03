@@ -4,6 +4,7 @@
 #include "es/state_tracking.h"
 #include "gles20/buffer_tracking.h"
 
+#include <algorithm>
 #include <GLES3/gl32.h>
 #include <memory>
 #include <omp.h>
@@ -52,28 +53,33 @@ struct MDElementsBaseVertexBatcher {
         GLint typeSize = getTypeSize(type);
         if (typeSize == 0) return;
 
-        DrawElementsBaseVertexCommand current = {
+        /* DrawElementsBaseVertexCommand current = {
             counts[0],
             reinterpret_cast<uintptr_t>(indices[0]) / typeSize,
-            basevertex[0]
-        };
-        
+            0
+        }; */
+
+        std::vector<const void*> accumulatedIndices(drawcount);
+        GLsizei accumulatedCount = counts[0];
+
+        #pragma omp parallel for num_threads(3) reduction(+:accumulatedCount)
         for (GLsizei i = 1; i < drawcount; ++i) {
-            GLuint nextFirstIndex = reinterpret_cast<uintptr_t>(indices[i]) / typeSize;
-
-             if (current.firstIndex + current.count == nextFirstIndex && current.baseVertex == basevertex[i]) {
-                current.count += counts[i];
-                LOGI("Merged!");
-            } else {
-                glDrawElementsBaseVertex(mode, current.count, type, reinterpret_cast<const void*>(current.firstIndex * typeSize), current.baseVertex);
-
-                current.count = counts[i];
-                current.firstIndex = nextFirstIndex;
-                current.baseVertex = basevertex[i];
-            }
+            accumulatedCount += counts[i];
+            accumulatedIndices.insert(
+                accumulatedIndices.end(),
+                std::begin(indices[i]),
+                std::end(indices[i])
+            );
         }
-
-        glDrawElementsBaseVertex(mode, current.count, type, reinterpret_cast<const void*>(current.firstIndex * typeSize), current.baseVertex);
+        accumulatedIndices.shrink_to_fit();
+        
+        glDrawElementsBaseVertex(
+            mode,
+            accumulatedCount,
+            type,
+            accumulatedIndices.data(),
+            0
+        );
     }
 };
 
