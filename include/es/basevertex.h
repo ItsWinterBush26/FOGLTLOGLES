@@ -38,7 +38,12 @@ struct MDElementsBaseVertexBatcher {
         const GLint* basevertex
     ) {
         if (!drawcount) return;
-        LOGI("orignal drawcount %d", drawcount);
+        if (drawcount < 256) {
+            for (GLsizei i = 0; i < drawcount; ++i) {
+                if (count[i] > 0) glDrawElementsBaseVertex(mode, count[i], type, indices[i], basevertex[i]);
+            }
+            return;
+        }
 
         // Group draw calls by currently bound VBO
         FAST_MAP_BI(GLuint, std::vector<GLsizei>) drawGroups;
@@ -68,7 +73,6 @@ struct MDElementsBaseVertexBatcher {
             const std::vector<const void*>& groupIndices = indexGroups[vbo];
             const std::vector<GLint>& groupBaseVertices = baseVertexGroups[vbo];
 
-            LOGI("new 'drawcount' per se : %d", groupCounts.size());
             for (size_t i = 0; i < groupCounts.size(); ++i) {
                 glDrawElementsBaseVertex(mode, groupCounts[i], type, groupIndices[i], groupBaseVertices[i]);
             }
