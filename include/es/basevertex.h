@@ -34,7 +34,10 @@ inline std::vector<T> mergeIndices(
     // mergedIndices.reserve(totalCount);
 
     for (GLsizei i = 0; i < drawcount; ++i) {
+        if (!count[i]) continue;
+        
         const T* indexData = static_cast<const T*>(indices[i]);
+        if (!indexData) continue;
         LOGI("got indexData from indices[%d]", i);
         LOGI("indexData? %p", indexData);
         LOGI("count[i] is? %d", count[i]);
@@ -64,6 +67,7 @@ struct MDElementsBaseVertexBatcher {
         const GLint* basevertex
     ) {
         if (!drawcount) return;
+        if (count[0] > 0) LOGI("elementptr %p", indices[0]);
         
         // plan:                           the second arr in the indices
         // merge indices                            |  |  |
