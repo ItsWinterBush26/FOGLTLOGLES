@@ -27,13 +27,15 @@ inline std::vector<T> mergeIndices(
     for (GLsizei i = 0; i < drawcount; ++i) {
         totalCount += count[i];
     }
-    LOGI("reserve %d for mergedIndices", totalCount);
-
+    
     std::vector<T> mergedIndices;
-    mergedIndices.reserve(totalCount);
+    LOGI("we dont reserve.");
+    // LOGI("reserve %d for mergedIndices", totalCount);
+    // mergedIndices.reserve(totalCount);
 
     for (GLsizei i = 0; i < drawcount; ++i) {
         const T* indexData = static_cast<const T*>(indices[i]);
+        LOGI("got indexData from indices[%d]", i);
         for (GLsizei j = 0; j < count[i]; ++j) {
             mergedIndices.push_back(indexData[j] + basevertex[i]);
         }
