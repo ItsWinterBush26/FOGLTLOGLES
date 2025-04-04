@@ -55,6 +55,7 @@ struct MDElementsBaseVertexBatcher {
             GLsizei offset = 0;
             #pragma omp parallel for reduction(inscan, +:offset)
             for (GLsizei i = 0; i < drawcount; ++i) {
+                if (counts[i] < 1) continue;
                 // Save the current offset; this is where our data should be written.
                 GLsizei currentOffset = offset;
                 // Increment offset by the number of indices in this draw.
@@ -87,6 +88,7 @@ struct MDElementsBaseVertexBatcher {
             GLsizei offset = 0;
             #pragma omp parallel for reduction(inscan, +:offset)
             for (GLsizei i = 0; i < drawcount; ++i) {
+                if (counts[i] < 1) continue;
                 // Save the current offset; this is where our data should be written.
                 GLsizei currentOffset = offset;
                 // Increment offset by the number of indices in this draw.
@@ -119,6 +121,7 @@ struct MDElementsBaseVertexBatcher {
             GLsizei offset = 0;
             #pragma omp parallel for reduction(inscan, +:offset)
             for (GLsizei i = 0; i < drawcount; ++i) {
+                if (counts[i] < 1) continue;
                 // Save the current offset; this is where our data should be written.
                 GLsizei currentOffset = offset;
                 // Increment offset by the number of indices in this draw.
