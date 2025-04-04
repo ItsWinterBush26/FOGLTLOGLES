@@ -66,6 +66,7 @@ inline std::vector<T> mergeIndicesGPU(
 
     // we assume ELEMENT_ARRAY_BUFFER is bound
     LOGI("bb.size == totalCount*T(%i)? (%d == %d)", sizeof(T), trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER].size, totalCount * sizeof(T));
+    glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER); // assuming 1282 means its already mapped
     void* realIndices = glMapBufferRange(
         GL_ELEMENT_ARRAY_BUFFER,
         0,
@@ -88,6 +89,7 @@ inline std::vector<T> mergeIndicesGPU(
         }
     }
 
+    glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
     return mergedIndices;
 }
 
