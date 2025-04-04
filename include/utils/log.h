@@ -11,6 +11,7 @@ extern "C" {
 #endif
 
 #ifdef PRINTF_LOG
+    #include <cstdio>
     #define LOGE(...) printf(TAG " E: " __VA_ARGS__), printf("\n")
     #define LOGW(...) printf(TAG " W: " __VA_ARGS__), printf("\n")
     #define LOGI(...) printf(TAG " I: " __VA_ARGS__), printf("\n")

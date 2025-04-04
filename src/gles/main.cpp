@@ -1,4 +1,5 @@
 #include "gles/main.h"
+#include "es/limits.h"
 #include "utils/log.h"
 
 void GLES::GLESWrapper::init() {
@@ -7,4 +8,6 @@ void GLES::GLESWrapper::init() {
     GLES::registerTranslatedFunctions();
     GLES::registerBrandingOverride();
     GLES::registerNoErrorOverride();
+
+    ESLimits::init();
 }

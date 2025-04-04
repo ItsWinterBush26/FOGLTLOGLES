@@ -1,5 +1,6 @@
 #pragma once
 
+#include "es/limits.h"
 #include "utils/log.h"
 #include "utils/fast_map.h"
 
