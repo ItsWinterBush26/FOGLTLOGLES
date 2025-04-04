@@ -17,6 +17,7 @@
 #endif
 
 struct Framebuffer;
+struct Buffer;
 
 struct TextureStates {
     std::pair<GLenum, GLuint> recentlyBoundTexture;
@@ -69,7 +70,7 @@ struct TrackedStates {
 
     // Type, Buffer
     // NOTE: Type is NOT a binding enum
-    FAST_MAP_BI(GLenum, GLuint) boundBuffers;
+    FAST_MAP_BI(GLenum, Buffer) boundBuffers;
 
     TrackedStates() {
         GLint maxTextureUnits;
@@ -104,4 +105,10 @@ struct Framebuffer {
     GLenum virtualDrawbuffers[MAX_DRAWBUFFERS] = { GL_COLOR_ATTACHMENT0 };
     GLenum physicalDrawbuffers[MAX_DRAWBUFFERS];
     GLsizei bufferAmount = 1;
+};
+
+struct Buffer {
+    GLenum target;
+    GLuint buffer;
+    GLsizei size;
 };

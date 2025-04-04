@@ -1,22 +1,25 @@
 #pragma once
 
+#include "es/state_tracking.h"
+#include "gles20/buffer_tracking.h"
 #include "utils/log.h"
 
 #include <GLES3/gl32.h>
 #include <omp.h>
 #include <vector>
 
-inline GLint getEnumByTypeSize(size_t size) {
+// reinterpret_cast<size_t>(indices[i]) / sizeof(T)
+template<typename T>
+inline size_t getIndexOffsetFast(T indexOffset, size_t size) {
     switch (size) {
-        case 1: return GL_UNSIGNED_BYTE;
-        case 2: return GL_UNSIGNED_SHORT;
-        case 4: // passthrough
-        default: return GL_UNSIGNED_INT;
+        case 4: return reinterpret_cast<size_t>(indexOffset) >> 2;
+        case 2: return reinterpret_cast<size_t>(indexOffset) >> 1;
+        default: return reinterpret_cast<size_t>(indexOffset);
     }
 }
 
 template<typename T>
-inline std::vector<T> mergeIndices(
+inline std::vector<T> mergeIndicesCPU(
     const GLsizei* count,
     const void* const* indices,
     GLsizei drawcount,
@@ -27,47 +30,106 @@ inline std::vector<T> mergeIndices(
     for (GLsizei i = 0; i < drawcount; ++i) {
         totalCount += count[i];
     }
-    
+    LOGI("reserve %d for mergedIndices", totalCount);
+
     std::vector<T> mergedIndices;
-    LOGI("we dont reserve.");
-    // LOGI("reserve %d for mergedIndices", totalCount);
-    // mergedIndices.reserve(totalCount);
+    mergedIndices.reserve(totalCount);
 
     for (GLsizei i = 0; i < drawcount; ++i) {
-        if (!count[i] || !indices[i]) continue;
         const T* indexData = static_cast<const T*>(indices[i]);
-        if (!indexData) continue;
-        
-        LOGI("got indexData from indices[%d]", i);
-        LOGI("indexData? %p", indexData);
-        LOGI("count[i] is? %d", count[i]);
+        const GLint indexBaseVertex = basevertex[i];
+
         for (GLsizei j = 0; j < count[i]; ++j) {
-            LOGI("got %u at the indexData[%d]", indexData[j], j);
-            mergedIndices.push_back(indexData[j] + basevertex[i]);
+            mergedIndices.push_back(indexData[j] + indexBaseVertex);
         }
     }
 
-    LOGI("W DONE MERGED! mergedIndices size == totalCount (%d == %d)", mergedIndices.size(), totalCount);
     return mergedIndices;
 }
 
+template<typename T>
+inline std::vector<T> mergeIndicesGPU(
+    const GLsizei* count,
+    const void* const* indices, // an offset now, not an array of pointers
+    GLsizei drawcount,
+    const GLint* basevertex
+) {
+    GLsizei totalCount = 0;
+    #pragma omp parallel for reduction(+:totalCount)
+    for (GLsizei i = 0; i < drawcount; ++i) {
+        totalCount += count[i];
+    }
+
+    std::vector<T> mergedIndices;
+    mergedIndices.reserve(totalCount);
+
+    // we assume ELEMENT_ARRAY_BUFFER is bound
+    void* realIndices = glMapBufferRange(
+        GL_ELEMENT_ARRAY_BUFFER,
+        0,
+        totalCount * sizeof(T), // test if this works, else Buffer.size in state_tracking.
+        GL_MAP_READ_BIT
+    );
+
+    if (!realIndices) {
+        LOGE("glMapBufferRange failed");
+        return mergedIndices;
+    }
+
+    for (GLsizei i = 0; i < drawcount; ++i) {
+        const T* indexData = static_cast<const T*>(realIndices) + getIndexOffsetFast(indices[i], sizeof(T));
+        const GLint indexBaseVertex = basevertex[i];
+        
+        for (GLsizei j = 0; j < count[i]; ++j) {
+            mergedIndices.push_back(indexData[j] + indexBaseVertex);
+        }
+    }
+
+    return mergedIndices;
+}
+
+template<typename T>
+inline void drawActual(
+    GLenum mode,
+    const GLsizei* count,
+    GLenum type,
+    const void* const* indices,
+    GLsizei drawcount,
+    const GLint* basevertex
+) {
+    std::vector<T> mergedIndices;
+    if (trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER].buffer == 0) {
+        mergedIndices = mergeIndicesCPU<T>(count, indices, drawcount, basevertex);
+    } else {
+        mergedIndices = mergeIndicesGPU<T>(count, indices, drawcount, basevertex);
+        OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // unbound to make it seem like the indices was "digested"
+    }
+    if (!mergedIndices.size()) {
+        LOGE("mergedIndices is empty");
+        return;
+    }
+    
+    glDrawElementsBaseVertex(
+        mode,
+        mergedIndices.size(),
+        type,
+        reinterpret_cast<const void*>(
+            const_cast<const T*>(mergedIndices.data())
+        ),
+        0
+    );
+}  
+
 struct MDElementsBaseVertexBatcher {
-    MDElementsBaseVertexBatcher() {
-    }
-
-    ~MDElementsBaseVertexBatcher() {
-    }
-
     void batch(
         GLenum mode,
         const GLsizei* count,
         GLenum type,
-        const void* const* indices, // array of pointers to indices array
+        const void* const* indices, // array of pointers to indices array (apparently sometimes)
         GLsizei drawcount,
         const GLint* basevertex
     ) {
         if (!drawcount) return;
-        if (count[0] > 0) LOGI("elementptr %p", indices[0]);
         
         // plan:                           the second arr in the indices
         // merge indices                            |  |  |
@@ -82,49 +144,40 @@ struct MDElementsBaseVertexBatcher {
         //
         // glDrawElementsBaseVertex(.., .., .., indices[i], ..);
         //                                              |
-        //                                        array pointer
+        //                              array pointer or an offset (wth ogl)
         //                                         const void*
 
         switch (type) {
             case GL_UNSIGNED_BYTE: {
-                auto mergedIndices = mergeIndices<GLubyte>(count, indices, drawcount, basevertex);
-                LOGI("drawing %d indices", mergedIndices.size());
-                glDrawElementsBaseVertex(
+                drawActual<GLubyte>(
                     mode,
-                    mergedIndices.size(),
+                    count,
                     type,
-                    reinterpret_cast<const void*>(
-                        const_cast<const GLubyte*>(mergedIndices.data())
-                    ),
-                    0
+                    indices,
+                    drawcount,
+                    basevertex
                 );
                 break;
             }
             case GL_UNSIGNED_SHORT: {
-                auto mergedIndices = mergeIndices<GLushort>(count, indices, drawcount, basevertex);
-                LOGI("drawing %d indices", mergedIndices.size());
-                glDrawElementsBaseVertex(
+                drawActual<GLushort>(
                     mode,
-                    mergedIndices.size(),
+                    count,
                     type,
-                    reinterpret_cast<const void*>(
-                        const_cast<const GLushort*>(mergedIndices.data())
-                    ),
-                    0
+                    indices,
+                    drawcount,
+                    basevertex
                 );
                 break;
             }
             case GL_UNSIGNED_INT: {
-                auto mergedIndices = mergeIndices<GLuint>(count, indices, drawcount, basevertex);
-                LOGI("drawing %d indices", mergedIndices.size());
-                glDrawElementsBaseVertex(
+                drawActual<GLuint>(
                     mode,
-                    mergedIndices.size(),
+                    count,
                     type,
-                    reinterpret_cast<const void*>(
-                        const_cast<const GLuint*>(mergedIndices.data())
-                    ),
-                    0
+                    indices,
+                    drawcount,
+                    basevertex
                 );
                 break;
             }

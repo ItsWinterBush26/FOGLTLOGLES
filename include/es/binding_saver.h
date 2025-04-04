@@ -43,7 +43,7 @@ struct SaveBoundedBuffer {
     GLenum bufferType;
     
     SaveBoundedBuffer(GLenum bufferType) : bufferType(bufferType) {
-        boundedBuffer = trackedStates->boundBuffers[bufferType];
+        boundedBuffer = trackedStates->boundBuffers[bufferType].buffer;
     }
 
     ~SaveBoundedBuffer() {
