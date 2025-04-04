@@ -19,6 +19,7 @@ void GLES20::registerTrackingFunctions() {
     REGISTEROV(glActiveTexture);
 
     REGISTEROV(glBindBuffer);
+    REGISTEROV(glBufferData);
 
     REGISTEROV(glBindRenderbuffer);
     REGISTEROV(glDeleteRenderbuffers); // deleting tracked iformat
