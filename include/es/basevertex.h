@@ -36,7 +36,10 @@ inline std::vector<T> mergeIndices(
     for (GLsizei i = 0; i < drawcount; ++i) {
         const T* indexData = static_cast<const T*>(indices[i]);
         LOGI("got indexData from indices[%d]", i);
+        LOGI("indexData? %p", indexData);
+        LOGI("count[i] is? %d", count[i]);
         for (GLsizei j = 0; j < count[i]; ++j) {
+            LOGI("got %u at the indexData[%d]", indexData[j], j);
             mergedIndices.push_back(indexData[j] + basevertex[i]);
         }
     }
