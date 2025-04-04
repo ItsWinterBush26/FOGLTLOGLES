@@ -1,81 +1,121 @@
 #pragma once
 
-#include "es/state_tracking.h"
-#include "gles20/buffer_tracking.h"
-#include "utils/fast_map.h"
-
+#include "utils/log.h"
 #include <GLES3/gl32.h>
 #include <omp.h>
-#include <unordered_map>
 #include <vector>
 
-inline GLint getTypeSize(GLenum type) {
-    switch (type) {
-        case GL_UNSIGNED_BYTE:  return 1;
-        case GL_UNSIGNED_SHORT: return 2;
-        case GL_UNSIGNED_INT:   return 4;
-        default:                return 0;
+inline GLint getEnumByTypeSize(size_t size) {
+    switch (size) {
+        case 1: return GL_UNSIGNED_BYTE;
+        case 2: return GL_UNSIGNED_SHORT;
+        case 4: // passthrough
+        default: return GL_UNSIGNED_INT;
     }
 }
 
-struct MDElementsBaseVertexBatcher {
-    GLuint ebo;
+template<typename T>
+inline std::vector<T> mergeIndices(
+    const GLsizei* count,
+    const void* const* indices,
+    GLsizei drawcount,
+    const GLint* basevertex
+) {
+    GLsizei totalCount = 0;
+    #pragma omp parallel for reduction(+:totalCount)
+    for (GLsizei i = 0; i < drawcount; ++i) {
+        totalCount += count[i];
+    }
+    LOGI("reserve %d for mergedIndices", totalCount);
 
+    std::vector<T> mergedIndices;
+    mergedIndices.reserve(totalCount);
+
+    for (GLsizei i = 0; i < drawcount; ++i) {
+        const T* indexData = static_cast<const T*>(indices[i]);
+        for (GLsizei j = 0; j < count[i]; ++j) {
+            mergedIndices.push_back(indexData[j] + basevertex[i]);
+        }
+    }
+
+    return mergedIndices;
+}
+
+struct MDElementsBaseVertexBatcher {
     MDElementsBaseVertexBatcher() {
-        glGenBuffers(1, &ebo);
     }
 
     ~MDElementsBaseVertexBatcher() {
-        glDeleteBuffers(1, &ebo);
     }
 
     void batch(
         GLenum mode,
         const GLsizei* count,
         GLenum type,
-        const void* const* indices,
+        const void* const* indices, // array of pointers to indices array
         GLsizei drawcount,
         const GLint* basevertex
     ) {
         if (!drawcount) return;
-        if (drawcount < 256) {
-            for (GLsizei i = 0; i < drawcount; ++i) {
-                if (count[i] > 0) glDrawElementsBaseVertex(mode, count[i], type, indices[i], basevertex[i]);
+        
+        // plan:                           the second arr in the indices
+        // merge indices                            |  |  |
+        // [0, 1, 2] | [0, 1, 2] turns to [0, 1, 2, 3, 4, 5]
+        //              |  |  |
+        //           the second arr
+        //
+        // indices (const void* const*):
+        // [ptr1, ptr2]
+        // ptr1: [0, 1, 2]
+        // ptr2: [0, 1, 2]
+        //
+        // glDrawElementsBaseVertex(.., .., .., indices[i], ..);
+        //                                              |
+        //                                        array pointer
+        //                                         const void*
+
+        switch (type) {
+            case GL_UNSIGNED_BYTE: {
+                auto mergedIndices = mergeIndices<GLubyte>(count, indices, drawcount, basevertex);
+                glDrawElementsBaseVertex(
+                    mode,
+                    mergedIndices.size(),
+                    type,
+                    reinterpret_cast<const void*>(
+                        const_cast<const GLubyte*>(mergedIndices.data())
+                    ),
+                    0
+                );
+                break;
             }
-            return;
-        }
-
-        // Group draw calls by currently bound VBO
-        FAST_MAP_BI(GLuint, std::vector<GLsizei>) drawGroups;
-        FAST_MAP_BI(GLuint, std::vector<const void*>) indexGroups;
-        FAST_MAP_BI(GLuint, std::vector<GLint>) baseVertexGroups;
-
-        // Populate draw groups by checking the buffer states
-        for (GLsizei i = 0; i < drawcount; ++i) {
-            GLuint currentVBO = trackedStates->boundBuffers[GL_ARRAY_BUFFER];
-            
-            drawGroups[currentVBO].push_back(count[i]);
-            indexGroups[currentVBO].push_back(indices[i]);
-            baseVertexGroups[currentVBO].push_back(basevertex[i]);
-        }
-
-        GLuint lastBoundVBO = trackedStates->boundBuffers[GL_ARRAY_BUFFER];
-        for (const auto& group : drawGroups) {
-            GLuint vbo = group.first;
-
-            // Bind only if necessary (we compare with the last bound buffer tracked in trackedStates)
-            if (vbo != lastBoundVBO) {
-                OV_glBindBuffer(GL_ARRAY_BUFFER, vbo);
-                lastBoundVBO = vbo;
+            case GL_UNSIGNED_SHORT: {
+                auto mergedIndices = mergeIndices<GLushort>(count, indices, drawcount, basevertex);
+                glDrawElementsBaseVertex(
+                    mode,
+                    mergedIndices.size(),
+                    type,
+                    reinterpret_cast<const void*>(
+                        const_cast<const GLushort*>(mergedIndices.data())
+                    ),
+                    0
+                );
+                break;
             }
-
-            const std::vector<GLsizei>& groupCounts = group.second;
-            const std::vector<const void*>& groupIndices = indexGroups[vbo];
-            const std::vector<GLint>& groupBaseVertices = baseVertexGroups[vbo];
-
-            for (size_t i = 0; i < groupCounts.size(); ++i) {
-                glDrawElementsBaseVertex(mode, groupCounts[i], type, groupIndices[i], groupBaseVertices[i]);
+            case GL_UNSIGNED_INT: {
+                auto mergedIndices = mergeIndices<GLuint>(count, indices, drawcount, basevertex);
+                glDrawElementsBaseVertex(
+                    mode,
+                    mergedIndices.size(),
+                    type,
+                    reinterpret_cast<const void*>(
+                        const_cast<const GLuint*>(mergedIndices.data())
+                    ),
+                    0
+                );
+                break;
             }
+            default:
+                return;
         }
     }
 };
