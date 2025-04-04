@@ -30,9 +30,10 @@ inline std::vector<T> mergeIndicesCPU(
     for (GLsizei i = 0; i < drawcount; ++i) {
         totalCount += count[i];
     }
-    LOGI("reserve %d for mergedIndices", totalCount);
-
+    
     std::vector<T> mergedIndices;
+
+    LOGI("reserve %d for mergedIndices", totalCount);
     mergedIndices.reserve(totalCount);
 
     for (GLsizei i = 0; i < drawcount; ++i) {
@@ -64,15 +65,17 @@ inline std::vector<T> mergeIndicesGPU(
     mergedIndices.reserve(totalCount);
 
     // we assume ELEMENT_ARRAY_BUFFER is bound
+    LOGI("bb.size == totalCount*T(%i)? (%d == %d)", sizeof(T), trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER].size, totalCount * sizeof(T));
     void* realIndices = glMapBufferRange(
         GL_ELEMENT_ARRAY_BUFFER,
         0,
-        totalCount * sizeof(T), // test if this works, else Buffer.size in state_tracking.
+        trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER].size, // totalCount * sizeof(T), // test if this works, else Buffer.size in state_tracking.
         GL_MAP_READ_BIT
     );
 
     if (!realIndices) {
-        LOGE("glMapBufferRange failed");
+        LOGE("glMapBufferRange failed!");
+        LOGE("%u", glGetError());
         return mergedIndices;
     }
 
@@ -102,8 +105,9 @@ inline void drawActual(
         mergedIndices = mergeIndicesCPU<T>(count, indices, drawcount, basevertex);
     } else {
         mergedIndices = mergeIndicesGPU<T>(count, indices, drawcount, basevertex);
-        OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // unbound to make it seem like the indices was "digested"
+        // OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // unbound to make it seem like the indices was "digested"
     }
+    
     if (!mergedIndices.size()) {
         LOGE("mergedIndices is empty");
         return;
