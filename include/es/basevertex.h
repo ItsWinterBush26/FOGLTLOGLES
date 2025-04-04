@@ -1,6 +1,7 @@
 #pragma once
 
 #include "utils/log.h"
+
 #include <GLES3/gl32.h>
 #include <omp.h>
 #include <vector>
@@ -38,6 +39,7 @@ inline std::vector<T> mergeIndices(
         }
     }
 
+    LOGI("W DONE MERGED! mergedIndices size == totalCount (%d == %d)", mergedIndices.size(), totalCount);
     return mergedIndices;
 }
 
@@ -77,6 +79,7 @@ struct MDElementsBaseVertexBatcher {
         switch (type) {
             case GL_UNSIGNED_BYTE: {
                 auto mergedIndices = mergeIndices<GLubyte>(count, indices, drawcount, basevertex);
+                LOGI("drawing %d indices", mergedIndices.size());
                 glDrawElementsBaseVertex(
                     mode,
                     mergedIndices.size(),
@@ -90,6 +93,7 @@ struct MDElementsBaseVertexBatcher {
             }
             case GL_UNSIGNED_SHORT: {
                 auto mergedIndices = mergeIndices<GLushort>(count, indices, drawcount, basevertex);
+                LOGI("drawing %d indices", mergedIndices.size());
                 glDrawElementsBaseVertex(
                     mode,
                     mergedIndices.size(),
@@ -103,6 +107,7 @@ struct MDElementsBaseVertexBatcher {
             }
             case GL_UNSIGNED_INT: {
                 auto mergedIndices = mergeIndices<GLuint>(count, indices, drawcount, basevertex);
+                LOGI("drawing %d indices", mergedIndices.size());
                 glDrawElementsBaseVertex(
                     mode,
                     mergedIndices.size(),
