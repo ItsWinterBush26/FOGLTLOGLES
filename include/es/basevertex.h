@@ -70,7 +70,7 @@ inline std::vector<T> mergeIndicesGPU(
     void* realIndices = glMapBufferRange(
         GL_ELEMENT_ARRAY_BUFFER,
         0,
-        trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER].size, // totalCount * sizeof(T), // test if this works, else Buffer.size in state_tracking.
+        totalCount * sizeof(T), // test if this works, else Buffer.size in state_tracking.
         GL_MAP_READ_BIT
     );
 
@@ -90,6 +90,7 @@ inline std::vector<T> mergeIndicesGPU(
     }
 
     glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+    LOGI("W MERGE SYCCES (indices as offsets)");
     return mergedIndices;
 }
 
@@ -110,7 +111,7 @@ inline void drawActual(
         // OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // unbound to make it seem like the indices was "digested"
     }
     
-    if (!mergedIndices.size()) {
+    if (mergedIndices.empty()) {
         LOGE("mergedIndices is empty");
         return;
     }
@@ -124,6 +125,7 @@ inline void drawActual(
         ),
         0
     );
+    LOGI("called draw!");
 }  
 
 struct MDElementsBaseVertexBatcher {
