@@ -38,7 +38,7 @@ set(RELEASE_FLAGS
     -fomit-frame-pointer
     -ffunction-sections
     -fdata-sections
-    -fno-rtti
+    # -fno-rtti
     -fvisibility=hidden
     -fvisibility-inlines-hidden
     -DNDEBUG
