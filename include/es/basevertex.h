@@ -34,10 +34,10 @@ inline std::vector<T> mergeIndices(
     // mergedIndices.reserve(totalCount);
 
     for (GLsizei i = 0; i < drawcount; ++i) {
-        if (!count[i]) continue;
-        
+        if (!count[i] || !indices[i]) continue;
         const T* indexData = static_cast<const T*>(indices[i]);
         if (!indexData) continue;
+        
         LOGI("got indexData from indices[%d]", i);
         LOGI("indexData? %p", indexData);
         LOGI("count[i] is? %d", count[i]);
