@@ -1,11 +1,13 @@
 #pragma once
 
-#include "es/binding_saver.h"
+#include "es/state_tracking.h"
 #include "gles20/buffer_tracking.h"
+#include "utils/fast_map.h"
 
-#include <vector>
 #include <GLES3/gl32.h>
 #include <omp.h>
+#include <unordered_map>
+#include <vector>
 
 inline GLint getTypeSize(GLenum type) {
     switch (type) {
@@ -27,127 +29,49 @@ struct MDElementsBaseVertexBatcher {
         glDeleteBuffers(1, &ebo);
     }
 
-    // 'indices' is an array of pointers to index data.
-    // 'counts' holds the number of indices per draw call.
-    // 'drawcount' is the number of draws.
-    // 'basevertex' holds the base vertex offset for each draw.
-    void batch(GLenum mode,
-               const GLsizei* counts,
-               GLenum type,
-               const void* const* indices,
-               GLsizei drawcount,
-               const GLint* basevertex) {
-        if (drawcount <= 0) return;
+    void batch(
+        GLenum mode,
+        const GLsizei* count,
+        GLenum type,
+        const void* const* indices,
+        GLsizei drawcount,
+        const GLint* basevertex
+    ) {
+        if (!drawcount) return;
+        LOGI("orignal drawcount %d", drawcount);
 
-        GLint typeSize = getTypeSize(type);
-        if (typeSize == 0) return;
+        // Group draw calls by currently bound VBO
+        FAST_MAP_BI(GLuint, std::vector<GLsizei>) drawGroups;
+        FAST_MAP_BI(GLuint, std::vector<const void*>) indexGroups;
+        FAST_MAP_BI(GLuint, std::vector<GLint>) baseVertexGroups;
 
-        GLsizei totalCount = 0;
-        #pragma omp parallel for reduction(+:totalCount)
+        // Populate draw groups by checking the buffer states
         for (GLsizei i = 0; i < drawcount; ++i) {
-            totalCount += counts[i];
+            GLuint currentVBO = trackedStates->boundBuffers[GL_ARRAY_BUFFER];
+            
+            drawGroups[currentVBO].push_back(count[i]);
+            indexGroups[currentVBO].push_back(indices[i]);
+            baseVertexGroups[currentVBO].push_back(basevertex[i]);
         }
 
-        SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
-        if (type == GL_UNSIGNED_BYTE) {
-            std::vector<GLubyte> combinedIndices(totalCount);
+        GLuint lastBoundVBO = trackedStates->boundBuffers[GL_ARRAY_BUFFER];
+        for (const auto& group : drawGroups) {
+            GLuint vbo = group.first;
 
-            GLsizei offset = 0;
-            #pragma omp parallel for reduction(inscan, +:offset)
-            for (GLsizei i = 0; i < drawcount; ++i) {
-                if (counts[i] < 1) continue;
-                // Save the current offset; this is where our data should be written.
-                GLsizei currentOffset = offset;
-                // Increment offset by the number of indices in this draw.
-                offset += counts[i];
-                // The scan directive ensures that each iteration sees the correct prefix sum.
-                #pragma omp scan inclusive(offset)
-                {
-                    // Cast the pointer to the correct type.
-                    const GLubyte* idxData = reinterpret_cast<const GLubyte*>(indices[i]);
-                    for (GLsizei j = 0; j < counts[i]; ++j) {
-                        // Adjust each index by the corresponding basevertex.
-                        combinedIndices[currentOffset + j] = idxData[j] + basevertex[i];
-                    }
-                }
+            // Bind only if necessary (we compare with the last bound buffer tracked in trackedStates)
+            if (vbo != lastBoundVBO) {
+                OV_glBindBuffer(GL_ARRAY_BUFFER, vbo);
+                lastBoundVBO = vbo;
             }
 
-            OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-            glBufferData(
-                GL_ELEMENT_ARRAY_BUFFER,
-                combinedIndices.size() * sizeof(GLubyte),
-                combinedIndices.data(),
-                GL_STATIC_DRAW
-            );
+            const std::vector<GLsizei>& groupCounts = group.second;
+            const std::vector<const void*>& groupIndices = indexGroups[vbo];
+            const std::vector<GLint>& groupBaseVertices = baseVertexGroups[vbo];
 
-            // Since the indices are pre-adjusted, we pass 0 as the base vertex.
-            glDrawElementsBaseVertex(mode, totalCount, type, 0, 0);
-        } else if (type == GL_UNSIGNED_SHORT) {
-            std::vector<GLushort> combinedIndices(totalCount);
-
-            GLsizei offset = 0;
-            #pragma omp parallel for reduction(inscan, +:offset)
-            for (GLsizei i = 0; i < drawcount; ++i) {
-                if (counts[i] < 1) continue;
-                // Save the current offset; this is where our data should be written.
-                GLsizei currentOffset = offset;
-                // Increment offset by the number of indices in this draw.
-                offset += counts[i];
-                // The scan directive ensures that each iteration sees the correct prefix sum.
-                #pragma omp scan inclusive(offset)
-                {
-                    // Cast the pointer to the correct type.
-                    const GLushort* idxData = reinterpret_cast<const GLushort*>(indices[i]);
-                    for (GLsizei j = 0; j < counts[i]; ++j) {
-                        // Adjust each index by the corresponding basevertex.
-                        combinedIndices[currentOffset + j] = idxData[j] + basevertex[i];
-                    }
-                }
+            LOGI("new 'drawcount' per se : %d", groupCounts.size());
+            for (size_t i = 0; i < groupCounts.size(); ++i) {
+                glDrawElementsBaseVertex(mode, groupCounts[i], type, groupIndices[i], groupBaseVertices[i]);
             }
-
-            OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-            glBufferData(
-                GL_ELEMENT_ARRAY_BUFFER,
-                combinedIndices.size() * sizeof(GLushort),
-                combinedIndices.data(),
-                GL_STATIC_DRAW
-            );
-
-            // Since the indices are pre-adjusted, we pass 0 as the base vertex.
-            glDrawElementsBaseVertex(mode, totalCount, type, 0, 0);
-        } else if (type == GL_UNSIGNED_INT) {
-            std::vector<GLuint> combinedIndices(totalCount);
-
-            GLsizei offset = 0;
-            #pragma omp parallel for reduction(inscan, +:offset)
-            for (GLsizei i = 0; i < drawcount; ++i) {
-                if (counts[i] < 1) continue;
-                // Save the current offset; this is where our data should be written.
-                GLsizei currentOffset = offset;
-                // Increment offset by the number of indices in this draw.
-                offset += counts[i];
-                // The scan directive ensures that each iteration sees the correct prefix sum.
-                #pragma omp scan inclusive(offset)
-                {
-                    // Cast the pointer to the correct type.
-                    const GLuint* idxData = reinterpret_cast<const GLuint*>(indices[i]);
-                    for (GLsizei j = 0; j < counts[i]; ++j) {
-                        // Adjust each index by the corresponding basevertex.
-                        combinedIndices[currentOffset + j] = idxData[j] + basevertex[i];
-                    }
-                }
-            }
-
-            OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-            glBufferData(
-                GL_ELEMENT_ARRAY_BUFFER,
-                combinedIndices.size() * sizeof(GLuint),
-                combinedIndices.data(),
-                GL_STATIC_DRAW
-            );
-
-            // Since the indices are pre-adjusted, we pass 0 as the base vertex.
-            glDrawElementsBaseVertex(mode, totalCount, type, 0, 0);
         }
     }
 };
