@@ -50,21 +50,15 @@ void FFP::registerVertexFunctions() {
 
 #pragma region Vertex Integer Implementations
 void glVertex2i(GLint x, GLint y) {
-    floatVertexBuffer.push_back(static_cast<GLfloat>(x));
-    floatVertexBuffer.push_back(static_cast<GLfloat>(y));
+    glVertex2f(static_cast<GLfloat>(x), static_cast<GLfloat>(y));
 }
 
 void glVertex3i(GLint x, GLint y, GLint z) {
-    floatVertexBuffer.push_back(static_cast<GLfloat>(x));
-    floatVertexBuffer.push_back(static_cast<GLfloat>(y));
-    floatVertexBuffer.push_back(static_cast<GLfloat>(z));
+    glVertex3f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z));
 }
 
 void glVertex4i(GLint x, GLint y, GLint z, GLint w) {
-    floatVertexBuffer.push_back(static_cast<GLfloat>(x));
-    floatVertexBuffer.push_back(static_cast<GLfloat>(y));
-    floatVertexBuffer.push_back(static_cast<GLfloat>(z));
-    floatVertexBuffer.push_back(static_cast<GLfloat>(w));
+    glVertex4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 void glVertex2iv(const GLint *v) {

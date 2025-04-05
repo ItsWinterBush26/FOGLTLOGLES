@@ -1,6 +1,7 @@
 #include "build_info.h"
 #include "main.h"
 #include "es/utils.h"
+#include "ffp/main.h"
 #include "gles/main.h"
 #include "gles20/main.h"
 #include "gles30/main.h"
@@ -42,6 +43,7 @@ void FOGLTLOGLES::init() {
     LOGI("ESSL : %i", ESUtils::shadingVersion);
     
     GLES::wrapper->init();
+    FFP::wrapper->init();
     if (ESUtils::version.first >= 2) GLES20::wrapper->init();
     if (ESUtils::version.first >= 3) GLES30::wrapper->init();
     if (ESUtils::version.first >= 3 && ESUtils::version.second == 2) GLES32::wrapper->init();
