@@ -1,6 +1,9 @@
 #pragma once
 
+#include "glm/ext/matrix_float4x4.hpp"
 #include <GLES/gl.h>
+#include <memory>
+#include <stack>
 #include <vector>
 
 #ifndef GL_NONE
@@ -10,3 +13,7 @@
 inline GLenum currentPrimitive = GL_NONE;
 
 inline std::vector<GLfloat> floatVertexBuffer;
+
+inline GLenum currentMatrixMode = GL_MODELVIEW;
+inline std::stack<glm::mat4> matrixStack;
+inline std::vector<glm::mat4> currentMatrix;

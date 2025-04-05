@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.11)
 
 project(FOGLTOGLES LANGUAGES C CXX)
 
@@ -22,6 +22,15 @@ set(GLSLANG_TESTS OFF)
 
 add_subdirectory(deps/shaderc) 
 add_subdirectory(deps/spirv-cross)
+
+include(FetchContent)
+
+FetchContent_Declare(
+	glm
+	GIT_REPOSITORY	https://github.com/g-truc/glm.git
+)
+
+FetchContent_MakeAvailable(glm)
 
 ######## MAIN PROJECT ########
 set(COMMON_FLAGS
@@ -136,6 +145,8 @@ set(DEPENDENCIES
 	# OpenMP static
 	-fopenmp
 	-static-openmp
+
+    glm::glm
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_OPTIONS -fopenmp)

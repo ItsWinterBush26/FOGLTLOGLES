@@ -1,59 +1,74 @@
+#include "es/ffp.h"
 #include "ffp/main.h"
 #include "main.h"
 
+#include <glm/glm.hpp>
 #include <GLES/gl.h>
 
 typedef double GLdouble;
 
-void glMatrixMode(GLenum mode);
+void OV_glMatrixMode(GLenum mode);
  
 void glOrtho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val);
 void glFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val);
-void glViewport(GLint x, GLint y, GLsizei width, GLsizei height);
+void OV_glViewport(GLint x, GLint y, GLsizei width, GLsizei height);
 
-void glPushMatrix();
-void glPopMatrix();
-void glLoadIdentity();
+void OV_glPushMatrix();
+void OV_glPopMatrix();
+void OV_glLoadIdentity();
 
 void glLoadMatrixd(const GLdouble *m);
-void glLoadMatrixf(const GLfloat *m);
+void OV_glLoadMatrixf(const GLfloat *m);
 
 void glMultMatrixd(const GLdouble *m);
-void glMultMatrixf(const GLfloat *m);
+void OV_glMultMatrixf(const GLfloat *m);
 
 void glRotated(GLdouble angle, GLdouble x, GLdouble y, GLdouble z);
-void glRotatef( GLfloat angle, GLfloat x, GLfloat y, GLfloat z);
+void OV_glRotatef( GLfloat angle, GLfloat x, GLfloat y, GLfloat z);
 
 void glScaled(GLdouble x, GLdouble y, GLdouble z);
-void glScalef(GLfloat x, GLfloat y, GLfloat z);
+void OV_glScalef(GLfloat x, GLfloat y, GLfloat z);
 
 void glTranslated(GLdouble x, GLdouble y, GLdouble z);
-void glTranslatef(GLfloat x, GLfloat y, GLfloat z);
+void OV_glTranslatef(GLfloat x, GLfloat y, GLfloat z);
 
 
 void FFP::registerMatrixFunctions() {
-    REGISTER(glMatrixMode);
+    REGISTEROV(glMatrixMode);
 
     REGISTER(glOrtho);
     REGISTER(glFrustum);
-    REGISTER(glViewport);
+    REGISTEROV(glViewport);
 
-    REGISTER(glPushMatrix);
-    REGISTER(glPopMatrix);
-    REGISTER(glLoadIdentity);
+    REGISTEROV(glPushMatrix);
+    REGISTEROV(glPopMatrix);
+    REGISTEROV(glLoadIdentity);
 
     REGISTER(glLoadMatrixd);
-    REGISTER(glLoadMatrixf);
+    REGISTEROV(glLoadMatrixf);
 
     REGISTER(glMultMatrixd);
-    REGISTER(glMultMatrixf);
+    REGISTEROV(glMultMatrixf);
 
     REGISTER(glRotated);
-    REGISTER(glRotatef);
+    REGISTEROV(glRotatef);
 
     REGISTER(glScaled);
-    REGISTER(glScalef);
+    REGISTEROV(glScalef);
 
     REGISTER(glTranslated);
-    REGISTER(glTranslatef);
+    REGISTEROV(glTranslatef);
+}
+
+void OV_glMatrixMode(GLenum mode) {
+    switch (mode) {
+        case GL_MODELVIEW:
+        case GL_PROJECTION:
+        case GL_TEXTURE:
+            break;
+        default:
+            return;
+    }
+    
+    currentMatrixMode = mode;
 }
