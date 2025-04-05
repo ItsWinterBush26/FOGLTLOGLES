@@ -90,7 +90,7 @@ inline std::vector<T> mergeIndicesGPU(
         glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
     }
     mergedIndices.shrink_to_fit();
-    
+
     LOGI("W MERGE SYCCES (indices as offsets)");
     return mergedIndices;
 }
@@ -134,6 +134,10 @@ inline void drawActual(
         0
     );
     LOGI("called draw!");
+    LOGI("indices:");
+    for (const auto& index : mergedIndices) {
+        LOGI("%u", index);
+    }
 }  
 
 struct MDElementsBaseVertexBatcher {
