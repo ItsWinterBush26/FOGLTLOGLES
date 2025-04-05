@@ -1,49 +1,59 @@
-#include "es/ffp.h"
 #include "ffp/main.h"
 #include "main.h"
 
 #include <GLES/gl.h>
 
-void glBegin(GLenum mode);
-void glEnd();
+typedef double GLdouble;
 
-void FFP::registerImmediateFunctions() {
-    REGISTER(glBegin);
-    REGISTER(glEnd);
-}
+void glMatrixMode(GLenum mode);
+ 
+void glOrtho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val);
+void glFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val);
+void glViewport(GLint x, GLint y, GLsizei width, GLsizei height);
 
-void glBegin(GLenum mode) {
-    floatVertexBuffer.clear();
+void glPushMatrix();
+void glPopMatrix();
+void glLoadIdentity();
 
-    switch (mode) {
-        case GL_POINTS:
-        case GL_LINES:
-        case GL_LINE_STRIP:
-        case GL_LINE_LOOP:
-        case GL_TRIANGLES:
-        case GL_TRIANGLE_STRIP:
-        case GL_TRIANGLE_FAN:
-        case 0x7: // GL_QUADS
-        case 0x8: // GL_QUAD_STRIP
-        case 0x9: // GL_POLYGON
-            break;
-        default:
-            return;
-    }
+void glLoadMatrixd(const GLdouble *m);
+void glLoadMatrixf(const GLfloat *m);
 
-    currentPrimitive = mode;
-}
+void glMultMatrixd(const GLdouble *m);
+void glMultMatrixf(const GLfloat *m);
 
-void glEnd() {
-    glEnableClientState(GL_VERTEX_ARRAY);
-    
-    if (floatVertexBuffer.size() > 0) {
-        glVertexPointer(3, GL_FLOAT, 0, floatVertexBuffer.data());
-        glDrawArrays(currentPrimitive, 0, floatVertexBuffer.size() / 3);
-        floatVertexBuffer.clear();
-    }
+void glRotated(GLdouble angle, GLdouble x, GLdouble y, GLdouble z);
+void glRotatef( GLfloat angle, GLfloat x, GLfloat y, GLfloat z);
 
-    glDisableClientState(GL_VERTEX_ARRAY);
+void glScaled(GLdouble x, GLdouble y, GLdouble z);
+void glScalef(GLfloat x, GLfloat y, GLfloat z);
 
-    currentPrimitive = GL_NONE;
+void glTranslated(GLdouble x, GLdouble y, GLdouble z);
+void glTranslatef(GLfloat x, GLfloat y, GLfloat z);
+
+
+void FFP::registerMatrixFunctions() {
+    REGISTER(glMatrixMode);
+
+    REGISTER(glOrtho);
+    REGISTER(glFrustum);
+    REGISTER(glViewport);
+
+    REGISTER(glPushMatrix);
+    REGISTER(glPopMatrix);
+    REGISTER(glLoadIdentity);
+
+    REGISTER(glLoadMatrixd);
+    REGISTER(glLoadMatrixf);
+
+    REGISTER(glMultMatrixd);
+    REGISTER(glMultMatrixf);
+
+    REGISTER(glRotated);
+    REGISTER(glRotatef);
+
+    REGISTER(glScaled);
+    REGISTER(glScalef);
+
+    REGISTER(glTranslated);
+    REGISTER(glTranslatef);
 }
