@@ -134,10 +134,10 @@ inline void drawActual(
         0
     );
     LOGI("called draw!");
-    LOGI("indices:");
+    /* LOGI("indices:");
     for (const auto& index : mergedIndices) {
         LOGI("%u", index);
-    }
+    } */
 }  
 
 struct MDElementsBaseVertexBatcher {
