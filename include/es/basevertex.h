@@ -69,7 +69,7 @@ inline std::vector<T> mergeIndicesGPU(
     OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER].buffer);
     void* realIndices = glMapBufferRange(
         GL_ELEMENT_ARRAY_BUFFER,
-        0,
+        (GLintptr)indices[0], // will this?
         totalCount * sizeof(T), // test if this works, else Buffer.size in state_tracking.
         GL_MAP_READ_BIT
     );
