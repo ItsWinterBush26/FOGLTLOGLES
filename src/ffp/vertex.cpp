@@ -25,7 +25,8 @@ void glVertex4fv(const GLfloat *v);
 #pragma endregion
 
 void FFP::registerVertexFunctions() {
-#pragma region Vertex Float Registrations
+#pragma region Vertex Integer Registrations
+    // since GL_INT is not supported on OpenGL ES 1.0 we just use floatVertexBuffer
     REGISTER(glVertex2i);
     REGISTER(glVertex3i);
     REGISTER(glVertex4i);
@@ -49,21 +50,21 @@ void FFP::registerVertexFunctions() {
 
 #pragma region Vertex Integer Implementations
 void glVertex2i(GLint x, GLint y) {
-    intVertexBuffer.push_back(x);
-    intVertexBuffer.push_back(y);
+    floatVertexBuffer.push_back(static_cast<GLfloat>(x));
+    floatVertexBuffer.push_back(static_cast<GLfloat>(y));
 }
 
 void glVertex3i(GLint x, GLint y, GLint z) {
-    intVertexBuffer.push_back(x);
-    intVertexBuffer.push_back(y);
-    intVertexBuffer.push_back(z);
+    floatVertexBuffer.push_back(static_cast<GLfloat>(x));
+    floatVertexBuffer.push_back(static_cast<GLfloat>(y));
+    floatVertexBuffer.push_back(static_cast<GLfloat>(z));
 }
 
 void glVertex4i(GLint x, GLint y, GLint z, GLint w) {
-    intVertexBuffer.push_back(x);
-    intVertexBuffer.push_back(y);
-    intVertexBuffer.push_back(z);
-    intVertexBuffer.push_back(w);
+    floatVertexBuffer.push_back(static_cast<GLfloat>(x));
+    floatVertexBuffer.push_back(static_cast<GLfloat>(y));
+    floatVertexBuffer.push_back(static_cast<GLfloat>(z));
+    floatVertexBuffer.push_back(static_cast<GLfloat>(w));
 }
 
 void glVertex2iv(const GLint *v) {
