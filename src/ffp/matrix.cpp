@@ -36,15 +36,21 @@ void glBegin(GLenum mode) {
 }
 
 void glEnd() {
+    glEnableClientState(GL_VERTEX_ARRAY);
+    
     if (intVertexBuffer.size() > 0) {
+        glVertexPointer(3, GL_INT, 0, intVertexBuffer.data());
         glDrawArrays(currentPrimitive, 0, intVertexBuffer.size() / 3);
         intVertexBuffer.clear();
     }
 
     if (floatVertexBuffer.size() > 0) {
+        glVertexPointer(3, GL_FLOAT, 0, floatVertexBuffer.data());
         glDrawArrays(currentPrimitive, 0, floatVertexBuffer.size() / 3);
         floatVertexBuffer.clear();
     }
+
+    glDisableClientState(GL_VERTEX_ARRAY);
 
     currentPrimitive = GL_NONE;
 }
