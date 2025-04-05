@@ -67,29 +67,30 @@ inline std::vector<T> mergeIndicesGPU(
     // we dont assume ELEMENT_ARRAY_BUFFER is bound
     LOGI("bb.size == totalCount*T(%i)? (%d == %d)", sizeof(T), trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER].size, totalCount * sizeof(T));
     OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER].buffer);
-    void* realIndices = glMapBufferRange(
-        GL_ELEMENT_ARRAY_BUFFER,
-        (GLintptr)indices[0], // will this?
-        totalCount * sizeof(T), // test if this works, else Buffer.size in state_tracking.
-        GL_MAP_READ_BIT
-    );
-
-    if (!realIndices) {
-        LOGE("glMapBufferRange failed!");
-        LOGE("%u", glGetError());
-        return mergedIndices;
-    }
-
     for (GLsizei i = 0; i < drawcount; ++i) {
-        const T* indexData = static_cast<const T*>(realIndices) + getIndexOffsetFast(indices[i], sizeof(T));
+        void* realIndices = glMapBufferRange(
+            GL_ELEMENT_ARRAY_BUFFER,
+            (GLintptr) indices[i], // will this?
+            count[i] * sizeof(T), // test if this works, else Buffer.size in state_tracking.
+            GL_MAP_READ_BIT
+        );
+
+        if (!realIndices) {
+            LOGE("glMapBufferRange failed!"); 
+            LOGE("%u", glGetError());
+            return mergedIndices;
+        }
+        
+        const T* indexData = static_cast<const T*>(realIndices); // + getIndexOffsetFast(indices[i], sizeof(T));
         const GLint indexBaseVertex = basevertex[i];
         
         for (GLsizei j = 0; j < count[i]; ++j) {
             mergedIndices.push_back(indexData[j] + indexBaseVertex);
         }
+
+        glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
     }
 
-    glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
     LOGI("W MERGE SYCCES (indices as offsets)");
     return mergedIndices;
 }
