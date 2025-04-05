@@ -53,12 +53,12 @@ void glMultiDrawElements3(
     GLsizei primcount
 ) {
     if (primcount <= 0) return;
-    if (primcount > 32) {
+    // if (primcount > 32) {
         for (GLsizei i = 0; i < primcount; ++i) {
             if (count[i] > 0) glDrawElements(mode, count[i], type, indices[i]);
         }
         return;
-    }
+    /* }
 
     GLsizei threadNum = std::min(omp_get_max_threads(), std::max(1, primcount / 64));
 
@@ -77,5 +77,5 @@ void glMultiDrawElements3(
     SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
 
     batcher->batch(totalCount, typeSize, primcount, count, indices, sbb);
-    glDrawElements(mode, totalCount, type, (void*) 0);
+    glDrawElements(mode, totalCount, type, (void*) 0); */
 }
