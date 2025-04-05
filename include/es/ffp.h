@@ -8,4 +8,6 @@
 #endif
 
 inline GLenum currentPrimitive = GL_NONE;
-inline std::vector<GLfloat> vertexBuffer;
+
+inline std::vector<GLint> intVertexBuffer;
+inline std::vector<GLfloat> floatVertexBuffer;

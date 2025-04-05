@@ -3,5 +3,6 @@
 
 void FFP::FFPWrapper::init() {
     FFP::registerImmediateFunctions();
+    FFP::registerVertexFunctions();
 }
     

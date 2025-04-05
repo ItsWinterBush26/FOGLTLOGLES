@@ -13,4 +13,5 @@ namespace FFP {
     const inline std::shared_ptr<FFPWrapper> wrapper = std::make_shared<FFPWrapper>();
 
     void registerImmediateFunctions();
+    void registerVertexFunctions();
 }
