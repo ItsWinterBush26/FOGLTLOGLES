@@ -1,5 +1,6 @@
 #pragma once
 
+#include "es/binding_saver.h"
 #include "es/state_tracking.h"
 #include "gles20/buffer_tracking.h"
 #include "utils/log.h"
@@ -64,14 +65,12 @@ inline std::vector<T> mergeIndicesGPU(
     std::vector<T> mergedIndices;
     mergedIndices.reserve(totalCount);
 
-    // we dont assume ELEMENT_ARRAY_BUFFER is bound
-    LOGI("bb.size == totalCount*T(%i)? (%d == %d)", sizeof(T), trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER].size, totalCount * sizeof(T));
-    OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER].buffer);
     for (GLsizei i = 0; i < drawcount; ++i) {
+        LOGI("Mapping indexData. offset=%li, size=%u", (GLintptr) indices[i], count[i]);
         void* realIndices = glMapBufferRange(
             GL_ELEMENT_ARRAY_BUFFER,
-            (GLintptr) indices[i], // will this?
-            count[i] * sizeof(T), // test if this works, else Buffer.size in state_tracking.
+            (GLintptr) indices[i],
+            count[i] * sizeof(T),
             GL_MAP_READ_BIT
         );
 
@@ -81,7 +80,7 @@ inline std::vector<T> mergeIndicesGPU(
             return mergedIndices;
         }
         
-        const T* indexData = static_cast<const T*>(realIndices); // + getIndexOffsetFast(indices[i], sizeof(T));
+        const T* indexData = static_cast<const T*>(realIndices);
         const GLint indexBaseVertex = basevertex[i];
         
         for (GLsizei j = 0; j < count[i]; ++j) {
@@ -90,7 +89,8 @@ inline std::vector<T> mergeIndicesGPU(
 
         glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
     }
-
+    mergedIndices.shrink_to_fit();
+    
     LOGI("W MERGE SYCCES (indices as offsets)");
     return mergedIndices;
 }
@@ -102,34 +102,51 @@ inline void drawActual(
     GLenum type,
     const void* const* indices,
     GLsizei drawcount,
-    const GLint* basevertex
+    const GLint* basevertex,
+    GLuint buffer
 ) {
     std::vector<T> mergedIndices;
     if (trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER].buffer == 0) {
         mergedIndices = mergeIndicesCPU<T>(count, indices, drawcount, basevertex);
     } else {
         mergedIndices = mergeIndicesGPU<T>(count, indices, drawcount, basevertex);
-        // OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // unbound to make it seem like the indices was "digested"
     }
     
     if (mergedIndices.empty()) {
         LOGE("mergedIndices is empty");
         return;
     }
+
+    SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER,
+        mergedIndices.size() * sizeof(T),
+        mergedIndices.data(),
+        GL_STATIC_DRAW
+    );
     
     glDrawElementsBaseVertex(
         mode,
         mergedIndices.size(),
         type,
-        reinterpret_cast<const void*>(
-            const_cast<const T*>(mergedIndices.data())
-        ),
+        0, // no offset, we already have merged the indices
         0
     );
     LOGI("called draw!");
 }  
 
 struct MDElementsBaseVertexBatcher {
+    GLuint eab;
+
+    MDElementsBaseVertexBatcher() {
+        glGenBuffers(1, &eab);
+    }
+
+    ~MDElementsBaseVertexBatcher() {
+        glDeleteBuffers(1, &eab);
+    }
+
     void batch(
         GLenum mode,
         const GLsizei* count,
@@ -164,7 +181,8 @@ struct MDElementsBaseVertexBatcher {
                     type,
                     indices,
                     drawcount,
-                    basevertex
+                    basevertex,
+                    eab
                 );
                 break;
             }
@@ -175,7 +193,8 @@ struct MDElementsBaseVertexBatcher {
                     type,
                     indices,
                     drawcount,
-                    basevertex
+                    basevertex,
+                    eab
                 );
                 break;
             }
@@ -186,7 +205,8 @@ struct MDElementsBaseVertexBatcher {
                     type,
                     indices,
                     drawcount,
-                    basevertex
+                    basevertex,
+                    eab
                 );
                 break;
             }
