@@ -153,7 +153,8 @@ void OV_glMultMatrixf(const GLfloat *m) {
 }
 
 void glRotated(GLdouble angle, GLdouble x, GLdouble y, GLdouble z) {
-    // currentMatrix = glm::rotate(currentMatrix, glm::radians(angle), glm::vec3(x, y, z));
+    // currentMatrix = glm::rotate(currentMatrix, glm::radians(static_cast<float>(angle), glm::vec3(x, y, z));
+    OV_glRotatef(static_cast<float>(angle), static_cast<float>(x), static_cast<float>(y), static_cast<float>(z));
 }
 
 void OV_glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z) {
@@ -161,7 +162,8 @@ void OV_glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z) {
 }
 
 void glScaled(GLdouble x, GLdouble y, GLdouble z) {
-    currentMatrix = glm::scale(currentMatrix, glm::vec3(x, y, z));
+    // currentMatrix = glm::scale(currentMatrix, glm::vec3(x, y, z));
+    OV_glScalef(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z));
 }
 
 void OV_glScalef(GLfloat x, GLfloat y, GLfloat z) {
@@ -169,7 +171,8 @@ void OV_glScalef(GLfloat x, GLfloat y, GLfloat z) {
 }
 
 void glTranslated(GLdouble x, GLdouble y, GLdouble z) {
-    currentMatrix = glm::translate(currentMatrix, glm::vec3(x, y, z));
+    // currentMatrix = glm::translate(currentMatrix, glm::vec3(x, y, z));
+    OV_glTranslatef(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z));
 }
 
 void OV_glTranslatef(GLfloat x, GLfloat y, GLfloat z) {
