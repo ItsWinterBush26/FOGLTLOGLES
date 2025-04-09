@@ -22,7 +22,6 @@ void OV_glLoadMatrixf(const GLfloat *m);
  
 void glOrtho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val);
 void glFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val);
-void OV_glViewport(GLint x, GLint y, GLsizei width, GLsizei height);
 
 void glMultMatrixd(const GLdouble *m);
 void OV_glMultMatrixf(const GLfloat *m);
@@ -48,7 +47,6 @@ void FFP::registerMatrixFunctions() {
 
     REGISTER(glOrtho);
     REGISTER(glFrustum);
-    REGISTEROV(glViewport);
 
     REGISTER(glMultMatrixd);
     REGISTEROV(glMultMatrixf);
@@ -125,11 +123,6 @@ void glFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLd
         bottom, top,
         near_val, far_val
     );
-}
-
-void OV_glViewport(GLint x, GLint y, GLsizei width, GLsizei height) {
-    glViewport(x, y, width, height);
-    glScissor(x, y, width, height);
 }
 
 void glMultMatrixd(const GLdouble *m) {
