@@ -21,6 +21,13 @@ void glMultiDrawElementsBaseVertex(
     GLsizei drawcount,
     const GLint* basevertex
 ) {
+    if (drawcount <= 0) return;
+
+    for (GLint i = 0; i < drawcount; ++i) {
+        if (count[i] > 0) glDrawElementsBaseVertex(mode, count[i], type, indices[i], basevertex[i]);
+    }
+    
+    /*
     batcher->batch(
         mode,
         count,
@@ -28,5 +35,5 @@ void glMultiDrawElementsBaseVertex(
         indices,
         drawcount,
         basevertex
-    );
+    ); */
 }
