@@ -13,6 +13,7 @@ inline shaderc::CompileOptions generateGLSL2SPVOptions(int glslVersion) {
     options.SetVulkanRulesRelaxed(true);
 
     options.SetAutoMapLocations(true);
+    options.SetAutoBindUniforms(true);
     
     return options;
 }
