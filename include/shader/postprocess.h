@@ -47,7 +47,7 @@ namespace ShaderConverter::SPVCPostprocessor {
         removeLocationBindingAndDescriptorSets(compiler, resources.separate_samplers);
 
         // Process uniform buffers and potential standalone uniforms
-        removeLocationBindingAndDescriptorSets(compiler, resources.uniform_buffers);
+        removeLocationBindingAndDescriptorSets(compiler, resources.uniform_buffers, rLocation | rDescSet);
         removeLocationBindingAndDescriptorSets(compiler, resources.gl_plain_uniforms);
 
         // Process shader inputs and outputs
