@@ -4,9 +4,11 @@
 #include "gl/header.h"
 #include "gles/main.h"
 #include "main.h"
+#include "utils/env.h"
 #include "utils/strings.h"
 
 #include <GLES/gl.h>
+#include <string>
 
 #ifndef CAST_TO_CUBYTE
 #define CAST_TO_CUBYTE(str) reinterpret_cast<const GLubyte*>(str)
@@ -16,6 +18,9 @@ const GLubyte* OV_glGetString(GLenum name);
 void OV_glGetIntegerv(GLenum pname, int* v);
 const GLubyte* OV_glGetStringi(GLenum pname, int index);
 void OV_glEnable(GLenum cap);
+
+// TODO: make its own env var
+inline std::string debugEnabled = getEnvironmentVar("LIBGL_VGPU_DUMP");
 
 inline std::string glVersion;
 inline std::string rendererString;
@@ -94,7 +99,8 @@ const GLubyte* OV_glGetStringi(GLenum pname, int index) {
 void OV_glEnable(GLenum cap) {
     switch (cap) {
         case GL_DEBUG_OUTPUT:
-            // break;
+            if (debugEnabled == "0") break; // dont allow debug
+            // passthrough!
 
         default:
             glEnable(cap);
