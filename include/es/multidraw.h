@@ -6,7 +6,6 @@
 #include <GLES3/gl3.h>
 #include <memory>
 #include <omp.h>
-#include <vector>
 
 inline GLint getTypeSize(GLenum type) {
     switch (type) {

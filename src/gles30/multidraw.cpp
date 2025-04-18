@@ -1,12 +1,8 @@
-#include "es/multidraw.h"
-#include "es/binding_saver.h"
 #include "gles30/main.h"
 #include "main.h"
 #include "utils/log.h"
-#include "utils/pointers.h"
 
 #include <GLES3/gl3.h>
-#include <omp.h>
 
 void glMultiDrawArrays3(GLenum mode, const GLint* first, const GLsizei* count, GLsizei drawcount);
 void glMultiDrawElements3(GLenum mode, const GLsizei* count, GLenum type, const void* const* indices, GLsizei drawcount);
@@ -17,7 +13,7 @@ void GLES30::registerMultiDrawEmulation() {
     REGISTERREDIR(glMultiDrawArrays, glMultiDrawArrays3);
     REGISTERREDIR(glMultiDrawElements, glMultiDrawElements3);
 
-    batcher = MakeAggregateShared<MDElementsBatcher>();
+    // batcher = MakeAggregateShared<MDElementsBatcher>();
 }
 
 void glMultiDrawArrays3(

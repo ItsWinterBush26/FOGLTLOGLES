@@ -99,7 +99,7 @@ const GLubyte* OV_glGetStringi(GLenum pname, int index) {
 void OV_glEnable(GLenum cap) {
     switch (cap) {
         case GL_DEBUG_OUTPUT:
-            if (debugEnabled == "0") break; // dont allow debug
+            if (debugEnabled.empty()) break; // dont allow debug
             // passthrough!
 
         default:
