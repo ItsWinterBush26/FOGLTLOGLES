@@ -57,7 +57,7 @@ namespace ShaderConverter::Cache {
         if (std::filesystem::exists(filename)) {
             std::filesystem::remove(filename);
 
-            LOGI("Invalidated shader with key %i", key);
+            LOGI("Invalidated shader with key %zu", key);
             return true;
         }
 
@@ -72,7 +72,7 @@ namespace ShaderConverter::Cache {
         LOGI("Indexing shader caches!");
 
         if (!std::filesystem::is_directory(CACHE_DIRECTORY) || !std::filesystem::exists(CACHE_DIRECTORY)) {
-            LOGI("Cache doesn't exist, creating...");
+            LOGI("Cache directory doesn't exist, creating...");
             std::filesystem::create_directory(CACHE_DIRECTORY);
         }
 
@@ -86,7 +86,7 @@ namespace ShaderConverter::Cache {
                 }
             }
         }
-
-        LOGI("Shader cache size : %i", shaderCache.size());
+        
+        LOGI("Shader cache size : %zu", shaderCache.size());
     }
 }

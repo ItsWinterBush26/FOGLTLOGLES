@@ -68,6 +68,10 @@ namespace ShaderConverter {
             return;
         }
 
+        if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+            LOGI("Converting and fixing %s!", getKindStringFromKind(kind));
+        }
+
         shaderc::SpvCompilationResult spirv = compileToSPV(kind, source);
         transpileSPV2ESSL(kind, spirv, source);
 
@@ -75,6 +79,6 @@ namespace ShaderConverter {
     }
 
     inline void invalidateCurrentShader() {
-        if (Cache::invalidateShaderCache(currentKey)) LOGI("Shader invalidated as it failed to link.");
+        if (Cache::invalidateShaderCache(currentKey)) LOGI("Shader invalidated as it failed to compile.");
     }
 }; // namespace ShaderConverter

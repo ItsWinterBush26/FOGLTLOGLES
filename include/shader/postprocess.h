@@ -1,11 +1,14 @@
 #pragma once
 
+#include "shaderc/shaderc.h"
 #include "spirv.hpp"
 #include "spirv_cross.hpp"
 #include "spirv_glsl.hpp"
 #include "utils/log.h"
 
 #include <shaderc/shaderc.hpp>
+#include <string>
+#include <unordered_map>
 
 class SPVCExposed_CompilerGLSL : public spirv_cross::CompilerGLSL {
     public:
@@ -33,6 +36,46 @@ namespace ShaderConverter::SPVCPostprocessor {
         }
     }
 
+    inline std::unordered_map<std::string, int> uniformBuffersBindingIndex;
+    inline uint32_t currentBindingIndex;
+
+    inline void reIndexUniformBuffersBindingIndex(
+        SPVCExposed_CompilerGLSL& compiler,
+        const spirv_cross::SmallVector<spirv_cross::Resource>& resources
+    ) {
+        for (const auto& resource : resources) {
+            std::string name = compiler.get_name(resource.id);
+
+            if (auto it = uniformBuffersBindingIndex.find(name); it != uniformBuffersBindingIndex.end()) {
+                LOGW("The uniform buffer named %s already has a saved index! Overriding...", name.c_str());
+            }
+            
+            uint32_t currentIndex = currentBindingIndex++;
+            compiler.set_decoration(resource.id, spv::DecorationBinding, currentIndex);
+            uniformBuffersBindingIndex[name] = currentIndex;
+        }
+    }
+
+    inline void fixUniformBuffersBindingIndex(
+        SPVCExposed_CompilerGLSL& compiler,
+        const spirv_cross::SmallVector<spirv_cross::Resource>& resources
+    ) {
+        if (uniformBuffersBindingIndex.empty()) return;
+        for (const auto& resource : resources) {
+            std::string name = compiler.get_name(resource.id);
+
+            if (auto it = uniformBuffersBindingIndex.find(name); it == uniformBuffersBindingIndex.end()) {
+                LOGW("The uniform buffer named %s doesn't have a saved index!", name.c_str());
+
+                compiler.set_decoration(resource.id, spv::DecorationBinding, currentBindingIndex++);
+
+                continue;
+            }
+
+            compiler.set_decoration(resource.id, spv::DecorationBinding, uniformBuffersBindingIndex.at(name));
+        }
+    }
+
     inline void processSPVBytecode(SPVCExposed_CompilerGLSL &compiler, shaderc_shader_kind kind) {
         if (kind == shaderc_glsl_compute_shader) {
             LOGI("Compute shader processing is unimplemented right now...");
@@ -47,7 +90,13 @@ namespace ShaderConverter::SPVCPostprocessor {
         removeLocationBindingAndDescriptorSets(compiler, resources.separate_samplers);
 
         // Process uniform buffers and potential standalone uniforms
-        removeLocationBindingAndDescriptorSets(compiler, resources.uniform_buffers, rLocation | rDescSet);
+        removeLocationBindingAndDescriptorSets(compiler, resources.uniform_buffers);
+
+        if (kind == shaderc_fragment_shader)
+            fixUniformBuffersBindingIndex(compiler, resources.uniform_buffers);
+        else if (kind == shaderc_vertex_shader)
+            reIndexUniformBuffersBindingIndex(compiler, resources.uniform_buffers);
+
         removeLocationBindingAndDescriptorSets(compiler, resources.gl_plain_uniforms);
 
         // Process shader inputs and outputs
