@@ -44,7 +44,7 @@ namespace ShaderConverter::SPVCPostprocessor {
         const spirv_cross::SmallVector<spirv_cross::Resource>& resources
     ) {
         for (const auto& resource : resources) {
-            std::string name = compiler.get_name(resource.id);
+            std::string name = compiler.get_name(compiler.get_type(resource.base_type_id).self);
 
             if (auto it = uniformBuffersBindingIndex.find(name); it != uniformBuffersBindingIndex.end()) {
                 LOGW("The uniform buffer named %s already has a saved index! Overriding...", name.c_str());
@@ -62,7 +62,7 @@ namespace ShaderConverter::SPVCPostprocessor {
     ) {
         if (uniformBuffersBindingIndex.empty()) return;
         for (const auto& resource : resources) {
-            std::string name = compiler.get_name(resource.id);
+            std::string name = compiler.get_name(compiler.get_type(resource.base_type_id).self);
 
             if (auto it = uniformBuffersBindingIndex.find(name); it == uniformBuffersBindingIndex.end()) {
                 LOGW("The uniform buffer named %s doesn't have a saved index!", name.c_str());
@@ -76,11 +76,16 @@ namespace ShaderConverter::SPVCPostprocessor {
         }
     }
 
+    inline bool preprocessedVS, preprocessedFS;
+
     inline void processSPVBytecode(SPVCExposed_CompilerGLSL &compiler, shaderc_shader_kind kind) {
         if (kind == shaderc_glsl_compute_shader) {
             LOGI("Compute shader processing is unimplemented right now...");
             return;
         }
+
+        if (!preprocessedVS && kind == shaderc_vertex_shader) preprocessedVS = true;
+        if (!preprocessedFS && kind == shaderc_fragment_shader) preprocessedFS = true;
 
         spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
@@ -106,5 +111,10 @@ namespace ShaderConverter::SPVCPostprocessor {
         if (kind == shaderc_fragment_shader
          && resources.stage_outputs.size() > 1) flags = rDescSet | rBinding;
         removeLocationBindingAndDescriptorSets(compiler, resources.stage_outputs, flags);
+
+        if (preprocessedVS && preprocessedVS) {
+            uniformBuffersBindingIndex.clear();
+            currentBindingIndex = 0;
+        }
     }
 }; // namespace ShaderConverer::SPVPostprocessor
