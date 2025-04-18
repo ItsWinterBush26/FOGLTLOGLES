@@ -5,13 +5,15 @@
 #include <string>
 #include <unordered_map>
 
-namespace ShaderConverter::RegexPreprocessor {
+inline const std::regex uniformRegex("uniform\\s+mat4\\s+(\\w+)\\s*=\\s*([^;]+);");
+inline const std::regex uniformRegex2("(uniform\\s+mat4\\s+\\w+)\\s*=\\s*[^;]+;");
+inline const std::regex texture2DRegex(R"(\btexture2D\s*\()");
+inline const std::regex glFragColorRegex(R"(\bgl_FragColor\b)");
 
+namespace ShaderConverter::GLSLRegexPreprocessor {
     // This assumes the GLSL is not malformed.
     // TODO: match (vec2, vec3, etc.)
-    inline void moveVariableInitialization(std::string &source) {
-        std::regex uniformRegex("uniform\\s+mat4\\s+(\\w+)\\s*=\\s*([^;]+);");
-        // Store each uniform's name and initializer.
+    inline void moveVariableInitialization(std::string& source) {
         std::vector<std::pair<std::string, std::string>> uniforms;
 
         // First pass: process each line to extract uniform declarations
@@ -25,9 +27,7 @@ namespace ShaderConverter::RegexPreprocessor {
                 uniforms.push_back({ match[1].str(), match[2].str() });
                 // Replace with just the uniform declaration.
                 line = std::regex_replace(
-                    line,
-                    std::regex("(uniform\\s+mat4\\s+\\w+)\\s*=\\s*[^;]+;"),
-                    "$1;"
+                    line, uniformRegex2, "$1;"
                 );
             }
             globalStream << line << "\n";
@@ -87,7 +87,26 @@ namespace ShaderConverter::RegexPreprocessor {
         source = output.str();
     }
 
-    inline void processGLSLSource(std::string& source) {
-        moveVariableInitialization(source);
+    inline void fixDeprecatedTextureFunction(std::string& source) {
+        source = std::regex_replace(source, texture2DRegex, "texture(");
+    }
+
+    inline void fixDeprecatedFragOutColor(std::string& source) {
+        if (source.find("gl_FragColor") != std::string::npos) {
+            source = std::regex_replace(source, glFragColorRegex, "fragColor");
+    
+            // Inject `out vec4 fragColor;` after #version
+            std::size_t versionPos = source.find("#version");
+            if (versionPos != std::string::npos) {
+                std::size_t lineEnd = source.find('\n', versionPos);
+                if (lineEnd != std::string::npos) {
+                    source.insert(lineEnd + 1, "varying vec4 fragColor;\n");
+                } else {
+                    source += "\nvarying vec4 fragColor;\n";
+                }
+            } else {
+                source = "varying vec4 fragColor;\n" + source;
+            }
+        }
     }
 }

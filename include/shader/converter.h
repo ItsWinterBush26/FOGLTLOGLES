@@ -20,14 +20,20 @@ inline size_t currentKey = 0;
 
 namespace ShaderConverter {
     inline shaderc::SpvCompilationResult compileToSPV(shaderc_shader_kind kind, std::string& source) {
-        RegexPreprocessor::processGLSLSource(source);
-
         int shaderVersion = 0;
         std::string shaderProfile = ""; // useless
         getShaderVersion(source, shaderVersion, shaderProfile);
 
         shaderc::Compiler compiler;
         shaderc::SpvCompilationResult result;
+
+        GLSLRegexPreprocessor::moveVariableInitialization(source);
+
+        if (shaderVersion <= 120) {
+            GLSLRegexPreprocessor::fixDeprecatedTextureFunction(source);
+
+            if (kind == shaderc_fragment_shader) GLSLRegexPreprocessor::fixDeprecatedFragOutColor(source);
+        }
 
         if (shaderVersion < 330) {
             upgradeTo330(kind, source);
