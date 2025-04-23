@@ -8,16 +8,16 @@
 #include <GLES3/gl31.h>
 #include <regex>
 
-inline void combineSources(GLsizei count, const GLchar *const* sources, const GLint* length, std::string& destination) {
+inline void combineSources(GLsizei count, const GLchar *const* sources, const GLint* lengths, std::string& destination) {
     for (GLsizei i = 0; i < count; i++) {
-        if (sources[i]) {
-           if (length && length[i] > 0) {
-                 destination.append(sources[i], length[i]);
-           } else {
-               destination.append(sources[i]);
-           }
-       }
-   }
+        if (lengths && lengths[i] > 0) {
+            // If length is provided, use it
+            destination.append(sources[i], lengths[i]);
+        } else {
+            // Otherwise treat as null-terminated string
+            destination.append(sources[i]);
+        }
+    }
 }
 
 inline shaderc_shader_kind getKindFromShader(GLuint shader) {
