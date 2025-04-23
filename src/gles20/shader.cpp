@@ -54,7 +54,11 @@ void OV_glCompileShader(GLuint shader) {
 
     if (success != GL_TRUE) {
         ShaderConverter::invalidateCurrentShader();
+        GLchar bufLog[4096] = { 0 };
+        GLint size = 0;
+        glGetShaderInfoLog(shader, 4096, &size, bufLog);
 
+        LOGI("Compile error for shader %u: %s", shader, bufLog);
         throw std::runtime_error("Failed to compile shader!");
     }
 }
