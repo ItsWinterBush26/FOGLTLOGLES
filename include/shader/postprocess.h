@@ -112,9 +112,12 @@ namespace ShaderConverter::SPVCPostprocessor {
          && resources.stage_outputs.size() > 1) flags = rDescSet | rBinding;
         removeLocationBindingAndDescriptorSets(compiler, resources.stage_outputs, flags);
 
-        if (preprocessedVS && preprocessedVS) {
+        if (preprocessedVS && preprocessedFS) {
             uniformBuffersBindingIndex.clear();
             currentBindingIndex = 0;
+
+            preprocessedVS = false;
+            preprocessedFS = false;
         }
     }
 }; // namespace ShaderConverer::SPVPostprocessor
