@@ -13,7 +13,7 @@ inline void upgradeTo330(shaderc_shader_kind kind, std::string& src) {
     options.SetSourceLanguage(shaderc_source_language_glsl);
     options.SetTargetEnvironment(shaderc_target_env_opengl, 330);
     options.SetForcedVersionProfile(330, shaderc_profile_core);
-    options.SetOptimizationLevel(shaderc_optimization_level_performance);
+    options.SetOptimizationLevel(shaderc_optimization_level_zero);
     options.SetVulkanRulesRelaxed(true);
     
     options.SetAutoMapLocations(true);
