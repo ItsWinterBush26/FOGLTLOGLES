@@ -51,7 +51,6 @@ void OV_glCompileShader(GLuint shader) {
 
     GLint success = 0;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-
     if (success != GL_TRUE) {
         ShaderConverter::invalidateCurrentShader();
         GLchar bufLog[4096] = { 0 };
@@ -59,6 +58,18 @@ void OV_glCompileShader(GLuint shader) {
         glGetShaderInfoLog(shader, 4096, &size, bufLog);
 
         LOGI("Compile error for shader %u: %s", shader, bufLog);
+
+        GLint length = 0;
+        glGetShaderiv(shader, GL_SHADER_SOURCE_LENGTH, &length);
+        if (length > 0) {
+            GLchar* source = new GLchar[length];
+            glGetShaderSource(shader, length, NULL, source);
+            
+            LOGI("Shader %u source:", shader);
+            LOGI("%s", source);
+            
+            delete[] source;
+        }
         throw std::runtime_error("Failed to compile shader!");
     }
 }
