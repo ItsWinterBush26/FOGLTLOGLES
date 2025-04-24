@@ -1,6 +1,6 @@
 #pragma once
 
-#import "utils/log.h"
+#include "utils/log.h"
 
 #include <regex>
 #include <sstream>
@@ -11,6 +11,7 @@ inline const std::regex uniformRegex("uniform\\s+mat4\\s+(\\w+)\\s*=\\s*([^;]+);
 inline const std::regex uniformRegex2("(uniform\\s+mat4\\s+\\w+)\\s*=\\s*[^;]+;");
 inline const std::regex texture2DRegex(R"(\btexture2D\s*\()");
 inline const std::regex glFragColorRegex(R"(\bgl_FragColor\b)");
+inline const std::regex lineDirectiveRegex(R"(^\s*#line.*$)");
 
 namespace ShaderConverter::GLSLRegexPreprocessor {
     // This assumes the GLSL is not malformed.
@@ -92,6 +93,10 @@ namespace ShaderConverter::GLSLRegexPreprocessor {
             output << line << "\n";
         }
         source = output.str();
+    }
+
+    inline void removeLineDirectives(std::string& source) {
+        source = std::regex_replace(source, lineDirectiveRegex, "");
     }
 
     inline void fixDeprecatedTextureFunction(std::string& source) {
