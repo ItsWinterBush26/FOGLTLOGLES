@@ -22,7 +22,7 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* string
     std::string combinedSource;
     combineSources(count, string, length, combinedSource);
 
-    if (combineSource.empty()) {
+    if (combinedSource.empty()) {
         LOGW("glShaderSource was called without a shader source? Skipping...");
         return;
     }
@@ -44,7 +44,7 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* string
         LOGI("ShaderConverter::convertAndFix()!");
         
         ShaderConverter::convertAndFix(getKindFromShader(shader), combinedSource);
-        if (combineSource.empty()) {
+        if (combinedSource.empty()) {
             LOGE("Convertion failed?");
         }
         
