@@ -36,6 +36,11 @@ namespace ShaderConverter {
             if (kind == shaderc_fragment_shader) GLSLRegexPreprocessor::fixDeprecatedFragOutColor(source);
         }
 
+        if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+            LOGE("Preprocessed source:");
+            LOGE("%s", source.c_str());
+        }
+
         if (shaderVersion < 330) {
             upgradeTo330(kind, source);
             shaderVersion = 330;
