@@ -21,6 +21,11 @@ void GLES20::registerShaderOverrides() {
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length) {
     std::string combinedSource;
     combineSources(count, string, length, combinedSource);
+
+    if (combineSource.empty()) {
+        LOGW("glShaderSource was called without a shader source? Skipping...");
+        return;
+    }
     
     int version = 0; // useless
     std::string profile = "";
@@ -36,9 +41,14 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* string
     if (profile != "es") {
         if (profile == "core" || profile == "compatibility") LOGI("Shader is on '%s' profile! Let's see how this goes...", profile.c_str());
 
+        LOGI("ShaderConverter::convertAndFix()!");
+        
         ShaderConverter::convertAndFix(getKindFromShader(shader), combinedSource);
-        const GLchar* newSource = combinedSource.c_str();
-
+        if (combineSource.empty()) {
+            LOGE("Convertion failed?");
+        }
+        
+        const GLchar* newSource[] = { combinedSource.c_str() };
         glShaderSource(shader, 1, &newSource, nullptr);
     } else {
         LOGI("Shader already ESSL, no need to convert");
