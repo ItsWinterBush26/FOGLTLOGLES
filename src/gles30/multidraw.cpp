@@ -41,6 +41,55 @@ void glMultiDrawArrays3(
     glDrawArrays(mode, mergedFirst, mergedCount);
 }
 
+// Determine the byte-size of one index, given its GLenum type.
+static inline GLsizei getByteSize(GLenum type) {
+    switch(type) {
+        case GL_UNSIGNED_BYTE:  return sizeof(GLubyte);
+        case GL_UNSIGNED_SHORT: return sizeof(GLushort);
+        case GL_UNSIGNED_INT:   return sizeof(GLuint);
+        default:
+            return 0;
+    }
+}
+
+void glMultiDrawElements3(
+    GLenum mode,                 
+    const GLsizei* counts,
+    GLenum type,
+    const void* const* indices,
+    GLsizei primcount
+) {
+    const GLsizei idxSize = getByteSize(type);
+    if (primcount <= 0 || idxSize == 0) return;
+
+    const void* mergedBase = indices[0];
+    GLsizei mergedCount = counts[0];
+    const char* lastPtr = (const char*) indices[0] + counts[0] * idxSize;
+
+    for(GLsizei i = 1; i < primcount; ++i) {
+        const char* currBase = (const char*) indices[i];
+        GLsizei currCount = counts[i];
+
+        if (currBase == lastPtr) {
+            // extend the merged range
+            mergedCount += currCount;
+            lastPtr = currBase + currCount*idxSize;
+        }
+        else {
+            // flush
+            glDrawElements(mode, mergedCount, type, mergedBase);
+            
+            // new merged range
+            mergedBase = indices[i];
+            mergedCount = currCount;
+            lastPtr = currBase + currCount * idxSize;
+        }
+    }
+    // final flush
+    glDrawElements(mode, mergedCount, type, mergedBase);
+}
+
+/*
 void glMultiDrawElements3(
     GLenum mode,
     const GLsizei* count,
@@ -54,7 +103,7 @@ void glMultiDrawElements3(
             if (count[i] > 0) glDrawElements(mode, count[i], type, indices[i]);
         }
         return;
-    /* }
+    }
 
     GLsizei threadNum = std::min(omp_get_max_threads(), std::max(1, primcount / 64));
 
@@ -73,5 +122,6 @@ void glMultiDrawElements3(
     SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
 
     batcher->batch(totalCount, typeSize, primcount, count, indices, sbb);
-    glDrawElements(mode, totalCount, type, (void*) 0); */
+    glDrawElements(mode, totalCount, type, (void*) 0);
 }
+*/
