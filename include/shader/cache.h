@@ -8,12 +8,18 @@
 #include <fstream>
 #include <functional>
 #include <sstream>
+#include <string>
+#include <sys/stat.h>
 #include <unordered_map>
+#include <utility>
+
+inline const std::string SHADER_CACHE_DIRECTORY = getEnvironmentVar("MESA_GLSL_CACHE_DIR") + "/converted";
+inline const size_t SHADER_RETENTION_DAYS = std::stoull(getEnvironmentVar("FOGLE_CACHE_RETENTION_DAY", "30"));
 
 // key is hash, value is path
 inline FAST_MAP_BI(size_t, std::string) shaderCache;
 
-inline const std::string CACHE_DIRECTORY = getEnvironmentVar("MESA_GLSL_CACHE_DIR") + "/converted";
+inline const time_t thresholdInSeconds = SHADER_RETENTION_DAYS * 24 * 60 * 60;
 
 namespace ShaderConverter::Cache {
     inline bool isShaderInCache(size_t hashKey) {
@@ -27,7 +33,7 @@ namespace ShaderConverter::Cache {
             return;
         }
 
-        std::string filePath = CACHE_DIRECTORY + "/" + std::to_string(key);
+        std::string filePath = SHADER_CACHE_DIRECTORY + "/" + std::to_string(key);
 
         std::ofstream newFile(filePath, std::fstream::out | std::fstream::trunc);
         newFile << source << std::endl;
@@ -69,24 +75,65 @@ namespace ShaderConverter::Cache {
     }
 
     inline void init() {
+        size_t deletedOldCacheFiles = 0;
         LOGI("Indexing shader caches!");
+        LOGI("Deleting cache files older than %zu days...", SHADER_RETENTION_DAYS);
 
-        if (!std::filesystem::is_directory(CACHE_DIRECTORY) || !std::filesystem::exists(CACHE_DIRECTORY)) {
-            LOGI("Cache directory doesn't exist, creating...");
-            std::filesystem::create_directory(CACHE_DIRECTORY);
-        }
-
-        for (const auto& entry : std::filesystem::directory_iterator { CACHE_DIRECTORY }) {
-            if (std::filesystem::is_regular_file(entry.status())) {
-                try {
-                    size_t realFilename = std::stoull(entry.path().filename().string());
-                    shaderCache.insert({ realFilename, entry.path().string() });
-                } catch (const std::exception& e) {
-                    continue;
-                }
-            }
+        if (!std::filesystem::is_directory(SHADER_CACHE_DIRECTORY)) {
+            LOGI("Cache path is not a directory! Deleting!");
+            std::filesystem::remove(SHADER_CACHE_DIRECTORY);
         }
         
-        LOGI("Shader cache size : %zu", shaderCache.size());
+        if(!std::filesystem::exists(SHADER_CACHE_DIRECTORY)) {
+            LOGI("Cache directory doesn't exist! Creating...");
+            std::filesystem::create_directory(SHADER_CACHE_DIRECTORY);
+        }
+
+        for (const auto& entry : std::filesystem::directory_iterator { SHADER_CACHE_DIRECTORY }) {
+            if (!std::filesystem::is_regular_file(entry.status())) continue;
+
+            try {
+                std::pair<size_t, std::string> shaderCacheEntry = std::make_pair(
+                    std::stoull(entry.path().filename().string()),
+                    entry.path().string()
+                );
+
+                struct stat fileStat;
+                if (stat(shaderCacheEntry.second.c_str(), &fileStat) != 0) {
+                    LOGW("Failed to stat() cache file! Assuming invalid and deleting!");
+                    std::filesystem::remove(entry.path());
+
+                    deletedOldCacheFiles++;
+                    continue;
+                }
+
+                const time_t now = time(nullptr);
+                const double lastAccessTime = difftime(now, fileStat.st_atime);
+
+                if (lastAccessTime > thresholdInSeconds) {
+                    if (std::filesystem::remove(entry.path())) {
+                        deletedOldCacheFiles++;
+                    } else {
+                        LOGW("Failed to remove old shader cache file! Ignoring...");
+                    }
+
+                    continue;
+                }
+                
+                shaderCache.insert({ shaderCacheEntry.first, shaderCacheEntry.second });
+            } catch (const std::exception& e) {
+                LOGW("Error when indexing a cache file! Skipping...");
+                LOGW("%s", e.what());
+            }
+        }
+
+        LOGI("Deleted %zu old cache files.", deletedOldCacheFiles);
+
+        if (deletedOldCacheFiles > 0) {
+            LOGI("Shader cache size (old) : %zu", shaderCache.size() + deletedOldCacheFiles);
+            LOGI("Shader cache size (new) : %zu", shaderCache.size());
+        } else {
+            LOGI("Shader cache size : %zu", shaderCache.size());
+        }
     }
 }
