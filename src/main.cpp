@@ -12,7 +12,7 @@
 #include <GLES3/gl32.h>
 #include <unordered_map>
 
-inline std::unordered_map<std::string, FunctionPtr> registeredFunctions(256);
+inline std::unordered_map<std::string, FunctionPtr> registeredFunctions;
 
 void FOGLTLOGLES::registerFunction(std::string name, FunctionPtr function) {
     if (registeredFunctions.find(name) != registeredFunctions.end()) {
