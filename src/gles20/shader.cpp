@@ -40,15 +40,10 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* string
 
     if (profile != "es") {
         if (profile == "core" || profile == "compatibility") LOGI("Shader is on '%s' profile! Let's see how this goes...", profile.c_str());
-
-        LOGI("ShaderConverter::convertAndFix()!");
         
         ShaderConverter::convertAndFix(getKindFromShader(shader), combinedSource);
-        if (combinedSource.empty()) {
-            LOGE("Convertion failed?");
-        }
-        
-        const GLchar* newSource[] = { combinedSource.c_str() };
+
+        const GLchar* newSource = combinedSource.c_str();
         glShaderSource(shader, 1, &newSource, nullptr);
     } else {
         LOGI("Shader already ESSL, no need to convert");
@@ -63,23 +58,31 @@ void OV_glCompileShader(GLuint shader) {
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (success != GL_TRUE) {
         ShaderConverter::invalidateCurrentShader();
-        GLchar bufLog[4096] = { 0 };
-        GLint size = 0;
-        glGetShaderInfoLog(shader, 4096, &size, bufLog);
 
-        LOGI("Compile error for shader %u: %s", shader, bufLog);
+        GLint logLength = 0;
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
+        if (logLength > 0) {
+            GLchar* bufLog = new GLchar[logLength];
+            glGetShaderInfoLog(shader, logLength, nullptr, bufLog);
 
-        GLint length = 0;
-        glGetShaderiv(shader, GL_SHADER_SOURCE_LENGTH, &length);
-        if (length > 0) {
-            GLchar* source = new GLchar[length];
-            glGetShaderSource(shader, length, NULL, source);
+            LOGE("Compile error for shader %u:", shader);
+            LOGE("%s", bufLog);
+
+            delete[] bufLog;
+        }
+
+        GLint sourceLength = 0;
+        glGetShaderiv(shader, GL_SHADER_SOURCE_LENGTH, &sourceLength);
+        if (sourceLength > 0) {
+            GLchar* source = new GLchar[sourceLength];
+            glGetShaderSource(shader, sourceLength, nullptr, source);
             
-            LOGI("Shader %u source:", shader);
-            LOGI("%s", source);
+            LOGE("Shader %u source:", shader);
+            LOGE("%s", source);
             
             delete[] source;
         }
+
         throw std::runtime_error("Failed to compile shader!");
     }
 }
@@ -90,11 +93,19 @@ void OV_glLinkProgram(GLuint program) {
     GLint success = 0;
     glGetProgramiv(program, GL_LINK_STATUS, &success);
     if (success != GL_TRUE) {
-        GLchar bufLog[4096] = { 0 };
-        GLint size = 0;
-        glGetProgramInfoLog(program, 4096, &size, bufLog);
+        GLint logLength = 0;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
 
-        LOGI("Link error for program %u: %s", program, bufLog);
+        if (logLength > 0) {
+            GLchar* bufLog = new GLchar[logLength];
+            glGetProgramInfoLog(program, logLength, nullptr, bufLog);
+
+            LOGE("Link error for program %u:", program);
+            LOGE("%s", bufLog);
+
+            delete[] bufLog;
+        }
+
         throw std::runtime_error("Failed to link program!");
     }
 }

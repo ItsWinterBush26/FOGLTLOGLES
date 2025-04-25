@@ -77,7 +77,12 @@ namespace ShaderConverter {
         currentKey = Cache::getHash(source);
         if (Cache::isShaderInCache(currentKey)) {
             source = Cache::getCachedShaderSource(currentKey);
-            return;
+
+            if (!source.empty()) return;
+
+            LOGW("Returned cache source is empty! That's incredibly rare....");
+            LOGW("Gonna act like it's a cache miss...");
+            Cache::invalidateShaderCache(currentKey);
         }
 
         if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {

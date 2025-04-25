@@ -1,7 +1,5 @@
 #pragma once
 
-#include "utils/log.h"
-
 #include <regex>
 #include <sstream>
 #include <string>
@@ -17,11 +15,6 @@ namespace ShaderConverter::GLSLRegexPreprocessor {
     // This assumes the GLSL is not malformed.
     // TODO: match (vec2, vec3, etc.)
     inline void moveVariableInitialization(std::string& source) {
-        if (source.find("void main()") == std::string::npos) {
-            LOGE("Source: %s", source.c_str());
-            throw std::runtime_error("Shader source with no main function? How the hell???");
-        }
-        
         std::vector<std::pair<std::string, std::string>> uniforms;
 
         // First pass: process each line to extract uniform declarations
