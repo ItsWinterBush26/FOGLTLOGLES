@@ -138,28 +138,27 @@ struct MDElementsBaseVertexBatcher {
             totalIndexCount += drawParams[i].indexCount;
         }
 
-        SaveBoundedBuffer saveSSBO(GL_SHADER_STORAGE_BUFFER);
-        SaveBoundedBuffer saveEBO(GL_ELEMENT_ARRAY_BUFFER);
-        SaveUsedProgram saveProgram;
-
         // Upload draw params
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, paramsSSBO);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, drawcount * sizeof(DrawParam), drawParams.data(), GL_STATIC_DRAW);
+        SaveBoundedBuffer saveSSBO(GL_SHADER_STORAGE_BUFFER);
+        OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, paramsSSBO);
+        OV_glBufferData(GL_SHADER_STORAGE_BUFFER, drawcount * sizeof(DrawParam), drawParams.data(), GL_STATIC_DRAW);
+
+        SaveBoundedBuffer saveEBO(GL_ELEMENT_ARRAY_BUFFER);
+        OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, outputIdxSSBO);
+        OV_glBufferData(GL_SHADER_STORAGE_BUFFER, totalIndexCount * elemSize, nullptr, GL_DYNAMIC_DRAW);
+
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, paramsSSBO);
-
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER].buffer);
-
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, outputIdxSSBO);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, totalIndexCount * elemSize, nullptr, GL_DYNAMIC_DRAW);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, outputIdxSSBO);
 
         // main
+        SaveUsedProgram saveProgram;
         glUseProgram(computeProgram);
         glDispatchCompute(drawcount, 2, 2);
         glMemoryBarrier(GL_ELEMENT_ARRAY_BARRIER_BIT);
 
         // draw
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outputIdxSSBO);
+        OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outputIdxSSBO);
         glDrawElements(mode, totalIndexCount, type, nullptr);
     }
 };
