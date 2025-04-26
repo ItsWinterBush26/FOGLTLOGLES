@@ -10,15 +10,16 @@
 inline std::once_flag eglInitFlag;
 inline std::once_flag rendererInitFlag;
 
+inline void* eglLibHandle = dlopen("libEGL.so", RTLD_LAZY | RTLD_LOCAL);
+
 FunctionPtr eglGetProcAddress(str procname) {
     std::call_once(eglInitFlag, eglInit);
     FunctionPtr tmp = FOGLTLOGLES::getFunctionAddress(procname);
     
     if (tmp) return tmp;
-    else {
-        if (real_eglGetProcAddress) return real_eglGetProcAddress(procname);
-        else return nullptr;
-    }
+    if (real_eglGetProcAddress) return real_eglGetProcAddress(procname);
+    
+    return nullptr;
 }
 
 EGLBoolean OV_eglMakeCurrent(EGLDisplay dpy, EGLSurface draw, EGLSurface read, EGLContext ctx) {
@@ -50,8 +51,14 @@ inline void eglInit() {
     REGISTER(eglTerminate);
     REGISTER(eglGetCurrentSurface);
     REGISTER(eglQuerySurface);
-    
-    LOGI("Done initializing!");
 
-    real_eglGetProcAddress = reinterpret_cast<PFNEGLGETPROCADDRESSPROC>(dlsym(dlopen("libEGL.so", RTLD_LAZY), "eglGetProcAddress"));
+    void* eglGetProcAddressSymbol = dlsym(eglLibHandle, "eglGetProcAddress");
+    if (!eglLibHandle || !eglGetProcAddressSymbol) {
+        LOGW("Failed to load libEGL.so/eglGetProcAddress! You may experience some issues...");
+        return;
+    }
+
+    real_eglGetProcAddress = reinterpret_cast<PFNEGLGETPROCADDRESSPROC>(eglGetProcAddressSymbol);
+
+    LOGI("Done initializing!");
 }
