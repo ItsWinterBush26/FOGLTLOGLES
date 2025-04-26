@@ -56,7 +56,7 @@ void main() {
 
     uint prevSum = low > 0 ? prefixSums[low - 1] : 0u;
     uint localIndex = outputIndex - prevSum;
-    uint inputIndex = localIdx + cmd.firstIndex;
+    uint inputIndex = localIndex + cmd.firstIndex;
 
     outputIndices[outputIndex] = inputElementBuffer[inputIndex] + uint(cmd.baseVertex);
 }
