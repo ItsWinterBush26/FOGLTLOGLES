@@ -81,6 +81,6 @@ struct SaveUsedProgram {
     }
 
     ~SaveUsedProgram() {
-        glLinkProgram(program);
+        glUseProgram(program);
     }
 };
