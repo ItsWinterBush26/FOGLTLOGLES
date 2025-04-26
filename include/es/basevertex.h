@@ -89,7 +89,8 @@ struct MDElementsBaseVertexBatcher {
         GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
 
         const GLchar* castedSource = COMPUTE_BATCHER_GLSL_BASE.c_str();
-        glShaderSource(computeShader, 1, &castedSource, nullptr);
+        const GLint sourceLength = COMPUTE_BATCHER_GLSL_BASE.length();
+        glShaderSource(computeShader, 1, &castedSource, &sourceLength);
         glCompileShader(computeShader);
 
         GLint success = 0;
@@ -149,14 +150,17 @@ struct MDElementsBaseVertexBatcher {
             );
         }
 
+        LOGI("mapping sum");
+
         DrawCommand* drawCommands = reinterpret_cast<DrawCommand*>(
             glMapBufferRange(
-                GL_SHADER_STORAGE_BUFFER,
-                0,
+                GL_SHADER_STORAGE_BUFFER, 0,
                 drawCommandsSize,
                 GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT
             )
         );
+
+        LOGI("constructing drawcommands");
 
         for (GLsizei i = 0; i < drawcount; ++i) {
             uintptr_t byteOffset = reinterpret_cast<uintptr_t>(indices[i]);
@@ -166,10 +170,14 @@ struct MDElementsBaseVertexBatcher {
 
         glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
+        LOGI("sum prefixes!");
+
         std::vector<GLuint> prefix(drawcount);
         prefix[0] = count[0];
         for (int i = 1; i < drawcount; ++i) prefix[i] = prefix[i - 1] + count[i];
         GLuint total = prefix.back();
+
+        LOGI("setup compute inputs/outputs");
         
         OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, prefixSSBO);
         OV_glBufferData(
@@ -202,11 +210,15 @@ struct MDElementsBaseVertexBatcher {
             outputIndexSSBO
         );
 
+        LOGI("dispatching compute");
+
         SaveUsedProgram sup;
         glUseProgram(computeProgram);
         glDispatchCompute((total + 127) / 128, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
         sup.reset();
+
+        LOGI("its draw time innit");
 
         SaveBoundedBuffer sbb2(GL_ELEMENT_ARRAY_BUFFER);
         OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outputIndexSSBO);
