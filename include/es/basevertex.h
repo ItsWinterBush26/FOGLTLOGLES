@@ -91,8 +91,7 @@ struct MDElementsBaseVertexBatcher {
         GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
 
         const GLchar* castedSource = COMPUTE_BATCHER_GLSL_BASE.c_str();
-        const GLint sourceLength = COMPUTE_BATCHER_GLSL_BASE.length();
-        glShaderSource(computeShader, 1, &castedSource, &sourceLength);
+        glShaderSource(computeShader, 1, &castedSource, nullptr);
         OV_glCompileShader(computeShader);
 
         GLint success = 0;
