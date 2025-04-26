@@ -13,8 +13,7 @@
 // Some of the code comes from:
 // https://github.com/MobileGL-Dev/MobileGlues/blob/8727ed43fde193ae595d73e84a8991ee771e43e7/src/main/cpp/gl/multidraw.cpp#L418
 
-inline const std::string COMPUTE_BATCHER_GLSL_BASE = R"(
-#version 320 es
+inline const std::string COMPUTE_BATCHER_GLSL_BASE = R"(#version 320 es
 layout(local_size_x = 128) in;
 
 struct DrawCommand {
@@ -57,8 +56,7 @@ void main() {
     uint inputIndex = localIndex + cmd.firstIndex;
 
     outputIndices[outputIndex] = uint(int(inputElementBuffer[inputIndex]) + cmd.baseVertex);
-}
-)";
+})";
 
 struct DrawCommand {
     GLuint firstIndex;
