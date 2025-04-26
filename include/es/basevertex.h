@@ -102,7 +102,7 @@ struct MDElementsBaseVertexBatcher {
         GLint success2 = 0;
         glGetProgramiv(computeProgram, GL_LINK_STATUS, &success2);
 
-        glDeleteShader(computeShader);
+        // glDeleteShader(computeShader);
 
         LOGI("MDElementsBaseVertexBatcher.computeReady=(%s && %s)", (!success) ? "false" : "true", (!success2) ? "false" : "true");
         // if (!(success && success2)) return;
@@ -110,6 +110,11 @@ struct MDElementsBaseVertexBatcher {
         glGenBuffers(1, &paramsSSBO);
         glGenBuffers(1, &prefixSSBO);
         glGenBuffers(1, &outputIndexSSBO);
+
+        GLint isProgram = 0;
+        glIsProgram(computeProgram, &isProgram);
+
+        LOGI("isProgram : %s", (isProgram == GL_TRUE) ? "true" : "false");
     }
 
     ~MDElementsBaseVertexBatcher() {
