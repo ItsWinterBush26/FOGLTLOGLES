@@ -106,7 +106,7 @@ struct MDElementsBaseVertexBatcher {
         glDeleteShader(computeShader);
 
         LOGI("MDElementsBaseVertexBatcher.computeReady=%s", (success && success2) ? "true" : "false");
-        if (!(success && success2)) return;
+        // if (!(success && success2)) return;
 
         glGenBuffers(1, &paramsSSBO);
         glGenBuffers(1, &prefixSSBO);
