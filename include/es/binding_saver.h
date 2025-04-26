@@ -81,6 +81,10 @@ struct SaveUsedProgram {
     }
 
     ~SaveUsedProgram() {
+        reset();
+    }
+
+    void reset() {
         glUseProgram(program);
     }
 };

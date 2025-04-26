@@ -136,10 +136,12 @@ struct MDElementsBaseVertexBatcher {
             }
         } */
         
+        SaveBoundedBuffer sbb(GL_SHADER_STORAGE_BUFFER);
         OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, paramsSSBO);
         const GLintptr previousSSBOSize = trackedStates->boundBuffers[GL_SHADER_STORAGE_BUFFER].size;
         const long drawCommandsSize = static_cast<long>(drawcount * sizeof(DrawCommand));
         if (previousSSBOSize < drawCommandsSize) {
+            LOGI("Resizing DrawCommands SSBO from %ld to %ld", previousSSBOSize, drawCommandsSize);
             OV_glBufferData(
                 GL_SHADER_STORAGE_BUFFER,
                 drawCommandsSize,
@@ -157,7 +159,7 @@ struct MDElementsBaseVertexBatcher {
         );
 
         for (GLsizei i = 0; i < drawcount; ++i) {
-            size_t byteOffset = reinterpret_cast<uintptr_t>(indices[i]);
+            uintptr_t byteOffset = reinterpret_cast<uintptr_t>(indices[i]);
             drawCommands[i].firstIndex = static_cast<GLuint>(byteOffset >> 2); // >> 2 -> / 4
             drawCommands[i].baseVertex = basevertex ? basevertex[i] : 0;
         }
@@ -183,8 +185,6 @@ struct MDElementsBaseVertexBatcher {
             nullptr, GL_DYNAMIC_DRAW
         );
 
-        SaveUsedProgram sup;
-        glUseProgram(computeProgram);
         glBindBufferBase(
             GL_SHADER_STORAGE_BUFFER, 0,
             trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER].buffer
@@ -202,10 +202,13 @@ struct MDElementsBaseVertexBatcher {
             outputIndexSSBO
         );
 
+        SaveUsedProgram sup;
+        glUseProgram(computeProgram);
         glDispatchCompute((total + 127) / 128, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+        sup.reset();
 
-        SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
+        SaveBoundedBuffer sbb2(GL_ELEMENT_ARRAY_BUFFER);
         OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outputIndexSSBO);
         glDrawElements(mode, total, type, 0);
     }
