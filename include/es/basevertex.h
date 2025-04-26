@@ -80,9 +80,13 @@ struct MDElementsBaseVertexBatcher {
     GLuint computeProgram;
 
     GLuint paramsSSBO;
+
     GLuint prefixSSBO;
+    std::vector<GLuint> prefix;
+
     GLuint outputIndexSSBO;
 
+    
     bool computeReady;
 
     MDElementsBaseVertexBatcher() {
@@ -137,15 +141,15 @@ struct MDElementsBaseVertexBatcher {
             }
         } */
         
-        SaveBoundedBuffer sbb(GL_SHADER_STORAGE_BUFFER);
-        OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, paramsSSBO);
+        SaveBoundedBuffer sbb(GL_DRAW_INDIRECT_BUFFER);
+        OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, paramsSSBO);
         const GLintptr previousSSBOSize = trackedStates->boundBuffers[GL_SHADER_STORAGE_BUFFER].size;
         const long drawCommandsSize = static_cast<long>(drawcount * sizeof(DrawCommand));
         if (previousSSBOSize < drawCommandsSize) {
-            LOGI("Resizing DrawCommands SSBO from %ld to %ld", previousSSBOSize, drawCommandsSize + (sizeof(DrawCommand) * 4));
+            LOGI("Resizing DrawCommands SSBO from %ld to %ld", previousSSBOSize, drawCommandsSize);
             OV_glBufferData(
-                GL_SHADER_STORAGE_BUFFER,
-                drawCommandsSize + (sizeof(DrawCommand) * 4),
+                GL_DRAW_INDIRECT_BUFFER,
+                drawCommandsSize,
                 nullptr, GL_DYNAMIC_DRAW
             );
         }
@@ -154,7 +158,7 @@ struct MDElementsBaseVertexBatcher {
 
         DrawCommand* drawCommands = reinterpret_cast<DrawCommand*>(
             glMapBufferRange(
-                GL_SHADER_STORAGE_BUFFER, 0,
+                GL_DRAW_INDIRECT_BUFFER, 0,
                 drawCommandsSize,
                 GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT
             )
@@ -168,11 +172,11 @@ struct MDElementsBaseVertexBatcher {
             drawCommands[i].baseVertex = basevertex ? basevertex[i] : 0;
         }
 
-        glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+        glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
 
         LOGI("sum prefixes!");
 
-        std::vector<GLuint> prefix(drawcount);
+        if (prefix.capacity() < drawcount) prefix.resize(drawcount);
         prefix[0] = count[0];
         for (int i = 1; i < drawcount; ++i) prefix[i] = prefix[i - 1] + count[i];
         GLuint total = prefix.back();
