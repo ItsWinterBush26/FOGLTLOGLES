@@ -173,17 +173,17 @@ struct MDElementsBaseVertexBatcher {
 
         LOGI("sum prefixes!");
 
-        if (static_cast<GLsizei>(prefix.capacity()) < drawcount) prefix.resize(drawcount);
+        if (static_cast<GLsizei>(prefix.capacity()) < drawcount) prefix.reserve(drawcount);
         prefix[0] = count[0];
         for (int i = 1; i < drawcount; ++i) prefix[i] = prefix[i - 1] + count[i];
-        GLuint total = prefix[prefix.size() - 1];
+        GLuint total = prefix[drawcount - 1];
 
         LOGI("setup compute inputs/outputs");
         
         OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, prefixSSBO);
         OV_glBufferData(
             GL_SHADER_STORAGE_BUFFER,
-            prefix.size() * sizeof(GLuint),
+            drawcount * sizeof(GLuint),
             prefix.data(), GL_DYNAMIC_DRAW
         );
 
@@ -217,6 +217,7 @@ struct MDElementsBaseVertexBatcher {
 
         SaveBoundedBuffer sbb2(GL_ARRAY_BUFFER);
         SaveUsedProgram sup;
+
         glUseProgram(computeProgram);
         glDispatchCompute((total + 127) / 128, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
@@ -228,7 +229,10 @@ struct MDElementsBaseVertexBatcher {
 
         SaveBoundedBuffer sbb3(GL_ELEMENT_ARRAY_BUFFER);
         OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outputIndexSSBO);
+
         glDrawElements(mode, total, type, 0);
+
+        LOGI("done");
     }
 };
 
