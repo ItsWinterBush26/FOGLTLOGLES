@@ -117,7 +117,7 @@ struct MDElementsBaseVertexBatcher {
 
         drawParams.resize(drawcount);
         GLuint totalIndexCount = 0, maxIndicesPerDraw = 0;
-
+        
         #pragma omp parallel for reduction(+:totalIndexCount) reduction(max:maxIndicesPerDraw)
         for (int i = 0; i < drawcount; ++i) {
             GLuint offset = reinterpret_cast<GLintptr>(indices[i]) / elemSize;
@@ -132,7 +132,6 @@ struct MDElementsBaseVertexBatcher {
         }
 
         // Prefix sum
-        #pragma omp parallel for reduction(+:totalIndexCount)
         for (int i = 0; i < drawcount; ++i) {
             drawParams[i].outputOffset = totalIndexCount;
             totalIndexCount += drawParams[i].indexCount;
