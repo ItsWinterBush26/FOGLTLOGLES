@@ -1,3 +1,4 @@
+#include "es/state_tracking.h"
 #include "shader/converter.h"
 #include "shader/utils.h"
 #include "gles20/main.h"
@@ -108,4 +109,6 @@ void OV_glLinkProgram(GLuint program) {
 
         throw std::runtime_error("Failed to link program!");
     }
+
+    trackedStates->lastLinkedProgram = program;
 }

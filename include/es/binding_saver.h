@@ -72,3 +72,15 @@ struct SaveBoundedFramebuffer {
         OV_glBindFramebuffer(framebufferType, boundedFramebuffer);
     }
 };
+
+struct SaveLinkedProgram {
+    GLuint program;
+
+    SaveLinkedProgram() {
+        program = trackedStates->lastLinkedProgram;
+    }
+
+    ~SaveLinkedProgram() {
+        glLinkProgram(program);
+    }
+};
