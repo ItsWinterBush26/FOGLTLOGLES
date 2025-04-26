@@ -173,7 +173,7 @@ struct MDElementsBaseVertexBatcher {
 
         LOGI("sum prefixes!");
 
-        if (prefix.capacity() < drawcount) prefix.resize(drawcount);
+        if (static_cast<GLsizei>(prefix.capacity()) < drawcount) prefix.resize(drawcount);
         prefix[0] = count[0];
         for (int i = 1; i < drawcount; ++i) prefix[i] = prefix[i - 1] + count[i];
         GLuint total = prefix[prefix.size() - 1];

@@ -41,13 +41,21 @@ struct SaveBoundedTexture {
 struct SaveBoundedBuffer {
     GLuint boundedBuffer;
     GLenum bufferType;
+
+    bool restored;
     
     SaveBoundedBuffer(GLenum bufferType) : bufferType(bufferType) {
         boundedBuffer = trackedStates->boundBuffers[bufferType].buffer;
     }
 
     ~SaveBoundedBuffer() {
+        if (!restored) restore();
+    }
+        
+    void restore() {
+        if (restored) return;
         OV_glBindBuffer(bufferType, boundedBuffer);
+        restored = true;
     }
 };
 
@@ -76,15 +84,19 @@ struct SaveBoundedFramebuffer {
 struct SaveUsedProgram {
     GLuint program;
 
+    bool restored;
+
     SaveUsedProgram() {
         program = trackedStates->lastUsedProgram;
     }
 
     ~SaveUsedProgram() {
-        reset();
+        if (!restored) restore();
     }
 
-    void reset() {
+    void restore() {
+        if (restored) return;
         glUseProgram(program);
+        restored = true;
     }
 };
