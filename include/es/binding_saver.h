@@ -73,14 +73,14 @@ struct SaveBoundedFramebuffer {
     }
 };
 
-struct SaveLinkedProgram {
+struct SaveUsedProgram {
     GLuint program;
 
-    SaveLinkedProgram() {
-        program = trackedStates->lastLinkedProgram;
+    SaveUsedProgram() {
+        program = trackedStates->lastUsedProgram;
     }
 
-    ~SaveLinkedProgram() {
+    ~SaveUsedProgram() {
         glLinkProgram(program);
     }
 };

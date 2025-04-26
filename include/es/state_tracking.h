@@ -72,7 +72,7 @@ struct TrackedStates {
     // NOTE: Type is NOT a binding enum
     FAST_MAP_BI(GLenum, Buffer) boundBuffers;
 
-    GLuint lastLinkedProgram;
+    GLuint lastUsedProgram;
 
     TrackedStates() {
         GLint maxTextureUnits;

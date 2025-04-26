@@ -66,8 +66,6 @@ struct MDElementsBaseVertexBatcher {
 
         computeProgram = glCreateProgram();
         glAttachShader(computeProgram, computeShader);
-
-        SaveLinkedProgram slp;
         glLinkProgram(computeProgram);
 
         GLint success2 = 0;
@@ -123,9 +121,6 @@ struct MDElementsBaseVertexBatcher {
             maxIndicesPerDraw   = std::max<GLuint>(maxIndicesPerDraw, count[i]);
         }
 
-        SaveLinkedProgram slp;
-        glLinkProgram(computeProgram);
-
         SaveBoundedBuffer sbb(GL_SHADER_STORAGE_BUFFER);
         OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, paramsSSBO);
         OV_glBufferData(
@@ -169,15 +164,15 @@ struct MDElementsBaseVertexBatcher {
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, outputIdxSSBO);
 
         // main
-
+        SaveUsedProgram sup;
         glUseProgram(computeProgram);
 
         GLuint groupsY = (maxIndicesPerDraw + 127) / 128;
         glDispatchCompute(drawcount, groupsY, 1);
-        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_ELEMENT_ARRAY_BARRIER_BIT);
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
         SaveBoundedBuffer sbb2(GL_ELEMENT_ARRAY_BUFFER);
-        OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outputIdxSSBO);             // :contentReference[oaicite:21]{index=21}
+        OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outputIdxSSBO);
         glDrawElements(mode, totalIndexCount, type, nullptr);
     }
 };

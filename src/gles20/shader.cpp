@@ -12,11 +12,13 @@
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length);
 void OV_glCompileShader(GLuint shader);
 void OV_glLinkProgram(GLuint program);
+void OV_glUseProgram(GLuint program);
 
 void GLES20::registerShaderOverrides() {
     REGISTEROV(glShaderSource);
     REGISTEROV(glCompileShader)
     REGISTEROV(glLinkProgram);
+    REGISTEROV(glUseProgram);
 }
 
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length) {
@@ -109,6 +111,10 @@ void OV_glLinkProgram(GLuint program) {
 
         throw std::runtime_error("Failed to link program!");
     }
+}
 
-    trackedStates->lastLinkedProgram = program;
+void OV_glUseProgram(GLuint program) {
+    glUseProgram(program);
+
+    trackedStates->lastUsedProgram = program;
 }
