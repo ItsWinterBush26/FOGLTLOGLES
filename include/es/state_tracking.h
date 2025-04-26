@@ -112,5 +112,5 @@ struct Framebuffer {
 struct Buffer {
     GLenum target;
     GLuint buffer;
-    GLsizei size;
+    GLsizeiptr size;
 };

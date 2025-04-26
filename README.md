@@ -15,6 +15,7 @@ This project is a Proof of Concept.
 # Credits
 - Shaderc
 - Spirv-Cross
-- TinyWrapper code
+- Some TinyWrapper code
 - Some LTW code
+- Some MobileGlues code
 - [@artdeell](https://github.com/artdeell) for helping me
