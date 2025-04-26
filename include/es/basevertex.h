@@ -13,11 +13,15 @@ inline const std::string COMPUTE_BATCHER_GLSL = R"(
 #version 320 es
 layout(local_size_x = 128) in;
 
+struct DrawParam {
+    uint firstIndexOffset;
+    uint indexCount;
+    uint baseVertex;
+    uint outputOffset;
+};
+
 layout(std430, binding = 0) buffer DrawParams {
-    uint firstIndexOffset[];
-    uint indexCount[];
-    uint baseVertex[];
-    uint outputOffset[];
+    DrawParam params[];
 };
 
 layout(std430, binding = 1) buffer InputIndices { uint indices[]; };
@@ -26,16 +30,22 @@ layout(std430, binding = 2) buffer OutputIndices { uint outIndices[]; };
 void main() {
     uint drawID  = gl_WorkGroupID.x;
     uint localID = gl_LocalInvocationID.x;
-    uint cnt     = indexCount[drawID];
-    if (localID >= cnt) return;
 
-    uint inIdx  = firstIndexOffset[drawID] + localID;
-    uint bv     = baseVertex[drawID];
-    uint outIdx = outputOffset[drawID] + localID;
+    DrawParam param = params[drawID];
+    if (localID >= param.indexCount) return;
 
-    outIndices.outIndices[outIdx] = indices[inIdx] + bv;
+    uint inIdx  = param.firstIndexOffset + localID;
+    uint outIdx = param.outputOffset + localID;
+    outIndices[outIdx] = indices[inIdx] + param.baseVertex;
 }
 )";
+
+struct DrawParam {
+    GLuint firstIndexOffset;
+    GLuint indexCount;
+    GLuint baseVertex;
+    GLuint outputOffset;
+};
 
 inline GLuint getTypeByteSize(GLenum type) {
     switch (type) {
@@ -51,6 +61,8 @@ struct MDElementsBaseVertexBatcher {
 
     GLuint paramsSSBO;
     GLuint outputIdxSSBO;
+
+    std::vector<DrawParam> drawParams;
 
     bool computeReady;
 
@@ -78,8 +90,6 @@ struct MDElementsBaseVertexBatcher {
 
         glGenBuffers(1, &paramsSSBO);
         glGenBuffers(1, &outputIdxSSBO);
-
-
     }
 
     ~MDElementsBaseVertexBatcher() {
@@ -105,74 +115,51 @@ struct MDElementsBaseVertexBatcher {
             }
         } */
 
-        std::vector<GLuint> firstIndexOffset(drawcount),
-                            indexCount(drawcount),
-                            baseVertex(drawcount),
-                            outputOffset(drawcount);
-        
-        // omp this
+        drawParams.resize(drawcount);
         GLuint totalIndexCount = 0, maxIndicesPerDraw = 0;
+
+        #pragma omp parallel for reduction(+:totalIndexCount) reduction(max:maxIndicesPerDraw)
         for (int i = 0; i < drawcount; ++i) {
-            firstIndexOffset[i] = reinterpret_cast<GLintptr>(indices[i]) / elemSize;
-            indexCount[i]       = count[i];
-            baseVertex[i]       = basevertex[i];
-            outputOffset[i]     = totalIndexCount;
-            totalIndexCount    += count[i];
-            maxIndicesPerDraw   = std::max<GLuint>(maxIndicesPerDraw, count[i]);
+            GLuint offset = reinterpret_cast<GLintptr>(indices[i]) / elemSize;
+            GLuint cnt = count[i];
+            GLuint base = basevertex[i];
+
+            drawParams[i] = {
+                offset, cnt, base, 0
+            };
+
+            maxIndicesPerDraw = std::max(maxIndicesPerDraw, cnt);
         }
 
-        SaveBoundedBuffer sbb(GL_SHADER_STORAGE_BUFFER);
-        OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, paramsSSBO);
-        OV_glBufferData(
-            GL_SHADER_STORAGE_BUFFER,
-            drawcount * 4 * elemSize, // 4 arrays
-            nullptr,
-            GL_STATIC_DRAW
-        );
-        glBufferSubData(
-            GL_SHADER_STORAGE_BUFFER, 0,
-            drawcount * elemSize, firstIndexOffset.data()
-        );
-        glBufferSubData(
-            GL_SHADER_STORAGE_BUFFER, drawcount * elemSize,
-            drawcount * elemSize, indexCount.data()
-        );
-        glBufferSubData(
-            GL_SHADER_STORAGE_BUFFER, 2 * drawcount * elemSize,
-            drawcount * elemSize, baseVertex.data()
-        );
-        glBufferSubData(
-            GL_SHADER_STORAGE_BUFFER, 3 * drawcount * elemSize,
-            drawcount * elemSize, outputOffset.data()
-        );
+        // Prefix sum
+        #pragma omp parallel for reduction(+:totalIndexCount)
+        for (int i = 0; i < drawcount; ++i) {
+            drawParams[i].outputOffset = totalIndexCount;
+            totalIndexCount += drawParams[i].indexCount;
+        }
 
-        glBindBufferBase(
-            GL_SHADER_STORAGE_BUFFER, 0, paramsSSBO
-        );
+        SaveBoundedBuffer saveSSBO(GL_SHADER_STORAGE_BUFFER);
+        SaveBoundedBuffer saveEBO(GL_ELEMENT_ARRAY_BUFFER);
+        SaveUsedProgram saveProgram;
 
-        glBindBufferBase(
-            GL_SHADER_STORAGE_BUFFER, 1, trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER].buffer
-        ); 
+        // Upload draw params
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, paramsSSBO);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, drawcount * sizeof(DrawParam), drawParams.data(), GL_STATIC_DRAW);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, paramsSSBO);
 
-        OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, outputIdxSSBO);
-        OV_glBufferData(
-            GL_SHADER_STORAGE_BUFFER,
-            totalIndexCount * elemSize,
-            nullptr, GL_DYNAMIC_DRAW
-        );
-        
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER].buffer);
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, outputIdxSSBO);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, totalIndexCount * elemSize, nullptr, GL_DYNAMIC_DRAW);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, outputIdxSSBO);
 
         // main
-        SaveUsedProgram sup;
         glUseProgram(computeProgram);
+        glDispatchCompute(drawcount, 2, 2);
+        glMemoryBarrier(GL_ELEMENT_ARRAY_BARRIER_BIT);
 
-        GLuint groupsY = (maxIndicesPerDraw + 127) / 128;
-        glDispatchCompute(drawcount, groupsY, 1);
-        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
-        SaveBoundedBuffer sbb2(GL_ELEMENT_ARRAY_BUFFER);
-        OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outputIdxSSBO);
+        // draw
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outputIdxSSBO);
         glDrawElements(mode, totalIndexCount, type, nullptr);
     }
 };
