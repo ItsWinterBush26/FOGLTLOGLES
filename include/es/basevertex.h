@@ -142,10 +142,10 @@ struct MDElementsBaseVertexBatcher {
         const GLintptr previousSSBOSize = trackedStates->boundBuffers[GL_SHADER_STORAGE_BUFFER].size;
         const long drawCommandsSize = static_cast<long>(drawcount * sizeof(DrawCommand));
         if (previousSSBOSize < drawCommandsSize) {
-            LOGI("Resizing DrawCommands SSBO from %ld to %ld", previousSSBOSize, drawCommandsSize);
+            LOGI("Resizing DrawCommands SSBO from %ld to %ld", previousSSBOSize, drawCommandsSize + (sizeof(DrawCommand) * 4));
             OV_glBufferData(
                 GL_SHADER_STORAGE_BUFFER,
-                drawCommandsSize,
+                drawCommandsSize + (sizeof(DrawCommand) * 4),
                 nullptr, GL_DYNAMIC_DRAW
             );
         }
