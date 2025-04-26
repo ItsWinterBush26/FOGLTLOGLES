@@ -3,6 +3,7 @@
 #include "es/binding_saver.h"
 #include "es/state_tracking.h"
 #include "gles20/buffer_tracking.h"
+#include "gles20/shader_overrides.h"
 
 #include <GLES3/gl32.h>
 #include <memory>
@@ -92,14 +93,14 @@ struct MDElementsBaseVertexBatcher {
         const GLchar* castedSource = COMPUTE_BATCHER_GLSL_BASE.c_str();
         const GLint sourceLength = COMPUTE_BATCHER_GLSL_BASE.length();
         glShaderSource(computeShader, 1, &castedSource, &sourceLength);
-        glCompileShader(computeShader);
+        OV_glCompileShader(computeShader);
 
         GLint success = 0;
         glGetShaderiv(computeShader, GL_COMPILE_STATUS, &success);
 
         computeProgram = glCreateProgram();
         glAttachShader(computeProgram, computeShader);
-        glLinkProgram(computeProgram);
+        OV_glLinkProgram(computeProgram);
 
         GLint success2 = 0;
         glGetProgramiv(computeProgram, GL_LINK_STATUS, &success2);
@@ -218,7 +219,7 @@ struct MDElementsBaseVertexBatcher {
         SaveBoundedBuffer sbb2(GL_ARRAY_BUFFER);
         SaveUsedProgram sup;
 
-        glUseProgram(computeProgram);
+        OV_glUseProgram(computeProgram);
         glDispatchCompute((total + 127) / 128, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
         

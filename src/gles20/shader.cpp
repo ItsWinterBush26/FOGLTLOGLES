@@ -2,6 +2,7 @@
 #include "shader/converter.h"
 #include "shader/utils.h"
 #include "gles20/main.h"
+#include "gles20/shader_overrides.h"
 #include "main.h"
 #include "utils/env.h"
 
@@ -10,9 +11,6 @@
 #include <string>
 
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length);
-void OV_glCompileShader(GLuint shader);
-void OV_glLinkProgram(GLuint program);
-void OV_glUseProgram(GLuint program);
 
 void GLES20::registerShaderOverrides() {
     REGISTEROV(glShaderSource);
