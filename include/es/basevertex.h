@@ -161,13 +161,12 @@ struct MDElementsBaseVertexBatcher {
         } */
 
         LOGI("loop!");
-
+        std::vector<GLuint> prefix(drawcount);
         prefix[0] = count[0];
         for (int i = 1; i < drawcount; ++i) prefix[i] = prefix[i - 1] + count[i];
-
         LOGI("done loop to sum!");
         
-        GLuint total = prefix[drawcount - 1];
+        GLuint total = prefix.back();
         LOGI("total %i", total);
         
         OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, prefixSSBO);
