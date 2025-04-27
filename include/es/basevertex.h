@@ -111,9 +111,7 @@ struct MDElementsBaseVertexBatcher {
         glGenBuffers(1, &prefixSSBO);
         glGenBuffers(1, &outputIndexSSBO);
 
-        GLint isProgram = 0;
-        glIsProgram(computeProgram, &isProgram);
-
+        GLboolean isProgram = glIsProgram(computeProgram);
         LOGI("isProgram : %s", (isProgram == GL_TRUE) ? "true" : "false");
     }
 
