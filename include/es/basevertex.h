@@ -99,15 +99,6 @@ struct MDElementsBaseVertexBatcher {
         glGenBuffers(1, &outputIndexSSBO);
     }
 
-    ~MDElementsBaseVertexBatcher() {
-        LOGI("Deleting MDEBV batcher!");
-
-        OV_glDeleteProgram(computeProgram);
-        glDeleteBuffers(1, &paramsSSBO);
-        glDeleteBuffers(1, &prefixSSBO);
-        glDeleteBuffers(1, &outputIndexSSBO);
-    }
-
     void batch(
         GLenum mode,
         const GLsizei* count,
