@@ -122,6 +122,8 @@ struct MDElementsBaseVertexBatcher {
                 if (count[i] > 0) glDrawElementsBaseVertex(mode, count[i], type, indices[i], basevertex[i]);
             }
         } */
+
+        LOGI("batching %i draw calls", drawcount);
         
         SaveBoundedBuffer sbb(GL_DRAW_INDIRECT_BUFFER);
         OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, paramsSSBO);
@@ -143,6 +145,8 @@ struct MDElementsBaseVertexBatcher {
                 GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT
             )
         );
+
+        LOGI("making draw commands");
 
         for (GLsizei i = 0; i < drawcount; ++i) {
             uintptr_t byteOffset = reinterpret_cast<uintptr_t>(indices[i]);
@@ -166,6 +170,8 @@ struct MDElementsBaseVertexBatcher {
         
         GLuint total = prefix.back();
         LOGI("total %u", total);
+
+        LOGI("setup compute inputs and output");
         
         OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, prefixSSBO);
         OV_glBufferData(
@@ -196,19 +202,25 @@ struct MDElementsBaseVertexBatcher {
             GL_SHADER_STORAGE_BUFFER, 3, outputIndexSSBO
         );
 
+        LOGI("dispatch compute");
+
         SaveBoundedBuffer sbb3(GL_ARRAY_BUFFER);
         SaveUsedProgram sup;
         OV_glUseProgram(computeProgram);
         glDispatchCompute((total + 63) / 64, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+        LOGI("restore program and array, bind eab");
         
         sup.restore();
         sbb3.restore();
         OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outputIndexSSBO);
 
+        LOGI("draw");
+
         glDrawElements(mode, total, type, 0);
 
-        LOGI("done dispatch and drawed!");
+        LOGI("done!");
     }
 };
 
