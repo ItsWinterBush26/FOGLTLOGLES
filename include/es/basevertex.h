@@ -82,7 +82,7 @@ struct MDElementsBaseVertexBatcher {
     GLuint prefixSSBO;
     std::vector<GLuint> prefix;    
 
-    MDElementsBaseVertexBatcher() {
+    void init() {
         computeProgram = glCreateProgram();
         GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
         
@@ -220,4 +220,4 @@ struct MDElementsBaseVertexBatcher {
     }
 };
 
-inline std::shared_ptr<MDElementsBaseVertexBatcher> batcher;
+inline std::shared_ptr<MDElementsBaseVertexBatcher> batcher = std::make_shared<MDElementsBaseVertexBatcher>();
