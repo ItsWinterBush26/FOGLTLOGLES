@@ -196,17 +196,16 @@ struct MDElementsBaseVertexBatcher {
         SaveBoundedBuffer sbb2(GL_ARRAY_BUFFER);
         SaveUsedProgram sup;
 
-        GLboolean isProgram = glIsProgram(computeProgram);
-        LOGI("isProgram : %s", (isProgram == GL_TRUE) ? "true" : "false");
-
         OV_glUseProgram(computeProgram);
         glDispatchCompute((total + 127) / 128, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-        LOGI("restore AB and Program and bind EAB");
+        LOGI("restore AB and Program");
         
         sbb2.restore();
         sup.restore();
+
+        LOGI("save previous EAB & bind EAB");
 
         SaveBoundedBuffer sbb3(GL_ELEMENT_ARRAY_BUFFER);
         OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outputIndexSSBO);
