@@ -1,4 +1,5 @@
 #pragma once
+#pragma clang optimize off
 
 #include "es/binding_saver.h"
 #include "es/state_tracking.h"
@@ -123,8 +124,6 @@ struct MDElementsBaseVertexBatcher {
             }
         } */
 
-        LOGI("batching %i draw calls", drawcount);
-        
         SaveBoundedBuffer sbb(GL_DRAW_INDIRECT_BUFFER);
         OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, paramsSSBO);
 
@@ -146,8 +145,6 @@ struct MDElementsBaseVertexBatcher {
             )
         );
 
-        LOGI("making draw commands");
-
         for (GLsizei i = 0; i < drawcount; ++i) {
             uintptr_t byteOffset = reinterpret_cast<uintptr_t>(indices[i]);
             drawCommands[i].firstIndex = static_cast<GLuint>(byteOffset / elemSize);
@@ -156,27 +153,16 @@ struct MDElementsBaseVertexBatcher {
         
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
         sbb.restore();
-
-        LOGI("prefix sums");
-        std::vector<GLuint> prefix(drawcount);
-
-        LOGI("loop!");
-        for (GLsizei i = 0; i < drawcount; ++i) {
-            GLuint tmp = (i == 0) ? count[i] : (prefix[i - 1] + count[i]);
-            LOGI("prefix[%i] = %u (count=%i)", i, tmp, count[i]);
-            prefix[i] = tmp;
-        }
-        LOGI("done loop to sum!");
         
+        std::vector<GLuint> prefix(drawcount);
+        prefix[0] = count[0];
+        for (GLsizei i = 1; i < drawcount; ++i) prefix[i] = prefix[i - 1] + count[i];
         GLuint total = prefix.back();
-        LOGI("total %u", total);
-
-        LOGI("setup compute inputs and output");
         
         OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, prefixSSBO);
         OV_glBufferData(
             GL_SHADER_STORAGE_BUFFER,
-            drawcount * sizeof(GLuint),
+            prefix.size() * sizeof(GLuint),
             prefix.data(), GL_DYNAMIC_DRAW
         );
 
@@ -202,29 +188,21 @@ struct MDElementsBaseVertexBatcher {
             GL_SHADER_STORAGE_BUFFER, 3, outputIndexSSBO
         );
 
-        LOGI("dispatch compute");
-
         SaveBoundedBuffer sbb3(GL_ARRAY_BUFFER);
         SaveUsedProgram sup;
         OV_glUseProgram(computeProgram);
         glDispatchCompute((total + 63) / 64, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-        LOGI("restore program and array, bind eab");
-        
         sup.restore();
         sbb3.restore();
         OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outputIndexSSBO);
 
-        LOGI("draw");
-
         glDrawElements(mode, total, type, 0);
 
-        LOGI("draw done, restore states");
-
         sbb2.restore();
-        LOGI("done!");
     }
 };
 
 inline std::shared_ptr<MDElementsBaseVertexBatcher> batcher = std::make_shared<MDElementsBaseVertexBatcher>();
+#pragma clang optimize on
