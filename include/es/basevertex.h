@@ -76,43 +76,27 @@ struct MDElementsBaseVertexBatcher {
     GLuint computeProgram;
 
     GLuint paramsSSBO;
-
-    GLuint prefixSSBO;
-    std::vector<GLuint> prefix;
-
     GLuint outputIndexSSBO;
 
-    
-    bool computeReady;
+    GLuint prefixSSBO;
+    std::vector<GLuint> prefix;    
 
     MDElementsBaseVertexBatcher() {
+        computeProgram = glCreateProgram();
         GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
-
+        
         const GLchar* castedSource = COMPUTE_BATCHER_GLSL_BASE.c_str();
         glShaderSource(computeShader, 1, &castedSource, nullptr);
         OV_glCompileShader(computeShader);
 
-        GLint success = 0;
-        glGetShaderiv(computeShader, GL_COMPILE_STATUS, &success);
-
-        computeProgram = glCreateProgram();
         glAttachShader(computeProgram, computeShader);
         OV_glLinkProgram(computeProgram);
 
-        GLint success2 = 0;
-        glGetProgramiv(computeProgram, GL_LINK_STATUS, &success2);
-
-        // glDeleteShader(computeShader);
-
-        LOGI("MDElementsBaseVertexBatcher.computeReady=(%s && %s)", (!success) ? "false" : "true", (!success2) ? "false" : "true");
-        // if (!(success && success2)) return;
+        glDeleteShader(computeShader);
 
         glGenBuffers(1, &paramsSSBO);
         glGenBuffers(1, &prefixSSBO);
         glGenBuffers(1, &outputIndexSSBO);
-
-        GLboolean isProgram = glIsProgram(computeProgram);
-        LOGI("isProgram : %s", (isProgram == GL_TRUE) ? "true" : "false");
     }
 
     ~MDElementsBaseVertexBatcher() {
@@ -196,7 +180,7 @@ struct MDElementsBaseVertexBatcher {
         );
 
         OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
+        
         glBindBufferBase(
             GL_SHADER_STORAGE_BUFFER, 0,
             trackedStates->boundBuffers[GL_ELEMENT_ARRAY_BUFFER].buffer
@@ -219,17 +203,22 @@ struct MDElementsBaseVertexBatcher {
         SaveBoundedBuffer sbb2(GL_ARRAY_BUFFER);
         SaveUsedProgram sup;
 
+        GLboolean isProgram = glIsProgram(computeProgram);
+        LOGI("isProgram : %s", (isProgram == GL_TRUE) ? "true" : "false");
+
         OV_glUseProgram(computeProgram);
         glDispatchCompute((total + 127) / 128, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-        
-        LOGI("its draw time innit");
 
+        LOGI("restore AB and Program and bind EAB");
+        
         sbb2.restore();
         sup.restore();
 
         SaveBoundedBuffer sbb3(GL_ELEMENT_ARRAY_BUFFER);
         OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outputIndexSSBO);
+
+        LOGI("its draw time innit");
 
         glDrawElements(mode, total, type, 0);
 
