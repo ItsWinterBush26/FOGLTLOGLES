@@ -195,7 +195,7 @@ struct MDElementsBaseVertexBatcher {
 
         LOGI("dispatching compute & restoring");
         
-        SaveUsedProgram sup;
+        SaveUsedProgram sup = SaveUsedProgram();
         OV_glUseProgram(computeProgram);
         glDispatchCompute((total + 127) / 128, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
@@ -208,7 +208,7 @@ struct MDElementsBaseVertexBatcher {
 
         LOGI("its draw time innit");
 
-        glDrawElementsBaseVertex(mode, total, type, 0, 0); // maybe this is the root cause?
+        glDrawElements(mode, total, type, 0);
 
         LOGI("done");
     }
