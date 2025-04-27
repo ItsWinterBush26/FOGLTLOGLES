@@ -61,6 +61,7 @@ void main() {
 struct DrawCommand {
     GLuint firstIndex;
     GLint baseVertex;
+    // GLuint prefix;
 };
 
 inline GLuint getTypeByteSize(GLenum type) {
@@ -145,7 +146,11 @@ struct MDElementsBaseVertexBatcher {
             uintptr_t byteOffset = reinterpret_cast<uintptr_t>(indices[i]);
             drawCommands[i].firstIndex = static_cast<GLuint>(byteOffset / elemSize);
             drawCommands[i].baseVertex = basevertex ? basevertex[i] : 0;
+
+            // one for loop for all
+            // drawCommands[i].prefix = count[i] + (i == 0) ? 0 : drawCommands[i - 1].prefix;
         }
+        // GLuint total = prefix[drawcount - 1];
 
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
 
