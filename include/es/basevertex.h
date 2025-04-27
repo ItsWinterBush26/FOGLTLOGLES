@@ -152,6 +152,7 @@ struct MDElementsBaseVertexBatcher {
         }
         
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
+        sbb.restore();
 
         LOGI("prefix sums");
         if (static_cast<GLsizei>(prefix.size()) < drawcount) {
@@ -161,7 +162,7 @@ struct MDElementsBaseVertexBatcher {
 
         LOGI("loop!");
         for (GLsizei i = 0; i < drawcount; ++i) {
-            Gluint tmp = (i == 0) ? count[i] : (prefix[i - 1] + count[i]);
+            GLuint tmp = (i == 0) ? count[i] : (prefix[i - 1] + count[i]);
             LOGI("prefix[%i] = %u (count=%i)", i, tmp, count[i]);
             prefix[i] = tmp;
         }
