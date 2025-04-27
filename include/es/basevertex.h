@@ -80,7 +80,6 @@ struct MDElementsBaseVertexBatcher {
     GLuint outputIndexSSBO;
 
     GLuint prefixSSBO;
-    std::vector<GLuint> prefix;
 
     ~MDElementsBaseVertexBatcher() {
         glDeleteProgram(computeProgram);
@@ -155,10 +154,7 @@ struct MDElementsBaseVertexBatcher {
         sbb.restore();
 
         LOGI("prefix sums");
-        if (static_cast<GLsizei>(prefix.size()) < drawcount) {
-            LOGI("Resizing prefix sums from %i to %i", static_cast<GLsizei>(prefix.capacity()), drawcount);
-            prefix.resize(drawcount);
-        }
+        std::vector<GLuint> prefix(drawcount);
 
         LOGI("loop!");
         for (GLsizei i = 0; i < drawcount; ++i) {
