@@ -193,13 +193,19 @@ struct MDElementsBaseVertexBatcher {
             outputIndexSSBO
         );
 
-        LOGI("dispatching compute & restoring");
+        LOGI("dispatching compute");
         
-        SaveUsedProgram sup = SaveUsedProgram();
+        // SaveUsedProgram sup = SaveUsedProgram();
+        GLuint lastProgram = trackedStates->lastUsedProgram;
+
         OV_glUseProgram(computeProgram);
         glDispatchCompute((total + 127) / 128, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-        sup.restore();
+
+        LOGI("restoring program");
+
+        // sup.restore();
+        OV_glUseProgram(lastProgram);
 
         LOGI("save previous EAB & bind EAB");
 

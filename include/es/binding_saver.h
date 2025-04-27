@@ -14,6 +14,28 @@
 
 // PROGRESS: PARTIAL
 
+struct Restorable {
+    bool restored;
+
+    virtual ~Restorable() {
+        if (restored) _internal_restore();
+    }
+    
+    virtual void _internal_restore() {
+        throw std::runtime_error("Restorable::_internal_restore() not implemented!");
+    }
+
+    void restore() {
+        if (restored) return;
+        _internal_restore();
+        restored = true;
+    }
+
+    bool isRestored() {
+        return restored;
+    }
+};
+
 struct SaveActiveTextureUnit {
     GLuint activeTextureUnit;
 
@@ -82,22 +104,16 @@ struct SaveBoundedFramebuffer {
     }
 };
 
-struct SaveUsedProgram {
-    GLuint program;
+struct SaveUsedProgram : public Restorable {
+    GLuint activeProgram;
 
     bool restored;
 
     SaveUsedProgram() {
-        program = trackedStates->lastUsedProgram;
+        activeProgram = trackedStates->lastUsedProgram;
     }
 
-    ~SaveUsedProgram() {
-        if (!restored) restore();
-    }
-
-    void restore() {
-        if (restored) return;
-        OV_glUseProgram(program);
-        restored = true;
+    void _internal_restore() override {
+        OV_glUseProgram(activeProgram);
     }
 };
