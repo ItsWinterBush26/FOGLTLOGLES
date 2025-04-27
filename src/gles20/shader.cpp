@@ -1,4 +1,5 @@
 #include "es/state_tracking.h"
+#include "shader/cache.h"
 #include "shader/converter.h"
 #include "shader/utils.h"
 #include "gles20/main.h"
@@ -10,8 +11,6 @@
 #include <stdexcept>
 #include <string>
 
-void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length);
-
 void GLES20::registerShaderOverrides() {
     REGISTEROV(glShaderSource);
     REGISTEROV(glCompileShader)
@@ -19,9 +18,13 @@ void GLES20::registerShaderOverrides() {
     REGISTEROV(glUseProgram);
 }
 
+inline size_t currentKey = 0;
+
 void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* string, const GLint* length) {
     std::string combinedSource;
     combineSources(count, string, length, combinedSource);
+
+    currentKey = ShaderConverter::Cache::getHash(combinedSource);
 
     if (combinedSource.empty()) {
         LOGW("glShaderSource was called without a shader source? Skipping...");
@@ -34,11 +37,28 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* string
         throw std::runtime_error("Shader with no version preprocessor!");
     }
 
-    if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
-        LOGI("Received GLSL source:");
-        LOGI("%s", combinedSource.data());
+    if (ShaderConverter::Cache::isShaderInCache(currentKey)) {
+        std::string cachedSource = ShaderConverter::Cache::getCachedShaderSource(currentKey);
+
+        if (cachedSource.empty()) {
+            LOGW("Returned cache source is empty! That's interesting....");
+            LOGW("Gonna act like it's a cache miss!");
+            ShaderConverter::Cache::invalidateShaderCache(currentKey);
+
+            goto convert_and_fix;
+        }
+
+        if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+            LOGI("Cache hit! Shader %u was found in cache.", shader);
+        }
+
+        const GLchar* newSource = cachedSource.c_str();
+        glShaderSource(shader, 1, &newSource, nullptr);
+
+        return;
     }
 
+convert_and_fix:
     if (profile != "es") {
         if (profile == "core" || profile == "compatibility") LOGI("Shader is on '%s' profile! Let's see how this goes...", profile.c_str());
         
@@ -46,6 +66,8 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* string
 
         const GLchar* newSource = combinedSource.c_str();
         glShaderSource(shader, 1, &newSource, nullptr);
+
+        ShaderConverter::Cache::putShaderInCache(currentKey, combinedSource);
     } else {
         LOGI("Shader already ESSL, no need to convert");
         glShaderSource(shader, 1, string, nullptr);
@@ -58,8 +80,6 @@ void OV_glCompileShader(GLuint shader) {
     GLint success = 0;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (success != GL_TRUE) {
-        ShaderConverter::invalidateCurrentShader();
-
         GLint logLength = 0;
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
         if (logLength > 0) {
@@ -84,6 +104,7 @@ void OV_glCompileShader(GLuint shader) {
             delete[] source;
         }
 
+        if (ShaderConverter::Cache::invalidateShaderCache(currentKey)) LOGI("Shader invalidated as it failed to compile.");
         throw std::runtime_error("Failed to compile shader!");
     }
 }

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "cache.h"
 #include "compilers.h"
 #include "postprocess.h"
 #include "preprocess.h"
@@ -15,8 +14,6 @@
 #include <string>
 #include <GLES2/gl2.h>
 #include <shaderc/shaderc.hpp>
-
-inline size_t currentKey = 0;
 
 namespace ShaderConverter {
     inline shaderc::SpvCompilationResult compileToSPV(shaderc_shader_kind kind, std::string& source) {
@@ -74,28 +71,16 @@ namespace ShaderConverter {
     }
 
     inline void convertAndFix(shaderc_shader_kind kind, std::string& source) {
-        currentKey = Cache::getHash(source);
-        if (Cache::isShaderInCache(currentKey)) {
-            source = Cache::getCachedShaderSource(currentKey);
-
-            if (!source.empty()) return;
-
-            LOGW("Returned cache source is empty! That's incredibly rare....");
-            LOGW("Gonna act like it's a cache miss...");
-            Cache::invalidateShaderCache(currentKey);
-        }
-
         if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
             LOGI("Converting and fixing %s!", getKindStringFromKind(kind));
         }
 
+        if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+            LOGI("Received GLSL source:");
+            LOGI("%s", source.c_str());
+        }
+
         shaderc::SpvCompilationResult spirv = compileToSPV(kind, source);
         transpileSPV2ESSL(kind, spirv, source);
-
-        Cache::putShaderInCache(currentKey, source);
-    }
-
-    inline void invalidateCurrentShader() {
-        if (Cache::invalidateShaderCache(currentKey)) LOGI("Shader invalidated as it failed to compile.");
     }
 }; // namespace ShaderConverter
