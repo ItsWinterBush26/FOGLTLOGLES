@@ -215,7 +215,7 @@ struct MDElementsBaseVertexBatcher {
 
         LOGI("its draw time innit");
 
-        sup.restore();
+        sup.restore(); // i do think this is the cause of the "libc++abi: terminating"
         glDrawElements(mode, total, type, 0);
 
         LOGI("done");

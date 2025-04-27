@@ -3,6 +3,7 @@
 #include "es/state_tracking.h"
 #include "gles20/buffer_tracking.h"
 #include "gles20/framebuffer_tracking.h"
+#include "gles20/shader_overrides.h"
 #include "gles20/texture_tracking.h"
 
 #include <GLES3/gl32.h>
@@ -96,7 +97,7 @@ struct SaveUsedProgram {
 
     void restore() {
         if (restored) return;
-        glUseProgram(program);
+        OV_glUseProgram(program);
         restored = true;
     }
 };
