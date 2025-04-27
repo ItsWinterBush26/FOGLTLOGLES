@@ -152,10 +152,22 @@ struct MDElementsBaseVertexBatcher {
         
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
 
-        if (static_cast<GLsizei>(prefix.size()) < drawcount) prefix.resize(drawcount);
+        LOGI("prefix sums");
+
+        if (static_cast<GLsizei>(prefix.size()) < drawcount) {
+            LOGI("Resizing prefix sums from %i to %i", static_cast<GLsizei>(prefix.size()), drawcount);
+            prefix.resize(drawcount);
+        }
+
+        LOGI("loop!");
+
         prefix[0] = count[0];
         for (int i = 1; i < drawcount; ++i) prefix[i] = prefix[i - 1] + count[i];
+
+        LOGI("done loop to sum!");
+        
         GLuint total = prefix[drawcount - 1];
+        LOGI("total %i", total);
         
         OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, prefixSSBO);
         OV_glBufferData(
