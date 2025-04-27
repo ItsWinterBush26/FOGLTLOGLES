@@ -23,15 +23,11 @@ protected:
     }
 
 public:
-    virtual ~Restorable() {
-        if (restored) {
-            LOGI("Restorable destructor called!");
-            _internal_restore();
-        }
-    }
+    virtual ~Restorable() = default;
 
     void restore() {
         if (restored) return;
+        LOGI("Restorable destructor called!");
         _internal_restore();
         restored = true;
     }
@@ -48,6 +44,11 @@ class SaveActiveTextureUnit : public Restorable {
         activeTextureUnit = trackedStates->activeTextureUnit;
     }
 
+    ~SaveActiveTextureUnit() {
+        restore();
+    }
+
+protected:
     void _internal_restore() override {
         OV_glActiveTexture(activeTextureUnit);
     }
@@ -75,6 +76,9 @@ struct SaveBoundedBuffer : public Restorable  {
         boundedBuffer = trackedStates->boundBuffers[bufferType].buffer;
     }
 
+    ~SaveBoundedBuffer() {
+        restore();
+    }
 
 protected:
     void _internal_restore() override {
@@ -99,6 +103,10 @@ struct SaveBoundedFramebuffer : public Restorable  {
         }
     }
 
+    ~SaveBoundedFramebuffer() {
+        restore();
+    }
+
 protected:
     void _internal_restore() override {
         OV_glBindFramebuffer(framebufferType, boundedFramebuffer);
@@ -110,6 +118,10 @@ struct SaveUsedProgram : public Restorable {
 
     SaveUsedProgram() {
         activeProgram = trackedStates->lastUsedProgram;
+    }
+
+    ~SaveUsedProgram() {
+        restore();
     }
 
 protected:

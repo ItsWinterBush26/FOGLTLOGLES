@@ -80,7 +80,14 @@ struct MDElementsBaseVertexBatcher {
     GLuint outputIndexSSBO;
 
     GLuint prefixSSBO;
-    std::vector<GLuint> prefix;    
+    std::vector<GLuint> prefix;
+
+    ~MDElementsBaseVertexBatcher() {
+        glDeleteProgram(computeProgram);
+        glDeleteBuffers(1, &paramsSSBO);
+        glDeleteBuffers(1, &prefixSSBO);
+        glDeleteBuffers(1, &outputIndexSSBO);
+    }
 
     void init() {
         computeProgram = glCreateProgram();
@@ -146,7 +153,6 @@ struct MDElementsBaseVertexBatcher {
             uintptr_t byteOffset = reinterpret_cast<uintptr_t>(indices[i]);
             drawCommands[i].firstIndex = static_cast<GLuint>(byteOffset / elemSize);
             drawCommands[i].baseVertex = basevertex ? basevertex[i] : 0;
-
         }
         
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
@@ -194,9 +200,7 @@ struct MDElementsBaseVertexBatcher {
         );
 
         LOGI("dispatching compute");
-        
-        // SaveUsedProgram sup = SaveUsedProgram();
-        GLuint lastProgram = trackedStates->lastUsedProgram;
+        SaveUsedProgram sup;
 
         OV_glUseProgram(computeProgram);
         glDispatchCompute((total + 127) / 128, 1, 1);
@@ -204,8 +208,7 @@ struct MDElementsBaseVertexBatcher {
 
         LOGI("restoring used program");
 
-        // sup.restore();
-        OV_glUseProgram(lastProgram);
+        sup.restore();
 
         LOGI("save previous EAB & bind EAB");
 
