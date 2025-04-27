@@ -126,13 +126,12 @@ struct MDElementsBaseVertexBatcher {
         
         SaveBoundedBuffer sbb(GL_DRAW_INDIRECT_BUFFER);
         OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, paramsSSBO);
-        const GLintptr previousSSBOSize = trackedStates->boundBuffers[GL_DRAW_INDIRECT_BUFFER].size;
-        const long drawCommandsSize = static_cast<long>(drawcount * sizeof(DrawCommand));
-        if (previousSSBOSize < drawCommandsSize) {
-            LOGI("Resizing DrawCommands SSBO from %ld to %ld", previousSSBOSize / sizeof(DrawCommand), drawCommandsSize / sizeof(DrawCommand));
+        const int previousSSBOSize = trackedStates->boundBuffers[GL_DRAW_INDIRECT_BUFFER].size / sizeof(DrawCommand);
+        if (previousSSBOSize < drawcount) {
+            LOGI("Resizing DrawCommands SSBO from %i to %i", previousSSBOSize, drawcount);
             OV_glBufferData(
                 GL_DRAW_INDIRECT_BUFFER,
-                drawCommandsSize,
+                drawcount * sizeof(DrawCommand),
                 nullptr, GL_DYNAMIC_DRAW
             );
         }
@@ -140,7 +139,7 @@ struct MDElementsBaseVertexBatcher {
         DrawCommand* drawCommands = reinterpret_cast<DrawCommand*>(
             glMapBufferRange(
                 GL_DRAW_INDIRECT_BUFFER, 0,
-                drawCommandsSize,
+                drawcount * sizeof(DrawCommand),
                 GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT
             )
         );
