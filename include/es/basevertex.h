@@ -174,7 +174,7 @@ struct MDElementsBaseVertexBatcher {
         OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, prefixSSBO);
         OV_glBufferData(
             GL_SHADER_STORAGE_BUFFER,
-            prefix.size() * sizeof(GLuint),
+            drawcount * sizeof(GLuint),
             prefix.data(), GL_DYNAMIC_DRAW
         );
 
