@@ -153,9 +153,9 @@ struct MDElementsBaseVertexBatcher {
             drawCommands[i].baseVertex = basevertex ? basevertex[i] : 0;
 
             // one for loop for all
-            // drawCommands[i].prefix = count[i] + (i == 0) ? 0 : drawCommands[i - 1].prefix;
+            // drawCommands[i].prefix = count[i] + ((i == 0) ? 0 : drawCommands[i - 1].prefix);
         }
-        // GLuint total = prefix[drawcount - 1];
+        // GLuint total = drawCommands[drawcount - 1].prefix;
 
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
 
