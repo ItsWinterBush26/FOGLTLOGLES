@@ -154,10 +154,11 @@ struct MDElementsBaseVertexBatcher {
 
         LOGI("prefix sums");
 
-        if (static_cast<GLsizei>(prefix.size()) < drawcount) {
+        LOGI("NO RESIZE!");
+        /* if (static_cast<GLsizei>(prefix.size()) < drawcount) {
             LOGI("Resizing prefix sums from %i to %i", static_cast<GLsizei>(prefix.size()), drawcount);
             prefix.resize(drawcount);
-        }
+        } */
 
         LOGI("loop!");
 
