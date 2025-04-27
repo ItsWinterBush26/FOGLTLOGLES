@@ -126,7 +126,8 @@ struct MDElementsBaseVertexBatcher {
         
         SaveBoundedBuffer sbb(GL_DRAW_INDIRECT_BUFFER);
         OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, paramsSSBO);
-        const int previousSSBOSize = trackedStates->boundBuffers[GL_DRAW_INDIRECT_BUFFER].size / sizeof(DrawCommand);
+
+        int previousSSBOSize = trackedStates->boundBuffers[GL_DRAW_INDIRECT_BUFFER].size / sizeof(DrawCommand);
         if (previousSSBOSize < drawcount) {
             LOGI("Resizing DrawCommands SSBO from %i to %i", previousSSBOSize, drawcount);
             OV_glBufferData(
@@ -153,15 +154,13 @@ struct MDElementsBaseVertexBatcher {
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
 
         LOGI("prefix sums");
-
-        LOGI("NO RESIZE!");
-        /* if (static_cast<GLsizei>(prefix.size()) < drawcount) {
-            LOGI("Resizing prefix sums from %i to %i", static_cast<GLsizei>(prefix.size()), drawcount);
-            prefix.resize(drawcount);
-        } */
+        if (static_cast<GLsizei>(prefix.capacity()) < drawcount) {
+            LOGI("Resizing prefix sums from %i to %i", static_cast<GLsizei>(prefix.capacity()), drawcount);
+            prefix.reserve(drawcount);
+        }
 
         LOGI("loop!");
-        std::vector<GLuint> prefix(drawcount);
+        prefix.clear();
         prefix[0] = count[0];
         for (int i = 1; i < drawcount; ++i) prefix[i] = prefix[i - 1] + count[i];
         LOGI("done loop to sum!");
@@ -183,38 +182,34 @@ struct MDElementsBaseVertexBatcher {
             nullptr, GL_DYNAMIC_DRAW
         );
 
-        OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
         SaveBoundedBuffer sbb2(GL_ELEMENT_ARRAY_BUFFER);
         
         glBindBufferBase(
             GL_SHADER_STORAGE_BUFFER, 0, sbb2.boundedBuffer
         );
         glBindBufferBase(
-            GL_SHADER_STORAGE_BUFFER, 1,
-            paramsSSBO
+            GL_SHADER_STORAGE_BUFFER, 1, paramsSSBO
         );
         glBindBufferBase(
-            GL_SHADER_STORAGE_BUFFER, 2,
-            prefixSSBO
+            GL_SHADER_STORAGE_BUFFER, 2, prefixSSBO
         );
         glBindBufferBase(
-            GL_SHADER_STORAGE_BUFFER, 3,
-            outputIndexSSBO
+            GL_SHADER_STORAGE_BUFFER, 3, outputIndexSSBO
         );
 
         SaveBoundedBuffer sbb3(GL_ARRAY_BUFFER);
-
         SaveUsedProgram sup;
         OV_glUseProgram(computeProgram);
         glDispatchCompute((total + 63) / 64, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-        sup.restore();
         
+        sup.restore();
         sbb3.restore();
-
         OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outputIndexSSBO);
 
         glDrawElements(mode, total, type, 0);
+
+        LOGI("done dispatch and drawed!");
     }
 };
 
