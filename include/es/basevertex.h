@@ -220,6 +220,9 @@ struct MDElementsBaseVertexBatcher {
 
         glDrawElements(mode, total, type, 0);
 
+        LOGI("draw done, restore states");
+
+        sbb2.restore();
         LOGI("done!");
     }
 };

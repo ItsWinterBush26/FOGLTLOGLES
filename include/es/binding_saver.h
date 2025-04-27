@@ -40,7 +40,7 @@ class SaveActiveTextureUnit : public Restorable {
     GLuint activeTextureUnit;
 
     SaveActiveTextureUnit() {
-        activeTextureUnit = trackedStates->activeTextureUnit;
+        this->activeTextureUnit = trackedStates->activeTextureUnit;
     }
 
     ~SaveActiveTextureUnit() {
@@ -49,7 +49,7 @@ class SaveActiveTextureUnit : public Restorable {
 
 protected:
     void _internal_restore() override {
-        OV_glActiveTexture(activeTextureUnit);
+        OV_glActiveTexture(this->activeTextureUnit);
     }
 };
 
@@ -58,12 +58,12 @@ struct SaveBoundedTexture : public Restorable  {
     GLenum textureType;
 
     SaveBoundedTexture(GLenum textureType) : textureType(textureType) {
-        boundedTexture = trackedStates->activeTextureState->boundTextures[textureType];
+        this->boundedTexture = trackedStates->activeTextureState->boundTextures[textureType];
     }
 
 protected:
     void _internal_restore() override {
-        OV_glBindTexture(textureType, boundedTexture);
+        OV_glBindTexture(this->textureType, this->boundedTexture);
     }
 };
 
@@ -72,7 +72,7 @@ struct SaveBoundedBuffer : public Restorable  {
     GLenum bufferType;
 
     SaveBoundedBuffer(GLenum bufferType) : bufferType(bufferType) {
-        boundedBuffer = trackedStates->boundBuffers[bufferType].buffer;
+        this->boundedBuffer = trackedStates->boundBuffers[bufferType].buffer;
     }
 
     ~SaveBoundedBuffer() {
@@ -81,7 +81,7 @@ struct SaveBoundedBuffer : public Restorable  {
 
 protected:
     void _internal_restore() override {
-        OV_glBindBuffer(bufferType, boundedBuffer);
+        OV_glBindBuffer(this->bufferType, this->boundedBuffer);
     }
 };
 
@@ -93,11 +93,11 @@ struct SaveBoundedFramebuffer : public Restorable  {
         switch (framebufferType) {
             case GL_FRAMEBUFFER:
             case GL_DRAW_FRAMEBUFFER:
-                boundedFramebuffer = trackedStates->framebufferState.boundDrawFramebuffer;
+                this->boundedFramebuffer = trackedStates->framebufferState.boundDrawFramebuffer;
             break;
 
             case GL_READ_FRAMEBUFFER:
-                boundedFramebuffer = trackedStates->framebufferState.boundReadFramebuffer;
+                this->boundedFramebuffer = trackedStates->framebufferState.boundReadFramebuffer;
             break;
         }
     }
@@ -108,7 +108,7 @@ struct SaveBoundedFramebuffer : public Restorable  {
 
 protected:
     void _internal_restore() override {
-        OV_glBindFramebuffer(framebufferType, boundedFramebuffer);
+        OV_glBindFramebuffer(this->framebufferType, this->boundedFramebuffer);
     }
 };
 
@@ -116,7 +116,7 @@ struct SaveUsedProgram : public Restorable {
     GLuint activeProgram;
 
     SaveUsedProgram() {
-        activeProgram = trackedStates->lastUsedProgram;
+        this->activeProgram = trackedStates->lastUsedProgram;
     }
 
     ~SaveUsedProgram() {
@@ -125,6 +125,6 @@ struct SaveUsedProgram : public Restorable {
 
 protected:
     void _internal_restore() override {
-        OV_glUseProgram(activeProgram);
+        OV_glUseProgram(this->activeProgram);
     }
 };
