@@ -27,7 +27,6 @@ public:
 
     void restore() {
         if (restored) return;
-        LOGI("Restorable destructor called!");
         _internal_restore();
         restored = true;
     }
