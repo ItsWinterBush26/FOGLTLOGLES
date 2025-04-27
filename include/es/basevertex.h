@@ -19,7 +19,6 @@ layout(local_size_x = 128) in;
 struct DrawCommand {
     uint  firstIndex;
     int   baseVertex;
-//  uint  prefix;
 };
 
 layout(std430, binding = 0) readonly buffer Input {
@@ -41,13 +40,11 @@ layout(std430, binding = 3) writeonly buffer Output {
 void main() {
     uint outputIndex = gl_GlobalInvocationID.x;
 
-    // if (outputIndex >= drawCommands[drawCommands.length() - 1].prefix) return;
     if (outputIndex >= prefixSums[prefixSums.length() - 1]) return;
 
     int low = 0, high = prefixSums.length() - 1;
     while (low < high) {
         int mid = (low + high) >> 1;
-        // if (drawCommands[mid].prefix > outputIndex) {
         if (prefixSums[mid] > outputIndex) {
             high = mid;
         } else {
@@ -56,7 +53,6 @@ void main() {
     }
 
     DrawCommand cmd = drawCommands[low];
-    // uint localIndex = outputIndex - ((low == 0) ? 0u : (drawCommmands[low - 1].prefix));
     uint localIndex = outputIndex - ((low == 0) ? 0u : (prefixSums[low - 1]));
     uint inputIndex = localIndex + cmd.firstIndex;
 
@@ -66,7 +62,6 @@ void main() {
 struct DrawCommand {
     GLuint firstIndex;
     GLint baseVertex;
-    // GLuint prefix;
 };
 
 inline GLuint getTypeByteSize(GLenum type) {
@@ -152,11 +147,8 @@ struct MDElementsBaseVertexBatcher {
             drawCommands[i].firstIndex = static_cast<GLuint>(byteOffset / elemSize);
             drawCommands[i].baseVertex = basevertex ? basevertex[i] : 0;
 
-            // one for loop for all
-            // drawCommands[i].prefix = count[i] + ((i == 0) ? 0 : drawCommands[i - 1].prefix);
         }
-        // GLuint total = drawCommands[drawcount - 1].prefix;
-
+        
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
 
         LOGI("sum prefixes!");
@@ -201,12 +193,13 @@ struct MDElementsBaseVertexBatcher {
             outputIndexSSBO
         );
 
-        LOGI("dispatching compute");
+        LOGI("dispatching compute & restoring");
         
         SaveUsedProgram sup;
         OV_glUseProgram(computeProgram);
         glDispatchCompute((total + 127) / 128, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+        sup.restore();
 
         LOGI("save previous EAB & bind EAB");
 
@@ -215,13 +208,7 @@ struct MDElementsBaseVertexBatcher {
 
         LOGI("its draw time innit");
 
-        try {
-            sup.restore(); // i do think this is the cause of the "libc++abi: terminating"
-        } catch (const std::exception& e) {
-            LOGE("Exception restoring previous program: %s", e.what());
-        }
-
-        glDrawElements(mode, total, type, 0);
+        glDrawElementsBaseVertex(mode, total, type, 0, 0); // maybe this is the root cause?
 
         LOGI("done");
     }
