@@ -202,7 +202,7 @@ struct MDElementsBaseVertexBatcher {
         glDispatchCompute((total + 127) / 128, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-        LOGI("restoring program");
+        LOGI("restoring used program");
 
         // sup.restore();
         OV_glUseProgram(lastProgram);
