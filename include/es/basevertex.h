@@ -215,7 +215,12 @@ struct MDElementsBaseVertexBatcher {
 
         LOGI("its draw time innit");
 
-        sup.restore(); // i do think this is the cause of the "libc++abi: terminating"
+        try {
+            sup.restore(); // i do think this is the cause of the "libc++abi: terminating"
+        } catch (const std::exception& e) {
+            LOGE("Exception restoring previous program: %s", e.what());
+        }
+
         glDrawElements(mode, total, type, 0);
 
         LOGI("done");
