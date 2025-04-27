@@ -19,6 +19,7 @@ layout(local_size_x = 128) in;
 struct DrawCommand {
     uint  firstIndex;
     int   baseVertex;
+//  uint  prefix;
 };
 
 layout(std430, binding = 0) readonly buffer Input {
@@ -39,11 +40,14 @@ layout(std430, binding = 3) writeonly buffer Output {
 
 void main() {
     uint outputIndex = gl_GlobalInvocationID.x;
+
+    // if (outputIndex >= drawCommands[drawCommands.length() - 1].prefix) return;
     if (outputIndex >= prefixSums[prefixSums.length() - 1]) return;
 
     int low = 0, high = prefixSums.length() - 1;
     while (low < high) {
         int mid = (low + high) >> 1;
+        // if (drawCommands[mid].prefix > outputIndex) {
         if (prefixSums[mid] > outputIndex) {
             high = mid;
         } else {
@@ -52,6 +56,7 @@ void main() {
     }
 
     DrawCommand cmd = drawCommands[low];
+    // uint localIndex = outputIndex - ((low == 0) ? 0u : (drawCommmands[low - 1].prefix));
     uint localIndex = outputIndex - ((low == 0) ? 0u : (prefixSums[low - 1]));
     uint inputIndex = localIndex + cmd.firstIndex;
 
