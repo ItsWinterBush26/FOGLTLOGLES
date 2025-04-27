@@ -86,7 +86,7 @@ struct MDElementsBaseVertexBatcher {
         GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
         
         const GLchar* castedSource = COMPUTE_BATCHER_GLSL_BASE.c_str();
-        glShaderSource(computeShader, 1, &castedSource, nullptr);
+        OV_glShaderSource(computeShader, 1, &castedSource, nullptr);
         OV_glCompileShader(computeShader);
 
         glAttachShader(computeProgram, computeShader);
@@ -100,7 +100,9 @@ struct MDElementsBaseVertexBatcher {
     }
 
     ~MDElementsBaseVertexBatcher() {
-        glDeleteProgram(computeProgram);
+        LOGI("Deleting MDEBV batcher!");
+
+        OV_glDeleteProgram(computeProgram);
         glDeleteBuffers(1, &paramsSSBO);
         glDeleteBuffers(1, &prefixSSBO);
         glDeleteBuffers(1, &outputIndexSSBO);

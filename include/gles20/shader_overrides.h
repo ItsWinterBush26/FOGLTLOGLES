@@ -7,3 +7,4 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* string
 void OV_glCompileShader(GLuint shader);
 void OV_glLinkProgram(GLuint program);
 void OV_glUseProgram(GLuint program);
+void OV_glDeleteProgram(GLuint program);

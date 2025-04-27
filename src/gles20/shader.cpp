@@ -16,6 +16,7 @@ void GLES20::registerShaderOverrides() {
     REGISTEROV(glCompileShader)
     REGISTEROV(glLinkProgram);
     REGISTEROV(glUseProgram);
+    REGISTEROV(glDeleteProgram);
 }
 
 inline size_t currentKey = 0;
@@ -136,4 +137,12 @@ void OV_glUseProgram(GLuint program) {
     glUseProgram(program);
 
     trackedStates->lastUsedProgram = program;
+}
+
+void OV_glDeleteProgram(GLuint program) {
+    glDeleteProgram(program);
+
+    if (trackedStates->lastUsedProgram == program) {
+        trackedStates->lastUsedProgram = 0;
+    }
 }
