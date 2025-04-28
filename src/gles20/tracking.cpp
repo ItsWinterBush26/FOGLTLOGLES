@@ -88,6 +88,7 @@ void OV_glBindBuffer(GLenum target, GLuint buffer) {
 void OV_glBufferData(GLenum target, GLsizeiptr size, const void* data, GLenum usage) {
     glBufferData(target, size, data, usage);
 
+    LOGI("BufferData: target %i, size %ld, usage %i", target, size, usage);
     trackedStates->boundBuffers[target].size = size;
 }
 

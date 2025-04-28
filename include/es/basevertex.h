@@ -109,7 +109,7 @@ struct MDElementsBaseVertexBatcher {
 
     void batch(
         GLenum mode,
-        const GLsizei* count,
+        const GLsizei* counts,
         GLenum type,
         const void* const* indices,
         GLsizei drawcount,
@@ -124,9 +124,7 @@ struct MDElementsBaseVertexBatcher {
             }
         } */
 
-        SaveBoundedBuffer sbb(GL_DRAW_INDIRECT_BUFFER);
         OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, paramsSSBO);
-
         int previousSSBOSize = trackedStates->boundBuffers[GL_DRAW_INDIRECT_BUFFER].size / sizeof(DrawCommand);
         if (previousSSBOSize < drawcount) {
             LOGI("Resizing DrawCommands SSBO from %i to %i", previousSSBOSize, drawcount);
@@ -152,17 +150,16 @@ struct MDElementsBaseVertexBatcher {
         }
         
         glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
-        sbb.restore();
         
         std::vector<GLuint> prefix(drawcount);
-        prefix[0] = count[0];
-        for (GLsizei i = 1; i < drawcount; ++i) prefix[i] = prefix[i - 1] + count[i];
+        prefix[0] = counts[0];
+        for (GLsizei i = 1; i < drawcount; ++i) prefix[i] = prefix[i - 1] + counts[i];
         GLuint total = prefix.back();
         
         OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, prefixSSBO);
         OV_glBufferData(
             GL_SHADER_STORAGE_BUFFER,
-            prefix.size() * sizeof(GLuint),
+            drawcount * sizeof(GLuint),
             prefix.data(), GL_DYNAMIC_DRAW
         );
 
@@ -173,6 +170,7 @@ struct MDElementsBaseVertexBatcher {
             nullptr, GL_DYNAMIC_DRAW
         );
 
+        OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
         SaveBoundedBuffer sbb2(GL_ELEMENT_ARRAY_BUFFER);
         
         glBindBufferBase(
