@@ -116,7 +116,7 @@ struct SaveUsedProgram : public Restorable {
     GLuint activeProgram;
 
     SaveUsedProgram() {
-        this->activeProgram = trackedStates->lastUsedProgram;
+        this->activeProgram = trackedStates->currentlyUsedProgram;
     }
 
     ~SaveUsedProgram() {
@@ -125,6 +125,7 @@ struct SaveUsedProgram : public Restorable {
 
 protected:
     void _internal_restore() override {
+        LOGI("resotore program! current=%u previous=%u", trackedStates->currentlyUsedProgram, this->activeProgram);
         OV_glUseProgram(this->activeProgram);
     }
 };

@@ -136,13 +136,13 @@ void OV_glLinkProgram(GLuint program) {
 void OV_glUseProgram(GLuint program) {
     glUseProgram(program);
 
-    trackedStates->lastUsedProgram = program;
+    trackedStates->currentlyUsedProgram = program;
 }
 
 void OV_glDeleteProgram(GLuint program) {
     glDeleteProgram(program);
 
-    if (trackedStates->lastUsedProgram == program) {
-        trackedStates->lastUsedProgram = 0;
+    if (trackedStates->currentlyUsedProgram == program) {
+        trackedStates->currentlyUsedProgram = 0;
     }
 }

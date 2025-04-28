@@ -72,14 +72,9 @@ struct TrackedStates {
     // NOTE: Type is NOT a binding enum
     FAST_MAP_BI(GLenum, Buffer) boundBuffers;
 
-    GLuint lastUsedProgram;
+    GLuint currentlyUsedProgram;
 
     TrackedStates() {
-        GLint maxTextureUnits;
-        glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
-        textureUnits.reserve(maxTextureUnits);
-        LOGI("Reserving %i texture units", maxTextureUnits);
-
         activeTextureState = &textureUnits[GL_TEXTURE0];
     }
 
