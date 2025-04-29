@@ -124,6 +124,8 @@ struct MDElementsBaseVertexBatcher {
             }
         } */
 
+        LOGI("batch begin! drawcount=%i", drawcount);
+
         OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, paramsSSBO);
         int previousSSBOSize = trackedStates->boundBuffers[GL_DRAW_INDIRECT_BUFFER].size / sizeof(DrawCommand);
         if (previousSSBOSize < drawcount) {
@@ -143,6 +145,8 @@ struct MDElementsBaseVertexBatcher {
             )
         );
 
+        LOGI("construct drawcommands");
+
         for (GLsizei i = 0; i < drawcount; ++i) {
             uintptr_t byteOffset = reinterpret_cast<uintptr_t>(indices[i]);
             drawCommands[i].firstIndex = static_cast<GLuint>(byteOffset / elemSize);
@@ -155,6 +159,8 @@ struct MDElementsBaseVertexBatcher {
         prefix[0] = counts[0];
         for (GLsizei i = 1; i < drawcount; ++i) prefix[i] = prefix[i - 1] + counts[i];
         GLuint total = prefix.back();
+
+        LOGI("prepare inputs and output of compute");
         
         OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, prefixSSBO);
         OV_glBufferData(
@@ -186,19 +192,25 @@ struct MDElementsBaseVertexBatcher {
             GL_SHADER_STORAGE_BUFFER, 3, outputIndexSSBO
         );
 
+        LOGI("dispatch compute! jobs=%u", (total + 63) / 64);
+
         SaveBoundedBuffer sbb3(GL_ARRAY_BUFFER);
         SaveUsedProgram sup;
         OV_glUseProgram(computeProgram);
         glDispatchCompute((total + 63) / 64, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
+        LOGI("restore states");
+        
         sup.restore();
         sbb3.restore();
         OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outputIndexSSBO);
 
+        LOGI("DRAW!");
         glDrawElements(mode, total, type, 0);
 
         sbb2.restore();
+        LOGI("done");
     }
 };
 
