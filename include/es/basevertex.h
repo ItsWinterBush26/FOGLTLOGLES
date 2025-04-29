@@ -17,30 +17,28 @@
 inline const std::string COMPUTE_BATCHER_GLSL_BASE = R"(#version 320 es
 layout(local_size_x = 64) in;
 
-struct DrawCommand {
-    uint  firstIndex;
-    int   baseVertex;
-};
-
 layout(std430, binding = 0) readonly buffer Input {
     uint inputElementBuffer[];
 };
 
-layout(std430, binding = 1) readonly buffer DrawCommands {
+layout(std430, binding = 1) readonly buffer Indices {
+    uint indices[];
+};
+
+layout(std430, binding = 2) readonly buffer BaseVertices {
+    int baseVertices[];
+};
+
+layout(std430, binding = 3) readonly buffer DrawCommands {
     DrawCommand drawCommands[];
 };
 
-layout(std430, binding = 2) readonly buffer PrefixSummations {
-    uint prefixSums[];
-};
-
-layout(std430, binding = 3) writeonly buffer Output {
+layout(std430, binding = 4) writeonly buffer Output {
     uint outputIndices[];
 };
 
 void main() {
     uint outputIndex = gl_GlobalInvocationID.x;
-
     if (outputIndex >= prefixSums[prefixSums.length() - 1]) return;
 
     int low = 0, high = prefixSums.length() - 1;
@@ -53,11 +51,13 @@ void main() {
         }
     }
 
-    DrawCommand cmd = drawCommands[low];
-    uint localIndex = outputIndex - ((low == 0) ? 0u : (prefixSums[low - 1]));
-    uint inputIndex = localIndex + cmd.firstIndex;
+    uint firstIndex = (indices[low] / 4);
+    int baseVertex = baseVertices[low];
 
-    outputIndices[outputIndex] = uint(int(inputElementBuffer[inputIndex]) + cmd.baseVertex);
+    uint localIndex = outputIndex - ((low == 0) ? 0u : (prefixSums[low - 1]));
+    uint inputIndex = localIndex + firstIndex;
+    
+    outputIndices[outputIndex] = uint(int(inputElementBuffer[inputIndex]) + baseVertex);
 })";
 
 struct DrawCommand {
@@ -77,14 +77,15 @@ inline GLuint getTypeByteSize(GLenum type) {
 struct MDElementsBaseVertexBatcher {
     GLuint computeProgram;
 
-    GLuint paramsSSBO;
-    GLuint outputIndexSSBO;
-
+    GLuint indicesSSBO;
+    GLuint baseVerticesSSBO;
     GLuint prefixSSBO;
+    GLuint outputIndexSSBO;
 
     ~MDElementsBaseVertexBatcher() {
         glDeleteProgram(computeProgram);
-        glDeleteBuffers(1, &paramsSSBO);
+        glDeleteBuffers(1, &indicesSSBO);
+        glDeleteBuffers(1, &baseVerticesSSBO);
         glDeleteBuffers(1, &prefixSSBO);
         glDeleteBuffers(1, &outputIndexSSBO);
     }
@@ -102,7 +103,8 @@ struct MDElementsBaseVertexBatcher {
 
         glDeleteShader(computeShader);
 
-        glGenBuffers(1, &paramsSSBO);
+        glGenBuffers(1, &indicesSSBO);
+        glGenBuffers(1, &baseVerticesSSBO);
         glGenBuffers(1, &prefixSSBO);
         glGenBuffers(1, &outputIndexSSBO);
     }
@@ -126,41 +128,26 @@ struct MDElementsBaseVertexBatcher {
 
         LOGI("batch begin! drawcount=%i", drawcount);
 
-        OV_glBindBuffer(GL_DRAW_INDIRECT_BUFFER, paramsSSBO);
-        int previousSSBOSize = trackedStates->boundBuffers[GL_DRAW_INDIRECT_BUFFER].size / sizeof(DrawCommand);
-        if (previousSSBOSize < drawcount) {
-            LOGI("Resizing DrawCommands SSBO from %i to %i", previousSSBOSize, drawcount);
-            OV_glBufferData(
-                GL_DRAW_INDIRECT_BUFFER,
-                drawcount * sizeof(DrawCommand),
-                nullptr, GL_DYNAMIC_DRAW
-            );
-        }
-
-        DrawCommand* drawCommands = reinterpret_cast<DrawCommand*>(
-            glMapBufferRange(
-                GL_DRAW_INDIRECT_BUFFER, 0,
-                drawcount * sizeof(DrawCommand),
-                GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT
-            )
-        );
-
-        LOGI("construct drawcommands");
-
-        for (GLsizei i = 0; i < drawcount; ++i) {
-            uintptr_t byteOffset = reinterpret_cast<uintptr_t>(indices[i]);
-            drawCommands[i].firstIndex = static_cast<GLuint>(byteOffset / elemSize);
-            drawCommands[i].baseVertex = basevertex ? basevertex[i] : 0;
-        }
-        
-        glUnmapBuffer(GL_DRAW_INDIRECT_BUFFER);
+        LOGI("prepare inputs and output of compute");
         
         std::vector<GLuint> prefix(drawcount);
         prefix[0] = counts[0];
         for (GLsizei i = 1; i < drawcount; ++i) prefix[i] = prefix[i - 1] + counts[i];
         GLuint total = prefix.back();
 
-        LOGI("prepare inputs and output of compute");
+        OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, indicesSSBO);
+        OV_glBufferData(
+            GL_SHADER_STORAGE_BUFFER,
+            drawcount * elemSize,
+            indices, GL_DYNAMIC_DRAW
+        );
+
+        OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, baseVerticesSSBO);
+        OV_glBufferData(
+            GL_SHADER_STORAGE_BUFFER,
+            drawcount * sizeof(GLint),
+            basevertex, GL_DYNAMIC_DRAW
+        );
         
         OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, prefixSSBO);
         OV_glBufferData(
@@ -183,13 +170,16 @@ struct MDElementsBaseVertexBatcher {
             GL_SHADER_STORAGE_BUFFER, 0, sbb2.boundedBuffer
         );
         glBindBufferBase(
-            GL_SHADER_STORAGE_BUFFER, 1, paramsSSBO
+            GL_SHADER_STORAGE_BUFFER, 1, indicesSSBO
         );
         glBindBufferBase(
-            GL_SHADER_STORAGE_BUFFER, 2, prefixSSBO
+            GL_SHADER_STORAGE_BUFFER, 2, baseVerticesSSBO
         );
         glBindBufferBase(
-            GL_SHADER_STORAGE_BUFFER, 3, outputIndexSSBO
+            GL_SHADER_STORAGE_BUFFER, 3, prefixSSBO
+        );
+        glBindBufferBase(
+            GL_SHADER_STORAGE_BUFFER, 4, outputIndexSSBO
         );
 
         LOGI("dispatch compute! jobs=%u", (total + 63) / 64);
