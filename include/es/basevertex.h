@@ -205,7 +205,7 @@ struct MDElementsBaseVertexBatcher {
                 0, total * sizeof(GLuint),
                 GL_MAP_READ_BIT
             )
-        )
+        );
 
         for (GLuint i = 0; i < total; ++i) {
             LOGI("outputIndexSSBO : %u", i);
