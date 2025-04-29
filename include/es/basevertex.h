@@ -1,8 +1,8 @@
 #pragma once
+#include <numeric>
 #pragma clang optimize off
 
 #include "es/binding_saver.h"
-#include "es/state_tracking.h"
 #include "gles20/buffer_tracking.h"
 #include "gles20/shader_overrides.h"
 
@@ -59,11 +59,6 @@ void main() {
     
     outputIndices[outputIndex] = uint(int(inputElementBuffer[inputIndex]) + baseVertex);
 })";
-
-struct DrawCommand {
-    GLuint firstIndex;
-    GLint baseVertex;
-};
 
 inline GLuint getTypeByteSize(GLenum type) {
     switch (type) {
@@ -131,8 +126,10 @@ struct MDElementsBaseVertexBatcher {
         LOGI("prepare inputs and output of compute");
         
         std::vector<GLuint> prefix(drawcount);
-        prefix[0] = counts[0];
-        for (GLsizei i = 1; i < drawcount; ++i) prefix[i] = prefix[i - 1] + counts[i];
+        std::inclusive_scan(
+            counts, counts + drawcount,
+            prefix.begin()
+        );
         GLuint total = prefix.back();
 
         OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, indicesSSBO);
