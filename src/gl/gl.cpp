@@ -14,8 +14,11 @@ FunctionPtr glXGetProcAddress(const GLchar* pn) {
     std::call_once(eglInitFlag, eglInit);
     std::call_once(rendererInitFlag, FOGLTLOGLES::init);
     std::call_once(initDebugFlag, initDebug);
+
+    FunctionPtr tmp = FOGLTLOGLES::getFunctionAddress(pn);
     
-    return FOGLTLOGLES::getFunctionAddress(pn);
+    if (tmp) return tmp;
+    if (real_eglGetProcAddress) return real_eglGetProcAddress(pn);
 }
 
 void initDebug() {
