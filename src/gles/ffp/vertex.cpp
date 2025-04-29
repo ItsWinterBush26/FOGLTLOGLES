@@ -138,17 +138,44 @@ void glVertex4iv(const GLint *v) {
 
 #pragma region Vertex Float Implementations
 void glVertex2f(GLfloat x, GLfloat y) {
+    if (Lists::displayListManager->isRecording()) {
+        Lists::displayListManager->addCommand([=]() {
+            floatVertexBuffer.push_back(x);
+            floatVertexBuffer.push_back(y);
+        });
+        return;
+    }
+
     floatVertexBuffer.push_back(x);
     floatVertexBuffer.push_back(y);
 }
 
 void glVertex3f(GLfloat x, GLfloat y, GLfloat z) {
+    if (Lists::displayListManager->isRecording()) {
+        Lists::displayListManager->addCommand([=]() {
+            floatVertexBuffer.push_back(x);
+            floatVertexBuffer.push_back(y);
+            floatVertexBuffer.push_back(z);
+        });
+        return;
+    }
+
     floatVertexBuffer.push_back(x);
     floatVertexBuffer.push_back(y);
     floatVertexBuffer.push_back(z);
 }
 
 void glVertex4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w) {
+    if (Lists::displayListManager->isRecording()) {
+        Lists::displayListManager->addCommand([=]() {
+            floatVertexBuffer.push_back(x);
+            floatVertexBuffer.push_back(y);
+            floatVertexBuffer.push_back(z);
+            floatVertexBuffer.push_back(w);
+        });
+        return;
+    }
+
     floatVertexBuffer.push_back(x);
     floatVertexBuffer.push_back(y);
     floatVertexBuffer.push_back(z);

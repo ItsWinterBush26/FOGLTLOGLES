@@ -61,6 +61,22 @@ void FFP::registerMatrixFunctions() {
 }
 
 void OV_glMatrixMode(GLenum mode) {
+    if (Lists::displayListManager->isRecording()) {
+        Lists::displayListManager->addCommand([=]() {
+            switch (mode) {
+                case GL_MODELVIEW:
+                case GL_PROJECTION:
+                case GL_TEXTURE:
+                    break;
+                default:
+                    return;
+            }
+            
+            currentMatrixMode = mode;
+        });
+        return;
+    }
+
     switch (mode) {
         case GL_MODELVIEW:
         case GL_PROJECTION:
