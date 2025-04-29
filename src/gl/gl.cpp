@@ -1,4 +1,5 @@
 #include "gl/gl.h"
+#include "egl/egl.h"
 #include "main.h"
 #include "utils/log.h"
 
@@ -10,6 +11,8 @@ inline std::once_flag initDebugFlag;
 void OV_glDebugMessageCallback(GLDEBUGPROC callback, const void* userParam);
 
 FunctionPtr glXGetProcAddress(const GLchar* pn) {
+    std::call_once(eglInitFlag, eglInit);
+    std::call_once(rendererInitFlag, FOGLTLOGLES::init);
     std::call_once(initDebugFlag, initDebug);
     
     return FOGLTLOGLES::getFunctionAddress(pn);
