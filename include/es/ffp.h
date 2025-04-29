@@ -1,10 +1,10 @@
 #pragma once
 
-#include "glm/ext/matrix_double4x4.hpp"
+#include "glm/ext/matrix_float4x4.hpp"
 #include "utils/fast_map.h"
 #include <GLES/gl.h>
 #include <memory>
-#include <set>
+
 #include <stack>
 #include <vector>
 
@@ -32,7 +32,7 @@ public:
     }
 
     void execute() const {
-        for (auto& command : commands) {
+        for (const auto& command : commands) {
             command();
         }
     }
@@ -47,6 +47,7 @@ private:
 
 public:
     void startDisplayList(GLuint list) {
+        if (activeDisplayListIndex != 0) return;
         if (displayLists.find(list) != displayLists.end()) {
             return;
         }
