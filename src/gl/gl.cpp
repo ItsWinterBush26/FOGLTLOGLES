@@ -19,6 +19,8 @@ FunctionPtr glXGetProcAddress(const GLchar* pn) {
     
     if (tmp) return tmp;
     if (real_eglGetProcAddress) return real_eglGetProcAddress(pn);
+
+    return nullptr;
 }
 
 void initDebug() {
