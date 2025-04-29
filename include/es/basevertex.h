@@ -43,7 +43,7 @@ void main() {
 
     int low = 0, high = prefixSums.length() - 1;
     while (low < high) {
-        int mid = (low + high) >> 1;
+        int mid = high >> 1;
         if (prefixSums[mid] > outputIndex) {
             high = mid;
         } else {
@@ -51,7 +51,7 @@ void main() {
         }
     }
 
-    uint firstIndex = indices[low] / uint(4);
+    uint firstIndex = indices[low] / 4u;
     int baseVertex = baseVertices[low];
 
     uint localIndex = outputIndex - ((low == 0) ? 0u : (prefixSums[low - 1]));
