@@ -51,7 +51,7 @@ void main() {
         }
     }
 
-    uint firstIndex = (indices[low] / 4);
+    uint firstIndex = uint(indices[low] / 4);
     int baseVertex = baseVertices[low];
 
     uint localIndex = outputIndex - ((low == 0) ? 0u : (prefixSums[low - 1]));
