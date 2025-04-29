@@ -1,7 +1,5 @@
 #include "build_info.h"
 #include "es/utils.h"
-#include "gl/glext.h"
-#include "gl/header.h"
 #include "gles/main.h"
 #include "main.h"
 #include "utils/env.h"
@@ -20,7 +18,7 @@ const GLubyte* OV_glGetStringi(GLenum pname, int index);
 void OV_glEnable(GLenum cap);
 
 // TODO: make its own env var
-inline std::string debugEnabled = getEnvironmentVar("LIBGL_VGPU_DUMP");
+inline bool debugEnabled = getEnvironmentVar("LIBGL_VGPU_DUMP", "0") == "1";
 
 inline std::string glVersion;
 inline std::string rendererString;
@@ -98,8 +96,9 @@ const GLubyte* OV_glGetStringi(GLenum pname, int index) {
 
 void OV_glEnable(GLenum cap) {
     switch (cap) {
-        case GL_DEBUG_OUTPUT:
-            if (debugEnabled.empty()) break; // dont allow debug
+        case 0x92e0: // GL_DEBUG_OUTPUT
+        case 0x8242: // GL_DEBUG_OUTPUT_SYNCHRONOUS
+            if (!debugEnabled) break; // dont allow debug
             // passthrough!
 
         default:

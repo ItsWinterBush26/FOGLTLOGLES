@@ -149,7 +149,7 @@ namespace ShaderConverter::Cache {
             }
         } catch (const std::exception& e) {
             LOGW("Failed to initialize cache index!");
-            LOGW("Reason:\n%s", e.what());
+            LOGW("Reason: %s", e.what());
 
             LOGW("Shader cache will be disabled!");
             ENABLE_SHADER_CACHE = false;

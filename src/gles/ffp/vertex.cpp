@@ -1,8 +1,8 @@
 #include "es/ffp.h"
-#include "ffp/main.h"
-
-#include "gl/header.h"
+#include "gles/ffp/main.h"
 #include "main.h"
+
+#include <GLES3/gl32.h>
 
 #pragma region Vertex Integer Declarations
 void glVertex2i(GLint x, GLint y);

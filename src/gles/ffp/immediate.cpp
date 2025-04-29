@@ -1,5 +1,5 @@
 #include "es/ffp.h"
-#include "ffp/main.h"
+#include "gles/ffp/main.h"
 #include "main.h"
 
 #include <GLES/gl.h>

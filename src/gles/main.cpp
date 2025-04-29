@@ -1,4 +1,5 @@
 #include "gles/main.h"
+#include "gles/ffp/main.h"
 #include "es/limits.h"
 #include "utils/log.h"
 
@@ -10,4 +11,5 @@ void GLES::GLESWrapper::init() {
     GLES::registerNoErrorOverride();
 
     ESLimits::init();
+    FFP::wrapper->init();
 }
