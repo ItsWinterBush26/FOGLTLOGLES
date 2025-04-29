@@ -14,5 +14,5 @@ inline GLenum currentPrimitive = GL_NONE;
 inline std::vector<GLfloat> floatVertexBuffer;
 
 inline GLenum currentMatrixMode = GL_MODELVIEW;
-inline glm::dmat4 currentMatrix;
-inline std::stack<glm::dmat4> matrixStack;
+inline glm::mat4 currentMatrix;
+inline std::stack<glm::mat4> matrixStack;

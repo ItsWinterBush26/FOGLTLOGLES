@@ -4,6 +4,18 @@
 
 #include <GLES3/gl32.h>
 
+typedef double GLdouble;
+
+#pragma region Vertex Short Declarations
+void glVertex2s(GLshort x, GLshort y);
+void glVertex3s(GLshort x, GLshort y, GLshort z);
+void glVertex4s(GLshort x, GLshort y, GLshort z, GLshort w);
+
+void glVertex2sv(const GLshort *v);
+void glVertex3sv(const GLshort *v);
+void glVertex4sv(const GLshort *v);
+#pragma endregion
+
 #pragma region Vertex Integer Declarations
 void glVertex2i(GLint x, GLint y);
 void glVertex3i(GLint x, GLint y, GLint z);
@@ -24,9 +36,28 @@ void glVertex3fv(const GLfloat *v);
 void glVertex4fv(const GLfloat *v);
 #pragma endregion
 
+#pragma region Vertex Double Declarations
+void glVertex2d(GLdouble x, GLdouble y);
+void glVertex3d(GLdouble x, GLdouble y, GLdouble z);
+void glVertex4d(GLdouble x, GLdouble y, GLdouble z, GLdouble w);
+
+void glVertex2dv(const GLdouble *v);
+void glVertex3dv(const GLdouble *v);
+void glVertex4dv(const GLdouble *v);
+#pragma endregion
+
 void FFP::registerVertexFunctions() {
+#pragma region Vertex Registrations
+    REGISTER(glVertex2s);
+    REGISTER(glVertex3s);
+    REGISTER(glVertex4s);
+
+    REGISTER(glVertex2sv);
+    REGISTER(glVertex3sv);
+    REGISTER(glVertex4sv);
+#pragma endregion
+
 #pragma region Vertex Integer Registrations
-    // since GL_INT is not supported on OpenGL ES 1.0 we just use floatVertexBuffer
     REGISTER(glVertex2i);
     REGISTER(glVertex3i);
     REGISTER(glVertex4i);
@@ -45,8 +76,39 @@ void FFP::registerVertexFunctions() {
     REGISTER(glVertex3fv);
     REGISTER(glVertex4fv);
 #pragma endregion
+
+#pragma region Vertex Double Registrations
+    REGISTER(glVertex2d);
+    REGISTER(glVertex3d);
+    REGISTER(glVertex4d);
+
+    REGISTER(glVertex2dv);
+    REGISTER(glVertex3dv);
+    REGISTER(glVertex4dv);
+#pragma endregion
 }
 
+#pragma region Vertex Short Implementations
+void glVertex2s(GLshort x, GLshort y) {
+    glVertex2i(static_cast<GLint>(x), static_cast<GLint>(y));
+}
+void glVertex3s(GLshort x, GLshort y, GLshort z) {
+    glVertex3i(static_cast<GLint>(x), static_cast<GLint>(y), static_cast<GLint>(z));
+}
+void glVertex4s(GLshort x, GLshort y, GLshort z, GLshort w) {
+    glVertex4i(static_cast<GLint>(x), static_cast<GLint>(y), static_cast<GLint>(z), static_cast<GLint>(w));
+}
+
+void glVertex2sv(const GLshort *v) {
+    glVertex2s(v[0], v[1]);
+}
+void glVertex3sv(const GLshort *v) {
+    glVertex3s(v[0], v[1], v[2]);
+}
+void glVertex4sv(const GLshort *v) {
+    glVertex4s(v[0], v[1], v[2], v[3]);
+}
+#pragma endregion
 
 #pragma region Vertex Integer Implementations
 void glVertex2i(GLint x, GLint y) {
@@ -105,3 +167,30 @@ void glVertex4fv(const GLfloat *v) {
     glVertex4f(v[0], v[1], v[2], v[3]);
 }
 #pragma endregion
+
+#pragma region Vertex Double Implementations
+void glVertex2d(GLdouble x, GLdouble y) {
+    glVertex2f(static_cast<GLfloat>(x), static_cast<GLfloat>(y));
+}
+
+void glVertex3d(GLdouble x, GLdouble y, GLdouble z) {
+    glVertex3f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z));
+}
+
+void glVertex4d(GLdouble x, GLdouble y, GLdouble z, GLdouble w) {
+    glVertex4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), static_cast<GLfloat>(w));
+}
+
+void glVertex2dv(const GLdouble *v) {
+    glVertex2d(v[0], v[1]);
+}
+
+void glVertex3dv(const GLdouble *v) {
+    glVertex3d(v[0], v[1], v[2]);
+}
+
+void glVertex4dv(const GLdouble *v) {
+    glVertex4d(v[0], v[1], v[2], v[3]);
+}
+#pragma endregion
+
