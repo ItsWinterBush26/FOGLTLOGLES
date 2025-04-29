@@ -14,7 +14,7 @@
 // Some of the code comes from:
 // https://github.com/MobileGL-Dev/MobileGlues/blob/8727ed43fde193ae595d73e84a8991ee771e43e7/src/main/cpp/gl/multidraw.cpp#L418
 
-inline const std::string COMPUTE_BATCHER_GLSL_BASE = R"(#version 320 es
+inline const std::string COMPUTE_BATCHER_GLSL_BASE = R"(#version 310 es
 layout(local_size_x = 64) in;
 
 layout(std430, binding = 0) readonly buffer Input {
@@ -43,7 +43,7 @@ void main() {
 
     int low = 0, high = prefixSums.length() - 1;
     while (low < high) {
-        int mid = high >> 1;
+        int mid = (low + high) / 2;
         if (prefixSums[mid] > outputIndex) {
             high = mid;
         } else {
@@ -124,6 +124,11 @@ struct MDElementsBaseVertexBatcher {
         LOGI("batch begin! drawcount=%i", drawcount);
 
         LOGI("prepare inputs and output of compute");
+
+        std::vector<GLuint> properIndices(drawcount);
+        for (GLsizei i = 0; i < drawcount; ++i) {
+            properIndices[i] = static_cast<GLuint>(reinterpret_cast<uintptr>(indices[i]));
+        }
         
         std::vector<GLuint> prefix(drawcount);
         std::inclusive_scan(
@@ -136,7 +141,7 @@ struct MDElementsBaseVertexBatcher {
         OV_glBufferData(
             GL_SHADER_STORAGE_BUFFER,
             drawcount * elemSize,
-            indices, GL_DYNAMIC_DRAW
+            properIndices.data(), GL_DYNAMIC_DRAW
         );
 
         OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, baseVerticesSSBO);
