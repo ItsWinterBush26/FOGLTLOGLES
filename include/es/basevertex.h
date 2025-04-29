@@ -29,8 +29,8 @@ layout(std430, binding = 2) readonly buffer BaseVertices {
     int baseVertices[];
 };
 
-layout(std430, binding = 3) readonly buffer DrawCommands {
-    DrawCommand drawCommands[];
+layout(std430, binding = 3) readonly buffer PrefixSums {
+    uint prefixSums[];
 };
 
 layout(std430, binding = 4) writeonly buffer Output {
