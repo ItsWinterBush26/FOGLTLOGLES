@@ -2,15 +2,13 @@
 
 #include "es/limits.h"
 #include "es/utils.h"
-#include "gl/header.h"
-#include "gl/glext.h"
 
 #include <GLES3/gl3.h>
 #include <GLES2/gl2ext.h>
 
 inline void selectProperTexParamf(GLenum target, GLenum& pname, GLfloat& param) {
     switch (pname) {
-        case GL_TEXTURE_LOD_BIAS:
+        case 0x8501: // GL_TEXTURE_LOD_BIAS
             pname = GL_TEXTURE_MIN_LOD;
             return;
 
