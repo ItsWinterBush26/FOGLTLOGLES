@@ -1,6 +1,4 @@
 #pragma once
-#include <numeric>
-#pragma clang optimize off
 
 #include "es/binding_saver.h"
 #include "gles20/buffer_tracking.h"
@@ -8,8 +6,11 @@
 
 #include <GLES3/gl32.h>
 #include <memory>
+#include <numeric>
 #include <string>
 #include <vector>
+
+#pragma clang optimize off
 
 // Some of the code comes from:
 // https://github.com/MobileGL-Dev/MobileGlues/blob/8727ed43fde193ae595d73e84a8991ee771e43e7/src/main/cpp/gl/multidraw.cpp#L418
@@ -197,6 +198,20 @@ struct MDElementsBaseVertexBatcher {
         sup.restore();
         sbb3.restore();
         OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outputIndexSSBO);
+
+        GLuint* outputMapped = reinterpret_cast<GLuint*>(
+            glMapBufferRange(
+                GL_ELEMENT_ARRAY_BUFFER,
+                0, total * sizeof(GLuint),
+                GL_MAP_READ_BIT
+            )
+        )
+
+        for (GLuint i = 0; i < total; ++i) {
+            LOGI("outputIndexSSBO : %u", i);
+        }
+
+        glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 
         LOGI("DRAW!");
         glDrawElements(mode, total, type, 0);
