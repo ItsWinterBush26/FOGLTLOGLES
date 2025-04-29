@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.11)
 
-project(FOGLTOGLES LANGUAGES C CXX)
+project(FOGLTLOGLES LANGUAGES C CXX)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
