@@ -43,7 +43,7 @@ void main() {
 
     int low = 0, high = prefixSums.length() - 1;
     while (low < high) {
-        int mid = (low + high) / 2;
+        int mid = low + (high - low) / 2;
         if (prefixSums[mid] > outputIndex) {
             high = mid;
         } else {
@@ -127,7 +127,7 @@ struct MDElementsBaseVertexBatcher {
 
         std::vector<GLuint> properIndices(drawcount);
         for (GLsizei i = 0; i < drawcount; ++i) {
-            properIndices[i] = static_cast<GLuint>(reinterpret_cast<uintptr>(indices[i]));
+            properIndices[i] = static_cast<GLuint>(reinterpret_cast<uintptr_t>(indices[i]));
         }
         
         std::vector<GLuint> prefix(drawcount);
