@@ -81,6 +81,8 @@ void OV_glActiveTexture(GLuint texture) {
 void OV_glBindBuffer(GLenum target, GLuint buffer) {
     glBindBuffer(target, buffer);
 
+    LOGI("BindBuffer: target %i, buffer %u", target, buffer);
+
     trackedStates->boundBuffers[target].target = target;
     trackedStates->boundBuffers[target].buffer = buffer;
 }
@@ -88,7 +90,7 @@ void OV_glBindBuffer(GLenum target, GLuint buffer) {
 void OV_glBufferData(GLenum target, GLsizeiptr size, const void* data, GLenum usage) {
     glBufferData(target, size, data, usage);
 
-    LOGI("BufferData: target %i, size %ld, usage %i", target, size, usage);
+    // LOGI("BufferData: target %i, size %ld, usage %i", target, size, usage);
     trackedStates->boundBuffers[target].size = size;
 }
 
