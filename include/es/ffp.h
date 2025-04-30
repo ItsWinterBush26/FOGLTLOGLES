@@ -41,7 +41,9 @@ public:
 class DisplayListManager {
 private:
     GLuint activeDisplayListIndex;
-    DisplayList activeDisplayList = DisplayList();
+    DisplayList activeDisplayList;
+
+    bool isExecuting;
 
     FAST_MAP_BI(GLuint, const DisplayList) displayLists;
 
@@ -53,11 +55,19 @@ public:
         }
 
         activeDisplayListIndex = list;
+        activeDisplayList = DisplayList();
     }
 
-    void addCommand(const std::function<void()>& command) {
+    template<auto F, typename... Args>
+    void addCommand(Args&&... args) {
         if (activeDisplayListIndex == 0) return;
-        activeDisplayList.addCommand(command);
+        static_assert(std::is_invocable_v<decltype(F), Args...>, "addCommand<...>(args...) must match the function signature");
+
+        activeDisplayList.addCommand(
+            [a = std::make_tuple(std::forward<Args>(args)...)]() mutable {
+                std::apply(F, a);
+            }
+        );
     }
 
     void endDisplayList() {
@@ -68,13 +78,21 @@ public:
         activeDisplayList = DisplayList();
     }
 
+    void deleteDisplayList(GLuint list) {
+        if (displayLists.find(list) == displayLists.end()) return;
+        displayLists.erase(list);
+    }
+
     void callDisplayList(GLuint list) {
         if (displayLists.find(list) == displayLists.end()) return;
+
+        isExecuting = true;
         displayLists[list].execute();
+        isExecuting = false;
     }
 
     bool isRecording() {
-        return activeDisplayListIndex != 0;
+        return activeDisplayListIndex != 0 && !isExecuting;
     }
 };
 

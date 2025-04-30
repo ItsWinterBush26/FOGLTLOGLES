@@ -62,128 +62,115 @@ void FFP::registerMatrixFunctions() {
 }
 
 void OV_glMatrixMode(GLenum mode) {
-    const auto glCall_lambda = [=]() {
-        switch (mode) {
-            case GL_MODELVIEW:
-            case GL_PROJECTION:
-            case GL_TEXTURE:
-                break;
-            default:
-                return;
-        }
-        
-        currentMatrixMode = mode;
-    };
-
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand(glCall_lambda);
-    } else {
-        glCall_lambda();
+        Lists::displayListManager->addCommand<OV_glMatrixMode>(mode);
+        return;
     }
+    
+    switch (mode) {
+        case GL_MODELVIEW:
+        case GL_PROJECTION:
+        case GL_TEXTURE:
+            break;
+        default:
+            return;
+    }
+    
+    currentMatrixMode = mode;
 }
 
 void OV_glPushMatrix() {
-    const auto glCall_lambda = [=]() {
-        matrixStack.push(currentMatrix);
-    };
-
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand(glCall_lambda);
-    } else {
-        glCall_lambda();
+        Lists::displayListManager->addCommand<OV_glPushMatrix>();
+        return;
     }
+
+    matrixStack.push(currentMatrix);
 }
 
 void OV_glPopMatrix() {
-    const auto glCall_lambda = [=]() {
-        if (matrixStack.empty()) {
-            return;
-        }
-
-        currentMatrix = matrixStack.top();
-        matrixStack.pop();
-    };
-    
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand(glCall_lambda);
-    } else {
-        glCall_lambda();
+        Lists::displayListManager->addCommand<OV_glPopMatrix>();
+        return;
     }
+
+    if (matrixStack.empty()) {
+        return;
+    }
+
+    currentMatrix = matrixStack.top();
+    matrixStack.pop();
 }
 
 void OV_glLoadIdentity() {
-    const auto glCall_lambda = [=]() {
-        currentMatrix = glm::mat4(1.0f);
-    };
-
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand(glCall_lambda);
-    } else {
-        glCall_lambda();
+        Lists::displayListManager->addCommand<OV_glLoadIdentity>();
+        return;
     }
+
+    currentMatrix = glm::mat4(1.0f);
 }
 
 void glLoadMatrixd(const GLdouble *m) {
-    const auto glCall_lambda = [=]() {
-        currentMatrix = glm::mat4(
-            m[0], m[1], m[2], m[3],
-            m[4], m[5], m[6], m[7],
-            m[8], m[9], m[10], m[11],
-            m[12], m[13], m[14], m[15]
-        );
-    };
-    
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand(glCall_lambda);
-    } else {
-        glCall_lambda();
+        Lists::displayListManager->addCommand<glLoadMatrixd>(m);
+        return;
     }
+    
+    currentMatrix = glm::mat4(
+        m[0], m[1], m[2], m[3],
+        m[4], m[5], m[6], m[7],
+        m[8], m[9], m[10], m[11],
+        m[12], m[13], m[14], m[15]
+    );
 }
 
 void OV_glLoadMatrixf(const GLfloat *m) {
-    const auto glCall_lambda = [=]() {
-        currentMatrix = glm::mat4(
-            m[0], m[1], m[2], m[3],
-            m[4], m[5], m[6], m[7],
-            m[8], m[9], m[10], m[11],
-            m[12], m[13], m[14], m[15]
-        );
-    };
-
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand(glCall_lambda);
-    } else {
-        glCall_lambda();
+        Lists::displayListManager->addCommand<OV_glLoadMatrixf>(m);
+        return;
     }
+
+    currentMatrix = glm::mat4(
+        m[0], m[1], m[2], m[3],
+        m[4], m[5], m[6], m[7],
+        m[8], m[9], m[10], m[11],
+        m[12], m[13], m[14], m[15]
+    );
 }
 
 void glOrtho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val) {
-    const auto glCall_lambda = [=]() {
-        currentMatrix = glm::ortho(
-            left, right,
-            bottom, top,
-            near_val, far_val
-        );
-    };
-
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand(glCall_lambda);
-    } else {
-        glCall_lambda();
+        Lists::displayListManager->addCommand<glOrtho>(left, right, bottom, top, near_val, far_val);
+        return;
     }
+
+    currentMatrix = glm::ortho(
+        left, right,
+        bottom, top,
+        near_val, far_val
+    );
 }
 
 void glFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val) {
-    const auto glCall_lambda = [=]() {
-        currentMatrix = glm::frustum(
-            left, right,
-            bottom, top,
-            near_val, far_val
-        );
-    };
+    if (Lists::displayListManager->isRecording()) {
+        Lists::displayListManager->addCommand<glFrustum>(left, right, bottom, top, near_val, far_val);
+        return;
+    }
+
+    currentMatrix = glm::frustum(
+        left, right,
+        bottom, top,
+        near_val, far_val
+    );
 }
 
 void glMultMatrixd(const GLdouble *m) {
+    if (Lists::displayListManager->isRecording()) {
+        Lists::displayListManager->addCommand<glMultMatrixd>(m);
+        return;
+    }
+
     glm::mat4 matrix = glm::mat4(
         m[0], m[1], m[2], m[3],
         m[4], m[5], m[6], m[7],
@@ -194,6 +181,11 @@ void glMultMatrixd(const GLdouble *m) {
 }
 
 void OV_glMultMatrixf(const GLfloat *m) {
+    if (Lists::displayListManager->isRecording()) {
+        Lists::displayListManager->addCommand<OV_glMultMatrixf>(m);
+        return;
+    }
+
     glm::mat4 matrix = glm::mat4(
         m[0], m[1], m[2], m[3],
         m[4], m[5], m[6], m[7],
@@ -208,6 +200,11 @@ void glRotated(GLdouble angle, GLdouble x, GLdouble y, GLdouble z) {
 }
 
 void OV_glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z) {
+    if (Lists::displayListManager->isRecording()) {
+        Lists::displayListManager->addCommand<OV_glRotatef>(angle, x, y, z);
+        return;
+    }
+
     currentMatrix = glm::rotate(currentMatrix, glm::radians(angle), glm::vec3(x, y, z));
 }
 
@@ -216,6 +213,11 @@ void glScaled(GLdouble x, GLdouble y, GLdouble z) {
 }
 
 void OV_glScalef(GLfloat x, GLfloat y, GLfloat z) {
+    if (Lists::displayListManager->isRecording()) {
+        Lists::displayListManager->addCommand<OV_glScalef>(x, y, z);
+        return;
+    }
+
     currentMatrix = glm::scale(currentMatrix, glm::vec3(x, y, z));
 }
 
@@ -224,5 +226,10 @@ void glTranslated(GLdouble x, GLdouble y, GLdouble z) {
 }
 
 void OV_glTranslatef(GLfloat x, GLfloat y, GLfloat z) {
+    if (Lists::displayListManager->isRecording()) {
+        Lists::displayListManager->addCommand<OV_glTranslatef>(x, y, z);
+        return;
+    }
+    
     currentMatrix = glm::translate(currentMatrix, glm::vec3(x, y, z));
 }

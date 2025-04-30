@@ -139,10 +139,7 @@ void glVertex4iv(const GLint *v) {
 #pragma region Vertex Float Implementations
 void glVertex2f(GLfloat x, GLfloat y) {
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand([=]() {
-            floatVertexBuffer.push_back(x);
-            floatVertexBuffer.push_back(y);
-        });
+        Lists::displayListManager->addCommand<glVertex2f>(x, y);
         return;
     }
 
@@ -152,11 +149,7 @@ void glVertex2f(GLfloat x, GLfloat y) {
 
 void glVertex3f(GLfloat x, GLfloat y, GLfloat z) {
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand([=]() {
-            floatVertexBuffer.push_back(x);
-            floatVertexBuffer.push_back(y);
-            floatVertexBuffer.push_back(z);
-        });
+        Lists::displayListManager->addCommand<glVertex3f>(x, y, z);
         return;
     }
 
@@ -167,12 +160,7 @@ void glVertex3f(GLfloat x, GLfloat y, GLfloat z) {
 
 void glVertex4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w) {
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand([=]() {
-            floatVertexBuffer.push_back(x);
-            floatVertexBuffer.push_back(y);
-            floatVertexBuffer.push_back(z);
-            floatVertexBuffer.push_back(w);
-        });
+        Lists::displayListManager->addCommand<glVertex4f>(x, y, z, w);
         return;
     }
 
