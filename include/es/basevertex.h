@@ -188,14 +188,17 @@ struct MDElementsBaseVertexBatcher {
         LOGI("dispatch compute! jobs=%u", (total + 63) / 64);
 
         SaveBoundedBuffer sbb3(GL_ARRAY_BUFFER);
-        SaveUsedProgram sup;
+        // SaveUsedProgram sup;
+        GLuint curProg = 0;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &curProg);
+    
         OV_glUseProgram(computeProgram);
         glDispatchCompute((total + 63) / 64, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
         LOGI("restore states");
         
-        sup.restore();
+        OV_glUseProgram(curProg);
         sbb3.restore();
         OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outputIndexSSBO);
 
