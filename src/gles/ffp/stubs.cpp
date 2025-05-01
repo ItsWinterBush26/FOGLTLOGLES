@@ -14,12 +14,10 @@ typedef double GLdouble;
 
 // Immediate Mode
 STUB_FUNC(glArrayElement, (GLint i))
-STUB_FUNC(glBegin, (GLenum mode))
 STUB_FUNC(glColor3f, (GLfloat red, GLfloat green, GLfloat blue))
 STUB_FUNC(glColor3fv, (const GLfloat *v))
 STUB_FUNC(glColor4f, (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha))
 STUB_FUNC(glColor4fv, (const GLfloat *v))
-STUB_FUNC(glEnd, (void))
 STUB_FUNC(glEvalCoord1f, (GLfloat u))
 STUB_FUNC(glEvalCoord1fv, (const GLfloat *u))
 STUB_FUNC(glEvalCoord2f, (GLfloat u, GLfloat v))
@@ -56,12 +54,6 @@ STUB_FUNC(glTexCoord3f, (GLfloat s, GLfloat t, GLfloat r))
 STUB_FUNC(glTexCoord3fv, (const GLfloat *v))
 STUB_FUNC(glTexCoord4f, (GLfloat s, GLfloat t, GLfloat r, GLfloat q))
 STUB_FUNC(glTexCoord4fv, (const GLfloat *v))
-STUB_FUNC(glVertex2f, (GLfloat x, GLfloat y))
-STUB_FUNC(glVertex2fv, (const GLfloat *v))
-STUB_FUNC(glVertex3f, (GLfloat x, GLfloat y, GLfloat z))
-STUB_FUNC(glVertex3fv, (const GLfloat *v))
-STUB_FUNC(glVertex4f, (GLfloat x, GLfloat y, GLfloat z, GLfloat w))
-STUB_FUNC(glVertex4fv, (const GLfloat *v))
 
 // GL2 Rasterization
 STUB_FUNC(glBitmap, (GLsizei width, GLsizei height, GLfloat xorig, GLfloat yorig, GLfloat xmove, GLfloat ymove, const GLubyte *bitmap))
@@ -161,26 +153,10 @@ STUB_FUNC(glTexGeni, (GLenum coord, GLenum pname, GLint param))
 STUB_FUNC(glTexGeniv, (GLenum coord, GLenum pname, const GLint *params))
 
 // Matrix State
-STUB_FUNC(glFrustum, (GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar))
-STUB_FUNC(glLoadIdentity, (void))
-STUB_FUNC(glLoadMatrixf, (const GLfloat *m))
-STUB_FUNC(glLoadMatrixd, (const GLdouble *m))
 STUB_FUNC(glLoadTransposeMatrixf, (const GLfloat *m))
 STUB_FUNC(glLoadTransposeMatrixd, (const GLdouble *m))
-STUB_FUNC(glMatrixMode, (GLenum mode))
-STUB_FUNC(glMultMatrixf, (const GLfloat *m))
-STUB_FUNC(glMultMatrixd, (const GLdouble *m))
 STUB_FUNC(glMultTransposeMatrixf, (const GLfloat *m))
 STUB_FUNC(glMultTransposeMatrixd, (const GLdouble *m))
-STUB_FUNC(glOrtho, (GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble zNear, GLdouble zFar))
-STUB_FUNC(glPopMatrix, (void))
-STUB_FUNC(glPushMatrix, (void))
-STUB_FUNC(glRotatef, (GLfloat angle, GLfloat x, GLfloat y, GLfloat z))
-STUB_FUNC(glRotated, (GLdouble angle, GLdouble x, GLdouble y, GLdouble z))
-STUB_FUNC(glScalef, (GLfloat x, GLfloat y, GLfloat z))
-STUB_FUNC(glScaled, (GLdouble x, GLdouble y, GLdouble z))
-STUB_FUNC(glTranslatef, (GLfloat x, GLfloat y, GLfloat z))
-STUB_FUNC(glTranslated, (GLdouble x, GLdouble y, GLdouble z))
 
 // GL2 Textures
 STUB_FUNC_RET(GLboolean, glAreTexturesResident, (GLsizei n, const GLuint *textures, GLboolean *residences), GL_TRUE)
@@ -207,12 +183,10 @@ STUB_FUNC(glNewList, (GLuint list, GLenum mode))
 void FFP::registerStubFunctions() {
     // Immediate Mode
     REGISTER(glArrayElement);
-    REGISTER(glBegin);
     REGISTER(glColor3f);
     REGISTER(glColor3fv);
     REGISTER(glColor4f);
     REGISTER(glColor4fv);
-    REGISTER(glEnd);
     REGISTER(glEvalCoord1f);
     REGISTER(glEvalCoord1fv);
     REGISTER(glEvalCoord2f);
@@ -249,12 +223,6 @@ void FFP::registerStubFunctions() {
     REGISTER(glTexCoord3fv);
     REGISTER(glTexCoord4f);
     REGISTER(glTexCoord4fv);
-    REGISTER(glVertex2f);
-    REGISTER(glVertex2fv);
-    REGISTER(glVertex3f);
-    REGISTER(glVertex3fv);
-    REGISTER(glVertex4f);
-    REGISTER(glVertex4fv);
     
     // GL2 Rasterization
     REGISTER(glBitmap);
@@ -354,26 +322,10 @@ void FFP::registerStubFunctions() {
     REGISTER(glTexGeniv);
     
     // Matrix State
-    REGISTER(glFrustum);
-    REGISTER(glLoadIdentity);
-    REGISTER(glLoadMatrixf);
-    REGISTER(glLoadMatrixd);
     REGISTER(glLoadTransposeMatrixf);
     REGISTER(glLoadTransposeMatrixd);
-    REGISTER(glMatrixMode);
-    REGISTER(glMultMatrixf);
-    REGISTER(glMultMatrixd);
     REGISTER(glMultTransposeMatrixf);
     REGISTER(glMultTransposeMatrixd);
-    REGISTER(glOrtho);
-    REGISTER(glPopMatrix);
-    REGISTER(glPushMatrix);
-    REGISTER(glRotatef);
-    REGISTER(glRotated);
-    REGISTER(glScalef);
-    REGISTER(glScaled);
-    REGISTER(glTranslatef);
-    REGISTER(glTranslated);
     
     // GL2 Textures
     REGISTER(glAreTexturesResident);
