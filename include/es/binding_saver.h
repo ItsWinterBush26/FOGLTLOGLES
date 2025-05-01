@@ -23,7 +23,7 @@ protected:
     }
 
 public:
-    virtual ~Restorable() = default;
+    virtual ~Restorable();
 
     void restore() {
         if (restored) return;
@@ -125,7 +125,7 @@ struct SaveUsedProgram : public Restorable {
 
 protected:
     void _internal_restore() override {
-        LOGI("resotore program! current=%u previous=%u", trackedStates->currentlyUsedProgram, this->activeProgram);
+        LOGI("restore program! current=%u previous=%u", trackedStates->currentlyUsedProgram, this->activeProgram);
         OV_glUseProgram(this->activeProgram);
     }
 };
