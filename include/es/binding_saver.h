@@ -23,7 +23,7 @@ protected:
     }
 
 public:
-    virtual ~Restorable();
+    virtual ~Restorable() { }
 
     void restore() {
         if (restored) return;
