@@ -168,16 +168,6 @@ STUB_FUNC(glPixelTransferf, (GLenum pname, GLfloat param))
 STUB_FUNC(glPixelTransferi, (GLenum pname, GLint param))
 STUB_FUNC(glPrioritizeTextures, (GLsizei n, const GLuint *textures, const GLclampf *priorities))
 
-// Call Lists
-STUB_FUNC(glCallList, (GLuint list))
-STUB_FUNC(glCallLists, (GLsizei n, GLenum type, const void *lists))
-STUB_FUNC(glDeleteLists, (GLuint list, GLsizei range))
-STUB_FUNC(glEndList, (void))
-STUB_FUNC_RET(GLuint, glGenLists, (GLsizei range), 0)
-STUB_FUNC_RET(GLboolean, glIsList, (GLuint list), GL_FALSE)
-STUB_FUNC(glListBase, (GLuint base))
-STUB_FUNC(glNewList, (GLuint list, GLenum mode))
-
 #pragma GCC diagnostic pop
 
 void FFP::registerStubFunctions() {
@@ -336,14 +326,4 @@ void FFP::registerStubFunctions() {
     REGISTER(glPixelTransferf);
     REGISTER(glPixelTransferi);
     REGISTER(glPrioritizeTextures);
-    
-    // Call Lists
-    REGISTER(glCallList);
-    REGISTER(glCallLists);
-    REGISTER(glDeleteLists);
-    REGISTER(glEndList);
-    REGISTER(glGenLists);
-    REGISTER(glIsList);
-    REGISTER(glListBase);
-    REGISTER(glNewList);
 }
