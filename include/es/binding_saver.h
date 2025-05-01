@@ -16,7 +16,7 @@
 
 class Restorable {
 protected:
-    bool restored;
+    bool restored = false;
 
     virtual void _internal_restore() {
         throw std::runtime_error("Restorable::_internal_restore() not implemented!");
@@ -59,6 +59,10 @@ struct SaveBoundedTexture : public Restorable  {
 
     SaveBoundedTexture(GLenum textureType) : textureType(textureType) {
         this->boundedTexture = trackedStates->activeTextureState->boundTextures[textureType];
+    }
+
+    ~SaveBoundedTexture() {
+        restore();
     }
 
 protected:
