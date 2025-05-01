@@ -52,13 +52,10 @@ void main() {
         }
     }
 
-    uint firstIndex = indices[low] / 4u;
-    int baseVertex = baseVertices[low];
-
     uint localIndex = outputIndex - ((low == 0) ? 0u : (prefixSums[low - 1]));
-    uint inputIndex = localIndex + firstIndex;
+    uint inputIndex = localIndex + (indices[low] / 4u);
     
-    outputIndices[outputIndex] = uint(int(inputElementBuffer[inputIndex]) + baseVertex);
+    outputIndices[outputIndex] = uint(int(inputElementBuffer[inputIndex]) + baseVertices[low]);
 })";
 
 inline GLuint getTypeByteSize(GLenum type) {
@@ -114,17 +111,14 @@ struct MDElementsBaseVertexBatcher {
             }
         } */
 
-        LOGI("batch begin! drawcount=%i", drawcount);
-
-        SaveBoundedBuffer arrayBufferSaver(GL_ARRAY_BUFFER);
-        SaveUsedProgram currentProgramSaver;
+        // LOGI("batch begin! drawcount=%i", drawcount);
         
-        LOGI("prepare inputs and output of compute");
+        // LOGI("prepare inputs and output of compute");
 
-        std::vector<GLuint> properIndices(drawcount);
+        /* std::vector<GLuint> properIndices(drawcount);
         for (GLsizei i = 0; i < drawcount; ++i) {
             properIndices[i] = static_cast<GLuint>(reinterpret_cast<uintptr_t>(indices[i]));
-        }
+        } */
         
         std::vector<GLuint> prefix(drawcount);
         std::inclusive_scan(
@@ -146,7 +140,7 @@ struct MDElementsBaseVertexBatcher {
         OV_glBufferData(
             GL_SHADER_STORAGE_BUFFER,
             drawcount * elemSize,
-            properIndices.data(), GL_DYNAMIC_DRAW
+            indices, GL_DYNAMIC_DRAW
         );
         glBindBufferBase(
             GL_SHADER_STORAGE_BUFFER, 1, indicesSSBO
@@ -182,24 +176,23 @@ struct MDElementsBaseVertexBatcher {
             GL_SHADER_STORAGE_BUFFER, 4, outputIndexSSBO
         );
 
-        LOGI("dispatch compute! jobs=%u", (total + 63) / 64);
+        // LOGI("dispatch compute! jobs=%u", (total + 63) / 64);
+
+        SaveUsedProgram currentProgramSaver;
 
         OV_glUseProgram(computeProgram);
         glDispatchCompute((total + 63) / 64, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-        LOGI("restore states");
+        // LOGI("restore states");
         
         currentProgramSaver.restore();
-        arrayBufferSaver.restore();
         OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outputIndexSSBO);
 
-        LOGI("DRAW!");
+        // LOGI("DRAW!");
         glDrawElements(mode, total, type, 0);
 
-        elementArraySaver.restore();
-        shaderStorageSaver.restore();
-        LOGI("done");
+        // LOGI("done");
     }
 };
 
