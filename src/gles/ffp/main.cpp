@@ -4,6 +4,7 @@
 void FFP::FFPWrapper::init() {
     LOGI("GLES 1.0 :: FFP entrypoint!");
 
+    FFP::registerStubFunctions();
     FFP::registerImmediateFunctions();
     FFP::registerVertexFunctions();
     FFP::registerMatrixFunctions();
