@@ -38,10 +38,6 @@ layout(std430, binding = 4) writeonly buffer Output {
     uint outputIndices[];
 };
 
-layout(std430, binding = 0) readonly buffer DrawParamsInput {
-    DrawParams drawParams;
-};
-
 void main() {
     uint outputIndex = gl_GlobalInvocationID.x;
     if (outputIndex >= prefixSums[prefixSums.length() - 1]) {
