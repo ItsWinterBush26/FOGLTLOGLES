@@ -37,10 +37,15 @@ layout(std430, binding = 3) readonly buffer PrefixSums {
 layout(std430, binding = 4) writeonly buffer Output {
     uint outputIndices[];
 };
+ayout(std430, binding = 0) readonly buffer DrawParamsInput {
+    DrawParams drawParams;
+};
 
 void main() {
     uint outputIndex = gl_GlobalInvocationID.x;
-    if (outputIndex >= prefixSums[prefixSums.length() - 1]) return;
+    if (outputIndex >= prefixSums[prefixSums.length() - 1]) {
+        return;
+    }
 
     int low = 0, high = prefixSums.length() - 1;
     while (low < high) {
@@ -177,7 +182,6 @@ struct MDElementsBaseVertexBatcher {
         );
 
         // LOGI("dispatch compute! jobs=%u", (total + 63) / 64);
-
         SaveUsedProgram currentProgramSaver;
 
         OV_glUseProgram(computeProgram);
@@ -192,6 +196,8 @@ struct MDElementsBaseVertexBatcher {
         // LOGI("DRAW!");
         glDrawElements(mode, total, type, 0);
 
+        shaderStorageSaver.restore();
+        elementArraySaver.restore();
         // LOGI("done");
     }
 };
