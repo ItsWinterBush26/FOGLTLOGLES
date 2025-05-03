@@ -37,7 +37,8 @@ layout(std430, binding = 3) readonly buffer PrefixSums {
 layout(std430, binding = 4) writeonly buffer Output {
     uint outputIndices[];
 };
-ayout(std430, binding = 0) readonly buffer DrawParamsInput {
+
+layout(std430, binding = 0) readonly buffer DrawParamsInput {
     DrawParams drawParams;
 };
 
