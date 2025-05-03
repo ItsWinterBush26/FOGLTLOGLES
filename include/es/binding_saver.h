@@ -129,7 +129,7 @@ struct SaveUsedProgram : public Restorable {
 
 protected:
     void _internal_restore() override {
-        LOGI("restore program! current=%u previous=%u", trackedStates->currentlyUsedProgram, this->activeProgram);
+        // LOGI("restore program! current=%u previous=%u", trackedStates->currentlyUsedProgram, this->activeProgram);
         OV_glUseProgram(this->activeProgram);
     }
 };
