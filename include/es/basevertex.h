@@ -76,6 +76,16 @@ struct MDElementsBaseVertexBatcher {
     GLuint baseVerticesSSBO;
     GLuint prefixSSBO;
     GLuint outputIndexSSBO;
+
+    ~MDElementsBaseVertexBatcher() {
+        LOGI("MDElementsBaseVertexBatcher destructor!");
+
+        glDeleteProgram(computeProgram);
+        glDeleteBuffers(1, &indicesSSBO);
+        glDeleteBuffers(1, &baseVerticesSSBO);
+        glDeleteBuffers(1, &prefixSSBO);
+        glDeleteBuffers(1, &outputIndexSSBO);
+    }
     
     void init() {
         computeProgram = glCreateProgram();
@@ -128,12 +138,9 @@ struct MDElementsBaseVertexBatcher {
             prefix.begin()
         );
         GLuint total = prefix.back();
-
-        SaveBoundedBuffer shaderStorageSaver(GL_SHADER_STORAGE_BUFFER);
+        
         SaveBoundedBuffer elementArraySaver(GL_ELEMENT_ARRAY_BUFFER);
-        
-        if (elementArraySaver.boundedBuffer == 0) LOGI("element array buffer is 0!");
-        
+        if (elementArraySaver.boundedBuffer == 0) LOGI("element array buffer is 0!"); // we probably should early return but idc
         glBindBufferBase(
             GL_SHADER_STORAGE_BUFFER, 0, elementArraySaver.boundedBuffer
         );
@@ -183,7 +190,7 @@ struct MDElementsBaseVertexBatcher {
 
         OV_glUseProgram(computeProgram);
         glDispatchCompute((total + 63) / 64, 1, 1);
-        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_BUFFER_UPDATE_BARRIER_BIT);
 
         // LOGI("restore states");
         
@@ -192,9 +199,7 @@ struct MDElementsBaseVertexBatcher {
 
         // LOGI("DRAW!");
         glDrawElements(mode, total, type, 0);
-
-        shaderStorageSaver.restore();
-        elementArraySaver.restore();
+        
         // LOGI("done");
     }
 };
