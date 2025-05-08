@@ -119,7 +119,7 @@ struct MDElementsBaseVertexBatcher {
 
         // if (!computeReady || drawcount < 1024) {
             for (GLint i = 0; i < drawcount; ++i) {
-                if (count[i] > 0) glDrawElementsBaseVertex(mode, count[i], type, indices[i], basevertex[i]);
+                if (counts[i] > 0) glDrawElementsBaseVertex(mode, counts[i], type, indices[i], basevertex[i]);
             }
         // }
 
