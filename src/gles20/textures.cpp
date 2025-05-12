@@ -128,7 +128,7 @@ void OV_glCopyTexSubImage2D(
 }
 
 void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param) {
-    LOGI("glTexParameterf: target=%u pname=%u param=%f", target, pname, param);
+    // LOGI("glTexParameterf: target=%u pname=%u param=%f", target, pname, param);
     
     selectProperTexParamf(target, pname, param);
     glTexParameterf(target, pname, param);
