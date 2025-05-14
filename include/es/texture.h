@@ -26,8 +26,10 @@ inline bool isDepthFormat(GLenum format) {
 inline void swizzleBGRA(GLenum& type, std::vector<SwizzleOperation>& ops) {
     switch (type) {
         case 0x8035: // GL_UNSIGNED_INT_8_8_8_8
-            ops.push_back(BGRA2RGBA);
             ops.push_back(ENDIANNESS_SWAP);
+            ops.push_back(BGRA2RGBA);
+
+            type = GL_UNSIGNED_BYTE;
             break;
         case 0x8367: // GL_UNSIGNED_INT_8_8_8_8_REV
             type = GL_UNSIGNED_BYTE;
