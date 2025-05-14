@@ -14,20 +14,19 @@ inline const std::unordered_map<SwizzleOperation, std::vector<GLint>> swizzleArr
     { ENDIANNESS_SWAP,     { GL_ALPHA, GL_BLUE, GL_GREEN, GL_RED } }
 };
 
-/// Transforms the current swizzle vector using the provided transformation vector.
-/// It produces a new vector where each element is remapped from the current state.
 inline std::vector<GLint> transformSwizzle(
     const std::vector<GLint>& current, 
     const std::vector<GLint>& transform
 ) {
     std::vector<GLint> result(4);
     for (int i = 0; i < 4; i++) {
-        // Calculate index offset based on GL_RED
-        int idx = transform[i] - GL_RED;
-        if (idx >= 0 && idx < 4) {
-            result[i] = current[idx];  // Remap using the current state
+        GLint component = transform[i];
+        if (component >= GL_RED && component <= GL_ALPHA) {
+            // Map through the existing swizzle
+            result[i] = current[component - GL_RED];
         } else {
-            result[i] = transform[i];  // Pass-through if the value isn't a swizzle enum
+            // Pass through non-swizzle values
+            result[i] = component;
         }
     }
     return result;
