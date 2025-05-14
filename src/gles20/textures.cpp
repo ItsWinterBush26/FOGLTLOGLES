@@ -37,7 +37,7 @@ void OV_glTexImage2D(
     GLint border, GLenum format,
     GLenum type, const void* pixels
 ) {
-    LOGI("glTexImage2D: internalformat=%i border=%i format=%i type=%u", internalFormat, border, format, type);
+    LOGI("glTexImage2D (before): internalformat=%i border=%i format=%i type=%u", internalFormat, border, format, type);
 
     if (isProxyTexture(target)) {
         boundProxyTexture = MakeAggregateShared<ProxyTexture>(
@@ -54,6 +54,8 @@ void OV_glTexImage2D(
             width, height,
             border, format, type, pixels
         );
+
+        LOGI("glTexImage2D (after): internalformat=%i border=%i format=%i type=%u", internalFormat, border, format, type);
     }
 
     trackTextureFormat(internalFormat);
@@ -66,9 +68,12 @@ void OV_glTexSubImage2D(
     GLenum format, GLenum type,
     const void* pixels
 ) {
-    std::vector<SwizzleOperation> ops;
-    swizzleBGRA(type, ops);
-    doSwizzling(target, ops);
+    if (format == 0x80e1) { // GL_BGRA
+        swizzleBGRA(type);
+        doSwizzling(target);
+
+        format = GL_RGBA;
+    }
 
     if (isDepthFormat(format)
         && width == fakeDepthbuffer->width

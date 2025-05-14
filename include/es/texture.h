@@ -23,11 +23,11 @@ inline bool isDepthFormat(GLenum format) {
     return false;
 }
 
-inline void swizzleBGRA(GLenum& type, std::vector<SwizzleOperation>& ops) {
+inline void swizzleBGRA(GLenum& type) {
     switch (type) {
         case 0x8035: // GL_UNSIGNED_INT_8_8_8_8
-            ops.push_back(ENDIANNESS_SWAP);
-            ops.push_back(BGRA2RGBA);
+            currentSwizzleOperations.push_back(ENDIANNESS_SWAP);
+            currentSwizzleOperations.push_back(BGRA2RGBA);
         
             // fall through
         case 0x8367: // GL_UNSIGNED_INT_8_8_8_8_REV
@@ -40,8 +40,6 @@ inline void swizzleBGRA(GLenum& type, std::vector<SwizzleOperation>& ops) {
 }
 
 inline void fixTexArguments(GLenum& target, GLint& internalFormat, GLenum& type, GLenum& format) {
-    std::vector<SwizzleOperation> swizzlingOperations;
-
     // Special cases for depth, depth-stencil, red and RG unsized formats.
     switch (format) {
         case GL_DEPTH_COMPONENT:
@@ -347,16 +345,16 @@ inline void fixTexArguments(GLenum& target, GLint& internalFormat, GLenum& type,
     // Finally, apply BGRA swizzling adjustments.
     switch (internalFormat) {
         case GL_R8: {
-            if (format == 0x80e1) {
+            if (format == 0x80e1) { // GL_BGRA
                 format = GL_RED;
-                swizzleBGRA(type, swizzlingOperations);
+                swizzleBGRA(type);
             }
             break;
         }
         case GL_RG8: {
-            if (format == 0x80e1) {
+            if (format == 0x80e1) { // GL_BGRA
                 format = GL_RG;
-                swizzleBGRA(type, swizzlingOperations);
+                swizzleBGRA(type);
             }
             break;
         }
@@ -364,11 +362,11 @@ inline void fixTexArguments(GLenum& target, GLint& internalFormat, GLenum& type,
         case GL_RGBA8: {
             if (format == 0x80e1) { // GL_BGRA
                 format = GL_RGBA;
-                swizzleBGRA(type, swizzlingOperations);
+                swizzleBGRA(type);
             }
             break;
         }
     }
 
-    doSwizzling(target, swizzlingOperations);
+    doSwizzling(target);
 }
