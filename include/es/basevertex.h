@@ -98,7 +98,6 @@ struct MDElementsBaseVertexBatcher {
 
         glAttachShader(computeProgram, computeShader);
         OV_glLinkProgram(computeProgram);
-        OV_glLinkProgram(0);
 
         glDeleteShader(computeShader);
 
