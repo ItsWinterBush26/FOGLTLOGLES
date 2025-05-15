@@ -37,8 +37,6 @@ void OV_glTexImage2D(
     GLint border, GLenum format,
     GLenum type, const void* pixels
 ) {
-    LOGI("glTexImage2D (before): internalformat=%i border=%i format=%i type=%u", internalFormat, border, format, type);
-
     if (isProxyTexture(target)) {
         boundProxyTexture = MakeAggregateShared<ProxyTexture>(
             target,
@@ -48,6 +46,8 @@ void OV_glTexImage2D(
             internalFormat
         );
     } else {
+        LOGI("glTexImage2D (before): internalformat=%i border=%i format=%i type=%u", internalFormat, border, format, type);
+        
         fixTexArguments(target, internalFormat, type, format);
         glTexImage2D(
             target, level, internalFormat, 
