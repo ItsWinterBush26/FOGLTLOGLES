@@ -219,7 +219,7 @@ struct FakeDepthFramebuffer {
         );
 
         SaveBoundedFramebuffer sbf1(GL_DRAW_FRAMEBUFFER);
-        OV_glBindFramebuffer(GL_DRAW_FRAMEBUFFER, drawFramebuffer);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, drawFramebuffer);
 
         glFramebufferTexture2D(
             GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
@@ -259,10 +259,10 @@ struct FakeDepthFramebuffer {
         if (!ready) return;
 
         SaveBoundedFramebuffer sbf1(GL_DRAW_FRAMEBUFFER);
-        OV_glBindFramebuffer(GL_DRAW_FRAMEBUFFER, drawFramebuffer);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, drawFramebuffer);
 
         SaveBoundedFramebuffer sbf2(GL_READ_FRAMEBUFFER);
-        OV_glBindFramebuffer(GL_READ_FRAMEBUFFER, readFramebuffer);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, readFramebuffer);
 
         glFramebufferTexture2D(
             GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target,
