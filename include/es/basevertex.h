@@ -132,22 +132,12 @@ struct MDElementsBaseVertexBatcher {
             counts, counts + drawcount,
             prefix.begin()
         );
-        GLuint total = prefix.back();
         
-        SaveBoundedBuffer elementArraySaver(GL_ELEMENT_ARRAY_BUFFER);
-        if (elementArraySaver.boundedBuffer == 0) LOGI("element array buffer is 0!"); // we probably should early return but idc
-        glBindBufferBase(
-            GL_SHADER_STORAGE_BUFFER, 0, elementArraySaver.boundedBuffer
-        );
-
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, indicesSSBO);
         glBufferData(
             GL_SHADER_STORAGE_BUFFER,
             drawcount * elemSize,
             indices, GL_DYNAMIC_DRAW
-        );
-        glBindBufferBase(
-            GL_SHADER_STORAGE_BUFFER, 1, indicesSSBO
         );
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, baseVerticesSSBO);
@@ -156,9 +146,6 @@ struct MDElementsBaseVertexBatcher {
             drawcount * sizeof(GLint),
             basevertex, GL_DYNAMIC_DRAW
         );
-        glBindBufferBase(
-            GL_SHADER_STORAGE_BUFFER, 2, baseVerticesSSBO
-        );
         
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, prefixSSBO);
         glBufferData(
@@ -166,15 +153,28 @@ struct MDElementsBaseVertexBatcher {
             drawcount * sizeof(GLuint),
             prefix.data(), GL_DYNAMIC_DRAW
         );
-        glBindBufferBase(
-            GL_SHADER_STORAGE_BUFFER, 3, prefixSSBO
-        );
 
+        GLuint total = prefix.back();
+        LOGI("prefix.back() = %u", total);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, outputIndexSSBO);
         glBufferData(
             GL_SHADER_STORAGE_BUFFER,
             total * sizeof(GLuint),
             nullptr, GL_DYNAMIC_DRAW
+        );
+
+        SaveBoundedBuffer elementArraySaver(GL_ELEMENT_ARRAY_BUFFER);
+        glBindBufferBase(
+            GL_SHADER_STORAGE_BUFFER, 0, elementArraySaver.boundedBuffer
+        );
+        glBindBufferBase(
+            GL_SHADER_STORAGE_BUFFER, 1, indicesSSBO
+        );
+        glBindBufferBase(
+            GL_SHADER_STORAGE_BUFFER, 2, baseVerticesSSBO
+        );
+        glBindBufferBase(
+            GL_SHADER_STORAGE_BUFFER, 3, prefixSSBO
         );
         glBindBufferBase(
             GL_SHADER_STORAGE_BUFFER, 4, outputIndexSSBO
@@ -182,14 +182,16 @@ struct MDElementsBaseVertexBatcher {
 
         // LOGI("dispatch compute! jobs=%u", (total + 63) / 64);
         SaveUsedProgram currentProgramSaver;
+        SaveBoundedBuffer arrayBufferSaver(GL_ARRAY_BUFFER);
 
         glUseProgram(computeProgram);
         glDispatchCompute((total + 63) / 64, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-        // LOGI("restore states");
-        
+        LOGI("restore states");
+
         currentProgramSaver.restore();
+        arrayBufferSaver.restore();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, outputIndexSSBO);
 
         // LOGI("DRAW!");
