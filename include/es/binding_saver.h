@@ -82,7 +82,7 @@ struct SaveBoundedBuffer : public Restorable  {
 protected:
     void _internal_restore() override {
         glBindBuffer(this->bufferType, this->boundedBuffer);
-        LOGI("bufres: type=%u", this->boundedBuffer);
+        LOGI("bufres: type=%u", this->bufferType);
     }
 };
 
