@@ -117,7 +117,7 @@ STUB_FUNC(glSecondaryColorPointer, (GLint size, GLenum type, GLsizei stride, con
 
 // Fixed Function
 STUB_FUNC(glAccum, (GLenum op, GLfloat value))
-STUB_FUNC(glAlphaFunc, (GLenum func, GLclampf ref))
+// STUB_FUNC(glAlphaFunc, (GLenum func, GLclampf ref))
 STUB_FUNC(glClearAccum, (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha))
 STUB_FUNC(glColorMaterial, (GLenum face, GLenum mode))
 STUB_FUNC(glEdgeFlag, (GLboolean flag))
@@ -276,7 +276,7 @@ void FFP::registerStubFunctions() {
     
     // Fixed Function
     REGISTER(glAccum);
-    REGISTER(glAlphaFunc);
+    // REGISTER(glAlphaFunc);
     REGISTER(glClearAccum);
     REGISTER(glColorMaterial);
     REGISTER(glEdgeFlag);
