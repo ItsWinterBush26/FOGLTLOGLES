@@ -17,10 +17,7 @@ void OV_glColor4f(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) {
         return;
     }
 
-    if (Immediate::immediateModeState->isActive()) {
-        Immediate::immediateModeState->getCurrentVertex().color = glm::vec4(red, green, blue, alpha);
-        return; // idk if in spec but im not looking for allat
-    }
+    Immediate::immediateModeState->setColor(glm::vec4(red, green, blue, alpha));
 
     glColor4f(red, green, blue, alpha);
 }

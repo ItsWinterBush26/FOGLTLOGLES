@@ -71,6 +71,10 @@ class ImmediateModeState {
 private:
     GLenum currentPrimitive;
 
+    glm::vec3 currentNormal;
+    glm::vec4 currentColor;
+    glm::vec2 currentTexCoord;
+
     std::vector<VertexData> vertices;
     VertexData currentVertex;
 
@@ -138,22 +142,51 @@ public:
         glDeleteVertexArrays(1, &vao);
     }
 
+    void reset() {
+        vertices.clear();
+        currentVertex = VertexData();
+        currentNormal = glm::vec3();
+        currentColor = glm::vec4();
+        currentTexCoord = glm::vec2();
+    }
+
     void begin(GLenum primitive) {
         if (active) return;
 
+        this->reset();
         currentPrimitive = primitive;
-        vertices.clear();
-        currentVertex = VertexData();
-
+        
         active = true;
+    }
+
+    void setNormal(const glm::vec3& normal) {
+        if (!active) return;
+
+        currentNormal = normal;
+    }
+
+    void setColor(const glm::vec4& color) {
+        if (!active) return;
+
+        currentColor = color;
+    }
+
+    void setTexCoord(const glm::vec2& texCoord) {
+        if (!active) return;
+
+        currentTexCoord = texCoord;
     }
 
     void advance(std::function<void(VertexData&)> applyVertexPosition) {
         if (!active) return;
         
         applyVertexPosition(currentVertex);
+        currentVertex.normal = currentNormal;
+        currentVertex.color = currentColor;
+        currentVertex.texCoord = currentTexCoord;
 
         vertices.push_back(currentVertex);
+
         currentVertex = VertexData();
     }
 
@@ -180,8 +213,8 @@ public:
         glBindVertexArray(vao);
         glDrawArrays(currentPrimitive, 0, vertices.size());
         
-        vertices.clear();
-
+        this->reset();
+        
         active = false;
     }
 
