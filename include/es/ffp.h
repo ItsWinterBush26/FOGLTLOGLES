@@ -50,7 +50,7 @@ uniform sampler2D uTexture;
 
 void main() {
     if (uUseTexture) {
-        oFragColor = texture(uTexture, iVertexTextureCoord) * iVertexColor;
+        oFragColor = texture(uTexture, iVertexTextureCoord.st) * iVertexColor;
     } else {
         oFragColor = iVertexColor;
     }
