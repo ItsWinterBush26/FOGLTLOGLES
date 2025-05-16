@@ -3,22 +3,20 @@
 #include "glm/ext/vector_float4.hpp"
 #include "main.h"
 
-#include <GLES/gl.h>
+#include <GLES3/gl32.h>
 
-void OV_glColor4f(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
+void glColor4f(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
 
 void FFP::registerColorFunctions() {
-    REGISTEROV(glColor4f);
+    REGISTER(glColor4f);
 }
 
-void OV_glColor4f(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) {
+void glColor4f(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) {
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<OV_glColor4f>(red, green, blue, alpha);
+        Lists::displayListManager->addCommand<glColor4f>(red, green, blue, alpha);
         return;
     }
 
     Immediate::immediateModeState->setColor(glm::vec4(red, green, blue, alpha));
-
-    glColor4f(red, green, blue, alpha);
 }
 

@@ -7,13 +7,13 @@
 #include "utils/fast_map.h"
 
 #include <cstddef>
-#include <GLES/gl.h>
 #include <GLES3/gl32.h>
 #include <memory>
 #include <stack>
 #include <vector>
 
 inline GLenum currentMatrixMode = GL_MODELVIEW;
+
 inline glm::mat4 currentMatrix;
 inline std::stack<glm::mat4> matrixStack;
 
@@ -21,15 +21,15 @@ namespace Immediate {
 
 inline const std::string immediateModeVS = R"(#version 320 es
 
-layout(location = 0) in vec4 iVertexPosition;
+layout(location = 0) in vec2 iVertexPosition;
 layout(location = 1) in vec3 iVertexNormal;
 layout(location = 2) in vec4 iVertexColor;
-layout(location = 3) in vec4 iVertexTexCoord;
+layout(location = 3) in vec2 iVertexTexCoord;
 
 uniform mat4 modelViewProjection;
 
 out vec4 vertexColor;
-out vec4 vertexTexCoord;
+out vec2 vertexTexCoord;
 
 void main() {
     gl_Position = modelViewProjection * iVertexPosition;
@@ -41,7 +41,7 @@ inline const std::string immediateModeFS = R"(#version 320 es
 precision mediump float;
 
 in vec4 vertexColor;
-in vec4 vertexTexCoord;
+in vec2 vertexTexCoord;
 
 out vec4 fragColor;
 
@@ -50,7 +50,7 @@ uniform sampler2D uTexture;
 
 void main() {
     if (uUseTexture) {
-        fragColor = texture(uTexture, vertexTexCoord.st) * vertexColor;
+        fragColor = texture(uTexture, vertexTexCoord) * vertexColor;
     } else {
         fragColor = vertexColor;
     }
@@ -60,7 +60,7 @@ struct VertexData {
     glm::vec4 position;
     glm::vec3 normal;
     glm::vec4 color;
-    glm::vec4 texCoord;
+    glm::vec2 texCoord;
 };
 
 class ImmediateModeState {
@@ -69,7 +69,7 @@ private:
 
     glm::vec3 currentNormal;
     glm::vec4 currentColor;
-    glm::vec4 currentTexCoord;
+    glm::vec2 currentTexCoord;
 
     std::vector<VertexData> vertices;
     VertexData currentVertex;
@@ -127,7 +127,7 @@ public:
         
         glEnableVertexAttribArray(3);
         glVertexAttribPointer(
-            3, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), 
+            3, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), 
             (void*) offsetof(VertexData, texCoord)
         );
     }
@@ -141,9 +141,9 @@ public:
     void reset() {
         vertices.clear();
         currentVertex = VertexData();
-        currentNormal = glm::vec3();
-        currentColor = glm::vec4();
-        currentTexCoord = glm::vec4();
+        currentNormal = glm::vec3(0, 0, 0);
+        currentColor = glm::vec4(0, 0, 0, 1);
+        currentTexCoord = glm::vec2(0, 0);
     }
 
     void begin(GLenum primitive) {
@@ -167,7 +167,7 @@ public:
         currentColor = color;
     }
 
-    void setTexCoord(const glm::vec4& texCoord) {
+    void setTexCoord(const glm::vec2& texCoord) {
         if (!active) return;
 
         currentTexCoord = texCoord;

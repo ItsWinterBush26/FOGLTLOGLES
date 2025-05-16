@@ -2,7 +2,7 @@
 #include "main.h"
 #include "utils/env.h"
 
-#include <GLES/gl.h>
+#include <GLES3/gl32.h>
 
 inline bool envNoError = (getEnvironmentVar("LIBGL_NO_ERROR") == "1");
 

@@ -7,7 +7,7 @@
 #include "utils/log.h"
 #include "utils/strings.h"
 
-#include <GLES/gl.h>
+#include <GLES3/gl32.h>
 #include <string>
 
 #ifndef CAST_TO_CUBYTE

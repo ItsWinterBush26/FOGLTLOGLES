@@ -7,63 +7,63 @@
 #include "main.h"
 
 #include <glm/glm.hpp>
-#include <GLES/gl.h>
+#include <GLES3/gl32.h>
 
 typedef double GLdouble;
 
-void OV_glMatrixMode(GLenum mode);
+void glMatrixMode(GLenum mode);
 
-void OV_glPushMatrix();
-void OV_glPopMatrix();
-void OV_glLoadIdentity();
+void glPushMatrix();
+void glPopMatrix();
+void glLoadIdentity();
 
 void glLoadMatrixd(const GLdouble *m);
-void OV_glLoadMatrixf(const GLfloat *m);
+void glLoadMatrixf(const GLfloat *m);
  
 void glOrtho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val);
 void glFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val);
 
 void glMultMatrixd(const GLdouble *m);
-void OV_glMultMatrixf(const GLfloat *m);
+void glMultMatrixf(const GLfloat *m);
 
 void glRotated(GLdouble angle, GLdouble x, GLdouble y, GLdouble z);
-void OV_glRotatef( GLfloat angle, GLfloat x, GLfloat y, GLfloat z);
+void glRotatef( GLfloat angle, GLfloat x, GLfloat y, GLfloat z);
 
 void glScaled(GLdouble x, GLdouble y, GLdouble z);
-void OV_glScalef(GLfloat x, GLfloat y, GLfloat z);
+void glScalef(GLfloat x, GLfloat y, GLfloat z);
 
 void glTranslated(GLdouble x, GLdouble y, GLdouble z);
-void OV_glTranslatef(GLfloat x, GLfloat y, GLfloat z);
+void glTranslatef(GLfloat x, GLfloat y, GLfloat z);
 
 void FFP::registerMatrixFunctions() {
-    REGISTEROV(glMatrixMode);
+    REGISTER(glMatrixMode);
 
-    REGISTEROV(glPushMatrix);
-    REGISTEROV(glPopMatrix);
-    REGISTEROV(glLoadIdentity);
+    REGISTER(glPushMatrix);
+    REGISTER(glPopMatrix);
+    REGISTER(glLoadIdentity);
 
     REGISTER(glLoadMatrixd);
-    REGISTEROV(glLoadMatrixf);
+    REGISTER(glLoadMatrixf);
 
     REGISTER(glOrtho);
     REGISTER(glFrustum);
 
     REGISTER(glMultMatrixd);
-    REGISTEROV(glMultMatrixf);
+    REGISTER(glMultMatrixf);
 
     REGISTER(glRotated);
-    REGISTEROV(glRotatef);
+    REGISTER(glRotatef);
 
     REGISTER(glScaled);
-    REGISTEROV(glScalef);
+    REGISTER(glScalef);
 
     REGISTER(glTranslated);
-    REGISTEROV(glTranslatef);
+    REGISTER(glTranslatef);
 }
 
-void OV_glMatrixMode(GLenum mode) {
+void glMatrixMode(GLenum mode) {
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<OV_glMatrixMode>(mode);
+        Lists::displayListManager->addCommand<glMatrixMode>(mode);
         return;
     }
     
@@ -76,22 +76,20 @@ void OV_glMatrixMode(GLenum mode) {
     }
     
     currentMatrixMode = mode;
-
-    glMatrixMode(mode);
 }
 
-void OV_glPushMatrix() {
+void glPushMatrix() {
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<OV_glPushMatrix>();
+        Lists::displayListManager->addCommand<glPushMatrix>();
         return;
     }
 
     matrixStack.push(currentMatrix);
 }
 
-void OV_glPopMatrix() {
+void glPopMatrix() {
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<OV_glPopMatrix>();
+        Lists::displayListManager->addCommand<glPopMatrix>();
         return;
     }
 
@@ -103,9 +101,9 @@ void OV_glPopMatrix() {
     matrixStack.pop();
 }
 
-void OV_glLoadIdentity() {
+void glLoadIdentity() {
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<OV_glLoadIdentity>();
+        Lists::displayListManager->addCommand<glLoadIdentity>();
         return;
     }
 
@@ -126,9 +124,9 @@ void glLoadMatrixd(const GLdouble *m) {
     );
 }
 
-void OV_glLoadMatrixf(const GLfloat *m) {
+void glLoadMatrixf(const GLfloat *m) {
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<OV_glLoadMatrixf>(m);
+        Lists::displayListManager->addCommand<glLoadMatrixf>(m);
         return;
     }
 
@@ -138,8 +136,6 @@ void OV_glLoadMatrixf(const GLfloat *m) {
         m[8], m[9], m[10], m[11],
         m[12], m[13], m[14], m[15]
     );
-
-    glLoadMatrixf(m);
 }
 
 void glOrtho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val) {
@@ -183,9 +179,9 @@ void glMultMatrixd(const GLdouble *m) {
     currentMatrix = currentMatrix * matrix;
 }
 
-void OV_glMultMatrixf(const GLfloat *m) {
+void glMultMatrixf(const GLfloat *m) {
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<OV_glMultMatrixf>(m);
+        Lists::displayListManager->addCommand<glMultMatrixf>(m);
         return;
     }
 
@@ -199,46 +195,40 @@ void OV_glMultMatrixf(const GLfloat *m) {
 }
 
 void glRotated(GLdouble angle, GLdouble x, GLdouble y, GLdouble z) {
-    OV_glRotatef(static_cast<float>(angle), static_cast<float>(x), static_cast<float>(y), static_cast<float>(z));
+    glRotatef(static_cast<float>(angle), static_cast<float>(x), static_cast<float>(y), static_cast<float>(z));
 }
 
-void OV_glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z) {
+void glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z) {
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<OV_glRotatef>(angle, x, y, z);
+        Lists::displayListManager->addCommand<glRotatef>(angle, x, y, z);
         return;
     }
 
     currentMatrix = glm::rotate(currentMatrix, glm::radians(angle), glm::vec3(x, y, z));
-
-    glRotatef(angle, x, y, z);
 }
 
 void glScaled(GLdouble x, GLdouble y, GLdouble z) {
-    OV_glScalef(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z));
+    glScalef(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z));
 }
 
 void OV_glScalef(GLfloat x, GLfloat y, GLfloat z) {
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<OV_glScalef>(x, y, z);
+        Lists::displayListManager->addCommand<glScalef>(x, y, z);
         return;
     }
 
     currentMatrix = glm::scale(currentMatrix, glm::vec3(x, y, z));
-
-    glScalef(x, y, z);
 }
 
 void glTranslated(GLdouble x, GLdouble y, GLdouble z) {
-    OV_glTranslatef(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z));
+    glTranslatef(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z));
 }
 
-void OV_glTranslatef(GLfloat x, GLfloat y, GLfloat z) {
+void glTranslatef(GLfloat x, GLfloat y, GLfloat z) {
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<OV_glTranslatef>(x, y, z);
+        Lists::displayListManager->addCommand<glTranslatef>(x, y, z);
         return;
     }
     
     currentMatrix = glm::translate(currentMatrix, glm::vec3(x, y, z));
-
-    glTranslatef(x, y, z);
 }

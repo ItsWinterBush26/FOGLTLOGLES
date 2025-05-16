@@ -2,7 +2,7 @@
 #include "gles/ffp/main.h"
 #include "main.h"
 
-#include <GLES/gl.h>
+#include <GLES3/gl32.h>
 
 void glTexCoord2f(GLfloat s, GLfloat t);
 

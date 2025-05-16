@@ -3,7 +3,7 @@
 #include "main.h"
 #include "utils/pointers.h"
 
-#include <GLES/gl.h>
+#include <GLES3/gl32.h>
 
 void glBegin(GLenum mode);
 void glEnd();

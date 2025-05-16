@@ -1,7 +1,7 @@
 #include "gles/main.h"
 #include "main.h"
 
-#include <GLES/gl.h>
+#include <GLES3/gl32.h>
 
 void glClearDepth(double d);
 void glDepthRange(double near, double far);
