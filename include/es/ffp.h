@@ -25,13 +25,13 @@ inline const std::string immediateModeVS = R"(
 
 layout(location = 0) in vec4 iVertexPostion;
 layout(location = 1) in vec3 iVertexNormal;
-layout(location = 2) in vec2 iVertexTexCoord;
+layout(location = 2) in vec4 iVertexTexCoord;
 layout(location = 3) in vec4 iVertexColor;
 
 uniform mat4 modelViewProjection;
 
 out vec4 oVertexColor;
-out vec2 oVertexTexCoord;
+out vec4 oVertexTexCoord;
 
 void main() {
     gl_Position = modelViewProjection * iVertexPosition;
@@ -45,7 +45,7 @@ inline const std::string immediateModeFS = R"(
 precision mediump float;
 
 in vec4 iVertexColor;
-in vec2 iVertexTextureCoord;
+in vec4 iVertexTextureCoord;
 
 out vec4 oFragColor;
 
@@ -73,7 +73,7 @@ private:
 
     glm::vec3 currentNormal;
     glm::vec4 currentColor;
-    glm::vec2 currentTexCoord;
+    glm::vec4 currentTexCoord;
 
     std::vector<VertexData> vertices;
     VertexData currentVertex;
@@ -147,7 +147,7 @@ public:
         currentVertex = VertexData();
         currentNormal = glm::vec3();
         currentColor = glm::vec4();
-        currentTexCoord = glm::vec2();
+        currentTexCoord = glm::vec4();
     }
 
     void begin(GLenum primitive) {
@@ -171,7 +171,7 @@ public:
         currentColor = color;
     }
 
-    void setTexCoord(const glm::vec2& texCoord) {
+    void setTexCoord(const glm::vec4& texCoord) {
         if (!active) return;
 
         currentTexCoord = texCoord;
