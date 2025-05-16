@@ -4,6 +4,7 @@
 #include "gles/main.h"
 #include "main.h"
 #include "utils/env.h"
+#include "utils/log.h"
 #include "utils/strings.h"
 
 #include <GLES/gl.h>
@@ -106,6 +107,7 @@ void OV_glEnable(GLenum cap) {
 
         default:
             glEnable(cap);
+            if (debugEnabled) LOGI("glEnable: cap=%u", cap);
 
             trackedStates->capabilitiesState[cap] = true;
             break;
@@ -114,6 +116,7 @@ void OV_glEnable(GLenum cap) {
 
 void OV_glDisable(GLenum cap) {
     glDisable(cap);
+    if (debugEnabled) LOGI("glDisable: cap=%u", cap);
 
     trackedStates->capabilitiesState[cap] = false;
 }
