@@ -19,8 +19,7 @@ inline std::stack<glm::mat4> matrixStack;
 
 namespace Immediate {
 
-inline const std::string immediateModeVS = R"(
-#version 320 es
+inline const std::string immediateModeVS = R"(#version 320 es
 
 layout(location = 0) in vec4 iVertexPosition;
 layout(location = 1) in vec3 iVertexNormal;
@@ -39,8 +38,7 @@ void main() {
 }
 )";
 
-inline const std::string immediateModeFS = R"(
-#version 320 es
+inline const std::string immediateModeFS = R"(#version 320 es
 precision mediump float;
 
 in vec4 iVertexColor;
