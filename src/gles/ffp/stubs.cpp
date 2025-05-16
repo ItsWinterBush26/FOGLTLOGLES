@@ -16,7 +16,7 @@ typedef double GLdouble;
 STUB_FUNC(glArrayElement, (GLint i))
 STUB_FUNC(glColor3f, (GLfloat red, GLfloat green, GLfloat blue))
 STUB_FUNC(glColor3fv, (const GLfloat *v))
-STUB_FUNC(glColor4f, (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha))
+// STUB_FUNC(glColor4f, (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha))
 STUB_FUNC(glColor4fv, (const GLfloat *v))
 STUB_FUNC(glEvalCoord1f, (GLfloat u))
 STUB_FUNC(glEvalCoord1fv, (const GLfloat *u))
@@ -112,7 +112,7 @@ STUB_FUNC(glInterleavedArrays, (GLenum format, GLsizei stride, const void *point
 STUB_FUNC(glPopClientAttrib, (void))
 STUB_FUNC(glPushClientAttrib, (GLbitfield mask))
 STUB_FUNC(glSecondaryColorPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
-STUB_FUNC(glTexCoordPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
+// STUB_FUNC(glTexCoordPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
 // STUB_FUNC(glVertexPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
 
 // Fixed Function
@@ -160,7 +160,7 @@ STUB_FUNC(glMultTransposeMatrixd, (const GLdouble *m))
 
 // GL2 Textures
 STUB_FUNC_RET(GLboolean, glAreTexturesResident, (GLsizei n, const GLuint *textures, GLboolean *residences), GL_TRUE)
-STUB_FUNC(glClientActiveTexture, (GLenum texture))
+// STUB_FUNC(glClientActiveTexture, (GLenum texture))
 STUB_FUNC(glPixelMapfv, (GLenum map, GLsizei mapsize, const GLfloat *values))
 STUB_FUNC(glPixelMapuiv, (GLenum map, GLsizei mapsize, const GLuint *values))
 STUB_FUNC(glPixelMapusv, (GLenum map, GLsizei mapsize, const GLushort *values))
@@ -175,7 +175,7 @@ void FFP::registerStubFunctions() {
     REGISTER(glArrayElement);
     REGISTER(glColor3f);
     REGISTER(glColor3fv);
-    REGISTER(glColor4f);
+    // REGISTER(glColor4f);
     REGISTER(glColor4fv);
     REGISTER(glEvalCoord1f);
     REGISTER(glEvalCoord1fv);
@@ -271,7 +271,7 @@ void FFP::registerStubFunctions() {
     REGISTER(glPopClientAttrib);
     REGISTER(glPushClientAttrib);
     REGISTER(glSecondaryColorPointer);
-    REGISTER(glTexCoordPointer);
+    // REGISTER(glTexCoordPointer);
     // REGISTER(glVertexPointer);
     
     // Fixed Function
@@ -319,7 +319,7 @@ void FFP::registerStubFunctions() {
     
     // GL2 Textures
     REGISTER(glAreTexturesResident);
-    REGISTER(glClientActiveTexture);
+    // REGISTER(glClientActiveTexture);
     REGISTER(glPixelMapfv);
     REGISTER(glPixelMapuiv);
     REGISTER(glPixelMapusv);
