@@ -1,6 +1,7 @@
 #include "es/ffp.h"
 #include "gles/ffp/main.h"
 #include "main.h"
+#include "utils/pointers.h"
 
 #include <GLES/gl.h>
 
@@ -10,6 +11,8 @@ void glEnd();
 void FFP::registerImmediateFunctions() {
     REGISTER(glBegin);
     REGISTER(glEnd);
+
+    Immediate::immediateModeState = MakeAggregateShared<Immediate::ImmediateModeState>();
 }
 
 void glBegin(GLenum mode) {

@@ -5,7 +5,6 @@
 #include "gles20/shader_overrides.h"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "utils/fast_map.h"
-#include "utils/pointers.h"
 
 #include <cstddef>
 #include <GLES/gl.h>
@@ -228,7 +227,7 @@ public:
 };
 
 
-inline std::shared_ptr<ImmediateModeState> immediateModeState = MakeAggregateShared<ImmediateModeState>();
+inline std::shared_ptr<ImmediateModeState> immediateModeState;
 }
 
 namespace Lists {
