@@ -22,7 +22,7 @@ namespace Immediate {
 inline const std::string immediateModeVS = R"(
 #version 320 es
 
-layout(location = 0) in vec4 iVertexPostion;
+layout(location = 0) in vec4 iVertexPosition;
 layout(location = 1) in vec3 iVertexNormal;
 layout(location = 2) in vec4 iVertexColor;
 layout(location = 3) in vec4 iVertexTexCoord;
