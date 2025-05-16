@@ -7,6 +7,7 @@ void FFP::FFPWrapper::init() {
     FFP::registerStubFunctions();
     FFP::registerImmediateFunctions();
     FFP::registerColorFunctions();
+    FFP::registerTexCoordFunctions();
     FFP::registerVertexFunctions();
     FFP::registerMatrixFunctions();
     FFP::registerListsFunctions();
