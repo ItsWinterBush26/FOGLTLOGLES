@@ -28,31 +28,31 @@ layout(location = 3) in vec4 iVertexTexCoord;
 
 uniform mat4 modelViewProjection;
 
-out vec4 oVertexColor;
-out vec4 oVertexTexCoord;
+out vec4 vertexColor;
+out vec4 vertexTexCoord;
 
 void main() {
     gl_Position = modelViewProjection * iVertexPosition;
-    oVertexColor = iVertexColor;
-    oVertexTexCoord = iVertexTexCoord;
+    vertexColor = iVertexColor;
+    vertexTexCoord = iVertexTexCoord;
 })";
 
 inline const std::string immediateModeFS = R"(#version 320 es
 precision mediump float;
 
-in vec4 iVertexColor;
-in vec4 iVertexTextureCoord;
+in vec4 vertexColor;
+in vec4 vertexTextureCoord;
 
-out vec4 oFragColor;
+out vec4 fragColor;
 
 uniform bool uUseTexture;
 uniform sampler2D uTexture;
 
 void main() {
     if (uUseTexture) {
-        oFragColor = texture(uTexture, iVertexTextureCoord.st) * iVertexColor;
+        fragColor = texture(uTexture, vertexTextureCoord.st) * vertexColor;
     } else {
-        oFragColor = iVertexColor;
+        fragColor = vertexColor;
     }
 })";
 
