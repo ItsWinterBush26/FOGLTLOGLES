@@ -35,8 +35,7 @@ void main() {
     gl_Position = modelViewProjection * iVertexPosition;
     oVertexColor = iVertexColor;
     oVertexTexCoord = iVertexTexCoord;
-}
-)";
+})";
 
 inline const std::string immediateModeFS = R"(#version 320 es
 precision mediump float;
@@ -55,7 +54,7 @@ void main() {
     } else {
         oFragColor = iVertexColor;
     }
-)";
+})";
 
 struct VertexData {
     glm::vec4 position;
