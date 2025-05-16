@@ -95,25 +95,4 @@ namespace ShaderConverter::GLSLRegexPreprocessor {
     inline void fixDeprecatedTextureFunction(std::string& source) {
         source = std::regex_replace(source, texture2DRegex, "texture(");
     }
-
-    inline void fixDeprecatedFragOutColor(std::string& source) {
-        /*
-        if (source.find("gl_FragColor") != std::string::npos) {
-            source = std::regex_replace(source, glFragColorRegex, "fragColor");
-    
-            // Inject `out vec4 fragColor;` after #version
-            std::size_t versionPos = source.find("#version");
-            if (versionPos != std::string::npos) {
-                std::size_t lineEnd = source.find('\n', versionPos);
-                if (lineEnd != std::string::npos) {
-                    source.insert(lineEnd + 1, "varying vec4 fragColor;\n");
-                } else {
-                    source += "\nvarying vec4 fragColor;\n";
-                }
-            } else {
-                source = "varying vec4 fragColor;\n" + source;
-            }
-        }
-        */
-    }
 }

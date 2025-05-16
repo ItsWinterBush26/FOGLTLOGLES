@@ -29,8 +29,6 @@ namespace ShaderConverter {
 
         if (shaderVersion <= 120) {
             GLSLRegexPreprocessor::fixDeprecatedTextureFunction(source);
-
-            if (kind == shaderc_fragment_shader) GLSLRegexPreprocessor::fixDeprecatedFragOutColor(source);
         }
 
         if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {

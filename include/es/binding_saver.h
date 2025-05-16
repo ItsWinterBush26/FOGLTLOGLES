@@ -1,6 +1,7 @@
 #pragma once
 
 #include "es/state_tracking.h"
+#include "utils/log.h"
 
 #include <GLES2/gl2.h>
 
