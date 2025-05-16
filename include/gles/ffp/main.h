@@ -14,6 +14,7 @@ namespace FFP {
 
     void registerStubFunctions();
     void registerImmediateFunctions();
+    void registerColorFunctions();
     void registerVertexFunctions();
     void registerMatrixFunctions();
     void registerListsFunctions();

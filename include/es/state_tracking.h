@@ -1,6 +1,5 @@
 #pragma once
 
-#include "utils/log.h"
 #include "utils/fast_map.h"
 
 #include <GLES3/gl3.h>
@@ -54,6 +53,8 @@ struct FramebufferStates {
 };
 
 struct TrackedStates {
+    FAST_MAP_BI(GLenum, bool) capabilitiesState;
+
     GLuint activeTextureUnit = GL_TEXTURE0;
     TextureStates* activeTextureState;
 
@@ -81,6 +82,10 @@ struct TrackedStates {
     void setActiveTextureUnit(GLuint unit) {
         activeTextureUnit = unit;
         activeTextureState = &textureUnits[unit];
+    }
+
+    bool isCapabilityEnabled(GLenum capability) {
+        return capabilitiesState[capability];
     }
 };
 

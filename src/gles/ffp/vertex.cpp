@@ -1,5 +1,6 @@
 #include "es/ffp.h"
 #include "gles/ffp/main.h"
+#include "glm/ext/vector_float4.hpp"
 #include "main.h"
 
 #include <GLES3/gl32.h>
@@ -138,36 +139,39 @@ void glVertex4iv(const GLint *v) {
 
 #pragma region Vertex Float Implementations
 void glVertex2f(GLfloat x, GLfloat y) {
+    if (!Immediate::immediateModeState->isActive()) return;
     if (Lists::displayListManager->isRecording()) {
         Lists::displayListManager->addCommand<glVertex2f>(x, y);
         return;
     }
 
-    floatVertexBuffer.push_back(x);
-    floatVertexBuffer.push_back(y);
+    Immediate::immediateModeState->advance([&](Immediate::VertexData& vertex) {
+        vertex.position = glm::vec4(x, y, 0, 1);
+    });
 }
 
 void glVertex3f(GLfloat x, GLfloat y, GLfloat z) {
+    if (!Immediate::immediateModeState->isActive()) return;
     if (Lists::displayListManager->isRecording()) {
         Lists::displayListManager->addCommand<glVertex3f>(x, y, z);
         return;
     }
 
-    floatVertexBuffer.push_back(x);
-    floatVertexBuffer.push_back(y);
-    floatVertexBuffer.push_back(z);
+    Immediate::immediateModeState->advance([&](Immediate::VertexData& vertex) {
+        vertex.position = glm::vec4(x, y, z, 1);
+    });
 }
 
 void glVertex4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w) {
+    if (!Immediate::immediateModeState->isActive()) return;
     if (Lists::displayListManager->isRecording()) {
         Lists::displayListManager->addCommand<glVertex4f>(x, y, z, w);
         return;
     }
 
-    floatVertexBuffer.push_back(x);
-    floatVertexBuffer.push_back(y);
-    floatVertexBuffer.push_back(z);
-    floatVertexBuffer.push_back(w);
+    Immediate::immediateModeState->advance([&](Immediate::VertexData& vertex) {
+        vertex.position = glm::vec4(x, y, z, w);
+    });
 }
 
 void glVertex2fv(const GLfloat *v) {

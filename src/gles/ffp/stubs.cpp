@@ -6,7 +6,7 @@
 
 typedef double GLdouble;
 
-#define STUB_FUNC(name, args) void name args { LOGI("%s called!", #name); }
+#define STUB_FUNC(name, args) void name args { LOGI("%s was called!", #name); }
 #define STUB_FUNC_RET(ret, name, args, retval) ret name args { LOGI("%s called!", #name); return retval; }
 
 #pragma GCC diagnostic push
@@ -102,18 +102,18 @@ STUB_FUNC(glWindowPos3f, (GLfloat x, GLfloat y, GLfloat z))
 STUB_FUNC(glWindowPos3fv, (const GLfloat *v))
 
 // Client Arrays
-STUB_FUNC(glColorPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
-STUB_FUNC(glDisableClientState, (GLenum array))
-STUB_FUNC(glEnableClientState, (GLenum array))
+// STUB_FUNC(glColorPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
+// STUB_FUNC(glDisableClientState, (GLenum array))
+// STUB_FUNC(glEnableClientState, (GLenum array))
 STUB_FUNC(glFogCoordPointer, (GLenum type, GLsizei stride, const void *pointer))
 STUB_FUNC(glIndexPointer, (GLenum type, GLsizei stride, const void *pointer))
 STUB_FUNC(glInterleavedArrays, (GLenum format, GLsizei stride, const void *pointer))
-STUB_FUNC(glNormalPointer, (GLenum type, GLsizei stride, const void *pointer))
+// STUB_FUNC(glNormalPointer, (GLenum type, GLsizei stride, const void *pointer))
 STUB_FUNC(glPopClientAttrib, (void))
 STUB_FUNC(glPushClientAttrib, (GLbitfield mask))
 STUB_FUNC(glSecondaryColorPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
 STUB_FUNC(glTexCoordPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
-STUB_FUNC(glVertexPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
+// STUB_FUNC(glVertexPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
 
 // Fixed Function
 STUB_FUNC(glAccum, (GLenum op, GLfloat value))
@@ -261,18 +261,18 @@ void FFP::registerStubFunctions() {
     REGISTER(glWindowPos3fv);
     
     // Client Arrays
-    REGISTER(glColorPointer);
-    REGISTER(glDisableClientState);
-    REGISTER(glEnableClientState);
+    // REGISTER(glColorPointer);
+    // REGISTER(glDisableClientState);
+    // REGISTER(glEnableClientState);
     REGISTER(glFogCoordPointer);
     REGISTER(glIndexPointer);
     REGISTER(glInterleavedArrays);
-    REGISTER(glNormalPointer);
+    // REGISTER(glNormalPointer);
     REGISTER(glPopClientAttrib);
     REGISTER(glPushClientAttrib);
     REGISTER(glSecondaryColorPointer);
     REGISTER(glTexCoordPointer);
-    REGISTER(glVertexPointer);
+    // REGISTER(glVertexPointer);
     
     // Fixed Function
     REGISTER(glAccum);

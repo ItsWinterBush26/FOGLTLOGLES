@@ -1,4 +1,5 @@
 #include "build_info.h"
+#include "es/state_tracking.h"
 #include "es/utils.h"
 #include "gles/main.h"
 #include "main.h"
@@ -16,6 +17,7 @@ const GLubyte* OV_glGetString(GLenum name);
 void OV_glGetIntegerv(GLenum pname, int* v);
 const GLubyte* OV_glGetStringi(GLenum pname, int index);
 void OV_glEnable(GLenum cap);
+void OV_glDisable(GLenum cap);
 
 // TODO: make its own env var
 inline bool debugEnabled = getEnvironmentVar("LIBGL_VGPU_DUMP", "0") == "1";
@@ -42,6 +44,7 @@ void GLES::registerBrandingOverride() {
     REGISTEROV(glGetIntegerv);
     REGISTEROV(glGetStringi);
     REGISTEROV(glEnable)
+    REGISTEROV(glDisable);
 }
 
 const GLubyte* OV_glGetString(GLenum name) {
@@ -103,6 +106,15 @@ void OV_glEnable(GLenum cap) {
 
         default:
             glEnable(cap);
+
+            trackedStates->capabilitiesState[cap] = true;
             break;
     }
 }
+
+void OV_glDisable(GLenum cap) {
+    glDisable(cap);
+
+    trackedStates->capabilitiesState[cap] = false;
+}
+

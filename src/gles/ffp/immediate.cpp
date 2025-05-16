@@ -13,8 +13,6 @@ void FFP::registerImmediateFunctions() {
 }
 
 void glBegin(GLenum mode) {
-    floatVertexBuffer.clear();
-
     switch (mode) {
         case GL_POINTS:
         case GL_LINES:
@@ -31,19 +29,9 @@ void glBegin(GLenum mode) {
             return;
     }
 
-    currentPrimitive = mode;
+    Immediate::immediateModeState->begin(mode);
 }
 
 void glEnd() {
-    glEnableClientState(GL_VERTEX_ARRAY);
-    
-    if (floatVertexBuffer.size() > 0) {
-        glVertexPointer(3, GL_FLOAT, 0, floatVertexBuffer.data());
-        glDrawArrays(currentPrimitive, 0, floatVertexBuffer.size() / 3);
-        floatVertexBuffer.clear();
-    }
-
-    glDisableClientState(GL_VERTEX_ARRAY);
-
-    currentPrimitive = GL_NONE;
+    Immediate::immediateModeState->end();
 }

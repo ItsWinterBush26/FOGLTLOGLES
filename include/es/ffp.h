@@ -1,20 +1,202 @@
 #pragma once
 
+#include "es/state_tracking.h"
 #include "gles/ffp/enums.h"
+#include "gles20/shader_overrides.h"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "utils/fast_map.h"
+#include "utils/pointers.h"
 #include <GLES/gl.h>
+#include <GLES3/gl32.h>
 #include <memory>
 
+#include <cstddef>
 #include <stack>
 #include <vector>
-
-inline GLenum currentPrimitive = GL_NONE;
-inline std::vector<GLfloat> floatVertexBuffer;
 
 inline GLenum currentMatrixMode = GL_MODELVIEW;
 inline glm::mat4 currentMatrix;
 inline std::stack<glm::mat4> matrixStack;
+
+namespace Immediate {
+
+inline const std::string immediateModeVS = R"(
+#version 320 es
+
+layout(location = 0) in vec4 iVertexPostion;
+layout(location = 1) in vec3 iVertexNormal;
+layout(location = 2) in vec2 iVertexTexCoord;
+layout(location = 3) in vec4 iVertexColor;
+
+uniform mat4 modelViewProjection;
+
+out vec4 oVertexColor;
+out vec2 oVertexTexCoord;
+
+void main() {
+    gl_Position = modelViewProjection * iVertexPosition;
+    oVertexColor = iVertexColor;
+    oVertexTexCoord = iVertexTexCoord;
+}
+)";
+
+inline const std::string immediateModeFS = R"(
+#version 320 es
+precision mediump float;
+
+in vec4 iVertexColor;
+in vec2 iVertexTextureCoord;
+
+out vec4 oFragColor;
+
+uniform bool uUseTexture;
+uniform sampler2D uTexture;
+
+void main() {
+    if (uUseTexture) {
+        oFragColor = texture(uTexture, iVertexTextureCoord) * iVertexColor;
+    } else {
+        oFragColor = iVertexColor;
+    }
+)";
+
+struct VertexData {
+    glm::vec4 position;
+    glm::vec3 normal;
+    glm::vec4 color;
+    glm::vec2 texCoord;
+};
+
+class ImmediateModeState {
+private:
+    GLenum currentPrimitive;
+
+    std::vector<VertexData> vertices;
+    VertexData currentVertex;
+
+    GLuint vao, vbo;
+    GLuint drawerProgram;
+    GLuint useTextureUniLoc, textureUniLoc;
+
+    bool active;
+
+public:
+    ImmediateModeState() {
+        GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+        const GLchar* vertexShaderSource = immediateModeVS.c_str();
+        OV_glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
+        OV_glCompileShader(vertexShader);
+
+        GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+        const GLchar* fragmentShaderSource = immediateModeFS.c_str();
+        OV_glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
+        OV_glCompileShader(fragmentShader);
+
+        drawerProgram = glCreateProgram();
+        glAttachShader(drawerProgram, vertexShader);
+        glAttachShader(drawerProgram, fragmentShader);
+
+        OV_glLinkProgram(drawerProgram);
+
+        useTextureUniLoc = glGetUniformLocation(drawerProgram, "uUseTeture");
+        textureUniLoc = glGetUniformLocation(drawerProgram, "uTexture");
+
+        glGenVertexArrays(1, &vao);
+        glGenBuffers(1, &vbo);
+
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(
+            0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), 
+            (void*) offsetof(VertexData, position)
+        );
+        
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(
+            1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), 
+            (void*) offsetof(VertexData, normal)
+        );
+        
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(
+            2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), 
+            (void*) offsetof(VertexData, texCoord)
+        );
+        
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(
+            3, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), 
+            (void*) offsetof(VertexData, color)
+        );
+    }
+
+    ~ImmediateModeState() {
+        glDeleteProgram(drawerProgram);
+        glDeleteBuffers(1, &vbo);
+        glDeleteVertexArrays(1, &vao);
+    }
+
+    void begin(GLenum primitive) {
+        if (active) return;
+
+        currentPrimitive = primitive;
+        vertices.clear();
+        currentVertex = VertexData();
+
+        active = true;
+    }
+
+    void advance(std::function<void(VertexData&)> applyVertexPosition) {
+        if (!active) return;
+        
+        applyVertexPosition(currentVertex);
+
+        vertices.push_back(currentVertex);
+        currentVertex = VertexData();
+    }
+
+    void end() {
+        if (!active) return;
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(
+            GL_ARRAY_BUFFER, vertices.size() * sizeof(VertexData), 
+            vertices.data(), GL_STREAM_DRAW
+        );
+
+        glUseProgram(drawerProgram);
+
+        const bool isTextureEnabled = trackedStates->isCapabilityEnabled(GL_TEXTURE_2D);
+        glUniform1i(useTextureUniLoc, isTextureEnabled ? GL_TRUE : GL_FALSE);
+        if (isTextureEnabled) {
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, trackedStates->activeTextureState->boundTextures[GL_TEXTURE_2D]);
+
+            glUniform1i(textureUniLoc, 0);
+        }
+
+        glBindVertexArray(vao);
+        glDrawArrays(currentPrimitive, 0, vertices.size());
+        
+        vertices.clear();
+
+        active = false;
+    }
+
+    VertexData& getCurrentVertex() {
+        return this->currentVertex;
+    }
+
+    bool isActive() {
+        return this->active;
+    }
+};
+
+
+inline std::shared_ptr<ImmediateModeState> immediateModeState = MakeAggregateShared<ImmediateModeState>();
+}
 
 namespace Lists {
 

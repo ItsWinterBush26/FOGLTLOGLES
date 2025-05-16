@@ -70,13 +70,14 @@ void OV_glMatrixMode(GLenum mode) {
     switch (mode) {
         case GL_MODELVIEW:
         case GL_PROJECTION:
-        case GL_TEXTURE:
             break;
         default:
             return;
     }
     
     currentMatrixMode = mode;
+
+    glMatrixMode(mode);
 }
 
 void OV_glPushMatrix() {
@@ -137,6 +138,8 @@ void OV_glLoadMatrixf(const GLfloat *m) {
         m[8], m[9], m[10], m[11],
         m[12], m[13], m[14], m[15]
     );
+
+    glLoadMatrixf(m);
 }
 
 void glOrtho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val) {
@@ -206,6 +209,8 @@ void OV_glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z) {
     }
 
     currentMatrix = glm::rotate(currentMatrix, glm::radians(angle), glm::vec3(x, y, z));
+
+    glRotatef(angle, x, y, z);
 }
 
 void glScaled(GLdouble x, GLdouble y, GLdouble z) {
@@ -219,6 +224,8 @@ void OV_glScalef(GLfloat x, GLfloat y, GLfloat z) {
     }
 
     currentMatrix = glm::scale(currentMatrix, glm::vec3(x, y, z));
+
+    glScalef(x, y, z);
 }
 
 void glTranslated(GLdouble x, GLdouble y, GLdouble z) {
@@ -232,4 +239,6 @@ void OV_glTranslatef(GLfloat x, GLfloat y, GLfloat z) {
     }
     
     currentMatrix = glm::translate(currentMatrix, glm::vec3(x, y, z));
+
+    glTranslatef(x, y, z);
 }
