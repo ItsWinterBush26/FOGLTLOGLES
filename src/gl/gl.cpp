@@ -1,6 +1,7 @@
 #include "gl/gl.h"
 #include "egl/egl.h"
 #include "main.h"
+#include "utils/env.h"
 #include "utils/log.h"
 
 #include <mutex>
@@ -23,8 +24,21 @@ FunctionPtr glXGetProcAddress(const GLchar* pn) {
     return nullptr;
 }
 
+void customDebugCallback(
+    GLenum, GLenum,
+    GLuint, GLenum,
+    GLsizei, const GLchar*,
+    const void*
+);
+
 void initDebug() {
-    REGISTEROV(glDebugMessageCallback);
+    if (getEnvironmentVar("LIBGL_VGPU_DUMP", "0") == "1") {
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageCallback(customDebugCallback, nullptr);
+    }
+
+    // REGISTEROV(glDebugMessageCallback);
 }
 
 void customDebugCallback(
