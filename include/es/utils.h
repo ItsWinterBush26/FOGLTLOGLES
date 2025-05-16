@@ -5,12 +5,10 @@
 
 #include <atomic>
 #include <GLES3/gl31.h>
-#include <sstream>
 #include <unordered_set>
 
 inline std::atomic_bool esUtilsInitialized = ATOMIC_VAR_INIT(false);
 
-void initExtensionsES2();
 void initExtensionsES3();
 
 namespace ESUtils {
@@ -28,12 +26,12 @@ namespace ESUtils {
         
         str versionStr = reinterpret_cast<str>(glGetString(GL_VERSION));
         if (!versionStr) {
-            throw std::runtime_error("Failed to get OpenGL ES version, is the context current or is there no context at all?");
+            throw std::runtime_error("Failed to get OpenGL ES version! Is the context current or is there no context at all?");
         }
 
         int major = 0, minor = 0;
         if (sscanf(versionStr, "OpenGL ES %d.%d", &major, &minor) != 2) {
-            throw std::runtime_error("Failed to get OpenGL ES version, is the context current or is there no context at all?");
+            throw std::runtime_error("Failed to get OpenGL ES version! Is the formatting different? (" + std::string(versionStr) + ")");
         }
         
         version = std::make_pair(major, minor);
@@ -74,17 +72,6 @@ namespace ESUtils {
     }
 }
 
-inline void initExtensionsES2() {
-    str extensions = reinterpret_cast<str>(glGetString(GL_EXTENSIONS));
-    if (extensions) {
-        std::istringstream iss(extensions);
-        std::string extension;
-        while (iss >> extension) {
-            ESUtils::realExtensions.insert(extension);
-        }
-    }
-}
-
 inline void initExtensionsES3() {
     GLint extensionCount = 0;
     glGetIntegerv(GL_NUM_EXTENSIONS, &extensionCount);
@@ -97,6 +84,7 @@ inline void initExtensionsES3() {
 
 inline GLenum getComponentTypeFromFormat(GLint format) {
     // Per OpenGL ES 3.0 spec, map internal formats to component types
+    // TODO: Update to GLES 3.2 spec, add GL 4.6 formats
     switch (format) {
         // Float formats
         case GL_R32F:

@@ -41,6 +41,14 @@ void FOGLTLOGLES::init() {
     ESUtils::init();
 
     LOGI("FOGLTLOGLES launched on:");
+    if (ESUtils::isAngle)
+        LOGI(
+            "ANGLE %i.%i.%i",
+            std::get<0>(ESUtils::angleVersion),
+            std::get<1>(ESUtils::angleVersion),
+            std::get<2>(ESUtils::angleVersion)
+        );
+    
     LOGI("GLES : %i.%i", ESUtils::version.first, ESUtils::version.second);
     LOGI("ESSL : %i", ESUtils::shadingVersion);
 
