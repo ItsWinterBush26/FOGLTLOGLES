@@ -49,9 +49,15 @@ namespace ESUtils {
             case 1:
                 throw std::runtime_error("OpenGL ES 1.0 is NOT supported");
             case 2:
-                initExtensionsES2();
-            default:
-                initExtensionsES3();
+                throw std::runtime_error("OpenGL ES 2.0 is NOT supported");
+            case 3:
+                switch (minor) {
+                    case 2:
+                        initExtensionsES3();
+                        break;
+                    default:
+                        throw std::runtime_error("OpenGL ES >3.0 & <3.2 is NOT supported");
+                }
         }
 
         fakeExtensions = realExtensions;

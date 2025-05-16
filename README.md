@@ -1,7 +1,9 @@
 # FOGLTLOGLES
 Fast OpenGL Translation Layer (to) OpenGL ES
 
-This project is a Proof of Concept.
+Requires OpenGL ES 3.2
+
+> This project is a Proof of Concept.
 
 # Goal
 - [x] Run Sodium 

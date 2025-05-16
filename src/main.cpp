@@ -36,16 +36,18 @@ FunctionPtr FOGLTLOGLES::getFunctionAddress(std::string name) {
 }
 
 void FOGLTLOGLES::init() {
+    LOGI("Using FOGLTLOGLES %s", RENDERER_VERSION);
+
     ESUtils::init();
+
     LOGI("FOGLTLOGLES launched on:");
     LOGI("GLES : %i.%i", ESUtils::version.first, ESUtils::version.second);
     LOGI("ESSL : %i", ESUtils::shadingVersion);
-    
-    GLES::wrapper->init();
-    if (ESUtils::version.first >= 2) GLES20::wrapper->init();
-    if (ESUtils::version.first >= 3) GLES30::wrapper->init();
-    if (ESUtils::version.first >= 3 && ESUtils::version.second == 2) GLES32::wrapper->init();
 
     ShaderConverter::Cache::init();
-    LOGI("Using FOGLTLOGLES %s", RENDERER_VERSION);
+    
+    GLES  ::wrapper->init();
+    GLES20::wrapper->init();
+    GLES30::wrapper->init();
+    GLES32::wrapper->init();
 }
