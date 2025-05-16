@@ -97,6 +97,7 @@ namespace ShaderConverter::GLSLRegexPreprocessor {
     }
 
     inline void fixDeprecatedFragOutColor(std::string& source) {
+        /*
         if (source.find("gl_FragColor") != std::string::npos) {
             source = std::regex_replace(source, glFragColorRegex, "fragColor");
     
@@ -113,5 +114,6 @@ namespace ShaderConverter::GLSLRegexPreprocessor {
                 source = "varying vec4 fragColor;\n" + source;
             }
         }
+        */
     }
 }
