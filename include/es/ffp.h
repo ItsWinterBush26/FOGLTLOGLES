@@ -6,11 +6,11 @@
 #include "glm/ext/matrix_float4x4.hpp"
 #include "utils/fast_map.h"
 #include "utils/pointers.h"
+
+#include <cstddef>
 #include <GLES/gl.h>
 #include <GLES3/gl32.h>
 #include <memory>
-
-#include <cstddef>
 #include <stack>
 #include <vector>
 
@@ -25,8 +25,8 @@ inline const std::string immediateModeVS = R"(
 
 layout(location = 0) in vec4 iVertexPostion;
 layout(location = 1) in vec3 iVertexNormal;
-layout(location = 2) in vec4 iVertexTexCoord;
-layout(location = 3) in vec4 iVertexColor;
+layout(location = 2) in vec4 iVertexColor;
+layout(location = 3) in vec4 iVertexTexCoord;
 
 uniform mat4 modelViewProjection;
 
@@ -64,7 +64,7 @@ struct VertexData {
     glm::vec4 position;
     glm::vec3 normal;
     glm::vec4 color;
-    glm::vec2 texCoord;
+    glm::vec4 texCoord;
 };
 
 class ImmediateModeState {
@@ -113,7 +113,7 @@ public:
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(
-            0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), 
+            0, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), 
             (void*) offsetof(VertexData, position)
         );
         
@@ -125,14 +125,14 @@ public:
         
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(
-            2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), 
-            (void*) offsetof(VertexData, texCoord)
+            2, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), 
+            (void*) offsetof(VertexData, color)
         );
         
         glEnableVertexAttribArray(3);
         glVertexAttribPointer(
             3, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), 
-            (void*) offsetof(VertexData, color)
+            (void*) offsetof(VertexData, texCoord)
         );
     }
 
