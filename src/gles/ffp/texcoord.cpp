@@ -11,5 +11,11 @@ void FFP::registerTexCoordFunctions() {
 }
 
 void glTexCoord2f(GLfloat s, GLfloat t) {
+    if (!Immediate::immediateModeState->isActive()) return;
+    if (Lists::displayListManager->isRecording()) {
+        Lists::displayListManager->addCommand<glTexCoord2f>(s, t);
+        return;
+    }
+
     Immediate::immediateModeState->setTexCoord(glm::vec4(s, t, 0, 1));
 }

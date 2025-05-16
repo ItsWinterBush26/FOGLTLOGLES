@@ -16,6 +16,11 @@ void FFP::registerImmediateFunctions() {
 }
 
 void glBegin(GLenum mode) {
+    if (Lists::displayListManager->isRecording()) {
+        Lists::displayListManager->addCommand<glBegin>(mode);
+        return;
+    }
+    
     switch (mode) {
         case GL_POINTS:
         case GL_LINES:
@@ -36,5 +41,10 @@ void glBegin(GLenum mode) {
 }
 
 void glEnd() {
+    if (Lists::displayListManager->isRecording()) {
+        Lists::displayListManager->addCommand<glEnd>();
+        return;
+    }
+
     Immediate::immediateModeState->end();
 }
