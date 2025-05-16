@@ -41,7 +41,7 @@ inline const std::string immediateModeFS = R"(#version 320 es
 precision mediump float;
 
 in vec4 vertexColor;
-in vec4 vertexTextureCoord;
+in vec4 vertexTexCoord;
 
 out vec4 fragColor;
 
@@ -50,7 +50,7 @@ uniform sampler2D uTexture;
 
 void main() {
     if (uUseTexture) {
-        fragColor = texture(uTexture, vertexTextureCoord.st) * vertexColor;
+        fragColor = texture(uTexture, vertexTexCoord.st) * vertexColor;
     } else {
         fragColor = vertexColor;
     }
@@ -98,7 +98,7 @@ public:
 
         OV_glLinkProgram(drawerProgram);
 
-        useTextureUniLoc = glGetUniformLocation(drawerProgram, "uUseTeture");
+        useTextureUniLoc = glGetUniformLocation(drawerProgram, "uUseTexture");
         textureUniLoc = glGetUniformLocation(drawerProgram, "uTexture");
 
         glGenVertexArrays(1, &vao);
