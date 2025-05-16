@@ -107,7 +107,10 @@ void OV_glEnable(GLenum cap) {
 
         default:
             glEnable(cap);
-            if (debugEnabled) LOGI("glEnable: cap=%u", cap);
+            if (debugEnabled) {
+                LOGI("glEnable: cap=%u", cap);
+                LOGI("glGetError -> %u", glGetError());
+            }
 
             trackedStates->capabilitiesState[cap] = true;
             break;
@@ -116,7 +119,6 @@ void OV_glEnable(GLenum cap) {
 
 void OV_glDisable(GLenum cap) {
     glDisable(cap);
-    if (debugEnabled) LOGI("glDisable: cap=%u", cap);
 
     trackedStates->capabilitiesState[cap] = false;
 }
