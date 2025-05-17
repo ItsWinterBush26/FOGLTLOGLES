@@ -231,7 +231,7 @@ void OV_glScalef(GLfloat x, GLfloat y, GLfloat z) {
     }
 
     Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
-        glm::scale(currentMatrix, glm::vec3(x, y, z));
+        return glm::scale(currentMatrix, glm::vec3(x, y, z));
     });
 }
 
