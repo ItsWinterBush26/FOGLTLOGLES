@@ -9,11 +9,10 @@
 #include <string>
 #include <vector>
 
-// #pragma clang optimize off
-
 // Some of the code comes from:
 // https://github.com/MobileGL-Dev/MobileGlues/blob/8727ed43fde193ae595d73e84a8991ee771e43e7/src/main/cpp/gl/multidraw.cpp#L418
 
+/*
 inline const std::string COMPUTE_BATCHER_GLSL_BASE = R"(#version 310 es
 layout(local_size_x = 64) in;
 
@@ -67,9 +66,10 @@ inline GLuint getTypeByteSize(GLenum type) {
         default: return 0;
     }
 }
+*/
 
 struct MDElementsBaseVertexBatcher {
-    GLuint computeProgram;
+    /* GLuint computeProgram;
 
     GLuint indicesSSBO;
     GLuint baseVerticesSSBO;
@@ -105,7 +105,7 @@ struct MDElementsBaseVertexBatcher {
         glGenBuffers(1, &baseVerticesSSBO);
         glGenBuffers(1, &prefixSSBO);
         glGenBuffers(1, &outputIndexSSBO);
-    }
+    } */
 
     void batch(
         GLenum mode,
@@ -115,19 +115,19 @@ struct MDElementsBaseVertexBatcher {
         GLsizei drawcount,
         const GLint* basevertex
     ) {
-        const size_t elemSize = sizeof(GLuint); /* getTypeByteSize(type); */
+        // const size_t elemSize = sizeof(GLuint); /* getTypeByteSize(type); */
         if (drawcount <= 0 /* || elemSize != 4 */) return; // force GL_UINT support for now
 
-        /* if (!computeReady || drawcount < 1024) {
+        // if (!computeReady || drawcount < 1024) {
             for (GLint i = 0; i < drawcount; ++i) {
                 if (counts[i] > 0) glDrawElementsBaseVertex(mode, counts[i], type, indices[i], basevertex[i]);
             }
-        } */
+        // }
 
         // LOGI("batch begin! drawcount=%i", drawcount);
         // LOGI("prepare inputs and output of compute");
 
-        std::vector<GLuint> prefix(drawcount);
+        /* std::vector<GLuint> prefix(drawcount);
         std::inclusive_scan(
             counts, counts + drawcount,
             prefix.begin()
@@ -197,9 +197,8 @@ struct MDElementsBaseVertexBatcher {
         // LOGI("DRAW!");
         glDrawElements(mode, total, type, 0);
         
-        LOGI("done"); 
+        LOGI("done"); */
     }
 };
 
 inline std::shared_ptr<MDElementsBaseVertexBatcher> batcher = std::make_shared<MDElementsBaseVertexBatcher>();
-// #pragma clang optimize on
