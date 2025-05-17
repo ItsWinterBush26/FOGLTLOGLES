@@ -224,7 +224,7 @@ void glScaled(GLdouble x, GLdouble y, GLdouble z) {
     glScalef(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z));
 }
 
-void OV_glScalef(GLfloat x, GLfloat y, GLfloat z) {
+void glScalef(GLfloat x, GLfloat y, GLfloat z) {
     if (Lists::displayListManager->isRecording()) {
         Lists::displayListManager->addCommand<glScalef>(x, y, z);
         return;
