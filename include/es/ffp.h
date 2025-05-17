@@ -4,6 +4,7 @@
 #include "gles/ffp/enums.h"
 #include "gles20/shader_overrides.h"
 #include "glm/ext/matrix_float4x4.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include "utils/fast_map.h"
 
 #include <cstddef>
@@ -12,10 +13,70 @@
 #include <stack>
 #include <vector>
 
-inline GLenum currentMatrixMode = GL_MODELVIEW;
+namespace Matrices {
+struct MatrixState {
+    GLenum type;
+    glm::mat4 matrix;
 
-inline glm::mat4 currentMatrix;
-inline std::stack<glm::mat4> matrixStack;
+    std::stack<glm::mat4> stack;
+}; 
+
+class MatricesStateManager {
+private:
+    GLenum currentMatrixType = GL_MODELVIEW;
+
+    std::unordered_map<GLenum, MatrixState> matrices;
+    MatrixState* currentMatrix;
+
+public:
+
+    MatricesStateManager() {
+        matrices.insert({
+            GL_MODELVIEW,
+            { GL_MODELVIEW, glm::mat4(1.0f), std::stack<glm::mat4>() }
+        });
+
+        matrices.insert({
+            GL_PROJECTION,
+            { GL_PROJECTION, glm::mat4(1.0f), std::stack<glm::mat4>() }
+        });
+
+        matrices.insert({
+            GL_TEXTURE,
+            { GL_TEXTURE, glm::mat4(1.0f), std::stack<glm::mat4>() }
+        });
+    }
+
+    void setCurrentMatrix(GLenum mode) {
+        currentMatrixType = mode;
+        currentMatrix = &matrices[mode];
+    }
+
+    void modifyCurrentMatrix(const std::function<glm::mat4(glm::mat4)>& newMatrix) {
+        currentMatrix->matrix = newMatrix(currentMatrix->matrix);
+    }
+
+    void pushCurrentMatrix() {
+        currentMatrix->stack.push(currentMatrix->matrix);
+    }
+
+    void popCurrentMatrix() {
+        if (currentMatrix->stack.empty()) return;
+        currentMatrix->matrix = currentMatrix->stack.top();
+        currentMatrix->stack.pop();
+    }
+
+    const MatrixState getMatrix(GLenum mode) {
+        return this->matrices[mode];
+    }
+
+    const MatrixState getCurrentMatrix() {
+        return *this->currentMatrix;
+    }
+};
+
+inline std::shared_ptr<MatricesStateManager> matricesStateManager;
+}
 
 namespace Immediate {
 
@@ -26,13 +87,13 @@ layout(location = 1) in vec3 iVertexNormal;
 layout(location = 2) in vec4 iVertexColor;
 layout(location = 3) in vec2 iVertexTexCoord;
 
-uniform mat4 modelViewProjection;
+uniform mat4 uModelViewProjection;
 
 out vec4 vertexColor;
 out vec2 vertexTexCoord;
 
 void main() {
-    gl_Position = modelViewProjection * iVertexPosition;
+    gl_Position = uModelViewProjection * iVertexPosition;
     vertexColor = iVertexColor;
     vertexTexCoord = iVertexTexCoord;
 })";
@@ -76,7 +137,7 @@ private:
 
     GLuint vao, vbo;
     GLuint drawerProgram;
-    GLuint useTextureUniLoc, textureUniLoc;
+    GLuint modelViewProjectionUniLoc, useTextureUniLoc, textureUniLoc;
 
     bool active;
 
@@ -98,6 +159,7 @@ public:
 
         OV_glLinkProgram(drawerProgram);
 
+        modelViewProjectionUniLoc = glGetUniformLocation(drawerProgram, "uModelViewProjection");
         useTextureUniLoc = glGetUniformLocation(drawerProgram, "uUseTexture");
         textureUniLoc = glGetUniformLocation(drawerProgram, "uTexture");
 
@@ -205,6 +267,9 @@ public:
 
             glUniform1i(textureUniLoc, 0);
         }
+
+        glm::mat4 finalMVP = Matrices::matricesStateManager->getMatrix(GL_MODELVIEW).matrix * Matrices::matricesStateManager->getMatrix(GL_PROJECTION).matrix;
+        glUniformMatrix4fv(modelViewProjectionUniLoc, 1, false, glm::value_ptr(finalMVP));
 
         glBindVertexArray(vao);
         glDrawArrays(currentPrimitive, 0, vertices.size());
