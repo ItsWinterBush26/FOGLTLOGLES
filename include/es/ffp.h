@@ -270,8 +270,6 @@ public:
     }
 
     void setNormal(const glm::vec3& normal) {
-        if (!active) return;
-
         currentNormal = normal;
     }
 
@@ -280,8 +278,6 @@ public:
     }
 
     void setTexCoord(const glm::vec2& texCoord) {
-        if (!active) return;
-
         currentTexCoord = texCoord;
     }
 
@@ -322,7 +318,7 @@ public:
         glUniformMatrix4fv(modelViewProjectionUniLoc, 1, false, glm::value_ptr(finalMVP));
 
         glUniform1i(alphaTestEnabledUniLoc, trackedStates->isCapabilityEnabled(GL_ALPHA_TEST) ? GL_TRUE : GL_FALSE);
-        glUniform1ui(alphaTestOpUniLoc, FFPStates::AlphaTest::op);
+        glUniform1i(alphaTestOpUniLoc, FFPStates::AlphaTest::op);
         glUniform1f(alphaTestThresholdUniLoc, FFPStates::AlphaTest::threshold);
 
         glBindVertexArray(vao);

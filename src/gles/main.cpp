@@ -9,6 +9,7 @@ void GLES::GLESWrapper::init() {
     GLES::registerTranslatedFunctions();
     GLES::registerBrandingOverride();
     GLES::registerNoErrorOverride();
+    GLES::registerDrawOverride();
 
     ESLimits::init();
     FFP::wrapper->init();
