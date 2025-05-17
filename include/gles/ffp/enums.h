@@ -2,6 +2,9 @@
 
 #define GL_NONE 0
 
+// FFP
+#define GL_ALPHA_TEST 0xbc0
+
 // Matrices
 #define GL_MODELVIEW 0x1700
 #define GL_PROJECTION 0x1701

@@ -1,10 +1,10 @@
 #include "build_info.h"
 #include "es/state_tracking.h"
 #include "es/utils.h"
+#include "gles/ffp/enums.h"
 #include "gles/main.h"
 #include "main.h"
 #include "utils/env.h"
-#include "utils/log.h"
 #include "utils/strings.h"
 
 #include <GLES3/gl32.h>
@@ -36,7 +36,7 @@ void GLES::registerBrandingOverride() {
     );
 
     rendererString = string_format(
-        "FOGLTLOGLES %s (on %s)", // TODO: implement versioning
+        "FOGLTLOGLES %s (on %s)",
         RENDERER_VERSION,
         glGetString(GL_RENDERER)
     );
@@ -54,7 +54,7 @@ const GLubyte* OV_glGetString(GLenum name) {
             return CAST_TO_CUBYTE(glVersion.c_str());
         
         case GL_SHADING_LANGUAGE_VERSION:
-            return CAST_TO_CUBYTE("4.60 FOGLTLOGLES"); // 1.50 for GL3.2
+            return CAST_TO_CUBYTE("4.00 FOGLTLOGLES"); // 1.50 for GL3.2
 
         case GL_VENDOR:
             return CAST_TO_CUBYTE("ThatMG393");
@@ -72,6 +72,7 @@ const GLubyte* OV_glGetString(GLenum name) {
 }
 
 void OV_glGetIntegerv(GLenum pname, int* v) {
+    LOGI("OV_glGetIntegerv: pname=%u", pname);
     switch (pname) {
         case GL_NUM_EXTENSIONS:
             (*v) = ESUtils::fakeExtensions.size();
@@ -100,25 +101,31 @@ const GLubyte* OV_glGetStringi(GLenum pname, int index) {
 
 void OV_glEnable(GLenum cap) {
     switch (cap) {
-        case 0x92e0: // GL_DEBUG_OUTPUT
-        case 0x8242: // GL_DEBUG_OUTPUT_SYNCHRONOUS
-            if (!debugEnabled) break; // dont allow debug
+        case GL_ALPHA_TEST:
+            break;
+
+        case GL_DEBUG_OUTPUT:
+        case GL_DEBUG_OUTPUT_SYNCHRONOUS:
+            if (!debugEnabled) return; // dont allow debug
             // passthrough!
 
         default:
             glEnable(cap);
-            if (debugEnabled) {
-                LOGI("glEnable: cap=%u", cap);
-                LOGI("glGetError -> %u", glGetError());
-            }
-
-            trackedStates->capabilitiesState[cap] = true;
             break;
     }
+    
+    trackedStates->capabilitiesState[cap] = true;
 }
 
 void OV_glDisable(GLenum cap) {
-    glDisable(cap);
+    switch (cap) {
+        case GL_ALPHA_TEST:
+            break;
+    
+        default:
+            glDisable(cap);
+            break;
+    }
 
     trackedStates->capabilitiesState[cap] = false;
 }
