@@ -13,6 +13,8 @@
 #include <stack>
 #include <vector>
 
+// TODO: break out and move to specific files
+
 namespace FFPStates {
 namespace AlphaTest {
     inline GLenum op = GL_ALWAYS;
@@ -121,7 +123,7 @@ uniform sampler2D uTexture;
 
 // alpha test
 uniform bool uAlphaTestEnabled;
-uniform uint uAlphaTestOp;
+uniform int uAlphaTestOp;
 uniform float uAlphaTestThreshold;
 
 void main() {
