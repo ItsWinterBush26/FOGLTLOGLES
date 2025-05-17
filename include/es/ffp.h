@@ -14,9 +14,9 @@
 #include <vector>
 
 namespace FFPStates {
-struct AlphaTest {
-    static GLenum op;
-    static GLclampf threshold;
+namespace AlphaTest {
+    inline GLenum op = GL_ALWAYS;
+    inline GLclampf threshold = 0.0f;
 };
 };
 
@@ -36,7 +36,6 @@ private:
     MatrixState* currentMatrix;
 
 public:
-
     MatricesStateManager() {
         matrices.insert({
             GL_MODELVIEW,
@@ -124,7 +123,7 @@ uniform float uAlphaTestThreshold;
 void main() {
     vec4 resultColor;
     if (uUseTexture) {
-        resultColor  = texture(uTexture, vertexTexCoord) * vertexColor;
+        resultColor = texture(uTexture, vertexTexCoord) * vertexColor;
     } else {
         resultColor = vertexColor;
     }
@@ -149,7 +148,7 @@ void main() {
 })";
 
 struct VertexData {
-    glm::vec4 position;
+    glm::vec4 position = glm::vec4(0, 0, 0, 1);
     glm::vec3 normal;
     glm::vec4 color;
     glm::vec2 texCoord;
@@ -271,8 +270,6 @@ public:
     }
 
     void setColor(const glm::vec4& color) {
-        if (!active) return;
-
         currentColor = color;
     }
 
