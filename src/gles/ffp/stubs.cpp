@@ -102,22 +102,22 @@ STUB_FUNC(glWindowPos3f, (GLfloat x, GLfloat y, GLfloat z))
 STUB_FUNC(glWindowPos3fv, (const GLfloat *v))
 
 // Client Arrays
-// STUB_FUNC(glColorPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
-// STUB_FUNC(glDisableClientState, (GLenum array))
-// STUB_FUNC(glEnableClientState, (GLenum array))
+STUB_FUNC(glColorPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
+STUB_FUNC(glDisableClientState, (GLenum array))
+STUB_FUNC(glEnableClientState, (GLenum array))
 STUB_FUNC(glFogCoordPointer, (GLenum type, GLsizei stride, const void *pointer))
 STUB_FUNC(glIndexPointer, (GLenum type, GLsizei stride, const void *pointer))
 STUB_FUNC(glInterleavedArrays, (GLenum format, GLsizei stride, const void *pointer))
-// STUB_FUNC(glNormalPointer, (GLenum type, GLsizei stride, const void *pointer))
+STUB_FUNC(glNormalPointer, (GLenum type, GLsizei stride, const void *pointer))
 STUB_FUNC(glPopClientAttrib, (void))
 STUB_FUNC(glPushClientAttrib, (GLbitfield mask))
 STUB_FUNC(glSecondaryColorPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
-// STUB_FUNC(glTexCoordPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
-// STUB_FUNC(glVertexPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
+STUB_FUNC(glTexCoordPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
+STUB_FUNC(glVertexPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
 
 // Fixed Function
 STUB_FUNC(glAccum, (GLenum op, GLfloat value))
-// STUB_FUNC(glAlphaFunc, (GLenum func, GLclampf ref))
+STUB_FUNC(glAlphaFunc, (GLenum func, GLclampf ref))
 STUB_FUNC(glClearAccum, (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha))
 STUB_FUNC(glColorMaterial, (GLenum face, GLenum mode))
 STUB_FUNC(glEdgeFlag, (GLboolean flag))
@@ -142,7 +142,7 @@ STUB_FUNC(glLightModeli, (GLenum pname, GLint param))
 STUB_FUNC(glLightModeliv, (GLenum pname, const GLint *params))
 STUB_FUNC(glPopAttrib, (void))
 STUB_FUNC(glPushAttrib, (GLbitfield mask))
-// STUB_FUNC(glShadeModel, (GLenum mode))
+STUB_FUNC(glShadeModel, (GLenum mode))
 STUB_FUNC(glTexEnvf, (GLenum target, GLenum pname, GLfloat param))
 STUB_FUNC(glTexEnvfv, (GLenum target, GLenum pname, const GLfloat *params))
 STUB_FUNC(glTexEnvi, (GLenum target, GLenum pname, GLint param))
@@ -160,7 +160,7 @@ STUB_FUNC(glMultTransposeMatrixd, (const GLdouble *m))
 
 // GL2 Textures
 STUB_FUNC_RET(GLboolean, glAreTexturesResident, (GLsizei n, const GLuint *textures, GLboolean *residences), GL_TRUE)
-// STUB_FUNC(glClientActiveTexture, (GLenum texture))
+STUB_FUNC(glClientActiveTexture, (GLenum texture))
 STUB_FUNC(glPixelMapfv, (GLenum map, GLsizei mapsize, const GLfloat *values))
 STUB_FUNC(glPixelMapuiv, (GLenum map, GLsizei mapsize, const GLuint *values))
 STUB_FUNC(glPixelMapusv, (GLenum map, GLsizei mapsize, const GLushort *values))
@@ -261,22 +261,22 @@ void FFP::registerStubFunctions() {
     REGISTER(glWindowPos3fv);
     
     // Client Arrays
-    // REGISTER(glColorPointer);
-    // REGISTER(glDisableClientState);
-    // REGISTER(glEnableClientState);
+    REGISTER(glColorPointer);
+    REGISTER(glDisableClientState);
+    REGISTER(glEnableClientState);
     REGISTER(glFogCoordPointer);
     REGISTER(glIndexPointer);
     REGISTER(glInterleavedArrays);
-    // REGISTER(glNormalPointer);
+    REGISTER(glNormalPointer);
     REGISTER(glPopClientAttrib);
     REGISTER(glPushClientAttrib);
     REGISTER(glSecondaryColorPointer);
-    // REGISTER(glTexCoordPointer);
-    // REGISTER(glVertexPointer);
+    REGISTER(glTexCoordPointer);
+    REGISTER(glVertexPointer);
     
     // Fixed Function
     REGISTER(glAccum);
-    // REGISTER(glAlphaFunc);
+    REGISTER(glAlphaFunc);
     REGISTER(glClearAccum);
     REGISTER(glColorMaterial);
     REGISTER(glEdgeFlag);
@@ -301,7 +301,7 @@ void FFP::registerStubFunctions() {
     REGISTER(glLightModeliv);
     REGISTER(glPopAttrib);
     REGISTER(glPushAttrib);
-    // REGISTER(glShadeModel);
+    REGISTER(glShadeModel);
     REGISTER(glTexEnvf);
     REGISTER(glTexEnvfv);
     REGISTER(glTexEnvi);
@@ -319,7 +319,7 @@ void FFP::registerStubFunctions() {
     
     // GL2 Textures
     REGISTER(glAreTexturesResident);
-    // REGISTER(glClientActiveTexture);
+    REGISTER(glClientActiveTexture);
     REGISTER(glPixelMapfv);
     REGISTER(glPixelMapuiv);
     REGISTER(glPixelMapusv);
