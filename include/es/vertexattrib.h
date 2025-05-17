@@ -30,7 +30,7 @@ inline void unpack_2_10_10_10_REV(GLuint value, GLfloat out[4],
             GLint r = extend(value & 0x3FF);
             GLint g = extend((value >> 10) & 0x3FF);
             GLint b = extend((value >> 20) & 0x3FF);
-            // Typically the 2-bit field (alpha) remains unsigned.
+            // Typically the 2-bit field (resultColorAlpha) remains unsigned.
             GLint a = (value >> 30) & 0x3;
             out[0] = r / 511.0f;
             out[1] = g / 511.0f;

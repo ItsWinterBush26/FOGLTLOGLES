@@ -13,6 +13,13 @@
 #include <stack>
 #include <vector>
 
+namespace FFPStates {
+struct AlphaTest {
+    static GLenum op;
+    static GLclampf threshold;
+};
+};
+
 namespace Matrices {
 struct MatrixState {
     GLenum type;
@@ -109,12 +116,36 @@ out vec4 fragColor;
 uniform bool uUseTexture;
 uniform sampler2D uTexture;
 
+// alpha test
+uniform bool uAlphaTestEnabled;
+uniform uint uAlphaTestOp;
+uniform float uAlphaTestThreshold;
+
 void main() {
+    vec4 resultColor;
     if (uUseTexture) {
-        fragColor = texture(uTexture, vertexTexCoord) * vertexColor;
+        resultColor  = texture(uTexture, vertexTexCoord) * vertexColor;
     } else {
-        fragColor = vertexColor;
+        resultColor = vertexColor;
     }
+
+    if (uAlphaTestEnabled && uAlphaTestOp != 0x0207) {
+        if (uAlphaTestOp == 0x0200) discard;
+        bool alphaTestPassed = false;
+        float resultColorAlpha = resultColor.a;
+
+        if (uAlphaTestOp == 0x0201) alphaTestPassed = (resultColorAlpha < uAlphaTestThreshold);
+        else if (uAlphaTestOp == 0x0201) alphaTestPassed = (resultColorAlpha < uAlphaTestThreshold);
+        else if (uAlphaTestOp == 0x0202) alphaTestPassed = (resultColorAlpha == uAlphaTestThreshold);
+        else if (uAlphaTestOp == 0x0203) alphaTestPassed = (resultColorAlpha <= uAlphaTestThreshold);
+        else if (uAlphaTestOp == 0x0204) alphaTestPassed = (resultColorAlpha > uAlphaTestThreshold);
+        else if (uAlphaTestOp == 0x0205) alphaTestPassed = (resultColorAlpha != uAlphaTestThreshold);
+        else if (uAlphaTestOp == 0x0206) alphaTestPassed = (resultColorAlpha >= uAlphaTestThreshold);
+
+        if (!alphaTestPassed) discard;
+    }
+
+    fragColor = resultColor;
 })";
 
 struct VertexData {
@@ -137,7 +168,15 @@ private:
 
     GLuint vao, vbo;
     GLuint drawerProgram;
-    GLuint modelViewProjectionUniLoc, useTextureUniLoc, textureUniLoc;
+
+    // vert
+    GLuint modelViewProjectionUniLoc;
+
+    // frag
+    GLuint useTextureUniLoc, textureUniLoc;
+
+    // alpha test
+    GLuint alphaTestEnabledUniLoc, alphaTestOpUniLoc, alphaTestThresholdUniLoc;
 
     bool active;
 
@@ -159,9 +198,17 @@ public:
 
         OV_glLinkProgram(drawerProgram);
 
+        // vert
         modelViewProjectionUniLoc = glGetUniformLocation(drawerProgram, "uModelViewProjection");
+
+        // frag
         useTextureUniLoc = glGetUniformLocation(drawerProgram, "uUseTexture");
         textureUniLoc = glGetUniformLocation(drawerProgram, "uTexture");
+
+        // alpha
+        alphaTestEnabledUniLoc = glGetUniformLocation(drawerProgram, "uAlphaTestEnabled");
+        alphaTestOpUniLoc = glGetUniformLocation(drawerProgram, "uAlphaTestOp");
+        alphaTestThresholdUniLoc = glGetUniformLocation(drawerProgram, "uAlphaTestThreshold");
 
         glGenVertexArrays(1, &vao);
         glGenBuffers(1, &vbo);
@@ -270,6 +317,10 @@ public:
 
         glm::mat4 finalMVP = Matrices::matricesStateManager->getMatrix(GL_MODELVIEW).matrix * Matrices::matricesStateManager->getMatrix(GL_PROJECTION).matrix;
         glUniformMatrix4fv(modelViewProjectionUniLoc, 1, false, glm::value_ptr(finalMVP));
+
+        glUniform1i(alphaTestEnabledUniLoc, trackedStates->isCapabilityEnabled(GL_ALPHA_TEST) ? GL_TRUE : GL_FALSE);
+        glUniform1ui(alphaTestOpUniLoc, FFPStates::AlphaTest::op);
+        glUniform1f(alphaTestThresholdUniLoc, FFPStates::AlphaTest::threshold);
 
         glBindVertexArray(vao);
         glDrawArrays(currentPrimitive, 0, vertices.size());
