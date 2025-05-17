@@ -149,11 +149,13 @@ void glOrtho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdou
         return;
     }
 
-    /* Matrices::matricesStateManager-> glm::ortho(
-        left, right,
-        bottom, top,
-        near_val, far_val
-    ); */
+    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4) {
+        return glm::ortho(
+            left, right,
+            bottom, top,
+            near_val, far_val
+        );
+    });
 }
 
 void glFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val) {
@@ -162,11 +164,13 @@ void glFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLd
         return;
     }
 
-    /* = glm::frustum(
-        left, right,
-        bottom, top,
-        near_val, far_val
-    ); */
+    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4) {
+        return glm::frustum(
+            left, right,
+            bottom, top,
+            near_val, far_val
+        );
+    });
 }
 
 void glMultMatrixd(const GLdouble *m) {
@@ -174,14 +178,15 @@ void glMultMatrixd(const GLdouble *m) {
         Lists::displayListManager->addCommand<glMultMatrixd>(m);
         return;
     }
-
-    /* glm::mat4 matrix = glm::mat4(
-        m[0], m[1], m[2], m[3],
-        m[4], m[5], m[6], m[7],
-        m[8], m[9], m[10], m[11],
-        m[12], m[13], m[14], m[15]
-    );
-     =  * matrix; */
+    
+    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
+        return currentMatrix * glm::mat4(
+            m[0], m[1], m[2], m[3],
+            m[4], m[5], m[6], m[7],
+            m[8], m[9], m[10], m[11],
+            m[12], m[13], m[14], m[15]
+        );
+    });
 }
 
 void glMultMatrixf(const GLfloat *m) {
@@ -190,13 +195,14 @@ void glMultMatrixf(const GLfloat *m) {
         return;
     }
 
-    /* glm::mat4 matrix = glm::mat4(
-        m[0], m[1], m[2], m[3],
-        m[4], m[5], m[6], m[7],
-        m[8], m[9], m[10], m[11],
-        m[12], m[13], m[14], m[15]
-    );
-     =  * matrix; */
+    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
+        return currentMatrix * glm::mat4(
+            m[0], m[1], m[2], m[3],
+            m[4], m[5], m[6], m[7],
+            m[8], m[9], m[10], m[11],
+            m[12], m[13], m[14], m[15]
+        );
+    });
 }
 
 void glRotated(GLdouble angle, GLdouble x, GLdouble y, GLdouble z) {
@@ -209,7 +215,9 @@ void glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z) {
         return;
     }
 
-    // = glm::rotate(, glm::radians(angle), glm::vec3(x, y, z));
+    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
+        return glm::rotate(currentMatrix, glm::radians(angle), glm::vec3(x, y, z));
+    });
 }
 
 void glScaled(GLdouble x, GLdouble y, GLdouble z) {
@@ -222,7 +230,9 @@ void OV_glScalef(GLfloat x, GLfloat y, GLfloat z) {
         return;
     }
 
-    // = glm::scale(, glm::vec3(x, y, z));
+    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
+        glm::scale(currentMatrix, glm::vec3(x, y, z));
+    });
 }
 
 void glTranslated(GLdouble x, GLdouble y, GLdouble z) {
@@ -235,5 +245,7 @@ void glTranslatef(GLfloat x, GLfloat y, GLfloat z) {
         return;
     }
     
-    // = glm::translate(, glm::vec3(x, y, z));
+    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4 currentMatrix) { 
+        return glm::translate(currentMatrix, glm::vec3(x, y, z));
+    });
 }
