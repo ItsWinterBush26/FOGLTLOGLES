@@ -3,7 +3,12 @@
 #define GL_NONE 0
 
 // FFP
+
+// alpha
 #define GL_ALPHA_TEST 0xbc0
+
+// shading
+#define GL_SMOOTH 0x1d01
 
 // Matrices
 #define GL_MODELVIEW 0x1700

@@ -18,6 +18,10 @@ namespace AlphaTest {
     inline GLenum op = GL_ALWAYS;
     inline GLclampf threshold = 0.0f;
 };
+
+namespace ShadeModel {
+    inline GLenum type = GL_SMOOTH;
+};
 };
 
 namespace Matrices {
