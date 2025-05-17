@@ -6,7 +6,7 @@
 
 typedef double GLdouble;
 
-#define STUB_FUNC(name, args) void name args { LOGI("%s was called!", #name); }
+#define STUB_FUNC(name, args) void name args { LOGI("%s is not yet implemented!", #name); }
 #define STUB_FUNC_RET(ret, name, args, retval) ret name args { LOGI("%s called!", #name); return retval; }
 
 #pragma GCC diagnostic push
