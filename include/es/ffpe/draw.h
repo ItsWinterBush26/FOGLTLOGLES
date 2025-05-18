@@ -133,6 +133,7 @@ void main() {
 })";
 
 inline const std::string arrayShaderFS = R"(#version 320 es
+precision mediump float;
 
 in vec4 vertexColor;
 in vec2 vertexTexCoord;
