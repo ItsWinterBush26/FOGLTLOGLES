@@ -84,12 +84,12 @@ struct MDElementsBaseVertexBatcher {
         glDeleteBuffers(1, &baseVerticesSSBO);
         glDeleteBuffers(1, &prefixSSBO);
         glDeleteBuffers(1, &outputIndexSSBO);
-    }
+    } */
     
     void init() {
         LOGI("MDElementsBaseVertexBatcher init!");
 
-        computeProgram = glCreateProgram();
+        /* computeProgram = glCreateProgram();
         GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
         
         const GLchar* castedSource = COMPUTE_BATCHER_GLSL_BASE.c_str();
@@ -104,8 +104,8 @@ struct MDElementsBaseVertexBatcher {
         glGenBuffers(1, &indicesSSBO);
         glGenBuffers(1, &baseVerticesSSBO);
         glGenBuffers(1, &prefixSSBO);
-        glGenBuffers(1, &outputIndexSSBO);
-    } */
+        glGenBuffers(1, &outputIndexSSBO); */
+    }
 
     void batch(
         GLenum mode,
