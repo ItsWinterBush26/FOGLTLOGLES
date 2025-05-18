@@ -145,7 +145,7 @@ void glVertex2f(GLfloat x, GLfloat y) {
         return;
     }
 
-    Immediate::immediateModeState->advance([&](Immediate::VertexData& vertex) {
+    Immediate::immediateModeState->advance([&](Immediate::VertexGenericData& vertex) {
         vertex.position = glm::vec4(x, y, 0, 1);
     });
 }
@@ -157,7 +157,7 @@ void glVertex3f(GLfloat x, GLfloat y, GLfloat z) {
         return;
     }
 
-    Immediate::immediateModeState->advance([&](Immediate::VertexData& vertex) {
+    Immediate::immediateModeState->advance([&](Immediate::VertexGenericData& vertex) {
         vertex.position = glm::vec4(x, y, z, 1);
     });
 }
@@ -169,7 +169,7 @@ void glVertex4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w) {
         return;
     }
 
-    Immediate::immediateModeState->advance([&](Immediate::VertexData& vertex) {
+    Immediate::immediateModeState->advance([&](Immediate::VertexGenericData& vertex) {
         vertex.position = glm::vec4(x, y, z, w);
     });
 }

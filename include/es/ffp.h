@@ -1,21 +1,30 @@
 #pragma once
 
+#include "es/limits.h"
 #include "es/state_tracking.h"
+#include "es/ffpe/shadergen.h"
+#include "gles/draw_overrides.h"
 #include "gles/ffp/enums.h"
 #include "gles20/shader_overrides.h"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "utils/fast_map.h"
 
+#include <GLES3/gl3.h>
 #include <cstddef>
 #include <GLES3/gl32.h>
 #include <memory>
 #include <stack>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 // TODO: break out and move to specific files
 
-namespace FFPStates {
+// lmao
+#define MAX_TEXTURE_UNITS 64
+
+namespace FFPE::States {
 namespace AlphaTest {
     inline GLenum op = GL_ALWAYS;
     inline GLclampf threshold = 0.0f;
@@ -24,7 +33,11 @@ namespace AlphaTest {
 namespace ShadeModel {
     inline GLenum type = GL_SMOOTH;
 };
-};
+namespace ClientState {
+    inline GLenum currentTexCoordTextureUnit;
+    inline std::unordered_set<GLenum> texCoordTextureUnits;
+}
+}
 
 namespace Matrices {
 struct MatrixState {
@@ -153,11 +166,14 @@ void main() {
     fragColor = resultColor;
 })";
 
-struct VertexData {
+struct VertexGenericData {
     glm::vec4 position = glm::vec4(0, 0, 0, 1);
     glm::vec3 normal;
     glm::vec4 color;
-    glm::vec2 texCoord;
+};
+
+struct VertexTexCoords {
+    glm::vec2 texCoords[MAX_TEXTURE_UNITS];
 };
 
 class ImmediateModeState {
@@ -166,10 +182,11 @@ private:
 
     glm::vec3 currentNormal;
     glm::vec4 currentColor;
-    glm::vec2 currentTexCoord;
+    std::vector<glm::vec2> currentTexCoords;
 
-    std::vector<VertexData> vertices;
-    VertexData currentVertex;
+    std::vector<VertexGenericData> vertices;
+    std::vector<VertexTexCoords> verticesTexCoords;
+    VertexGenericData currentVertex;
 
     GLuint vao, vbo;
     GLuint drawerProgram;
@@ -223,27 +240,27 @@ public:
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(
-            0, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), 
-            (void*) offsetof(VertexData, position)
+            0, 4, GL_FLOAT, GL_FALSE, sizeof(VertexGenericData), 
+            (void*) offsetof(VertexGenericData, position)
         );
         
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(
-            1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), 
-            (void*) offsetof(VertexData, normal)
+            1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexGenericData), 
+            (void*) offsetof(VertexGenericData, normal)
         );
         
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(
-            2, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), 
-            (void*) offsetof(VertexData, color)
+            2, 4, GL_FLOAT, GL_FALSE, sizeof(VertexGenericData), 
+            (void*) offsetof(VertexGenericData, color)
         );
         
-        glEnableVertexAttribArray(3);
+        /* glEnableVertexAttribArray(3);
         glVertexAttribPointer(
             3, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), 
-            (void*) offsetof(VertexData, texCoord)
-        );
+            (void*) offsetof(VertexData, texCoords)
+        ); */
     }
 
     ~ImmediateModeState() {
@@ -254,10 +271,9 @@ public:
 
     void reset() {
         vertices.clear();
-        currentVertex = VertexData();
+        currentVertex = VertexGenericData();
         currentNormal = glm::vec3(0, 0, 0);
         currentColor = glm::vec4(0, 0, 0, 1);
-        currentTexCoord = glm::vec2(0, 0);
     }
 
     void begin(GLenum primitive) {
@@ -278,29 +294,31 @@ public:
     }
 
     void setTexCoord(const glm::vec2& texCoord) {
-        currentTexCoord = texCoord;
+        currentTexCoords.push_back(texCoord);
     }
 
-    void advance(std::function<void(VertexData&)> applyVertexPosition) {
+    void advance(std::function<void(VertexGenericData&)> applyVertexPosition) {
         if (!active) return;
         
         applyVertexPosition(currentVertex);
         currentVertex.normal = currentNormal;
         currentVertex.color = currentColor;
-        currentVertex.texCoord = currentTexCoord;
+        // currentVertex.texCoord = currentTexCoord;
 
         vertices.push_back(currentVertex);
 
-        currentVertex = VertexData();
+        currentVertex = VertexGenericData();
     }
 
     void end() {
         if (!active) return;
+        LOGI("glEnd()!");
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(
-            GL_ARRAY_BUFFER, vertices.size() * sizeof(VertexData), 
-            vertices.data(), GL_STREAM_DRAW
+        glBufferSubData(
+            GL_ARRAY_BUFFER,
+            0, vertices.size() * sizeof(VertexGenericData), 
+            vertices.data()
         );
 
         glUseProgram(drawerProgram);
@@ -318,18 +336,18 @@ public:
         glUniformMatrix4fv(modelViewProjectionUniLoc, 1, false, glm::value_ptr(finalMVP));
 
         glUniform1i(alphaTestEnabledUniLoc, trackedStates->isCapabilityEnabled(GL_ALPHA_TEST) ? GL_TRUE : GL_FALSE);
-        glUniform1i(alphaTestOpUniLoc, FFPStates::AlphaTest::op);
-        glUniform1f(alphaTestThresholdUniLoc, FFPStates::AlphaTest::threshold);
+        glUniform1i(alphaTestOpUniLoc, FFPE::States::AlphaTest::op);
+        glUniform1f(alphaTestThresholdUniLoc, FFPE::States::AlphaTest::threshold);
 
         glBindVertexArray(vao);
-        glDrawArrays(currentPrimitive, 0, vertices.size());
+        OV_glDrawArrays(currentPrimitive, 0, vertices.size());
         
         this->reset();
         
         active = false;
     }
 
-    VertexData& getCurrentVertex() {
+    VertexGenericData& getCurrentVertex() {
         return this->currentVertex;
     }
 

@@ -7,13 +7,13 @@
 
 void glAlphaFunc(GLenum op, GLclampf threshold);
 
-void FFP::registerAlphaTestFunction() {
+void FFP::registerAlphaTestFunctions() {
     REGISTER(glAlphaFunc);
 }
 
 void glAlphaFunc(GLenum op, GLclampf threshold) {
     if (!trackedStates->isCapabilityEnabled(GL_ALPHA_TEST)) return;
 
-    FFPStates::AlphaTest::op = op;
-    FFPStates::AlphaTest::threshold = threshold;
+    FFPE::States::AlphaTest::op = op;
+    FFPE::States::AlphaTest::threshold = threshold;
 }

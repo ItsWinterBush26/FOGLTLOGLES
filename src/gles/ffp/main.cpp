@@ -11,6 +11,7 @@ void FFP::FFPWrapper::init() {
     FFP::registerVertexFunctions();
     FFP::registerMatrixFunctions();
     FFP::registerListsFunctions();
-    FFP::registerAlphaTestFunction();
+    FFP::registerAlphaTestFunctions();
+    FFP::registerTextureFunctions();
 }
     

@@ -17,5 +17,8 @@ void glTexCoord2f(GLfloat s, GLfloat t) {
         return;
     }
 
+    FFPE::States::ClientState::texCoordTextureUnits.insert({
+        FFPE::States::ClientState::currentTexCoordTextureUnit
+    });
     Immediate::immediateModeState->setTexCoord(glm::vec4(s, t, 0, 1));
 }

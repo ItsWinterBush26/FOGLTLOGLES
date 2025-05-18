@@ -19,5 +19,6 @@ namespace FFP {
     void registerVertexFunctions();
     void registerMatrixFunctions();
     void registerListsFunctions();
-    void registerAlphaTestFunction();
+    void registerAlphaTestFunctions();
+    void registerTextureFunctions();
 }
