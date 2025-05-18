@@ -8,6 +8,35 @@
 #include <string>
 
 namespace FFPE::Rendering::Arrays {
+
+namespace Attributes {
+
+inline GLuint VBO;
+
+inline void init() {
+    glGenVertexArrays(1, &VBO);
+}
+
+inline void enableEnabledAttributes() {
+    // TODO: bind gl*Pointer here as VAO's (doing this with no physical keyboard is making me mentally insane, ease send help)
+
+    glBindVertexArray(VBO);
+    
+    auto vertex = FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
+    if (vertex.enabled) {
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(
+            0,
+            vertex.parameters.size,
+            vertex.parameters.type,
+            GL_FALSE,
+            vertex.parameters.stride,
+            (void*) vertex.parameters.offset
+        );
+    }
+}
+
+}
     
 namespace Quads {
 
@@ -57,7 +86,7 @@ inline void init() {
     glAttachShader(eabGeneratorProgram, computeShader);
     OV_glLinkProgram(eabGeneratorProgram);
 
-    glDeleteShader(eabGeneratorProgram);
+    glDeleteShader(computeShader);
 }
 
 inline GLuint generateEAB(GLuint count) {
@@ -80,25 +109,75 @@ inline GLuint generateEAB(GLuint count) {
 inline void handleQuads(GLint first, GLuint count) {
     count = generateEAB(count);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
-
-    // TODO: bind gl*Pointer here as VAO's (doing this with no physical keyboard is making me mentally insane, ease send help)
-
-    States::ClientState::Arrays::ArrayState vertex = FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
-    if (vertex.enabled) {
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(
-            0,
-            vertex.parameters.size,
-            vertex.parameters.type,
-            GL_FALSE,
-            vertex.parameters.stride,
-            (void*) vertex.parameters.offset
-        );
-    }
+    
+    FFPE::Rendering::Arrays::Attributes::enableEnabledAttributes();
 
     glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 }
 
+}
+
+inline const std::string arrayShaderVS = R"(#version 320 es
+
+layout(location = 0) in vec3 iVertexPosition;
+layout(location = 1) in vec4 iVertexColor;
+layout(location = 2) in vec2 iVertexTexCoord;
+
+out vec4 vertexColor;
+out vec2 vertexTexCoord;
+
+void main() {
+    gl_Position = vec4(iVertexPosition, 1.0f);
+    oVertexColor = iVertexColor;
+    oVertexTexCoord = iVertexTexCoord;
+})";
+
+inline const std::string arrayShaderFS = R"(#version 320 es
+
+in vec4 vertexColor;
+in vec2 vertexTexCoord;
+
+out vec4 fragColor;
+
+uniform sampler2D texture0;
+
+void main() {
+    fragColor = texture(texture0, vertexTexCoord) * vertexColor;
+})";
+
+inline GLuint renderingProgram;
+
+inline void init() {
+    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    const GLchar* vertexShaderSource = arrayShaderVS.c_str();
+    OV_glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
+
+    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    const GLchar* fragmentShaderSource = arrayShaderFS.c_str();
+    OV_glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
+    
+    OV_glCompileShader(vertexShader);
+    OV_glCompileShader(fragmentShader);
+
+    renderingProgram = glCreateProgram();
+    glAttachShader(renderingProgram, vertexShader);
+    glAttachShader(renderingProgram, fragmentShader);
+    
+    OV_glLinkProgram(renderingProgram);
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+    
+    Attributes::init();
+    Quads::init();
+}
+
+inline void drawArrays(GLenum mode, GLint first, GLuint count) {
+    glUseProgram(renderingProgram);
+    
+    FFPE::Rendering::Arrays::Attributes::enableEnabledAttributes();
+    
+    glDrawArrays(mode, first, count);
 }
 
 }
