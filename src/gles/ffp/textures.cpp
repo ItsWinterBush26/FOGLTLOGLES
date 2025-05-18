@@ -11,5 +11,6 @@ void FFP::registerTextureFunctions() {
 }
 
 void glClientActiveTexture(GLenum unit) {
+    LOGI("glClientActiveTexture : unit=%u", unit);
     FFPE::States::ClientState::currentTexCoordTextureUnit = unit;
 }
