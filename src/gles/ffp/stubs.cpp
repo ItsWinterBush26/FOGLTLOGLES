@@ -160,7 +160,7 @@ STUB_FUNC(glMultTransposeMatrixd, (const GLdouble *m))
 
 // GL2 Textures
 STUB_FUNC_RET(GLboolean, glAreTexturesResident, (GLsizei n, const GLuint *textures, GLboolean *residences), GL_TRUE)
-STUB_FUNC(glClientActiveTexture, (GLenum texture))
+// STUB_FUNC(glClientActiveTexture, (GLenum texture))
 STUB_FUNC(glPixelMapfv, (GLenum map, GLsizei mapsize, const GLfloat *values))
 STUB_FUNC(glPixelMapuiv, (GLenum map, GLsizei mapsize, const GLuint *values))
 STUB_FUNC(glPixelMapusv, (GLenum map, GLsizei mapsize, const GLushort *values))
@@ -319,7 +319,7 @@ void FFP::registerStubFunctions() {
     
     // GL2 Textures
     REGISTER(glAreTexturesResident);
-    REGISTER(glClientActiveTexture);
+    // REGISTER(glClientActiveTexture);
     REGISTER(glPixelMapfv);
     REGISTER(glPixelMapuiv);
     REGISTER(glPixelMapusv);
