@@ -34,8 +34,33 @@ namespace ShadeModel {
     inline GLenum type = GL_SMOOTH;
 };
 namespace ClientState {
+    namespace Arrays {
+        struct ArrayParameters {
+            GLint size;
+            GLenum type;
+            GLsizei stride;
+            GLuint offset;
+        };
+        
+        struct ArrayState {
+            bool enabled;
+            ArrayParameters parameters;
+        };
+        
+        inline std::unordered_map<GLenum, ArrayState> arrayStates;
+
+        inline bool isArrayEnabled(GLenum array) {
+            return arrayStates[array].enabled;
+        }
+
+        inline ArrayState getArray(GLenum array) {
+            return arrayStates[array];
+        }
+    }
+
     inline GLenum currentTexCoordTextureUnit;
     inline std::unordered_set<GLenum> texCoordTextureUnits;
+
 }
 }
 

@@ -104,7 +104,7 @@ STUB_FUNC(glWindowPos3fv, (const GLfloat *v))
 // Client Arrays
 STUB_FUNC(glColorPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
 // STUB_FUNC(glDisableClientState, (GLenum array))
-STUB_FUNC(glEnableClientState, (GLenum array))
+// STUB_FUNC(glEnableClientState, (GLenum array))
 STUB_FUNC(glFogCoordPointer, (GLenum type, GLsizei stride, const void *pointer))
 STUB_FUNC(glIndexPointer, (GLenum type, GLsizei stride, const void *pointer))
 STUB_FUNC(glInterleavedArrays, (GLenum format, GLsizei stride, const void *pointer))
@@ -113,7 +113,7 @@ STUB_FUNC(glPopClientAttrib, (void))
 STUB_FUNC(glPushClientAttrib, (GLbitfield mask))
 STUB_FUNC(glSecondaryColorPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
 STUB_FUNC(glTexCoordPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
-STUB_FUNC(glVertexPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
+// STUB_FUNC(glVertexPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
 
 // Fixed Function
 STUB_FUNC(glAccum, (GLenum op, GLfloat value))
@@ -263,7 +263,7 @@ void FFP::registerStubFunctions() {
     // Client Arrays
     REGISTER(glColorPointer);
     // REGISTER(glDisableClientState);
-    REGISTER(glEnableClientState);
+    // REGISTER(glEnableClientState);
     REGISTER(glFogCoordPointer);
     REGISTER(glIndexPointer);
     REGISTER(glInterleavedArrays);
@@ -272,7 +272,7 @@ void FFP::registerStubFunctions() {
     REGISTER(glPushClientAttrib);
     REGISTER(glSecondaryColorPointer);
     REGISTER(glTexCoordPointer);
-    REGISTER(glVertexPointer);
+    // REGISTER(glVertexPointer);
     
     // Fixed Function
     REGISTER(glAccum);

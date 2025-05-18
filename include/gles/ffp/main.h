@@ -21,4 +21,5 @@ namespace FFP {
     void registerListsFunctions();
     void registerAlphaTestFunctions();
     void registerTextureFunctions();
+    void registerArrayFunctions();
 }

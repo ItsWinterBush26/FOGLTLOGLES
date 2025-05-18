@@ -1,7 +1,9 @@
 #pragma once
 
+#include "es/ffp.h"
 #include "gles20/shader_overrides.h"
 
+#include <GLES2/gl2.h>
 #include <GLES3/gl32.h>
 #include <string>
 
@@ -80,6 +82,19 @@ inline void handleQuads(GLint first, GLuint count) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
 
     // TODO: bind gl*Pointer here as VAO's (doing this with no physical keyboard is making me mentally insane, ease send help)
+
+    States::ClientState::Arrays::ArrayState vertex = FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
+    if (vertex.enabled) {
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(
+            0,
+            vertex.parameters.size,
+            vertex.parameters.type,
+            GL_FALSE,
+            vertex.parameters.stride,
+            (void*) vertex.parameters.offset
+        );
+    }
 
     glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 }
