@@ -58,28 +58,30 @@ inline void init() {
     glDeleteShader(eabGeneratorProgram);
 }
 
-inline void generateEAB(GLuint count) {
+inline GLuint generateEAB(GLuint count) {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, countInputBuffer);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(count), &count, GL_STATIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, countInputBuffer);
 
-
+    GLuint eabCount = sizeof(GLuint) * 6 * count;
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, indicesOutputBuffer);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(GLuint) * 6 * count, nullptr, GL_STATIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, eabCount, nullptr, GL_STATIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, indicesOutputBuffer);
 
     glUseProgram(eabGeneratorProgram);
     glDispatchCompute((count + 63) / 64, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+    return eabCount;
 }
 
 inline void handleQuads(GLint first, GLuint count) {
-    generateEAB(count);
+    count = generateEAB(count);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
 
     // TODO: bind gl*Pointer here as VAO's (doing this with no physical keyboard is making me mentally insane, ease send help)
 
-    glDrawElements(GL_TRIANGLES, 0, 0, nullptr);
+    glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 }
 
 }
