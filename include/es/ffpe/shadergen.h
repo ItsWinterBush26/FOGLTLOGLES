@@ -13,7 +13,7 @@ namespace FFPE::ImmediateMode::ShaderGen {
 
 inline const std::string nextLine = "\n\n";
 
-inline const std::regex bindPointRegex("{{BIND_POINT}}");
+inline const std::regex bindPointRegex("\{\{BIND_POINT\}\}");
 
 inline uint32_t nextBindingPointSSBO = 0;
 
