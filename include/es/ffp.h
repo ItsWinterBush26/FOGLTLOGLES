@@ -2,7 +2,6 @@
 
 #include "es/binding_saver.h"
 #include "es/state_tracking.h"
-#include "es/utils.h"
 #include "gles/draw_overrides.h"
 #include "gles/ffp/enums.h"
 #include "gles20/shader_overrides.h"
@@ -45,20 +44,22 @@ namespace ClientState {
         
         struct ArrayState {
             bool enabled;
-
             GLenum bufferType;
+
             ArrayParameters parameters;
 
             void bind(GLuint buffer, GLint location, GLsizei count) {
-                // GLsizei actualStride = parameters.stride ? parameters.stride : parameters.size * getTypeSize(parameters.type);
-                GLsizei totalSize = parameters.size * count;
-
                 SaveBoundedBuffer* sbb;
                 if (!parameters.buffered) {
                     sbb = new SaveBoundedBuffer(bufferType);
 
                     glBindBuffer(bufferType, buffer);
-                    glBufferData(bufferType, totalSize, parameters.firstElement, GL_STATIC_DRAW);
+                    glBufferData(
+                        bufferType,
+                        parameters.size * count,
+                        parameters.firstElement,
+                        GL_STATIC_DRAW
+                    );
                 }
 
                 // we assume a vao is already bound
@@ -79,8 +80,8 @@ namespace ClientState {
             return arrayStates[array].enabled;
         }
 
-        inline ArrayState getArray(GLenum array) {
-            return arrayStates[array];
+        inline ArrayState* getArray(GLenum array) {
+            return &arrayStates[array];
         }
     }
 

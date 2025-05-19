@@ -55,8 +55,8 @@ inline void enableEnabledAttributes(GLsizei count) {
     glBindVertexArray(VBO);
     
     auto vertex = FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
-    if (vertex.enabled) {
-        vertex.bind(
+    if (vertex->enabled) {
+        vertex->bind(
             FFPE::States::Rendering::universalVertexBuffer,
             0, count
         );

@@ -17,13 +17,12 @@ void FFP::registerArrayFunctions() {
     REGISTER(glVertexPointer);
 
     FFPE::Rendering::Arrays::init();
+    FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY)->bufferType = GL_ARRAY_BUFFER;
 }
 
 void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
     Lists::displayListManager->addCommand<glVertexPointer>(size, type, stride, pointer);
-
-
-    FFPE::States::ClientState::Arrays::arrayStates[GL_VERTEX_ARRAY].parameters = {
+    FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY)->parameters = {
         trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer != 0, size, type, stride, pointer
     };
 }
