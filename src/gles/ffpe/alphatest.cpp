@@ -13,6 +13,7 @@ void FFP::registerAlphaTestFunctions() {
 
 void glAlphaFunc(GLenum op, GLclampf threshold) {
     if (!trackedStates->isCapabilityEnabled(GL_ALPHA_TEST)) return;
+    Lists::displayListManager->addCommand<glAlphaFunc>(op, threshold);
 
     FFPE::States::AlphaTest::op = op;
     FFPE::States::AlphaTest::threshold = threshold;

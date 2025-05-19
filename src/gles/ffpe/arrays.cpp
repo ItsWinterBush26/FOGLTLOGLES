@@ -20,16 +20,19 @@ void FFP::registerArrayFunctions() {
 }
 
 void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
+    Lists::displayListManager->addCommand<glVertexPointer>(size, type, stride, pointer);
     FFPE::States::ClientState::Arrays::arrayStates[GL_VERTEX_ARRAY].parameters = {
         size, type, stride, pointer
     };
 }
 
 void glEnableClientState(GLenum array) {
+    Lists::displayListManager->addCommand<glEnableClientState>(array);
     FFPE::States::ClientState::Arrays::arrayStates[array].enabled = true;
 }
 
 void glDisableClientState(GLenum array) {
+    Lists::displayListManager->addCommand<glDisableClientState>(array);
     FFPE::States::ClientState::Arrays::arrayStates[array].enabled = false;
 }
 

@@ -119,7 +119,7 @@ public:
         currentMatrix->stack.push(currentMatrix->matrix);
     }
 
-    void popCurrentMatrix() {
+    void popTopMatrix() {
         if (currentMatrix->stack.empty()) return;
         currentMatrix->matrix = currentMatrix->stack.top();
         currentMatrix->stack.pop();
@@ -166,7 +166,7 @@ in vec2 vertexTexCoord;
 out vec4 fragColor;
 
 uniform bool uUseTexture;
-uniform sampler2D uTexture;
+uniform sampler2D texture0; // mc seems to only use one unit (good for us!)
 
 // alpha test
 uniform bool uAlphaTestEnabled;
@@ -176,7 +176,7 @@ uniform float uAlphaTestThreshold;
 void main() {
     vec4 resultColor;
     if (uUseTexture) {
-        resultColor = texture(uTexture, vertexTexCoord) * vertexColor;
+        resultColor = texture(texture0, vertexTexCoord) * vertexColor;
     } else {
         resultColor = vertexColor;
     }
@@ -272,6 +272,7 @@ public:
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
+        // TODO: use our emulated gl*Pointer instead for cleanliness
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(
             0, 4, GL_FLOAT, GL_FALSE, sizeof(VertexGenericData), 
@@ -312,6 +313,7 @@ public:
 
     void begin(GLenum primitive) {
         if (active) return;
+        LOGI("glBegin()!");
 
         this->reset();
         currentPrimitive = primitive;
@@ -349,22 +351,16 @@ public:
         LOGI("glEnd()!");
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferSubData(
+        glBufferData(
             GL_ARRAY_BUFFER,
-            0, vertices.size() * sizeof(VertexGenericData), 
-            vertices.data()
+            vertices.size() * sizeof(VertexGenericData), 
+            vertices.data(), GL_STATIC_DRAW
         );
 
         glUseProgram(drawerProgram);
 
         const bool isTextureEnabled = trackedStates->isCapabilityEnabled(GL_TEXTURE_2D);
         glUniform1i(useTextureUniLoc, isTextureEnabled ? GL_TRUE : GL_FALSE);
-        if (isTextureEnabled) {
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, trackedStates->activeTextureState->boundTextures[GL_TEXTURE_2D]);
-
-            glUniform1i(textureUniLoc, 0);
-        }
 
         glm::mat4 finalMVP = Matrices::matricesStateManager->getMatrix(GL_MODELVIEW).matrix * Matrices::matricesStateManager->getMatrix(GL_PROJECTION).matrix;
         glUniformMatrix4fv(modelViewProjectionUniLoc, 1, false, glm::value_ptr(finalMVP));
@@ -374,6 +370,7 @@ public:
         glUniform1f(alphaTestThresholdUniLoc, FFPE::States::AlphaTest::threshold);
 
         glBindVertexArray(vao);
+        // will get called twice when we on a display list (glend->gldraw,gldraw) (unsure!)
         OV_glDrawArrays(currentPrimitive, 0, vertices.size());
         
         this->reset();

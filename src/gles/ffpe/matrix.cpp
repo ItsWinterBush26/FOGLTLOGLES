@@ -98,7 +98,7 @@ void glPopMatrix() {
         return;
     }
 
-    Matrices::matricesStateManager->popCurrentMatrix();
+    Matrices::matricesStateManager->popTopMatrix();
 }
 
 void glLoadIdentity() {
