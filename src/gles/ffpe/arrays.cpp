@@ -1,4 +1,5 @@
 #include "es/ffp.h"
+#include "es/ffpe/draw.h"
 #include "gles/ffp/main.h"
 #include "main.h"
 
@@ -14,6 +15,8 @@ void FFP::registerArrayFunctions() {
     REGISTER(glDisableClientState);
 
     REGISTER(glVertexPointer);
+
+    FFPE::Rendering::Arrays::init();
 }
 
 void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
