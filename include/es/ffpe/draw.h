@@ -56,18 +56,18 @@ void main() {
     uint quadId = gl_GlobalInvocationID.x;
     if (quadId >= numQuads) return;
 
-    uint base = quadId * 4;
-    uint outIndex = quadId * 6;
+    uint base = quadId * 4u;
+    uint outIndex = quadId * 6u;
 
     // Triangle 1
-    indices[outIndex + 0] = base + 0;
-    indices[outIndex + 1] = base + 1;
-    indices[outIndex + 2] = base + 2;
+    indices[outIndex + 0u] = base + 0u;
+    indices[outIndex + 1u] = base + 1u;
+    indices[outIndex + 2u] = base + 2u;
 
     // Triangle 2
-    indices[outIndex + 3] = base + 0;
-    indices[outIndex + 4] = base + 2;
-    indices[outIndex + 5] = base + 3;
+    indices[outIndex + 3u] = base + 0u;
+    indices[outIndex + 4u] = base + 2u;
+    indices[outIndex + 5u] = base + 3u;
 })";
 
 inline GLuint eabGeneratorProgram;
