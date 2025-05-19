@@ -12,7 +12,7 @@ void GLES::registerDrawOverride() {
 }
 
 void OV_glDrawArrays(GLenum mode, GLint first, GLsizei count) {
-    LOGI("OV_glDrawArrays : mode=%u", mode);
+    if (debugEnabled) LOGI("OV_glDrawArrays : mode=%u", mode);
 
     switch (mode) {
         case GL_QUADS:

@@ -4,7 +4,6 @@
 #include "gles/ffp/enums.h"
 #include "gles/main.h"
 #include "main.h"
-#include "utils/env.h"
 #include "utils/strings.h"
 
 #include <GLES3/gl32.h>
@@ -19,9 +18,6 @@ void OV_glGetIntegerv(GLenum pname, int* v);
 const GLubyte* OV_glGetStringi(GLenum pname, int index);
 void OV_glEnable(GLenum cap);
 void OV_glDisable(GLenum cap);
-
-// TODO: make its own env var
-inline bool debugEnabled = getEnvironmentVar("LIBGL_VGPU_DUMP", "0") == "1";
 
 inline std::string glVersion;
 inline std::string rendererString;
@@ -102,6 +98,7 @@ const GLubyte* OV_glGetStringi(GLenum pname, int index) {
 void OV_glEnable(GLenum cap) {
     switch (cap) {
         case GL_ALPHA_TEST:
+        case GL_TEXTURE_2D:
             break;
 
         case GL_DEBUG_OUTPUT:
@@ -110,6 +107,7 @@ void OV_glEnable(GLenum cap) {
             // passthrough!
 
         default:
+            if (debugEnabled) LOGI("glEnable : cap=%u", cap);
             glEnable(cap);
             break;
     }
@@ -120,6 +118,7 @@ void OV_glEnable(GLenum cap) {
 void OV_glDisable(GLenum cap) {
     switch (cap) {
         case GL_ALPHA_TEST:
+        case GL_TEXTURE_2D:
             break;
     
         default:
