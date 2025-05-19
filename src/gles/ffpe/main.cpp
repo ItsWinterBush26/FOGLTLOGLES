@@ -14,6 +14,7 @@ void FFP::FFPWrapper::init() {
     FFP::registerListsFunctions();
     FFP::registerAlphaTestFunctions();
     FFP::registerTextureFunctions();
+    FFP::registerArrayFunctions();
 
     FFPE::Rendering::Arrays::init();
 }
