@@ -1,5 +1,6 @@
 #pragma once
 
+#include "es/ffpe/draw.h"
 #include "es/limits.h"
 #include "es/state_tracking.h"
 #include "es/ffpe/shadergen.h"
@@ -39,7 +40,7 @@ namespace ClientState {
             GLint size;
             GLenum type;
             GLsizei stride;
-            GLuint offset;
+            const void* array;
         };
         
         struct ArrayState {
@@ -61,6 +62,18 @@ namespace ClientState {
     inline GLenum currentTexCoordTextureUnit;
     inline std::unordered_set<GLenum> texCoordTextureUnits;
 
+}
+
+namespace Rendering {
+    inline GLuint universalVertexBuffer; // GL_ARRAY_BUFFER
+    // inline GLuint universalIndicesBuffer; // GL_ELEMENT_ARRAY_BUFFER
+
+    inline void init() {
+        glGenBuffers(1, &universalVertexBuffer);
+        // glGenBuffers(1, &universalIndicesBuffer);
+
+        FFPE::Rendering::Arrays::init();
+    }
 }
 }
 

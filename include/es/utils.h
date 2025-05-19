@@ -170,3 +170,20 @@ inline bool isSRGBFormat(GLint format) {
             return false;
     }
 }
+
+typedef double GLdouble;
+
+inline GLsizei getTypeSize(GLenum type) {
+    GLsizei typeSize = 0;
+    switch (type) {
+        case GL_FLOAT: typeSize = sizeof(GLfloat); break;
+        case 0x140a: /* GL_DOUBLE */ typeSize = sizeof(GLdouble); break;
+        case GL_INT: typeSize = sizeof(GLint); break;
+        case GL_SHORT: typeSize = sizeof(GLshort); break;
+        default:
+            LOGI("Unhandled type! (type=%u)", type);
+            break;
+    }
+
+    return typeSize;
+}

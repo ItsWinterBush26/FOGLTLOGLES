@@ -1,6 +1,7 @@
 #pragma once
 
 #include "es/ffp.h"
+#include "es/utils.h"
 #include "gles20/shader_overrides.h"
 
 #include <GLES2/gl2.h>
@@ -17,21 +18,28 @@ inline void init() {
     glGenVertexArrays(1, &VBO);
 }
 
-inline void enableEnabledAttributes() {
+inline void enableEnabledAttributes(GLsizei count) {
     // TODO: bind gl*Pointer here as VAO's (doing this with no physical keyboard is making me mentally insane, ease send help)
 
     glBindVertexArray(VBO);
     
     auto vertex = FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
     if (vertex.enabled) {
+        glBindBuffer(GL_ARRAY_BUFFER, FFPE::States::Rendering::universalVertexBuffer);
+
+        GLsizei actualStride = vertex.parameters.stride ? vertex.parameters.stride : vertex.parameters.size * getTypeSize(vertex.parameters.type);
+        GLsizei totalSize = actualStride * count;
+
+        glBufferData(GL_ARRAY_BUFFER, totalSize, vertex.parameters.array, GL_STATIC_DRAW);
+
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(
             0,
             vertex.parameters.size,
             vertex.parameters.type,
             GL_FALSE,
-            vertex.parameters.stride,
-            (void*) vertex.parameters.offset
+            actualStride,
+            nullptr
         );
     }
 }
@@ -110,7 +118,7 @@ inline void handleQuads(GLint first, GLuint count) {
     count = generateEAB(count);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
     
-    FFPE::Rendering::Arrays::Attributes::enableEnabledAttributes();
+    FFPE::Rendering::Arrays::Attributes::enableEnabledAttributes(count);
 
     glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 }
@@ -174,9 +182,8 @@ inline void init() {
 }
 
 inline void drawArrays(GLenum mode, GLint first, GLuint count) {
-    glUseProgram(renderingProgram);
-    
-    FFPE::Rendering::Arrays::Attributes::enableEnabledAttributes();
+    // glUseProgram(renderingProgram);
+    // FFPE::Rendering::Arrays::Attributes::enableEnabledAttributes(count);
     
     glDrawArrays(mode, first, count);
 }

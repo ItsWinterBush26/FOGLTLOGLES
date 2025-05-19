@@ -20,6 +20,6 @@ void OV_glDrawArrays(GLenum mode, GLint first, GLsizei count) {
             break;
 
         default:
-            glDrawArrays(mode, first, count);
+            FFPE::Rendering::Arrays::drawArrays(mode, first, count);
     }
 }

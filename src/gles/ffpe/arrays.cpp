@@ -18,7 +18,7 @@ void FFP::registerArrayFunctions() {
 
 void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
     FFPE::States::ClientState::Arrays::arrayStates[GL_VERTEX_ARRAY].parameters = {
-        size, type, stride, (GLuint) (uintptr_t) pointer
+        size, type, stride, pointer
     };
 }
 
