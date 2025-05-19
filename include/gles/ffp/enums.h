@@ -11,7 +11,7 @@
 #define GL_SMOOTH 0x1d01
 
 // draw array
-#define GL_QUADS 0x7
+// #define GL_QUADS 0x7
 
 // Matrices
 #define GL_MODELVIEW 0x1700

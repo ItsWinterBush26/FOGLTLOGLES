@@ -4,7 +4,6 @@
 #include "es/utils.h"
 #include "gles20/shader_overrides.h"
 
-#include <GLES2/gl2.h>
 #include <GLES3/gl32.h>
 #include <string>
 
