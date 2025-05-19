@@ -12,6 +12,8 @@ void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointe
 void FFP::registerArrayFunctions() {
     REGISTER(glEnableClientState);
     REGISTER(glDisableClientState);
+
+    REGISTER(glVertexPointer);
 }
 
 void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
