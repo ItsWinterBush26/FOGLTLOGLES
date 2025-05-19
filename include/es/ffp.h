@@ -1,6 +1,8 @@
 #pragma once
 
+#include "es/binding_saver.h"
 #include "es/state_tracking.h"
+#include "es/utils.h"
 #include "gles/draw_overrides.h"
 #include "gles/ffp/enums.h"
 #include "gles20/shader_overrides.h"
@@ -9,7 +11,6 @@
 #include "utils/fast_map.h"
 #include "utils/log.h"
 
-#include <GLES3/gl3.h>
 #include <cstddef>
 #include <GLES3/gl32.h>
 #include <memory>
@@ -35,15 +36,41 @@ namespace ShadeModel {
 namespace ClientState {
     namespace Arrays {
         struct ArrayParameters {
+            bool buffered;
             GLint size;
             GLenum type;
             GLsizei stride;
-            const void* array;
+            const void* firstElement;
         };
         
         struct ArrayState {
             bool enabled;
+
+            GLenum bufferType;
             ArrayParameters parameters;
+
+            void bind(GLuint buffer, GLint location, GLsizei count) {
+                // GLsizei actualStride = parameters.stride ? parameters.stride : parameters.size * getTypeSize(parameters.type);
+                GLsizei totalSize = parameters.size * count;
+
+                SaveBoundedBuffer* sbb;
+                if (!parameters.buffered) {
+                    sbb = new SaveBoundedBuffer(bufferType);
+
+                    glBindBuffer(bufferType, buffer);
+                    glBufferData(bufferType, totalSize, parameters.firstElement, GL_STATIC_DRAW);
+                }
+
+                // we assume a vao is already bound
+                glEnableVertexAttribArray(location);
+                glVertexAttribPointer(
+                    location, parameters.size,
+                    parameters.type, GL_FALSE, parameters.stride,
+                    (parameters.buffered) ? parameters.firstElement : nullptr
+                );
+
+                if (!parameters.buffered) delete sbb;
+            }
         };
         
         inline std::unordered_map<GLenum, ArrayState> arrayStates;

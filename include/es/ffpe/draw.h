@@ -1,5 +1,6 @@
 #pragma once
 
+#include "es/binding_saver.h"
 #include "es/ffp.h"
 #include "es/utils.h"
 #include "gles20/shader_overrides.h"
@@ -55,21 +56,9 @@ inline void enableEnabledAttributes(GLsizei count) {
     
     auto vertex = FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
     if (vertex.enabled) {
-        glBindBuffer(GL_ARRAY_BUFFER, FFPE::States::Rendering::universalVertexBuffer);
-
-        GLsizei actualStride = vertex.parameters.stride ? vertex.parameters.stride : vertex.parameters.size * getTypeSize(vertex.parameters.type);
-        GLsizei totalSize = actualStride * count;
-
-        glBufferData(GL_ARRAY_BUFFER, totalSize, vertex.parameters.array, GL_STATIC_DRAW);
-
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(
-            0,
-            vertex.parameters.size,
-            vertex.parameters.type,
-            GL_FALSE,
-            actualStride,
-            nullptr
+        vertex.bind(
+            FFPE::States::Rendering::universalVertexBuffer,
+            0, count
         );
     }
 }
@@ -145,6 +134,7 @@ inline GLuint generateEAB(GLuint count) {
 }
 
 inline void handleQuads(GLint first, GLuint count) {
+    // no checks because GL_QUADS has been deprecated and is only used by old apps (guaranteed to be FFP)
     glUseProgram(renderingProgram);
     FFPE::Rendering::Arrays::Attributes::enableEnabledAttributes(count);
     
@@ -182,10 +172,18 @@ inline void init() {
 }
 
 inline void drawArrays(GLenum mode, GLint first, GLuint count) {
-    // glUseProgram(renderingProgram);
-    // FFPE::Rendering::Arrays::Attributes::enableEnabledAttributes(count);
+    SaveUsedProgram* sup = nullptr;
+    if (trackedStates->currentlyUsedProgram == 0) {
+        sup = new SaveUsedProgram();
+        glUseProgram(renderingProgram);
+
+        // immediately assume we can do VAO's
+        FFPE::Rendering::Arrays::Attributes::enableEnabledAttributes(count);
+    }
     
     glDrawArrays(mode, first, count);
+
+    if (sup) delete sup;
 }
 
 }

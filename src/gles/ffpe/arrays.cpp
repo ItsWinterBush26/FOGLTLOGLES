@@ -21,8 +21,10 @@ void FFP::registerArrayFunctions() {
 
 void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
     Lists::displayListManager->addCommand<glVertexPointer>(size, type, stride, pointer);
+
+
     FFPE::States::ClientState::Arrays::arrayStates[GL_VERTEX_ARRAY].parameters = {
-        size, type, stride, pointer
+        trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer != 0, size, type, stride, pointer
     };
 }
 
