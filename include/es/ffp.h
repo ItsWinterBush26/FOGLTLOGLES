@@ -1,9 +1,8 @@
 #pragma once
 
 #include "es/ffpe/draw.h"
-#include "es/limits.h"
 #include "es/state_tracking.h"
-#include "es/ffpe/shadergen.h"
+#include "es/ffpe/draw.h"
 #include "gles/draw_overrides.h"
 #include "gles/ffp/enums.h"
 #include "gles20/shader_overrides.h"
