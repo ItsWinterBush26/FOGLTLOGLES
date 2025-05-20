@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gles/ffp/enums.h"
 #include "utils/log.h"
 #include "utils/types.h"
 
@@ -9,68 +10,69 @@
 
 inline std::atomic_bool esUtilsInitialized = ATOMIC_VAR_INIT(false);
 
-void initExtensionsES3();
-
 namespace ESUtils {
-    inline std::pair<int, int> version = std::make_pair(0, 0); // major, minor
-    inline int shadingVersion; // (major * 100) + (minor * 10)
+
+inline void initExtensionsES3();
+
+inline std::pair<int, int> version = std::make_pair(0, 0); // major, minor
+inline int shadingVersion; // (major * 100) + (minor * 10)
     
-    inline std::unordered_set<std::string> realExtensions;
-    inline std::unordered_set<std::string> fakeExtensions;
+inline std::unordered_set<std::string> realExtensions;
+inline std::unordered_set<std::string> fakeExtensions;
 
-    inline bool isAngle = false;
-    inline std::tuple<int, int, int> angleVersion = std::make_tuple(0, 0, 0);
+inline bool isAngle = false;
+inline std::tuple<int, int, int> angleVersion = std::make_tuple(0, 0, 0);
 
-    inline void init() {
-        if (esUtilsInitialized.load()) return;
+inline void init() {
+    if (esUtilsInitialized.load()) return;
         
-        str versionStr = reinterpret_cast<str>(glGetString(GL_VERSION));
-        if (!versionStr) {
-            throw std::runtime_error("Failed to get OpenGL ES version! Is the context current or is there no context at all?");
-        }
-
-        int major = 0, minor = 0;
-        if (sscanf(versionStr, "OpenGL ES %d.%d", &major, &minor) != 2) {
-            throw std::runtime_error("Failed to get OpenGL ES version! Is the formatting different? (" + std::string(versionStr) + ")");
-        }
-        
-        version = std::make_pair(major, minor);
-        shadingVersion = (major * 100) + (minor * 10); // 3 -> 300, 2 -> 20 = 320 = 3.2
-
-        int angleMajor = 0, angleMinor = 0, anglePatch = 0; // ts just made up
-        if (sscanf(versionStr, "(ANGLE %d.%d.%d", &angleMajor, &angleMinor, &anglePatch) == 3) {
-            isAngle = true;
-            angleVersion = std::make_tuple(angleMajor, angleMinor, anglePatch);
-        }
-
-        switch (major) {
-            case 1:
-                throw std::runtime_error("OpenGL ES 1.0 is NOT supported");
-            case 2:
-                throw std::runtime_error("OpenGL ES 2.0 is NOT supported");
-            case 3:
-                switch (minor) {
-                    case 2:
-                        initExtensionsES3();
-                        break;
-                    default:
-                        throw std::runtime_error("OpenGL ES >3.0 & <3.2 is NOT supported");
-                }
-        }
-
-        fakeExtensions = realExtensions;
-
-        esUtilsInitialized.store(true);
+    str versionStr = reinterpret_cast<str>(glGetString(GL_VERSION));
+    if (!versionStr) {
+        throw std::runtime_error("Failed to get OpenGL ES version! Is the context current or is there no context at all?");
     }
 
-    inline bool isExtensionSupported(std::string name) {
-        if (!esUtilsInitialized.load()) {
-            LOGW("Extension set wasn't initialized!");
-            ESUtils::init();
-        }
-        return realExtensions.find(name) != realExtensions.end();
+    int major = 0, minor = 0;
+    if (sscanf(versionStr, "OpenGL ES %d.%d", &major, &minor) != 2) {
+        throw std::runtime_error("Failed to get OpenGL ES version! Is the formatting different? (" + std::string(versionStr) + ")");
     }
+        
+    version = std::make_pair(major, minor);
+    shadingVersion = (major * 100) + (minor * 10); // 3 -> 300, 2 -> 20 = 320 = 3.2
+
+    int angleMajor = 0, angleMinor = 0, anglePatch = 0; // ts just made up
+    if (sscanf(versionStr, "(ANGLE %d.%d.%d", &angleMajor, &angleMinor, &anglePatch) == 3) {
+        isAngle = true;
+        angleVersion = std::make_tuple(angleMajor, angleMinor, anglePatch);
+    }
+
+    switch (major) {
+        case 1:
+            throw std::runtime_error("OpenGL ES 1.0 is NOT supported");
+        case 2:
+            throw std::runtime_error("OpenGL ES 2.0 is NOT supported");
+        case 3:
+            switch (minor) {
+                case 2:
+                    initExtensionsES3();
+                    break;
+                default:
+                    throw std::runtime_error("OpenGL ES >3.0 & <3.2 is NOT supported");
+        }
+    }
+
+    fakeExtensions = realExtensions;
+
+    esUtilsInitialized.store(true);
 }
+
+inline bool isExtensionSupported(std::string name) {
+    if (!esUtilsInitialized.load()) {
+        LOGW("Extension set wasn't initialized!");
+        ESUtils::init();
+    }
+    return realExtensions.find(name) != realExtensions.end();
+}
+
 
 inline void initExtensionsES3() {
     GLint extensionCount = 0;
@@ -171,19 +173,33 @@ inline bool isSRGBFormat(GLint format) {
     }
 }
 
-typedef double GLdouble;
+namespace TypeTraits {
 
 inline GLsizei getTypeSize(GLenum type) {
-    GLsizei typeSize = 0;
     switch (type) {
-        case GL_FLOAT: typeSize = sizeof(GLfloat); break;
-        case 0x140a: /* GL_DOUBLE */ typeSize = sizeof(GLdouble); break;
-        case GL_INT: typeSize = sizeof(GLint); break;
-        case GL_SHORT: typeSize = sizeof(GLshort); break;
+        case GL_SHORT: return sizeof(GLshort); break;
+        case GL_INT: return sizeof(GLint); break;
+        case GL_FLOAT: return sizeof(GLfloat); break;
+        case GL_DOUBLE: return sizeof(GLdouble); break;
         default:
             LOGI("Unhandled type! (type=%u)", type);
-            break;
+            return 0;
     }
+}
 
-    return typeSize;
+template<typename T>
+inline const T* asTypedArray(GLenum type, const void* array) {
+    switch (type) {
+        case GL_SHORT: return static_cast<const GLshort*>(array);
+        case GL_INT: return static_cast<const GLint*>(array);
+        case GL_FLOAT: return static_cast<const GLfloat*>(array);
+        case GL_DOUBLE: return static_cast<const GLdouble*>(array);
+        default:
+            LOGI("Unhandled type! (type=%u)", type);
+            return array;
+    }
+}
+
+}
+
 }

@@ -8,10 +8,7 @@
 #include "main.h"
 #include "utils/pointers.h"
 
-#include <glm/glm.hpp>
 #include <GLES3/gl32.h>
-
-typedef double GLdouble;
 
 void glMatrixMode(GLenum mode);
 

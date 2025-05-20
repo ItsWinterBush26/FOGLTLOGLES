@@ -1,20 +1,23 @@
 #pragma once
 
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include "es/binding_saver.h"
 #include "es/ffp.h"
 #include "es/state_tracking.h"
-#include "gles20/buffer_tracking.h"
+#include "es/utils.h"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/ext/vector_float4.hpp"
-#include <cstddef>
-#define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/string_cast.hpp"
+#include "utils/span.h"
+
+#include <cstddef>
 #include <GLES3/gl32.h>
 
 namespace FFPE::Rendering::VAO {
 
 struct VertexData {
-    glm::vec3 position;
+    glm::vec4 position;
     glm::vec3 normal;
     glm::vec4 color;
     glm::vec2 texCoord;
@@ -41,49 +44,65 @@ inline void resizeVAB(GLsizei count) {
     );
 }
 
-inline void putVertexData(GLenum arrayType, const void* array) {
-    LOGI("putVertexData : arrayType=%u", arrayType);
-    OV_glBindBuffer(GL_ARRAY_BUFFER, vab);
-    
-    // TODO: support other types
-    const GLfloat* dataPoints = (const GLfloat*) array;
-    VertexData* vertices = (VertexData*) glMapBufferRange(
-        GL_ARRAY_BUFFER, 0,
-        currentVABSize, GL_MAP_WRITE_BIT
-    );
+template<typename T1, typename T2>
+inline void fillDataComponents(GLsizei& offsetTracker, tcb::span<const T1> src, T2* dst) {
+    for (size_t i = 0; src.size(); i++) (*dst)[i] = src[i];
+    offsetTracker += src.size();
+}
 
+template<typename T>
+inline void putVertexDataInternal(GLenum arrayType, GLsizei dataSize, const T* src, VertexData* dst) {
     GLsizei verticesCount = currentVABSize / sizeof(VertexData);
-    GLsizei dataPointsCursor = 0;
+    GLsizei srcOffset = 0;
+
     for (GLsizei i = 0; i < verticesCount; ++i) {
         switch (arrayType) {
-            case GL_VERTEX_ARRAY: {
-                glm::vec3 position = glm::vec3(
-                    dataPoints[dataPointsCursor],
-                    dataPoints[dataPointsCursor + 1],
-                    dataPoints[dataPointsCursor + 2]
+            case GL_VERTEX_ARRAY:
+                fillDataComponents(
+                    srcOffset,
+                    tcb::span(src + srcOffset, dataSize),
+                    &dst[i].position
                 );
-
-                LOGI("vertices[%i].pos = %s", i, glm::to_string(position).c_str());
-
-                vertices[i].position = position;
-                dataPointsCursor += 3;
-            }
             break;
-            case GL_COLOR_ARRAY: {
-                glm::vec4 color = glm::vec4(
-                    dataPoints[dataPointsCursor],
-                    dataPoints[dataPointsCursor + 1],
-                    dataPoints[dataPointsCursor + 2],
-                    dataPoints[dataPointsCursor + 3]
+            
+            case GL_COLOR_ARRAY:
+                fillDataComponents(
+                    srcOffset,
+                    tcb::span(src + srcOffset, dataSize),
+                    &dst[i].color
                 );
-
-                LOGI("vertices[%i].col = %s", i, glm::to_string(color).c_str());
-
-                vertices[i].color = color;
-                dataPointsCursor += 4;
-            }
             break;
         }
+    }
+}
+
+
+
+inline void putVertexData(GLenum arrayType, VertexData* vertices, FFPE::States::ClientState::Arrays::ArrayState* array) {
+    LOGI("putVertexData : arrayType=%u", arrayType);
+    
+    switch (array->parameters.type) {
+        case GL_SHORT:
+            putVertexDataInternal(
+                arrayType, array->parameters.size,
+                const_cast<GLshort*>(ESUtils::TypeTraits::asTypedArray<GLshort>(
+                    array->parameters.type,
+                    array->parameters.firstElement
+                )),
+                vertices
+            );
+        break;
+    
+        case GL_FLOAT:
+            putVertexDataInternal(
+                arrayType, array->parameters.size,
+                const_cast<GLfloat*>(ESUtils::TypeTraits::asTypedArray<GLfloat>(
+                    array->parameters.type,
+                    array->parameters.firstElement
+                )),
+                vertices
+            );
+        break;
     }
 
     glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -94,13 +113,20 @@ inline void prepareVAOForRendering(GLsizei count) {
     // TODO: bind gl*Pointer here as VAO's (doing this with no physical keyboard is making me mentally insane, ease send help)
 
     SaveBoundedBuffer* sbb = nullptr;
+    VertexData* vertices = nullptr;
     if (trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer == 0) {
         LOGI("not buffered!");
         sbb = new SaveBoundedBuffer(GL_ARRAY_BUFFER);
+
         glBindBuffer(GL_ARRAY_BUFFER, vab);
         if ((count * sizeof(VertexData)) > (unsigned long) currentVABSize) {
             resizeVAB(count);
         }
+
+        vertices = (VertexData*) glMapBufferRange(
+            GL_ARRAY_BUFFER, 0,
+            currentVABSize, GL_MAP_WRITE_BIT
+        );
     }
 
     glBindVertexArray(vao);
@@ -115,7 +141,7 @@ inline void prepareVAOForRendering(GLsizei count) {
                 vertexArray->parameters.stride, vertexArray->parameters.firstElement
             );
         } else {
-            putVertexData(GL_VERTEX_ARRAY, vertexArray->parameters.firstElement);
+            putVertexData(GL_VERTEX_ARRAY, vertices, vertexArray);
             glVertexAttribPointer(
                 0, 3, vertexArray->parameters.type, GL_FALSE,
                 vertexArray->parameters.stride, (void*) offsetof(VertexData, position)
@@ -133,7 +159,7 @@ inline void prepareVAOForRendering(GLsizei count) {
                colorArray->parameters.stride, colorArray->parameters.firstElement
             );
         } else {
-            putVertexData(GL_COLOR_ARRAY, colorArray->parameters.firstElement);
+            putVertexData(GL_COLOR_ARRAY, vertices, colorArray);
             glVertexAttribPointer(
                 1, 4, colorArray->parameters.type, GL_FALSE,
                 colorArray->parameters.stride, (void*) offsetof(VertexData, color)
@@ -142,6 +168,7 @@ inline void prepareVAOForRendering(GLsizei count) {
     }
 
     if (sbb) delete sbb;
+    if (vertices) glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
 }
