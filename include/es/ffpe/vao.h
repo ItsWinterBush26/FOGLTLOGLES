@@ -5,6 +5,8 @@
 #include "gles20/buffer_tracking.h"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/ext/vector_float4.hpp"
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/string_cast.hpp"
 #include <GLES3/gl32.h>
 
 namespace FFPE::Rendering::VAO {
@@ -36,6 +38,7 @@ inline void resizeVAB(GLsizei count) {
 }
 
 inline void putVertexData(GLenum arrayType, const void* array) {
+    LOGI("putVertexData : arrayType=%u", arrayType);
     OV_glBindBuffer(GL_ARRAY_BUFFER, vab);
     
     // TODO: support other types
@@ -49,24 +52,32 @@ inline void putVertexData(GLenum arrayType, const void* array) {
     GLsizei dataPointsCursor = 0;
     for (GLsizei i = 0; i < verticesCount; ++i) {
         switch (arrayType) {
-            case GL_VERTEX_ARRAY:
-                vertices[i].position = glm::vec3(
+            case GL_VERTEX_ARRAY: {
+                glm::vec3 position = glm::vec3(
                     dataPoints[dataPointsCursor],
                     dataPoints[dataPointsCursor + 1],
                     dataPoints[dataPointsCursor + 2]
                 );
 
+                LOGI("vertices[%i].pos = %s", i, glm::to_string(position).c_str());
+
+                vertices[i].position = position;
                 dataPointsCursor += 3;
+            }
             break;
-            case GL_COLOR_ARRAY:
-                vertices[i].color = glm::vec4(
+            case GL_COLOR_ARRAY: {
+                glm::vec4 color = glm::vec4(
                     dataPoints[dataPointsCursor],
                     dataPoints[dataPointsCursor + 1],
                     dataPoints[dataPointsCursor + 2],
                     dataPoints[dataPointsCursor + 3]
                 );
 
+                LOGI("vertices[%i].col = %s", i, glm::to_string(color).c_str());
+
+                vertices[i].color = color;
                 dataPointsCursor += 4;
+            }
             break;
         }
     }
