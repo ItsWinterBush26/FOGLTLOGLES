@@ -100,8 +100,6 @@ inline void putVertexData(GLenum arrayType, VertexData* vertices, FFPE::States::
             );
         break;
     }
-
-    glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
 [[nodiscard]]
@@ -170,11 +168,10 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
             );
         }
     } else {
-        std::vector<glm::vec4> colors(count, FFPE::States::VertexData::color);
-        putVertexDataInternal(
-            GL_COLOR_ARRAY, FFPE::States::VertexData::color.length(),
-            ESUtils::TypeTraits::asTypedArray<GLshort>(colors.data()), vertices
-        );
+        for (GLsizei i = 0; i < count; ++i) {
+            vertices[i].color = FFPE::States::VertexData::color;
+        }
+        
         glVertexAttribPointer(
             1, sizeof(VertexData::color),
             GL_FLOAT, GL_FALSE,
