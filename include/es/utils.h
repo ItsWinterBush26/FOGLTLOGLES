@@ -188,16 +188,8 @@ inline GLsizei getTypeSize(GLenum type) {
 }
 
 template<typename T>
-inline const T* asTypedArray(GLenum type, const void* array) {
-    switch (type) {
-        case GL_SHORT: return static_cast<const GLshort*>(array);
-        case GL_INT: return static_cast<const GLint*>(array);
-        case GL_FLOAT: return static_cast<const GLfloat*>(array);
-        case GL_DOUBLE: return static_cast<const GLdouble*>(array);
-        default:
-            LOGI("Unhandled type! (type=%u)", type);
-            return array;
-    }
+inline const T* asTypedArray(const void* array) {
+    return static_cast<const T*>(array);
 }
 
 }

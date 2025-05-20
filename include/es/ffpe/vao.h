@@ -85,10 +85,9 @@ inline void putVertexData(GLenum arrayType, VertexData* vertices, FFPE::States::
         case GL_SHORT:
             putVertexDataInternal(
                 arrayType, array->parameters.size,
-                const_cast<GLshort*>(ESUtils::TypeTraits::asTypedArray<GLshort>(
-                    array->parameters.type,
+                ESUtils::TypeTraits::asTypedArray<GLshort>(
                     array->parameters.firstElement
-                )),
+                ),
                 vertices
             );
         break;
@@ -96,10 +95,9 @@ inline void putVertexData(GLenum arrayType, VertexData* vertices, FFPE::States::
         case GL_FLOAT:
             putVertexDataInternal(
                 arrayType, array->parameters.size,
-                const_cast<GLfloat*>(ESUtils::TypeTraits::asTypedArray<GLfloat>(
-                    array->parameters.type,
+                ESUtils::TypeTraits::asTypedArray<GLfloat>(
                     array->parameters.firstElement
-                )),
+                ),
                 vertices
             );
         break;
