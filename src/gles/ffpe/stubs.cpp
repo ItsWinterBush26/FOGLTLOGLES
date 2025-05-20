@@ -102,7 +102,7 @@ STUB_FUNC(glWindowPos3f, (GLfloat x, GLfloat y, GLfloat z))
 STUB_FUNC(glWindowPos3fv, (const GLfloat *v))
 
 // Client Arrays
-STUB_FUNC(glColorPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
+// STUB_FUNC(glColorPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
 // STUB_FUNC(glDisableClientState, (GLenum array))
 // STUB_FUNC(glEnableClientState, (GLenum array))
 STUB_FUNC(glFogCoordPointer, (GLenum type, GLsizei stride, const void *pointer))
@@ -261,7 +261,7 @@ void FFP::registerStubFunctions() {
     REGISTER(glWindowPos3fv);
     
     // Client Arrays
-    REGISTER(glColorPointer);
+    // REGISTER(glColorPointer);
     // REGISTER(glDisableClientState);
     // REGISTER(glEnableClientState);
     REGISTER(glFogCoordPointer);
