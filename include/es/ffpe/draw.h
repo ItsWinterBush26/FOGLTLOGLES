@@ -142,6 +142,7 @@ inline void init() {
     glDeleteShader(fragmentShader);
     
     Quads::init();
+    FFPE::Rendering::VAO::init();
 }
 
 inline void drawArrays(GLenum mode, GLint first, GLuint count) {
