@@ -1,5 +1,6 @@
 #include "es/ffp.h"
 #include "es/ffpe/draw.h"
+#include "es/utils.h"
 #include "gles/ffp/enums.h"
 #include "gles/ffp/main.h"
 #include "main.h"
@@ -27,7 +28,9 @@ void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointe
     Lists::displayListManager->addCommand<glVertexPointer>(size, type, stride, pointer);
     FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY)->parameters = {
         trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer != 0,
-        size, type, stride, pointer
+        size, type,
+        stride ? stride : size * ESUtils::TypeTraits::getTypeSize(type),
+        pointer
     };
 }
 
@@ -35,7 +38,9 @@ void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer
     Lists::displayListManager->addCommand<glVertexPointer>(size, type, stride, pointer);
     FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY)->parameters = {
         trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer != 0,
-        size, type, stride, pointer
+        size, type,
+        stride ? stride : size * ESUtils::TypeTraits::getTypeSize(type),
+        pointer
     };
 }
 

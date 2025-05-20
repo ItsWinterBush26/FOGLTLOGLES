@@ -6,7 +6,6 @@
 #include "es/ffp.h"
 #include "es/state_tracking.h"
 #include "es/utils.h"
-#include "glm/ext/vector_float3.hpp"
 #include "glm/ext/vector_float4.hpp"
 #include "glm/gtx/string_cast.hpp"
 #include "utils/span.h"
@@ -20,7 +19,6 @@ namespace FFPE::Rendering::VAO {
 struct VertexData {
     glm::vec4 position;
     glm::vec4 color;
-    glm::vec2 texCoord;
 };
 
 inline GLuint vao;
@@ -135,16 +133,19 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
         glEnableVertexAttribArray(0);
         
         if (vertexArray->parameters.buffered) {
-            GLsizei actualStride = vertexArray->parameters.stride ? vertexArray->parameters.stride : vertexArray->parameters.size * ESUtils::TypeTraits::getTypeSize(vertexArray->parameters.type);
             glVertexAttribPointer(
-                0, 3, vertexArray->parameters.type, GL_FALSE,
-                actualStride, vertexArray->parameters.firstElement
+                0,
+                vertexArray->parameters.size, vertexArray->parameters.type,
+                GL_FALSE,
+                vertexArray->parameters.stride,
+                vertexArray->parameters.firstElement
             );
         } else {
             putVertexData(GL_VERTEX_ARRAY, vertices, vertexArray);
             glVertexAttribPointer(
-                0, 3, vertexArray->parameters.type, GL_FALSE,
-                vertexArray->parameters.stride, (void*) offsetof(VertexData, position)
+                0, sizeof(VertexData::position),
+                vertexArray->parameters.type, GL_FALSE,
+                sizeof(VertexData), (void*) offsetof(VertexData, position)
             );
         }
     }
@@ -154,16 +155,19 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
         glEnableVertexAttribArray(1);
         
         if (colorArray->parameters.buffered) {
-            GLsizei actualStride = colorArray->parameters.stride ? colorArray->parameters.stride : colorArray->parameters.size * ESUtils::TypeTraits::getTypeSize(colorArray->parameters.type);
             glVertexAttribPointer(
-                1, 4, colorArray->parameters.type, GL_FALSE,
-                actualStride, colorArray->parameters.firstElement
+                1,
+                colorArray->parameters.size, colorArray->parameters.type,
+                GL_FALSE,
+                colorArray->parameters.stride,
+                colorArray->parameters.firstElement
             );
         } else {
             putVertexData(GL_COLOR_ARRAY, vertices, colorArray);
             glVertexAttribPointer(
-                1, 4, colorArray->parameters.type, GL_FALSE,
-                colorArray->parameters.stride, (void*) offsetof(VertexData, color)
+                1, sizeof(VertexData::color),
+                colorArray->parameters.type, GL_FALSE,
+                sizeof(VertexData), (void*) offsetof(VertexData, color)
             );
         }
     }

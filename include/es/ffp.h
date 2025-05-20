@@ -37,7 +37,7 @@ namespace ClientState {
             bool buffered;
             GLint size;
             GLenum type;
-            GLsizei stride;
+            GLsizei stride; // if stride == 0 then stride = size * sizeof(type) else stride = stride
             const void* firstElement;
         };
         
