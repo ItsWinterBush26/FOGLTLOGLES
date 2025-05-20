@@ -44,7 +44,7 @@ inline void resizeVAB(GLsizei count) {
 
 template<typename T1, typename T2>
 inline void fillDataComponents(GLsizei& offsetTracker, tcb::span<const T1> src, T2* dst) {
-    for (size_t i = 0; src.size(); i++) (*dst)[i] = src[i];
+    for (size_t i = 0; i < src.size(); i++) (*dst)[i] = src[i];
     offsetTracker += src.size();
 }
 
