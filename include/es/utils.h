@@ -177,10 +177,10 @@ namespace TypeTraits {
 
 inline GLsizei getTypeSize(GLenum type) {
     switch (type) {
-        case GL_SHORT: return sizeof(GLshort); break;
-        case GL_INT: return sizeof(GLint); break;
-        case GL_FLOAT: return sizeof(GLfloat); break;
-        case GL_DOUBLE: return sizeof(GLdouble); break;
+        case GL_SHORT: return sizeof(GLshort);
+        case GL_INT: return sizeof(GLint);
+        case GL_FLOAT: return sizeof(GLfloat);
+        case GL_DOUBLE: return sizeof(GLdouble);
         default:
             LOGI("Unhandled type! (type=%u)", type);
             return 0;
