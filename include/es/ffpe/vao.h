@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #define GLM_ENABLE_EXPERIMENTAL
 
 #include "es/binding_saver.h"
@@ -106,15 +107,16 @@ inline void putVertexData(GLenum arrayType, VertexData* vertices, FFPE::States::
     glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
-inline void prepareVAOForRendering(GLsizei count) {
+[[nodiscard]]
+inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) {
     LOGI("vao setup!");
     // TODO: bind gl*Pointer here as VAO's (doing this with no physical keyboard is making me mentally insane, ease send help)
+    std::unique_ptr<SaveBoundedBuffer> sbb;
 
-    SaveBoundedBuffer* sbb = nullptr;
     VertexData* vertices = nullptr;
     if (trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer == 0) {
         LOGI("not buffered!");
-        sbb = new SaveBoundedBuffer(GL_ARRAY_BUFFER);
+        sbb = std::make_unique<SaveBoundedBuffer>(GL_ARRAY_BUFFER);
 
         glBindBuffer(GL_ARRAY_BUFFER, vab);
         if ((count * sizeof(VertexData)) > (unsigned long) currentVABSize) {
@@ -165,8 +167,8 @@ inline void prepareVAOForRendering(GLsizei count) {
         }
     }
 
-    if (sbb) delete sbb;
     if (vertices) glUnmapBuffer(GL_ARRAY_BUFFER);
+    return sbb;
 }
 
 }

@@ -109,8 +109,9 @@ inline GLuint generateEAB(GLuint count) {
 
 inline void handleQuads(GLint first, GLuint count) {
     // no checks because GL_QUADS has been deprecated and is only used by old apps (guaranteed to be FFP)
+    
     glUseProgram(renderingProgram);
-    FFPE::Rendering::VAO::prepareVAOForRendering(count);
+    auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
     
     count = generateEAB(count);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
@@ -146,18 +147,19 @@ inline void init() {
 }
 
 inline void drawArrays(GLenum mode, GLint first, GLuint count) {
-    SaveUsedProgram* sup = nullptr;
     if (trackedStates->currentlyUsedProgram == 0) {
-        sup = new SaveUsedProgram();
+        SaveUsedProgram sup;
+
         glUseProgram(renderingProgram);
 
         // immediately assume we can do VAO's
-        FFPE::Rendering::VAO::prepareVAOForRendering(count);
+        auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
+        
+        glDrawArrays(mode, first, count);
+        return;
     }
-    
-    glDrawArrays(mode, first, count);
 
-    if (sup) delete sup;
+    glDrawArrays(mode, first, count);
 }
 
 }
