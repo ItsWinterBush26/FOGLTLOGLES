@@ -2,9 +2,11 @@
 
 #include "es/binding_saver.h"
 #include "es/ffp.h"
+#include "es/state_tracking.h"
 #include "gles20/buffer_tracking.h"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/ext/vector_float4.hpp"
+#include <cstddef>
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/string_cast.hpp"
 #include <GLES3/gl32.h>
@@ -13,7 +15,9 @@ namespace FFPE::Rendering::VAO {
 
 struct VertexData {
     glm::vec3 position;
+    glm::vec3 normal;
     glm::vec4 color;
+    glm::vec2 texCoord;
 };
 
 inline GLuint vao;
@@ -89,10 +93,14 @@ inline void prepareVAOForRendering(GLsizei count) {
     LOGI("vao setup!");
     // TODO: bind gl*Pointer here as VAO's (doing this with no physical keyboard is making me mentally insane, ease send help)
 
-    SaveBoundedBuffer sbb(GL_ARRAY_BUFFER);
-    glBindBuffer(GL_ARRAY_BUFFER, vab);
-    if ((count * sizeof(VertexData)) > (unsigned long) currentVABSize) {
-        resizeVAB(count);
+    SaveBoundedBuffer* sbb = nullptr;
+    if (trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer == 0) {
+        LOGI("not buffered!");
+        sbb = new SaveBoundedBuffer(GL_ARRAY_BUFFER);
+        glBindBuffer(GL_ARRAY_BUFFER, vab);
+        if ((count * sizeof(VertexData)) > (unsigned long) currentVABSize) {
+            resizeVAB(count);
+        }
     }
 
     glBindVertexArray(vao);
@@ -110,7 +118,7 @@ inline void prepareVAOForRendering(GLsizei count) {
             putVertexData(GL_VERTEX_ARRAY, vertexArray->parameters.firstElement);
             glVertexAttribPointer(
                 0, 3, vertexArray->parameters.type, GL_FALSE,
-                vertexArray->parameters.stride, nullptr
+                vertexArray->parameters.stride, (void*) offsetof(VertexData, position)
             );
         }
     }
@@ -128,10 +136,12 @@ inline void prepareVAOForRendering(GLsizei count) {
             putVertexData(GL_COLOR_ARRAY, colorArray->parameters.firstElement);
             glVertexAttribPointer(
                 1, 4, colorArray->parameters.type, GL_FALSE,
-                colorArray->parameters.stride, nullptr
+                colorArray->parameters.stride, (void*) offsetof(VertexData, color)
             );
         }
     }
+
+    if (sbb) delete sbb;
 }
 
 }
