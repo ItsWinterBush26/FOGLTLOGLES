@@ -105,8 +105,8 @@ void OV_glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarge
         framebuffer->colorInfo.colorLevels[attachmentIndex] = level;
 
         GLenum textureFormat = trackedStates->activeTextureState->textureInternalFormats[texture];
-        framebuffer->colorInfo.colorComponentType[attachmentIndex] = getComponentTypeFromFormat(textureFormat);
-        framebuffer->colorInfo.colorEncoding[attachmentIndex] = isSRGBFormat(textureFormat) ? GL_SRGB : GL_LINEAR;
+        framebuffer->colorInfo.colorComponentType[attachmentIndex] = ESUtils::getComponentTypeFromFormat(textureFormat);
+        framebuffer->colorInfo.colorEncoding[attachmentIndex] = ESUtils::isSRGBFormat(textureFormat) ? GL_SRGB : GL_LINEAR;
     }
 
     rebindFramebuffer(target, framebuffer, attachment);
@@ -135,8 +135,8 @@ void OV_glFramebufferTextureLayer(GLenum target, GLenum attachment, GLuint textu
         framebuffer->colorInfo.colorLayers[attachmentIndex] = layer;
         
         GLenum textureFormat = trackedStates->activeTextureState->textureInternalFormats[texture];
-        framebuffer->colorInfo.colorComponentType[attachmentIndex] = getComponentTypeFromFormat(textureFormat);
-        framebuffer->colorInfo.colorEncoding[attachmentIndex] = isSRGBFormat(textureFormat) ? GL_SRGB : GL_LINEAR;
+        framebuffer->colorInfo.colorComponentType[attachmentIndex] = ESUtils::getComponentTypeFromFormat(textureFormat);
+        framebuffer->colorInfo.colorEncoding[attachmentIndex] = ESUtils::isSRGBFormat(textureFormat) ? GL_SRGB : GL_LINEAR;
     }
 
     rebindFramebuffer(target, framebuffer, attachment);
@@ -161,8 +161,8 @@ void OV_glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum rende
         framebuffer->colorInfo.colorObjects[attachmentIndex] = renderbuffer;
         
         GLenum renderbufferFormat = trackedStates->renderbufferInternalFormats[renderbuffer];
-        framebuffer->colorInfo.colorComponentType[attachmentIndex] = getComponentTypeFromFormat(renderbufferFormat);
-        framebuffer->colorInfo.colorEncoding[attachmentIndex] = isSRGBFormat(renderbufferFormat) ? GL_SRGB : GL_LINEAR;
+        framebuffer->colorInfo.colorComponentType[attachmentIndex] = ESUtils::getComponentTypeFromFormat(renderbufferFormat);
+        framebuffer->colorInfo.colorEncoding[attachmentIndex] = ESUtils::isSRGBFormat(renderbufferFormat) ? GL_SRGB : GL_LINEAR;
     }
 
     rebindFramebuffer(target, framebuffer, attachment);
