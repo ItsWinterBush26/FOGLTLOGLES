@@ -1,5 +1,6 @@
 #include "es/ffp.h"
 #include "es/ffpe/draw.h"
+#include "gles/ffp/enums.h"
 #include "gles/ffp/main.h"
 #include "main.h"
 
@@ -9,21 +10,32 @@ void glEnableClientState(GLenum array);
 void glDisableClientState(GLenum array);
 
 void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointer);
+void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer);
+
 
 void FFP::registerArrayFunctions() {
     REGISTER(glEnableClientState);
     REGISTER(glDisableClientState);
 
     REGISTER(glVertexPointer);
+    REGISTER(glColorPointer);
 
     FFPE::Rendering::Arrays::init();
-    FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY)->bufferType = GL_ARRAY_BUFFER;
 }
 
 void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
     Lists::displayListManager->addCommand<glVertexPointer>(size, type, stride, pointer);
     FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY)->parameters = {
-        trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer != 0, size, type, stride, pointer
+        trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer != 0,
+        size, type, stride, pointer
+    };
+}
+
+void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
+    Lists::displayListManager->addCommand<glVertexPointer>(size, type, stride, pointer);
+    FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY)->parameters = {
+        trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer != 0,
+        size, type, stride, pointer
     };
 }
 

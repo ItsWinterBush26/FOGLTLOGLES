@@ -4,6 +4,9 @@
 
 // FFP
 
+// arrays
+#define GL_COLOR_ARRAY 0x8076
+
 // alpha
 #define GL_ALPHA_TEST 0xbc0
 

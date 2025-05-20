@@ -1,6 +1,5 @@
 #pragma once
 
-#include "es/binding_saver.h"
 #include "es/state_tracking.h"
 #include "gles/draw_overrides.h"
 #include "gles/ffp/enums.h"
@@ -44,34 +43,7 @@ namespace ClientState {
         
         struct ArrayState {
             bool enabled;
-            GLenum bufferType;
-
             ArrayParameters parameters;
-
-            void bind(GLuint buffer, GLint location, GLsizei count) {
-                SaveBoundedBuffer* sbb;
-                if (!parameters.buffered) {
-                    sbb = new SaveBoundedBuffer(bufferType);
-
-                    glBindBuffer(bufferType, buffer);
-                    glBufferData(
-                        bufferType,
-                        parameters.size * count,
-                        parameters.firstElement,
-                        GL_STATIC_DRAW
-                    );
-                }
-
-                // we assume a vao is already bound
-                glEnableVertexAttribArray(location);
-                glVertexAttribPointer(
-                    location, parameters.size,
-                    parameters.type, GL_FALSE, parameters.stride,
-                    (parameters.buffered) ? parameters.firstElement : nullptr
-                );
-
-                if (!parameters.buffered) delete sbb;
-            }
         };
         
         inline std::unordered_map<GLenum, ArrayState> arrayStates;
@@ -87,18 +59,8 @@ namespace ClientState {
 
     inline GLenum currentTexCoordTextureUnit;
     inline std::unordered_set<GLenum> texCoordTextureUnits;
-
 }
 
-namespace Rendering {
-    inline GLuint universalVertexBuffer; // GL_ARRAY_BUFFER
-    // inline GLuint universalIndicesBuffer; // GL_ELEMENT_ARRAY_BUFFER
-
-    inline void init() {
-        glGenBuffers(1, &universalVertexBuffer);
-        // glGenBuffers(1, &universalIndicesBuffer);
-    }
-}
 }
 
 namespace Matrices {

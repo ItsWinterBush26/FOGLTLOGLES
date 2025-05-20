@@ -1,5 +1,4 @@
 #include "gles/ffp/main.h"
-#include "es/ffp.h"
 #include "utils/log.h"
 
 void FFP::FFPWrapper::init() {
@@ -15,7 +14,5 @@ void FFP::FFPWrapper::init() {
     FFP::registerAlphaTestFunctions();
     FFP::registerTextureFunctions();
     FFP::registerArrayFunctions();
-
-    FFPE::States::Rendering::init();
 }
     

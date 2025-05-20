@@ -1,8 +1,7 @@
 #pragma once
 
 #include "es/binding_saver.h"
-#include "es/ffp.h"
-#include "es/utils.h"
+#include "es/ffpe/vao.h"
 #include "gles20/shader_overrides.h"
 
 #include <GLES3/gl32.h>
@@ -14,7 +13,6 @@ inline const std::string arrayShaderVS = R"(#version 320 es
 
 layout(location = 0) in vec3 iVertexPosition;
 layout(location = 1) in vec4 iVertexColor;
-layout(location = 2) in vec2 iVertexTexCoord;
 
 out vec4 vertexColor;
 out vec2 vertexTexCoord;
@@ -22,7 +20,7 @@ out vec2 vertexTexCoord;
 void main() {
     gl_Position = vec4(iVertexPosition, 1.0f);
     vertexColor = iVertexColor;
-    vertexTexCoord = iVertexTexCoord;
+    vertexTexCoord = vec2(0.0f, 0.0f); // iVertexTexCoord;
 })";
 
 inline const std::string arrayShaderFS = R"(#version 320 es
@@ -36,35 +34,11 @@ out vec4 fragColor;
 uniform sampler2D texture0;
 
 void main() {
-    fragColor = texture(texture0, vertexTexCoord) * vertexColor;
+    fragColor = /* texture(texture0, vertexTexCoord) */ vertexColor;
 })";
 
 inline GLuint renderingProgram;
 
-namespace Attributes {
-
-inline GLuint VBO;
-
-inline void init() {
-    glGenVertexArrays(1, &VBO);
-}
-
-inline void enableEnabledAttributes(GLsizei count) {
-    // TODO: bind gl*Pointer here as VAO's (doing this with no physical keyboard is making me mentally insane, ease send help)
-
-    glBindVertexArray(VBO);
-    
-    auto vertex = FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
-    if (vertex->enabled) {
-        vertex->bind(
-            FFPE::States::Rendering::universalVertexBuffer,
-            0, count
-        );
-    }
-}
-
-}
-    
 namespace Quads {
 
 inline const std::string quadEABGeneratorCS = R"(#version 310 es
@@ -136,7 +110,7 @@ inline GLuint generateEAB(GLuint count) {
 inline void handleQuads(GLint first, GLuint count) {
     // no checks because GL_QUADS has been deprecated and is only used by old apps (guaranteed to be FFP)
     glUseProgram(renderingProgram);
-    FFPE::Rendering::Arrays::Attributes::enableEnabledAttributes(count);
+    FFPE::Rendering::VAO::prepareVAOForRendering(count);
     
     count = generateEAB(count);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
@@ -167,7 +141,6 @@ inline void init() {
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
     
-    Attributes::init();
     Quads::init();
 }
 
@@ -178,7 +151,7 @@ inline void drawArrays(GLenum mode, GLint first, GLuint count) {
         glUseProgram(renderingProgram);
 
         // immediately assume we can do VAO's
-        FFPE::Rendering::Arrays::Attributes::enableEnabledAttributes(count);
+        FFPE::Rendering::VAO::prepareVAOForRendering(count);
     }
     
     glDrawArrays(mode, first, count);

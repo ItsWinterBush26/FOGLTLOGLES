@@ -73,6 +73,9 @@ struct TrackedStates {
     // NOTE: Type is NOT a binding enum
     FAST_MAP_BI(GLenum, Buffer) boundBuffers;
 
+    // FAST_MAP_BI(GLenum, FAST_MAP_BI(GLuint, Buffer)) boundBuffers2;
+    // Buffer Type, Buffer ID, Buffer
+
     GLuint currentlyUsedProgram;
 
     TrackedStates() {
