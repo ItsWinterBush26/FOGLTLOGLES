@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #define GLM_ENABLE_EXPERIMENTAL
 
 #include "es/binding_saver.h"
@@ -14,12 +13,12 @@
 
 #include <cstddef>
 #include <GLES3/gl32.h>
+#include <memory>
 
 namespace FFPE::Rendering::VAO {
 
 struct VertexData {
     glm::vec4 position;
-    glm::vec3 normal;
     glm::vec4 color;
     glm::vec2 texCoord;
 };
@@ -136,9 +135,10 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
         glEnableVertexAttribArray(0);
         
         if (vertexArray->parameters.buffered) {
+            GLsizei actualStride = vertexArray->parameters.stride ? vertexArray->parameters.stride : vertexArray->parameters.size * ESUtils::TypeTraits::getTypeSize(vertexArray->parameters.type);
             glVertexAttribPointer(
                 0, 3, vertexArray->parameters.type, GL_FALSE,
-                vertexArray->parameters.stride, vertexArray->parameters.firstElement
+                actualStride, vertexArray->parameters.firstElement
             );
         } else {
             putVertexData(GL_VERTEX_ARRAY, vertices, vertexArray);
@@ -154,9 +154,10 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
         glEnableVertexAttribArray(1);
         
         if (colorArray->parameters.buffered) {
+            GLsizei actualStride = colorArray->parameters.stride ? colorArray->parameters.stride : colorArray->parameters.size * ESUtils::TypeTraits::getTypeSize(colorArray->parameters.type);
             glVertexAttribPointer(
                 1, 4, colorArray->parameters.type, GL_FALSE,
-               colorArray->parameters.stride, colorArray->parameters.firstElement
+                actualStride, colorArray->parameters.firstElement
             );
         } else {
             putVertexData(GL_COLOR_ARRAY, vertices, colorArray);
