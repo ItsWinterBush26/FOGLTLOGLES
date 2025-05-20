@@ -17,6 +17,6 @@ void glColor4f(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) {
         return;
     }
 
-    Immediate::immediateModeState->setColor(glm::vec4(red, green, blue, alpha));
+    FFPE::States::VertexData::color = glm::vec4(red, green, blue, alpha);
 }
 

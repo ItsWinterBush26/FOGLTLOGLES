@@ -9,32 +9,30 @@
 
 namespace FFPE::Rendering::Arrays {
 
+// TODO: since vecN, where N is the component
+// and it might change, we need to...
+// SHADERGEN. implement shadergen!
 inline const std::string arrayShaderVS = R"(#version 320 es
 
-layout(location = 0) in vec3 iVertexPosition;
+layout(location = 0) in vec4 iVertexPosition;
 layout(location = 1) in vec4 iVertexColor;
 
 out vec4 vertexColor;
-out vec2 vertexTexCoord;
 
 void main() {
-    gl_Position = vec4(iVertexPosition, 1.0f);
+    gl_Position = iVertexPosition;
     vertexColor = iVertexColor;
-    vertexTexCoord = vec2(0.0f, 0.0f); // iVertexTexCoord;
 })";
 
 inline const std::string arrayShaderFS = R"(#version 320 es
 precision mediump float;
 
 in vec4 vertexColor;
-in vec2 vertexTexCoord;
 
 out vec4 fragColor;
 
-uniform sampler2D texture0;
-
 void main() {
-    fragColor = /* texture(texture0, vertexTexCoord) */ vertexColor;
+    fragColor = vertexColor;
 })";
 
 inline GLuint renderingProgram;

@@ -23,14 +23,18 @@
 #define MAX_TEXTURE_UNITS 64
 
 namespace FFPE::States {
+namespace VertexData {
+    inline glm::vec4 color = glm::vec4(1.0f);
+    inline glm::vec3 normal = glm::vec3(0.0f, 0.0f, 1.0f);
+    inline glm::vec4 texCoord = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+}
 namespace AlphaTest {
     inline GLenum op = GL_ALWAYS;
     inline GLclampf threshold = 0.0f;
-};
-
+}
 namespace ShadeModel {
     inline GLenum type = GL_SMOOTH;
-};
+}
 namespace ClientState {
     namespace Arrays {
         struct ArrayParameters {
@@ -205,7 +209,6 @@ private:
     GLenum currentPrimitive;
 
     glm::vec3 currentNormal;
-    glm::vec4 currentColor;
     std::vector<glm::vec2> currentTexCoords;
 
     std::vector<VertexGenericData> vertices;
@@ -298,7 +301,6 @@ public:
         vertices.clear();
         currentVertex = VertexGenericData();
         currentNormal = glm::vec3(0, 0, 0);
-        currentColor = glm::vec4(0, 0, 0, 1);
     }
 
     void begin(GLenum primitive) {
@@ -315,10 +317,6 @@ public:
         currentNormal = normal;
     }
 
-    void setColor(const glm::vec4& color) {
-        currentColor = color;
-    }
-
     void setTexCoord(const glm::vec2& texCoord) {
         currentTexCoords.push_back(texCoord);
     }
@@ -328,7 +326,7 @@ public:
         
         applyVertexPosition(currentVertex);
         currentVertex.normal = currentNormal;
-        currentVertex.color = currentColor;
+        currentVertex.color = FFPE::States::VertexData::color;
         // currentVertex.texCoord = currentTexCoord;
 
         vertices.push_back(currentVertex);

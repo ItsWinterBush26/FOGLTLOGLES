@@ -17,8 +17,8 @@
 namespace FFPE::Rendering::VAO {
 
 struct VertexData {
-    glm::vec4 position;
-    glm::vec4 color;
+    glm::vec4 position = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 };
 
 inline GLuint vao;
@@ -151,9 +151,8 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
     }
     
     auto colorArray = FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
+    glEnableVertexAttribArray(1);
     if (colorArray->enabled) {
-        glEnableVertexAttribArray(1);
-        
         if (colorArray->parameters.buffered) {
             glVertexAttribPointer(
                 1,
@@ -170,6 +169,17 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                 sizeof(VertexData), (void*) offsetof(VertexData, color)
             );
         }
+    } else {
+        std::vector<glm::vec4> colors(count, FFPE::States::VertexData::color);
+        putVertexDataInternal(
+            GL_COLOR_ARRAY, FFPE::States::VertexData::color.length(),
+            ESUtils::TypeTraits::asTypedArray<GLshort>(colors.data()), vertices
+        );
+        glVertexAttribPointer(
+            1, sizeof(VertexData::color),
+            GL_FLOAT, GL_FALSE,
+            sizeof(VertexData), (void*) offsetof(VertexData, color)
+        );
     }
 
     if (vertices) glUnmapBuffer(GL_ARRAY_BUFFER);
