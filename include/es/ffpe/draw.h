@@ -92,6 +92,7 @@ inline void init() {
 }
 
 inline GLuint generateEAB(GLuint count) {
+    LOGI("dispatch eab compute");
     GLuint quadCount = count / 4;
     GLuint eabCount = quadCount * 6;
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, indicesOutputBuffer);
@@ -110,19 +111,20 @@ inline GLuint generateEAB(GLuint count) {
     glDispatchCompute((count + 63) / 64, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
+    LOGI("quadCount=%u eabCount=%u", quadCount, eabCount);
     return eabCount;
 }
 
 inline void handleQuads(GLint first, GLuint count) {
     // no checks because GL_QUADS has been deprecated and is only used by old apps (guaranteed to be FFP)
-    
+    LOGI("quads!");
+    GLuint realCount = generateEAB(count);
+
     glUseProgram(renderingProgram);
     auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
-    
-    count = generateEAB(count);
+
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
-    
-    glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, realCount, GL_UNSIGNED_INT, nullptr);
 }
 
 }
