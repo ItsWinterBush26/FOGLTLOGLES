@@ -40,11 +40,11 @@ void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer
 
 void glEnableClientState(GLenum array) {
     Lists::displayListManager->addCommand<glEnableClientState>(array);
-    FFPE::States::ClientState::Arrays::arrayStates[array].enabled = true;
+    FFPE::States::ClientState::Arrays::getArray(array)->enabled = true;
 }
 
 void glDisableClientState(GLenum array) {
     Lists::displayListManager->addCommand<glDisableClientState>(array);
-    FFPE::States::ClientState::Arrays::arrayStates[array].enabled = false;
+    FFPE::States::ClientState::Arrays::getArray(array)->enabled = false;
 }
 

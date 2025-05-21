@@ -129,7 +129,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
     
     LOGI("vertices!");
     auto vertexArray = FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
-    if (vertexArray->enabled) {
+    if (vertexArray && vertexArray->enabled) {
         glEnableVertexAttribArray(0);
         
         if (vertexArray->parameters.buffered) {
@@ -150,12 +150,14 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                 sizeof(VertexData), (void*) offsetof(VertexData, position)
             );
         }
+    } else {
+        LOGW("no vertex array?? should we bail?");
     }
 
     LOGI("colors!");
     auto colorArray = FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
     glEnableVertexAttribArray(1);
-    if (colorArray->enabled) {
+    if (colorArray && colorArray->enabled) {
         if (colorArray->parameters.buffered) {
             LOGI("buffered!");
             glVertexAttribPointer(
@@ -175,6 +177,9 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
             );
         }
     } else {
+        LOGI("using global color state!");
+        if (!colorArray) LOGW("colorArray is null???????");
+
         for (GLsizei i = 0; i < count; ++i) {
             vertices[i].color = FFPE::States::VertexData::color;
         }
