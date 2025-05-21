@@ -177,21 +177,23 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
             );
         }
     } else {
-        LOGI("using global color state!");
-        if (!colorArray) LOGW("colorArray is null???????");
-
-        for (GLsizei i = 0; i < count; ++i) {
-            vertices[i].color = FFPE::States::VertexData::color;
+        if (trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer == 0) {
+            LOGI("using global color state!");
+            for (GLsizei i = 0; i < count; ++i) {
+                vertices[i].color = FFPE::States::VertexData::color;
+            }
+            
+            glVertexAttribPointer(
+                1,
+                decltype(VertexData::color)::length(),
+                ESUtils::TypeTraits::GLTypeEnum<
+                    decltype(VertexData::color)::value_type
+                >::value, GL_FALSE,
+                sizeof(VertexData), (void*) offsetof(VertexData, color)
+            );
+        } else {
+            LOGI("colorArray disabled and theres a buffer bound, dont use global color state");
         }
-        
-        glVertexAttribPointer(
-            1,
-            decltype(VertexData::color)::length(),
-            ESUtils::TypeTraits::GLTypeEnum<
-                decltype(VertexData::color)::value_type
-            >::value, GL_FALSE,
-            sizeof(VertexData), (void*) offsetof(VertexData, color)
-        );
     }
 
     if (vertices) glUnmapBuffer(GL_ARRAY_BUFFER);
