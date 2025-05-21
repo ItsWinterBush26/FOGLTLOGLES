@@ -91,7 +91,7 @@ inline void init() {
     glDeleteShader(computeShader);
 }
 
-inline GLuint generateEAB(GLuint count) {
+inline GLuint generateEAB_GPU(GLuint count) {
     LOGI("dispatch eab compute");
     GLuint quadCount = count / 4;
     GLuint eabCount = quadCount * 6;
@@ -115,10 +115,39 @@ inline GLuint generateEAB(GLuint count) {
     return eabCount;
 }
 
+// https://github.com/MobileGL-Dev/MobileGlues/blob/4902f3a629629ad17ad34165c7eec17a3a2d46b6/src/main/cpp/gl/fpe/fpe.cpp#L31
+inline GLuint generateEAB_CPU(GLuint n) {
+    GLuint num_quads = n / 4;
+    GLuint num_indices = num_quads * 6;
+
+    std::vector<GLuint> indices(num_indices, 0);
+    for (GLuint i = 0; i < num_quads; i++) {
+        GLuint base_index = i * 4;
+
+        indices[i * 6 + 0] = base_index + 0;
+        indices[i * 6 + 1] = base_index + 1;
+        indices[i * 6 + 2] = base_index + 2;
+
+        indices[i * 6 + 3] = base_index + 2;
+        indices[i * 6 + 4] = base_index + 3;
+        indices[i * 6 + 5] = base_index + 0;
+    }
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER,
+        num_indices * sizeof(GLuint),
+        indices.data(),
+        GL_DYNAMIC_DRAW
+    );
+
+    return num_indices;
+}
+
 inline void handleQuads(GLint first, GLuint count) {
     // no checks because GL_QUADS has been deprecated and is only used by old apps (guaranteed to be FFP)
     LOGI("quads!");
-    GLuint realCount = generateEAB(count);
+    GLuint realCount = generateEAB_CPU(count);
 
     glUseProgram(renderingProgram);
     auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
