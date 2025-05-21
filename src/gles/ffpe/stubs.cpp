@@ -112,7 +112,7 @@ STUB_FUNC(glNormalPointer, (GLenum type, GLsizei stride, const void *pointer))
 STUB_FUNC(glPopClientAttrib, (void))
 STUB_FUNC(glPushClientAttrib, (GLbitfield mask))
 STUB_FUNC(glSecondaryColorPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
-STUB_FUNC(glTexCoordPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
+// STUB_FUNC(glTexCoordPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
 // STUB_FUNC(glVertexPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
 
 // Fixed Function
@@ -271,7 +271,7 @@ void FFP::registerStubFunctions() {
     REGISTER(glPopClientAttrib);
     REGISTER(glPushClientAttrib);
     REGISTER(glSecondaryColorPointer);
-    REGISTER(glTexCoordPointer);
+    // REGISTER(glTexCoordPointer);
     // REGISTER(glVertexPointer);
     
     // Fixed Function
