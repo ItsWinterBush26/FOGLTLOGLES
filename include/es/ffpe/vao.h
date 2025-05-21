@@ -7,6 +7,7 @@
 #include "es/state_tracking.h"
 #include "es/utils.h"
 #include "glm/ext/vector_float4.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/string_cast.hpp"
 #include "utils/span.h"
 
@@ -177,8 +178,13 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
             );
         }
     } else {
-        if (trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer == 0) {
-            LOGI("using global color state!");
+        LOGI("using global color state!");
+        glDisableVertexAttribArray(1);
+        glVertexAttrib4fv(1, glm::value_ptr(
+            FFPE::States::VertexData::color
+        ));
+        /* if (trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer == 0) {
+            LOGI("not buffered!");
             for (GLsizei i = 0; i < count; ++i) {
                 vertices[i].color = FFPE::States::VertexData::color;
             }
@@ -192,8 +198,12 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                 sizeof(VertexData), (void*) offsetof(VertexData, color)
             );
         } else {
-            LOGI("colorArray disabled and theres a buffer bound, dont use global color state");
-        }
+            LOGI("buffered!");
+            glDisableVertexAttribArray(1);
+            glVertexAttrib4fv(1, glm::value_ptr(
+                FFPE::States::VertexData::color
+            ));
+        } */
     }
 
     if (vertices) glUnmapBuffer(GL_ARRAY_BUFFER);
