@@ -2,8 +2,6 @@
 
 typedef double GLdouble;
 
-#define GL_NONE 0
-
 // types
 #define GL_DOUBLE 0x140a
 

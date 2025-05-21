@@ -11,7 +11,6 @@ void FFP::registerTexCoordFunctions() {
 }
 
 void glTexCoord2f(GLfloat s, GLfloat t) {
-    if (!Immediate::immediateModeState->isActive()) return;
     if (Lists::displayListManager->isRecording()) {
         Lists::displayListManager->addCommand<glTexCoord2f>(s, t);
         return;
@@ -20,5 +19,9 @@ void glTexCoord2f(GLfloat s, GLfloat t) {
     FFPE::States::ClientState::texCoordTextureUnits.insert({
         FFPE::States::ClientState::currentTexCoordTextureUnit
     });
-    Immediate::immediateModeState->setTexCoord(glm::vec4(s, t, 0, 1));
+
+    FFPE::States::VertexData::set(
+        glm::vec2(s, t),
+        &FFPE::States::VertexData::texCoord
+    );
 }

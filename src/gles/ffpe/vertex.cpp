@@ -139,39 +139,39 @@ void glVertex4iv(const GLint *v) {
 
 #pragma region Vertex Float Implementations
 void glVertex2f(GLfloat x, GLfloat y) {
-    if (!Immediate::immediateModeState->isActive()) return;
     if (Lists::displayListManager->isRecording()) {
         Lists::displayListManager->addCommand<glVertex2f>(x, y);
         return;
     }
 
-    Immediate::immediateModeState->advance([&](Immediate::VertexGenericData& vertex) {
-        vertex.position = glm::vec4(x, y, 0, 1);
-    });
+    FFPE::States::VertexData::set(
+        glm::vec2(x, y),
+        &FFPE::States::VertexData::position
+    );
 }
 
 void glVertex3f(GLfloat x, GLfloat y, GLfloat z) {
-    if (!Immediate::immediateModeState->isActive()) return;
     if (Lists::displayListManager->isRecording()) {
         Lists::displayListManager->addCommand<glVertex3f>(x, y, z);
         return;
     }
 
-    Immediate::immediateModeState->advance([&](Immediate::VertexGenericData& vertex) {
-        vertex.position = glm::vec4(x, y, z, 1);
-    });
+    FFPE::States::VertexData::set(
+        glm::vec3(x, y, z),
+        &FFPE::States::VertexData::position
+    );
 }
 
 void glVertex4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w) {
-    if (!Immediate::immediateModeState->isActive()) return;
     if (Lists::displayListManager->isRecording()) {
         Lists::displayListManager->addCommand<glVertex4f>(x, y, z, w);
         return;
     }
 
-    Immediate::immediateModeState->advance([&](Immediate::VertexGenericData& vertex) {
-        vertex.position = glm::vec4(x, y, z, w);
-    });
+    FFPE::States::VertexData::set(
+        glm::vec4(x, y, z, w),
+        &FFPE::States::VertexData::position
+    );
 }
 
 void glVertex2fv(const GLfloat *v) {

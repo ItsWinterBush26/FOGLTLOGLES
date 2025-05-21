@@ -3,16 +3,10 @@
 #include "es/utils.h"
 #include "gles/ffp/enums.h"
 #include "gles/ffp/main.h"
+#include "gles/ffp/arrays.h"
 #include "main.h"
 
 #include <GLES3/gl32.h>
-
-void glEnableClientState(GLenum array);
-void glDisableClientState(GLenum array);
-
-void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointer);
-void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer);
-
 
 void FFP::registerArrayFunctions() {
     REGISTER(glEnableClientState);

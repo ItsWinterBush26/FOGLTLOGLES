@@ -1,18 +1,14 @@
 #pragma once
 
-#include "es/state_tracking.h"
-#include "gles/draw_overrides.h"
 #include "gles/ffp/enums.h"
-#include "gles20/shader_overrides.h"
 #include "glm/ext/matrix_float4x4.hpp"
-#include "glm/gtc/type_ptr.hpp"
 #include "utils/fast_map.h"
-#include "utils/log.h"
 
 #include <cstddef>
 #include <GLES3/gl32.h>
 #include <memory>
 #include <stack>
+#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -24,9 +20,24 @@
 
 namespace FFPE::States {
 namespace VertexData {
+    struct VertexRepresentation {
+        glm::vec4 position = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    };
+
+    inline glm::vec4 position = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     inline glm::vec4 color = glm::vec4(1.0f);
     inline glm::vec3 normal = glm::vec3(0.0f, 0.0f, 1.0f);
     inline glm::vec4 texCoord = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
+    template<typename VT, typename CT>
+    inline void set(CT val, VT* dst) {
+        static_assert(
+            decltype(val)::lenght() <= std::remove_reference_t<decltype(*dst)>::length(),
+            "'src' components must only be less than or equals of 'dst' components"
+        );
+        for (size_t i = 0; i < decltype(val)::length(); ++i) (*dst)[i] = val[i];
+    }
 }
 namespace AlphaTest {
     inline GLenum op = GL_ALWAYS;
@@ -129,254 +140,6 @@ public:
 };
 
 inline std::shared_ptr<MatricesStateManager> matricesStateManager;
-}
-
-namespace Immediate {
-
-inline const std::string immediateModeVS = R"(#version 320 es
-
-layout(location = 0) in vec4 iVertexPosition;
-layout(location = 1) in vec3 iVertexNormal;
-layout(location = 2) in vec4 iVertexColor;
-layout(location = 3) in vec2 iVertexTexCoord;
-
-uniform mat4 uModelViewProjection;
-
-out vec4 vertexColor;
-out vec2 vertexTexCoord;
-
-void main() {
-    gl_Position = uModelViewProjection * iVertexPosition;
-    vertexColor = iVertexColor;
-    vertexTexCoord = iVertexTexCoord;
-})";
-
-inline const std::string immediateModeFS = R"(#version 320 es
-precision mediump float;
-
-in vec4 vertexColor;
-in vec2 vertexTexCoord;
-
-out vec4 fragColor;
-
-uniform bool uUseTexture;
-uniform sampler2D texture0; // mc seems to only use one unit (good for us!)
-
-// alpha test
-uniform bool uAlphaTestEnabled;
-uniform int uAlphaTestOp;
-uniform float uAlphaTestThreshold;
-
-void main() {
-    vec4 resultColor;
-    if (uUseTexture) {
-        resultColor = texture(texture0, vertexTexCoord) * vertexColor;
-    } else {
-        resultColor = vertexColor;
-    }
-
-    if (uAlphaTestEnabled && uAlphaTestOp != 0x0207) {
-        if (uAlphaTestOp == 0x0200) discard;
-        bool alphaTestPassed = false;
-        float resultColorAlpha = resultColor.a;
-
-        if (uAlphaTestOp == 0x0201) alphaTestPassed = (resultColorAlpha < uAlphaTestThreshold);
-        else if (uAlphaTestOp == 0x0201) alphaTestPassed = (resultColorAlpha < uAlphaTestThreshold);
-        else if (uAlphaTestOp == 0x0202) alphaTestPassed = (resultColorAlpha == uAlphaTestThreshold);
-        else if (uAlphaTestOp == 0x0203) alphaTestPassed = (resultColorAlpha <= uAlphaTestThreshold);
-        else if (uAlphaTestOp == 0x0204) alphaTestPassed = (resultColorAlpha > uAlphaTestThreshold);
-        else if (uAlphaTestOp == 0x0205) alphaTestPassed = (resultColorAlpha != uAlphaTestThreshold);
-        else if (uAlphaTestOp == 0x0206) alphaTestPassed = (resultColorAlpha >= uAlphaTestThreshold);
-
-        if (!alphaTestPassed) discard;
-    }
-
-    fragColor = resultColor;
-})";
-
-struct VertexGenericData {
-    glm::vec4 position = glm::vec4(0, 0, 0, 1);
-    glm::vec3 normal;
-    glm::vec4 color;
-};
-
-struct VertexTexCoords {
-    glm::vec2 texCoords[MAX_TEXTURE_UNITS];
-};
-
-class ImmediateModeState {
-private:
-    GLenum currentPrimitive;
-
-    glm::vec3 currentNormal;
-    std::vector<glm::vec2> currentTexCoords;
-
-    std::vector<VertexGenericData> vertices;
-    std::vector<VertexTexCoords> verticesTexCoords;
-    VertexGenericData currentVertex;
-
-    GLuint vao, vbo;
-    GLuint drawerProgram;
-
-    // vert
-    GLuint modelViewProjectionUniLoc;
-
-    // frag
-    GLuint useTextureUniLoc, textureUniLoc;
-
-    // alpha test
-    GLuint alphaTestEnabledUniLoc, alphaTestOpUniLoc, alphaTestThresholdUniLoc;
-
-    bool active;
-
-public:
-    ImmediateModeState() {
-        GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        const GLchar* vertexShaderSource = immediateModeVS.c_str();
-        OV_glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
-        OV_glCompileShader(vertexShader);
-
-        GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        const GLchar* fragmentShaderSource = immediateModeFS.c_str();
-        OV_glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
-        OV_glCompileShader(fragmentShader);
-
-        drawerProgram = glCreateProgram();
-        glAttachShader(drawerProgram, vertexShader);
-        glAttachShader(drawerProgram, fragmentShader);
-
-        OV_glLinkProgram(drawerProgram);
-
-        // vert
-        modelViewProjectionUniLoc = glGetUniformLocation(drawerProgram, "uModelViewProjection");
-
-        // frag
-        useTextureUniLoc = glGetUniformLocation(drawerProgram, "uUseTexture");
-        textureUniLoc = glGetUniformLocation(drawerProgram, "uTexture");
-
-        // alpha
-        alphaTestEnabledUniLoc = glGetUniformLocation(drawerProgram, "uAlphaTestEnabled");
-        alphaTestOpUniLoc = glGetUniformLocation(drawerProgram, "uAlphaTestOp");
-        alphaTestThresholdUniLoc = glGetUniformLocation(drawerProgram, "uAlphaTestThreshold");
-
-        glGenVertexArrays(1, &vao);
-        glGenBuffers(1, &vbo);
-
-        glBindVertexArray(vao);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-        // TODO: use our emulated gl*Pointer instead for cleanliness
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(
-            0, 4, GL_FLOAT, GL_FALSE, sizeof(VertexGenericData), 
-            (void*) offsetof(VertexGenericData, position)
-        );
-        
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(
-            1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexGenericData), 
-            (void*) offsetof(VertexGenericData, normal)
-        );
-        
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(
-            2, 4, GL_FLOAT, GL_FALSE, sizeof(VertexGenericData), 
-            (void*) offsetof(VertexGenericData, color)
-        );
-        
-        /* glEnableVertexAttribArray(3);
-        glVertexAttribPointer(
-            3, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), 
-            (void*) offsetof(VertexData, texCoords)
-        ); */
-    }
-
-    ~ImmediateModeState() {
-        glDeleteProgram(drawerProgram);
-        glDeleteBuffers(1, &vbo);
-        glDeleteVertexArrays(1, &vao);
-    }
-
-    void reset() {
-        vertices.clear();
-        currentVertex = VertexGenericData();
-        currentNormal = glm::vec3(0, 0, 0);
-    }
-
-    void begin(GLenum primitive) {
-        if (active) return;
-        LOGI("glBegin()!");
-
-        this->reset();
-        currentPrimitive = primitive;
-        
-        active = true;
-    }
-
-    void setNormal(const glm::vec3& normal) {
-        currentNormal = normal;
-    }
-
-    void setTexCoord(const glm::vec2& texCoord) {
-        currentTexCoords.push_back(texCoord);
-    }
-
-    void advance(std::function<void(VertexGenericData&)> applyVertexPosition) {
-        if (!active) return;
-        
-        applyVertexPosition(currentVertex);
-        currentVertex.normal = currentNormal;
-        currentVertex.color = FFPE::States::VertexData::color;
-        // currentVertex.texCoord = currentTexCoord;
-
-        vertices.push_back(currentVertex);
-
-        currentVertex = VertexGenericData();
-    }
-
-    void end() {
-        if (!active) return;
-        LOGI("glEnd()!");
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(
-            GL_ARRAY_BUFFER,
-            vertices.size() * sizeof(VertexGenericData), 
-            vertices.data(), GL_STATIC_DRAW
-        );
-
-        glUseProgram(drawerProgram);
-
-        const bool isTextureEnabled = trackedStates->isCapabilityEnabled(GL_TEXTURE_2D);
-        glUniform1i(useTextureUniLoc, isTextureEnabled ? GL_TRUE : GL_FALSE);
-
-        glm::mat4 finalMVP = Matrices::matricesStateManager->getMatrix(GL_MODELVIEW).matrix * Matrices::matricesStateManager->getMatrix(GL_PROJECTION).matrix;
-        glUniformMatrix4fv(modelViewProjectionUniLoc, 1, false, glm::value_ptr(finalMVP));
-
-        glUniform1i(alphaTestEnabledUniLoc, trackedStates->isCapabilityEnabled(GL_ALPHA_TEST) ? GL_TRUE : GL_FALSE);
-        glUniform1i(alphaTestOpUniLoc, FFPE::States::AlphaTest::op);
-        glUniform1f(alphaTestThresholdUniLoc, FFPE::States::AlphaTest::threshold);
-
-        glBindVertexArray(vao);
-        // will get called twice when we on a display list (glend->gldraw,gldraw) (unsure!)
-        OV_glDrawArrays(currentPrimitive, 0, vertices.size());
-        
-        this->reset();
-        
-        active = false;
-    }
-
-    VertexGenericData& getCurrentVertex() {
-        return this->currentVertex;
-    }
-
-    bool isActive() {
-        return this->active;
-    }
-};
-
-
-inline std::shared_ptr<ImmediateModeState> immediateModeState;
 }
 
 namespace Lists {

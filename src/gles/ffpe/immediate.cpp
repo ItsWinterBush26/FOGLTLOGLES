@@ -1,7 +1,7 @@
+#include "es/ffpe/immediate.h"
 #include "es/ffp.h"
 #include "gles/ffp/main.h"
 #include "main.h"
-#include "utils/pointers.h"
 
 #include <GLES3/gl32.h>
 
@@ -12,7 +12,7 @@ void FFP::registerImmediateFunctions() {
     REGISTER(glBegin);
     REGISTER(glEnd);
 
-    Immediate::immediateModeState = MakeAggregateShared<Immediate::ImmediateModeState>();
+    FFPE::Rendering::ImmediateMode::init();
 }
 
 void glBegin(GLenum mode) {
@@ -37,7 +37,7 @@ void glBegin(GLenum mode) {
             return;
     }
 
-    Immediate::immediateModeState->begin(mode);
+    FFPE::Rendering::ImmediateMode::begin(mode);
 }
 
 void glEnd() {
@@ -46,5 +46,5 @@ void glEnd() {
         return;
     }
 
-    Immediate::immediateModeState->end();
+    FFPE::Rendering::ImmediateMode::end();
 }

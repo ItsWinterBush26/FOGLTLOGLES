@@ -175,6 +175,16 @@ inline bool isSRGBFormat(GLint format) {
 
 namespace TypeTraits {
 
+template <typename T>
+struct GLTypeEnum;
+
+#define GL_TYPE_ENUM(podt, glt) template <> struct GLTypeEnum<podt> { static constexpr GLenum value = glt; }
+
+GL_TYPE_ENUM(short, GL_SHORT);
+GL_TYPE_ENUM(int, GL_INT);
+GL_TYPE_ENUM(float, GL_FLOAT);
+GL_TYPE_ENUM(double, GL_DOUBLE);
+
 inline GLsizei getTypeSize(GLenum type) {
     switch (type) {
         case GL_SHORT: return sizeof(GLshort);

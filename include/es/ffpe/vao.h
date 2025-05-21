@@ -14,12 +14,9 @@
 #include <GLES3/gl32.h>
 #include <memory>
 
-namespace FFPE::Rendering::VAO {
+typedef FFPE::States::VertexData::VertexRepresentation VertexData;
 
-struct VertexData {
-    glm::vec4 position = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-};
+namespace FFPE::Rendering::VAO {
 
 inline GLuint vao;
 inline GLuint vab;
@@ -122,6 +119,8 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
             GL_ARRAY_BUFFER, 0,
             currentVABSize, GL_MAP_WRITE_BIT
         );
+    } else {
+        LOGI("buffered!");
     }
 
     glBindVertexArray(vao);
