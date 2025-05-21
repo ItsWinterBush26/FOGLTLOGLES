@@ -1,6 +1,7 @@
 #pragma once
 
 #include "es/binding_saver.h"
+#include "es/ffp.h"
 #include "es/ffpe/vao.h"
 #include "gles20/shader_overrides.h"
 
@@ -88,7 +89,7 @@ inline void init() {
     glDeleteShader(computeShader);
 }
 
-inline GLuint generateEAB(GLuint count) {
+inline GLuint generateEAB_GPU(GLuint count) {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, countInputBuffer);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(count), &count, GL_STATIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, countInputBuffer);
@@ -98,11 +99,43 @@ inline GLuint generateEAB(GLuint count) {
     glBufferData(GL_SHADER_STORAGE_BUFFER, eabCount, nullptr, GL_STATIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, indicesOutputBuffer);
 
+    SaveUsedProgram sup;
+
     glUseProgram(eabGeneratorProgram);
     glDispatchCompute((count + 63) / 64, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
     return eabCount;
+}
+
+inline GLuint generateEAB_CPU(GLint first, GLuint count) {
+    std::vector<GLuint> indices;
+
+    for (GLuint i = 0; i < count; i += 4) {
+        GLuint v0 = first + i;
+        GLuint v1 = v0 + 1;
+        GLuint v2 = v0 + 2;
+        GLuint v3 = v0 + 3;
+
+        // First triangle: v0, v1, v2
+        indices.push_back(v0);
+        indices.push_back(v1);
+        indices.push_back(v2);
+
+        // Second triangle: v2, v3, v0
+        indices.push_back(v0);
+        indices.push_back(v2);
+        indices.push_back(v3);
+    }
+
+    SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint),
+        indices.data(), GL_STATIC_DRAW
+    );
+
+    return indices.size();
 }
 
 inline void handleQuads(GLint first, GLuint count) {
@@ -111,7 +144,7 @@ inline void handleQuads(GLint first, GLuint count) {
     glUseProgram(renderingProgram);
     auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
     
-    count = generateEAB(count);
+    count = generateEAB_CPU(first, count);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
 
     glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
