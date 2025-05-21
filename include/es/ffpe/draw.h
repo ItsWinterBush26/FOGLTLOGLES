@@ -76,7 +76,7 @@ void main() {
 })";
 
 inline GLuint eabGeneratorProgram;
-inline GLuint countInputBuffer, indicesOutputBuffer;
+inline GLuint indicesOutputBuffer;
 inline GLuint numQuadsUniLoc;
 
 inline void init() {
@@ -139,6 +139,7 @@ inline GLuint generateEAB_CPU(GLuint n) {
         indices[i * 6 + 5] = base_index + 0;
     }
 
+    SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
@@ -158,8 +159,12 @@ inline void handleQuads(GLint first, GLuint count) {
     glUseProgram(renderingProgram);
     auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
 
+    SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
+    
     glDrawElements(GL_TRIANGLES, realCount, GL_UNSIGNED_INT, nullptr);
+
+    LOGI("done! drawElements (for quads)");
 }
 
 }
@@ -199,6 +204,7 @@ inline void drawArrays(GLenum mode, GLint first, GLuint count) {
         auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
         
         glDrawArrays(mode, first, count);
+        LOGI("done! drawArrays");
         return;
     }
 
