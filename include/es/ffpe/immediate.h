@@ -39,6 +39,7 @@ inline void begin(GLenum primitive) {
 }
 
 inline void advance() {
+    LOGI("glVertex*()! advancing!");
     States::vertices.push_back({
         FFPE::States::VertexData::position,
         FFPE::States::VertexData::color
@@ -83,8 +84,7 @@ inline void end() {
                 FFPE::States::VertexData::VertexRepresentation::color
             )::value_type
         >::value,
-        0,
-        (void*) offsetof(
+        0, (void*) offsetof(
             FFPE::States::VertexData::VertexRepresentation, color
         )
     );
@@ -96,6 +96,8 @@ inline void end() {
 
     States::primitive = GL_NONE;
     States::vertices.clear();
+
+    LOGI("glEnd() [END]!");
 }
 
 }
