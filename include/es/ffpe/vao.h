@@ -172,8 +172,11 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
         }
         
         glVertexAttribPointer(
-            1, sizeof(VertexData::color),
-            GL_FLOAT, GL_FALSE,
+            1,
+            decltype(VertexData::color)::length(),
+            ESUtils::TypeTraits::GLTypeEnum<
+                decltype(VertexData::color)::value_type
+            >::value, GL_FALSE,
             sizeof(VertexData), (void*) offsetof(VertexData, color)
         );
     }

@@ -6,6 +6,7 @@
 #include "es/utils.h"
 #include "gles/draw_overrides.h"
 #include "gles/ffp/arrays.h"
+#include "gles20/buffer_tracking.h"
 #include "utils/log.h"
 
 #include <GLES3/gl32.h>
@@ -48,7 +49,7 @@ inline void end() {
     LOGI("glEnd()!");
 
     SaveBoundedBuffer sbb(GL_ARRAY_BUFFER);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    OV_glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(
         GL_ARRAY_BUFFER,
         States::vertices.size() * sizeof(FFPE::States::VertexData::VertexRepresentation),
