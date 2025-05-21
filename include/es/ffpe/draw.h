@@ -40,38 +40,38 @@ inline GLuint renderingProgram;
 
 namespace Quads {
 
+// based on:
+// https://github.com/MobileGL-Dev/MobileGlues/blob/4902f3a629629ad17ad34165c7eec17a3a2d46b6/src/main/cpp/gl/fpe/fpe.cpp#L31
 inline const std::string quadEABGeneratorCS = R"(#version 310 es
 layout(local_size_x = 64) in;
 
-// Number of quads = totalVertices / 4
-layout(std430, binding = 0) readonly buffer VertexCount {
-    uint numQuads;
-};
-
-layout(std430, binding = 1) writeonly buffer IndexBuffer {
+layout(std430, binding = 0) writeonly buffer IndexBuffer {
     uint indices[];
 };
 
+uniform uint numQuads;
+
 void main() {
-    uint quadId = gl_GlobalInvocationID.x;
-    if (quadId >= numQuads) return;
+    uint i = gl_GlobalInvocationID.x;
+    if (i >= uint(numQuads)) return;
 
-    uint base = quadId * 4u;
-    uint outIndex = quadId * 6u;
+    uint baseIndex = i * 4u;
+    uint outIndex = i * 6u;
 
-    // Triangle 1
-    indices[outIndex + 0u] = base + 0u;
-    indices[outIndex + 1u] = base + 1u;
-    indices[outIndex + 2u] = base + 2u;
+    // first tri (0 1 2)
+    indices[outIndex + 0u] = baseIndex + 0u;
+    indices[outIndex + 1u] = baseIndex + 1u;
+    indices[outIndex + 2u] = baseIndex + 2u;
 
-    // Triangle 2
-    indices[outIndex + 3u] = base + 0u;
-    indices[outIndex + 4u] = base + 2u;
-    indices[outIndex + 5u] = base + 3u;
+    // second tri (2 3 0)
+    indices[outIndex + 3u] = baseIndex + 2u;
+    indices[outIndex + 4u] = baseIndex + 3u;
+    indices[outIndex + 5u] = baseIndex + 0u;
 })";
 
 inline GLuint eabGeneratorProgram;
 inline GLuint countInputBuffer, indicesOutputBuffer;
+inline GLuint numQuadsUniLoc;
 
 inline void init() {
     glGenBuffers(1, &countInputBuffer);
@@ -86,56 +86,31 @@ inline void init() {
     glAttachShader(eabGeneratorProgram, computeShader);
     OV_glLinkProgram(eabGeneratorProgram);
 
+    numQuadsUniLoc = glGetUniformLocation(eabGeneratorProgram, "numQuads");
+
     glDeleteShader(computeShader);
 }
 
-inline GLuint generateEAB_GPU(GLuint count) {
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, countInputBuffer);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(count), &count, GL_STATIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, countInputBuffer);
-
-    GLuint eabCount = sizeof(GLuint) * 6 * count;
+inline GLuint generateEAB(GLuint count) {
+    GLuint quadCount = n / 4;
+    GLuint eabCount = quadCount * 6;
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, indicesOutputBuffer);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, eabCount, nullptr, GL_STATIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, indicesOutputBuffer);
+    glBufferData(
+        GL_SHADER_STORAGE_BUFFER,
+        eabCount * sizeof(GLuint),
+        nullptr,
+        GL_DYNAMIC_DRAW
+    );
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, indicesOutputBuffer);
 
     SaveUsedProgram sup;
-
     glUseProgram(eabGeneratorProgram);
+    glUniform1ui(numQuadsUniLoc, quadCount);
+    
     glDispatchCompute((count + 63) / 64, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
     return eabCount;
-}
-
-inline GLuint generateEAB_CPU(GLint first, GLuint count) {
-    std::vector<GLuint> indices;
-
-    for (GLuint i = 0; i < count; i += 4) {
-        GLuint v0 = first + i;
-        GLuint v1 = v0 + 1;
-        GLuint v2 = v0 + 2;
-        GLuint v3 = v0 + 3;
-
-        // First triangle: v0, v1, v2
-        indices.push_back(v0);
-        indices.push_back(v1);
-        indices.push_back(v2);
-
-        // Second triangle: v2, v3, v0
-        indices.push_back(v0);
-        indices.push_back(v2);
-        indices.push_back(v3);
-    }
-
-    SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
-    glBufferData(
-        GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint),
-        indices.data(), GL_STATIC_DRAW
-    );
-
-    return indices.size();
 }
 
 inline void handleQuads(GLint first, GLuint count) {
@@ -144,7 +119,7 @@ inline void handleQuads(GLint first, GLuint count) {
     glUseProgram(renderingProgram);
     auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
     
-    count = generateEAB_CPU(first, count);
+    count = generateEAB(count);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
     
     glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
