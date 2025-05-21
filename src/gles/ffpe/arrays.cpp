@@ -14,6 +14,7 @@ void FFP::registerArrayFunctions() {
 
     REGISTER(glVertexPointer);
     REGISTER(glColorPointer);
+    REGISTER(glTexCoordPointer);
 
     FFPE::Rendering::Arrays::init();
 }
