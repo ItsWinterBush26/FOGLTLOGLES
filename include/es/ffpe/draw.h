@@ -16,25 +16,30 @@ inline const std::string arrayShaderVS = R"(#version 320 es
 
 layout(location = 0) in vec4 iVertexPosition;
 layout(location = 1) in vec4 iVertexColor;
+layout(location = 2) in vec4 iVertexTexCoord;
 
 out vec4 vertexColor;
+out vec4 vertexTexCoord;
 
 void main() {
     gl_Position = iVertexPosition;
+    
     vertexColor = iVertexColor;
+    vertexTexCoord = iVertexTexCoord;
 })";
 
 inline const std::string arrayShaderFS = R"(#version 320 es
 precision mediump float;
 
 in vec4 vertexColor;
+in vec4 vertexTexCoord;
 
 out vec4 fragColor;
 
 uniform sampler2D texture0;
 
 void main() {
-    fragColor = texture(texture0, vec2(0.0f, 0.0f)) * vertexColor;
+    fragColor = texture(texture0, vertexTexCoord) * vertexColor;
 })";
 
 inline GLuint renderingProgram;

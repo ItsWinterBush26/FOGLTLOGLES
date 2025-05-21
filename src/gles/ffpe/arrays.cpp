@@ -29,8 +29,18 @@ void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointe
 }
 
 void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
-    Lists::displayListManager->addCommand<glVertexPointer>(size, type, stride, pointer);
+    Lists::displayListManager->addCommand<glColorPointer>(size, type, stride, pointer);
     FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY)->parameters = {
+        trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer != 0,
+        size, type,
+        stride ? stride : size * ESUtils::TypeTraits::getTypeSize(type),
+        pointer
+    };
+}
+
+void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
+    Lists::displayListManager->addCommand<glTexCoordPointer>(size, type, stride, pointer);
+    FFPE::States::ClientState::Arrays::getArray(GL_TEXTURE_COORD_ARRAY)->parameters = {
         trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer != 0,
         size, type,
         stride ? stride : size * ESUtils::TypeTraits::getTypeSize(type),

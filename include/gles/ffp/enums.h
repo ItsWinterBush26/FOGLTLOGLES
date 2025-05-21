@@ -9,6 +9,7 @@ typedef double GLdouble;
 
 // arrays
 #define GL_COLOR_ARRAY 0x8076
+#define GL_TEXTURE_COORD_ARRAY 0x8078
 
 // alpha
 #define GL_ALPHA_TEST 0xbc0

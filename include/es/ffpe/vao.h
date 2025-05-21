@@ -1,12 +1,12 @@
 #pragma once
 
+#include "gles/ffp/enums.h"
 #define GLM_ENABLE_EXPERIMENTAL
 
 #include "es/binding_saver.h"
 #include "es/ffp.h"
 #include "es/state_tracking.h"
 #include "es/utils.h"
-#include "glm/ext/vector_float4.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/string_cast.hpp"
 #include "utils/span.h"
@@ -66,6 +66,14 @@ inline void putVertexDataInternal(GLenum arrayType, GLsizei dataSize, const T* s
                     srcOffset,
                     tcb::span(src + srcOffset, dataSize),
                     &dst[i].color
+                );
+            break;
+
+            case GL_TEXTURE_COORD_ARRAY:
+                fillDataComponents(
+                    srcOffset,
+                    tcb::span(src + srcOffset, dataSize),
+                    &dst[i].texCoord
                 );
             break;
         }
@@ -130,7 +138,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
     
     LOGI("vertices!");
     auto vertexArray = FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
-    if (vertexArray && vertexArray->enabled) {
+    if (vertexArray->enabled) {
         glEnableVertexAttribArray(0);
         
         if (vertexArray->parameters.buffered) {
@@ -158,7 +166,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
     LOGI("colors!");
     auto colorArray = FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
     glEnableVertexAttribArray(1);
-    if (colorArray && colorArray->enabled) {
+    if (colorArray->enabled) {
         if (colorArray->parameters.buffered) {
             LOGI("buffered!");
             glVertexAttribPointer(
@@ -183,27 +191,36 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
         glVertexAttrib4fv(1, glm::value_ptr(
             FFPE::States::VertexData::color
         ));
-        /* if (trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer == 0) {
-            LOGI("not buffered!");
-            for (GLsizei i = 0; i < count; ++i) {
-                vertices[i].color = FFPE::States::VertexData::color;
-            }
-            
+    }
+
+    LOGI("texcoords!");
+    auto texCoordArray = FFPE::States::ClientState::Arrays::getArray(GL_TEXTURE_COORD_ARRAY);
+    glEnableVertexAttribArray(2);
+    if (texCoordArray->enabled) {
+        if (texCoordArray->parameters.buffered) {
+            LOGI("buffered!");
             glVertexAttribPointer(
-                1,
-                decltype(VertexData::color)::length(),
-                ESUtils::TypeTraits::GLTypeEnum<
-                    decltype(VertexData::color)::value_type
-                >::value, GL_FALSE,
-                sizeof(VertexData), (void*) offsetof(VertexData, color)
+                2,
+                texCoordArray->parameters.size, texCoordArray->parameters.type,
+                GL_FALSE,
+                texCoordArray->parameters.stride,
+                texCoordArray->parameters.firstElement
             );
         } else {
-            LOGI("buffered!");
-            glDisableVertexAttribArray(1);
-            glVertexAttrib4fv(1, glm::value_ptr(
-                FFPE::States::VertexData::color
-            ));
-        } */
+            LOGI("not buffered!");
+            putVertexData(GL_TEXTURE_COORD_ARRAY, vertices, texCoordArray);
+            glVertexAttribPointer(
+                2, decltype(VertexData::texCoord)::length(),
+                texCoordArray->parameters.type, GL_FALSE,
+                sizeof(VertexData), (void*) offsetof(VertexData, texCoord)
+            );
+        }
+    } else {
+        LOGI("using global texCoord state!");
+        glDisableVertexAttribArray(2);
+        glVertexAttrib4fv(2, glm::value_ptr(
+            FFPE::States::VertexData::texCoord
+        ));
     }
 
     if (vertices) glUnmapBuffer(GL_ARRAY_BUFFER);

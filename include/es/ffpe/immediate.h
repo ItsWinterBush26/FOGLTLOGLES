@@ -6,6 +6,7 @@
 #include "es/utils.h"
 #include "gles/draw_overrides.h"
 #include "gles/ffp/arrays.h"
+#include "gles/ffp/enums.h"
 #include "gles20/buffer_tracking.h"
 #include "utils/log.h"
 
@@ -42,7 +43,8 @@ inline void advance() {
     LOGI("glVertex*()! advancing!");
     States::vertices.push_back({
         FFPE::States::VertexData::position,
-        FFPE::States::VertexData::color
+        FFPE::States::VertexData::color,
+        FFPE::States::VertexData::texCoord
     });
 }
 
@@ -86,6 +88,19 @@ inline void end() {
         >::value,
         0, (void*) offsetof(
             FFPE::States::VertexData::VertexRepresentation, color
+        )
+    );
+
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glTexCoordPointer(
+        decltype(FFPE::States::VertexData::VertexRepresentation::texCoord)::length(),
+        ESUtils::TypeTraits::GLTypeEnum<
+            decltype(
+                FFPE::States::VertexData::VertexRepresentation::texCoord
+            )::value_type
+        >::value,
+        0, (void*) offsetof(
+            FFPE::States::VertexData::VertexRepresentation, texCoord
         )
     );
 
