@@ -125,11 +125,15 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
 
     glBindVertexArray(vao);
 
+    LOGI("vertexattribs!");
+    
+    LOGI("vertices!");
     auto vertexArray = FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
     if (vertexArray->enabled) {
         glEnableVertexAttribArray(0);
         
         if (vertexArray->parameters.buffered) {
+            LOGI("buffered!");
             glVertexAttribPointer(
                 0,
                 vertexArray->parameters.size, vertexArray->parameters.type,
@@ -138,6 +142,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                 vertexArray->parameters.firstElement
             );
         } else {
+            LOGI("not buffered!");
             putVertexData(GL_VERTEX_ARRAY, vertices, vertexArray);
             glVertexAttribPointer(
                 0, decltype(VertexData::position)::length(),
@@ -146,11 +151,13 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
             );
         }
     }
-    
+
+    LOGI("colors!");
     auto colorArray = FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
     glEnableVertexAttribArray(1);
     if (colorArray->enabled) {
         if (colorArray->parameters.buffered) {
+            LOGI("buffered!");
             glVertexAttribPointer(
                 1,
                 colorArray->parameters.size, colorArray->parameters.type,
@@ -159,6 +166,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                 colorArray->parameters.firstElement
             );
         } else {
+            LOGI("not buffered!");
             putVertexData(GL_COLOR_ARRAY, vertices, colorArray);
             glVertexAttribPointer(
                 1, decltype(VertexData::color)::length(),
