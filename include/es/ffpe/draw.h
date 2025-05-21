@@ -146,7 +146,7 @@ inline void handleQuads(GLint first, GLuint count) {
     
     count = generateEAB_CPU(first, count);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
-
+    
     glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 }
 
