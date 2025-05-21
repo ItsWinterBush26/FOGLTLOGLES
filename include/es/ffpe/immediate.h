@@ -28,7 +28,7 @@ inline void init() {
 }
 
 inline void begin(GLenum primitive) {
-    if (primitive != GL_NONE) {
+    if (States::primitive != GL_NONE) {
         LOGW("glBegin has not been ended yet!");
         return;
     }
@@ -46,6 +46,11 @@ inline void advance() {
 }
 
 inline void end() {
+    if (States::primitive == GL_NONE) {
+        LOGI("glBegin has not been called yet!");
+        return;
+    }
+
     LOGI("glEnd()!");
 
     SaveBoundedBuffer sbb(GL_ARRAY_BUFFER);
