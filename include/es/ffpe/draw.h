@@ -92,7 +92,7 @@ inline void init() {
 }
 
 inline GLuint generateEAB(GLuint count) {
-    GLuint quadCount = n / 4;
+    GLuint quadCount = count / 4;
     GLuint eabCount = quadCount * 6;
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, indicesOutputBuffer);
     glBufferData(
