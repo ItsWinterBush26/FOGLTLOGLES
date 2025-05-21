@@ -33,7 +33,7 @@ namespace VertexData {
     template<typename VT, typename CT>
     inline void set(CT val, VT* dst) {
         static_assert(
-            decltype(val)::lenght() <= std::remove_reference_t<decltype(*dst)>::length(),
+            decltype(val)::length() <= std::remove_reference_t<decltype(*dst)>::length(),
             "'src' components must only be less than or equals of 'dst' components"
         );
         for (size_t i = 0; i < decltype(val)::length(); ++i) (*dst)[i] = val[i];
