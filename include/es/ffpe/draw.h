@@ -32,8 +32,10 @@ in vec4 vertexColor;
 
 out vec4 fragColor;
 
+uniform sampler2D texture0;
+
 void main() {
-    fragColor = vertexColor;
+    fragColor = texture(texture0, vec2(0.0f, 0.0f)) * vertexColor;
 })";
 
 inline GLuint renderingProgram;
