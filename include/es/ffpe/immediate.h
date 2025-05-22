@@ -1,13 +1,10 @@
 #pragma once
 
-
-#include "es/binding_saver.h"
 #include "es/ffp.h"
 #include "es/utils.h"
 #include "gles/draw_overrides.h"
 #include "gles/ffp/arrays.h"
 #include "gles/ffp/enums.h"
-#include "gles20/buffer_tracking.h"
 #include "utils/log.h"
 
 #include <GLES3/gl32.h>
@@ -19,15 +16,25 @@ namespace FFPE::Rendering::ImmediateMode {
 namespace States {
     inline GLenum primitive;
 
-    inline std::vector<FFPE::States::VertexData::VertexRepresentation> vertices;
+    inline std::vector<decltype(
+        FFPE::States::VertexData::VertexRepresentation::position
+    )> vertexPositions;
+
+    inline std::vector<decltype(
+        FFPE::States::VertexData::VertexRepresentation::color
+    )> vertexColors;
+
+    inline std::vector<decltype(
+        FFPE::States::VertexData::VertexRepresentation::texCoord
+    )> vertexTexCoords;
 }
 
-inline GLuint vbo;
+// inine GLuint vbo;
 
 inline void init() {
-    glGenBuffers(1, &vbo);
+    // glGenBuffers(1, &vbo);
 
-    LOGI("immediate mode buffer = %u", vbo);
+    // LOGI("immediate mode buffer = %u", vbo);
 }
 
 inline void begin(GLenum primitive) {
@@ -43,11 +50,17 @@ inline void begin(GLenum primitive) {
 
 inline void advance() {
     LOGI("glVertex*()! advancing!");
-    States::vertices.push_back({
-        FFPE::States::VertexData::position,
-        FFPE::States::VertexData::color,
+    States::vertexPositions.push_back(
+        FFPE::States::VertexData::position
+    );
+
+    States::vertexColors.push_back(
+        FFPE::States::VertexData::color
+    );
+
+    States::vertexTexCoords.push_back(
         FFPE::States::VertexData::texCoord
-    });
+    );
 }
 
 inline void end() {
@@ -58,20 +71,11 @@ inline void end() {
 
     LOGI("glEnd()!");
 
-    if (States::vertices.size() == 0) {
+    if ((States::vertexPositions.size()) == 0) {
         LOGW("glEnd called with no vertices??");
         LOGW("Ignoring!!");
         return;
     }
-
-    SaveBoundedBuffer sbb(GL_ARRAY_BUFFER);
-    OV_glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(
-        GL_ARRAY_BUFFER,
-        States::vertices.size() * sizeof(FFPE::States::VertexData::VertexRepresentation),
-        States::vertices.data(),
-        GL_STATIC_DRAW
-    );
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(
@@ -80,12 +84,8 @@ inline void end() {
             decltype(
                 FFPE::States::VertexData::VertexRepresentation::position
             )::value_type
-        >::value,
-        sizeof(
-            FFPE::States::VertexData::VertexRepresentation
-        ), (void*) offsetof(
-            FFPE::States::VertexData::VertexRepresentation, position
-        )
+        >::value, 0,
+        (void*) States::vertexPositions.data()
     );
 
     glEnableClientState(GL_COLOR_ARRAY);
@@ -95,13 +95,8 @@ inline void end() {
             decltype(
                 FFPE::States::VertexData::VertexRepresentation::color
             )::value_type
-        >::value,
-        sizeof(
-            FFPE::States::VertexData::VertexRepresentation
-        ),
-        (void*) offsetof(
-            FFPE::States::VertexData::VertexRepresentation, color
-        )
+        >::value, 0,
+        (void*) States::vertexColors.data()
     );
 
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -111,23 +106,20 @@ inline void end() {
             decltype(
                 FFPE::States::VertexData::VertexRepresentation::texCoord
             )::value_type
-        >::value,
-        sizeof(
-            FFPE::States::VertexData::VertexRepresentation
-        ),
-        (void*) offsetof(
-            FFPE::States::VertexData::VertexRepresentation, texCoord
-        )
+        >::value, 0,
+        (void*) States::vertexTexCoords.data()
     );
 
     Lists::displayListManager->ignoreNextCall();
-    OV_glDrawArrays(States::primitive, 0, States::vertices.size());
+    OV_glDrawArrays(States::primitive, 0, States::vertexPositions.size());
 
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
 
     States::primitive = GL_NONE;
-    States::vertices.clear();
+    States::vertexPositions.clear();
+    States::vertexColors.clear();
+    States::vertexTexCoords.clear();
 
     LOGI("glEnd() [END]!");
 }
