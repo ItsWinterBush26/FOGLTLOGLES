@@ -20,7 +20,7 @@ void FFP::registerArrayFunctions() {
 }
 
 void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
-    Lists::displayListManager->addCommand<glVertexPointer>(size, type, stride, pointer);
+    // Lists::displayListManager->addCommand<glVertexPointer>(size, type, stride, pointer);
     FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY)->parameters = {
         trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer != 0,
         size, type,
@@ -30,7 +30,7 @@ void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointe
 }
 
 void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
-    Lists::displayListManager->addCommand<glColorPointer>(size, type, stride, pointer);
+    // Lists::displayListManager->addCommand<glColorPointer>(size, type, stride, pointer);
     FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY)->parameters = {
         trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer != 0,
         size, type,
@@ -40,7 +40,7 @@ void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer
 }
 
 void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
-    Lists::displayListManager->addCommand<glTexCoordPointer>(size, type, stride, pointer);
+    // Lists::displayListManager->addCommand<glTexCoordPointer>(size, type, stride, pointer);
     FFPE::States::ClientState::Arrays::getArray(GL_TEXTURE_COORD_ARRAY)->parameters = {
         trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer != 0,
         size, type,
@@ -50,12 +50,12 @@ void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void* poin
 }
 
 void glEnableClientState(GLenum array) {
-    Lists::displayListManager->addCommand<glEnableClientState>(array);
+    // Lists::displayListManager->addCommand<glEnableClientState>(array);
     FFPE::States::ClientState::Arrays::getArray(array)->enabled = true;
 }
 
 void glDisableClientState(GLenum array) {
-    Lists::displayListManager->addCommand<glDisableClientState>(array);
+    // Lists::displayListManager->addCommand<glDisableClientState>(array);
     FFPE::States::ClientState::Arrays::getArray(array)->enabled = false;
 }
 
