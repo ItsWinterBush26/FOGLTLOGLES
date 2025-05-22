@@ -123,6 +123,7 @@ void OV_glDisable(GLenum cap) {
     switch (cap) {
         case GL_ALPHA_TEST:
         case GL_TEXTURE_2D:
+        case GL_COLOR_MATERIAL:
             break;
     
         default:
