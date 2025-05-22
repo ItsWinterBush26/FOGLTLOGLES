@@ -155,7 +155,9 @@ inline void handleQuads(GLint first, GLuint count) {
     LOGI("quads!");
     GLuint realCount = generateEAB_CPU(count);
 
+    SaveUsedProgram sup;
     glUseProgram(renderingProgram);
+    
     auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
 
     SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);

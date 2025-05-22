@@ -41,17 +41,16 @@ inline void resizeVAB(GLsizei count) {
 }
 
 template<typename T1, typename T2>
-inline void fillDataComponents(GLsizei& offsetTracker, tcb::span<const T1> src, T2* dst) {
+inline void fillDataComponents(GLuint& offsetTracker, tcb::span<const T1> src, T2* dst) {
     for (size_t i = 0; i < src.size(); i++) (*dst)[i] = src[i];
     offsetTracker += src.size();
 }
 
 template<typename T>
-inline void putVertexDataInternal(GLenum arrayType, GLsizei dataSize, const T* src, VertexData* dst) {
-    GLsizei verticesCount = currentVABSize / sizeof(VertexData);
-    GLsizei srcOffset = 0;
+inline void putVertexDataInternal(GLenum arrayType, GLsizei dataSize, GLuint verticesCount, const T* src, VertexData* dst) {
+    GLuint srcOffset = 0;
 
-    for (GLsizei i = 0; i < verticesCount; ++i) {
+    for (GLuint i = 0; i < verticesCount; ++i) {
         switch (arrayType) {
             case GL_VERTEX_ARRAY:
                 fillDataComponents(
@@ -82,13 +81,13 @@ inline void putVertexDataInternal(GLenum arrayType, GLsizei dataSize, const T* s
 
 
 
-inline void putVertexData(GLenum arrayType, VertexData* vertices, FFPE::States::ClientState::Arrays::ArrayState* array) {
+inline void putVertexData(GLenum arrayType, FFPE::States::ClientState::Arrays::ArrayState* array, VertexData* vertices, GLuint verticesCount) {
     LOGI("putVertexData : arrayType=%u", arrayType);
     
     switch (array->parameters.type) {
         case GL_SHORT:
             putVertexDataInternal(
-                arrayType, array->parameters.size,
+                arrayType, array->parameters.size, verticesCount,
                 ESUtils::TypeTraits::asTypedArray<GLshort>(
                     array->parameters.firstElement
                 ),
@@ -98,7 +97,7 @@ inline void putVertexData(GLenum arrayType, VertexData* vertices, FFPE::States::
     
         case GL_FLOAT:
             putVertexDataInternal(
-                arrayType, array->parameters.size,
+                arrayType, array->parameters.size, verticesCount,
                 ESUtils::TypeTraits::asTypedArray<GLfloat>(
                     array->parameters.firstElement
                 ),
@@ -116,7 +115,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
 
     VertexData* vertices = nullptr;
     if (trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer == 0) {
-        LOGI("not buffered!");
+        LOGI("not buffered! setup our own vab");
         sbb = std::make_unique<SaveBoundedBuffer>(GL_ARRAY_BUFFER);
 
         glBindBuffer(GL_ARRAY_BUFFER, vab);
@@ -152,7 +151,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
             );
         } else {
             LOGI("not buffered!");
-            putVertexData(GL_VERTEX_ARRAY, vertices, vertexArray);
+            putVertexData(GL_VERTEX_ARRAY, vertexArray, vertices, count);
             glVertexAttribPointer(
                 0, decltype(VertexData::position)::length(),
                 vertexArray->parameters.type, GL_FALSE,
@@ -178,7 +177,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
             );
         } else {
             LOGI("not buffered!");
-            putVertexData(GL_COLOR_ARRAY, vertices, colorArray);
+            putVertexData(GL_COLOR_ARRAY, colorArray, vertices, count);
             glVertexAttribPointer(
                 1, decltype(VertexData::color)::length(),
                 colorArray->parameters.type, GL_FALSE,
@@ -208,7 +207,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
             );
         } else {
             LOGI("not buffered!");
-            putVertexData(GL_TEXTURE_COORD_ARRAY, vertices, texCoordArray);
+            putVertexData(GL_TEXTURE_COORD_ARRAY, texCoordArray, vertices, count);
             glVertexAttribPointer(
                 2, decltype(VertexData::texCoord)::length(),
                 texCoordArray->parameters.type, GL_FALSE,
