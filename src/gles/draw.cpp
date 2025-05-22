@@ -12,6 +12,8 @@ void GLES::registerDrawOverride() {
 }
 
 void OV_glDrawArrays(GLenum mode, GLint first, GLsizei count) {
+    if (count <= 0) return;
+    
     if (debugEnabled) LOGI("OV_glDrawArrays : mode=%u", mode);
     Lists::displayListManager->addCommand<OV_glDrawArrays>(mode, first, count);
 
