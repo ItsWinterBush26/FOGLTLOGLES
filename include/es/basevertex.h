@@ -66,7 +66,6 @@ inline GLuint getTypeByteSize(GLenum type) {
         default: return 0;
     }
 }
-*/
 
 struct MDElementsBaseVertexBatcher {
     GLuint computeProgram;
