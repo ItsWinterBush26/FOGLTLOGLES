@@ -80,7 +80,6 @@ inline GLuint indicesOutputBuffer;
 inline GLuint numQuadsUniLoc;
 
 inline void init() {
-    glGenBuffers(1, &countInputBuffer);
     glGenBuffers(1, &indicesOutputBuffer);
 
     GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
