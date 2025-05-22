@@ -79,7 +79,9 @@ inline void end() {
                 FFPE::States::VertexData::VertexRepresentation::position
             )::value_type
         >::value,
-        0, (void*) offsetof(
+        sizeof(
+            FFPE::States::VertexData::VertexRepresentation
+        ), (void*) offsetof(
             FFPE::States::VertexData::VertexRepresentation, position
         )
     );
@@ -92,7 +94,10 @@ inline void end() {
                 FFPE::States::VertexData::VertexRepresentation::color
             )::value_type
         >::value,
-        0, (void*) offsetof(
+        sizeof(
+            FFPE::States::VertexData::VertexRepresentation
+        ),
+        (void*) offsetof(
             FFPE::States::VertexData::VertexRepresentation, color
         )
     );
@@ -105,7 +110,10 @@ inline void end() {
                 FFPE::States::VertexData::VertexRepresentation::texCoord
             )::value_type
         >::value,
-        0, (void*) offsetof(
+        sizeof(
+            FFPE::States::VertexData::VertexRepresentation
+        ),
+        (void*) offsetof(
             FFPE::States::VertexData::VertexRepresentation, texCoord
         )
     );

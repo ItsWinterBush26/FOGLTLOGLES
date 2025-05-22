@@ -134,9 +134,11 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
     glBindVertexArray(vao);
 
     LOGI("vertexattribs!");
-    
-    LOGI("vertices!");
     auto vertexArray = FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
+    auto colorArray = FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
+    auto texCoordArray = FFPE::States::ClientState::Arrays::getArray(GL_TEXTURE_COORD_ARRAY);
+
+    LOGI("vertices!");
     if (vertexArray->enabled) {
         glEnableVertexAttribArray(0);
         
@@ -163,7 +165,6 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
     }
 
     LOGI("colors!");
-    auto colorArray = FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
     glEnableVertexAttribArray(1);
     if (colorArray->enabled) {
         if (colorArray->parameters.buffered) {
@@ -193,7 +194,6 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
     }
 
     LOGI("texcoords!");
-    auto texCoordArray = FFPE::States::ClientState::Arrays::getArray(GL_TEXTURE_COORD_ARRAY);
     glEnableVertexAttribArray(2);
     if (texCoordArray->enabled) {
         if (texCoordArray->parameters.buffered) {
