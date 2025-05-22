@@ -16,10 +16,7 @@ void FFP::registerImmediateFunctions() {
 }
 
 void glBegin(GLenum mode) {
-    if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<glBegin>(mode);
-        return;
-    }
+    Lists::displayListManager->addCommand<glBegin>(mode);
     
     switch (mode) {
         case GL_POINTS:
@@ -41,10 +38,6 @@ void glBegin(GLenum mode) {
 }
 
 void glEnd() {
-    if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<glEnd>();
-        return;
-    }
-
+    Lists::displayListManager->addCommand<glEnd>();
     FFPE::Rendering::ImmediateMode::end();
 }

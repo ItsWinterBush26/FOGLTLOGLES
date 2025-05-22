@@ -1,4 +1,5 @@
 #include "build_info.h"
+#include "es/ffp.h"
 #include "es/state_tracking.h"
 #include "es/utils.h"
 #include "gles/ffp/enums.h"
@@ -96,6 +97,7 @@ const GLubyte* OV_glGetStringi(GLenum pname, int index) {
 }
 
 void OV_glEnable(GLenum cap) {
+    Lists::displayListManager->addCommand<OV_glEnable>(cap);
     switch (cap) {
         case GL_ALPHA_TEST:
         case GL_TEXTURE_2D:
@@ -116,6 +118,7 @@ void OV_glEnable(GLenum cap) {
 }
 
 void OV_glDisable(GLenum cap) {
+    Lists::displayListManager->addCommand<OV_glDisable>(cap);
     switch (cap) {
         case GL_ALPHA_TEST:
         case GL_TEXTURE_2D:

@@ -104,6 +104,7 @@ inline void end() {
         )
     );
 
+    Lists::displayListManager->ignoreNextCall();
     OV_glDrawArrays(States::primitive, 0, States::vertices.size());
 
     glDisableClientState(GL_VERTEX_ARRAY);

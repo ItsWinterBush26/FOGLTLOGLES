@@ -12,11 +12,7 @@ void FFP::registerColorFunctions() {
 }
 
 void glColor4f(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) {
-    if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<glColor4f>(red, green, blue, alpha);
-        return;
-    }
-
+    Lists::displayListManager->addCommand<glColor4f>(red, green, blue, alpha);
     FFPE::States::VertexData::set(
         glm::vec4(red, green, blue, alpha),
         &FFPE::States::VertexData::color

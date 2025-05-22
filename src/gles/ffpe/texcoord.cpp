@@ -11,10 +11,7 @@ void FFP::registerTexCoordFunctions() {
 }
 
 void glTexCoord2f(GLfloat s, GLfloat t) {
-    if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<glTexCoord2f>(s, t);
-        return;
-    }
+    Lists::displayListManager->addCommand<glTexCoord2f>(s, t);
 
     FFPE::States::ClientState::texCoordTextureUnits.insert({
         FFPE::States::ClientState::currentTexCoordTextureUnit

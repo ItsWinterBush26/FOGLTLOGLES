@@ -19,4 +19,5 @@ namespace GLES {
     void registerTranslatedFunctions();
     void registerNoErrorOverride();
     void registerDrawOverride();
+    void registerTexturesOverride();
 }

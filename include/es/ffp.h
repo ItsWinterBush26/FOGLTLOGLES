@@ -177,6 +177,8 @@ private:
     bool isExecuting;
     bool isCallBatched;
 
+    bool ignoreNextCallFlag;
+
     FAST_MAP_BI(GLuint, const DisplayList) displayLists;
 
     GLuint activeDisplayListIndex;
@@ -207,10 +209,19 @@ public:
         activeDisplayList.setMode(mode);
     }
 
+    void ignoreNextCall() {
+        if (activeDisplayListIndex == 0) return;
+        ignoreNextCallFlag = true;
+    }
+
     template<auto F, typename... Args>
     void addCommand(Args&&... args) {
         static_assert(std::is_invocable_v<decltype(F), Args...>, "addCommand<...>(args...) must match the function signature");
         if (activeDisplayListIndex == 0) return;
+        if (ignoreNextCallFlag) {
+            ignoreNextCallFlag = false;
+            return;
+        }
         
         activeDisplayList.addCommand(
             [a = std::make_tuple(std::forward<Args>(args)...)]() mutable {
