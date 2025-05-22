@@ -31,8 +31,7 @@ inline void init() {
 
 inline void resizeVAB(GLsizei count) {
     currentVABSize = count * sizeof(VertexData);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vab);
+    
     glBufferData(
         GL_ARRAY_BUFFER,
         currentVABSize,
