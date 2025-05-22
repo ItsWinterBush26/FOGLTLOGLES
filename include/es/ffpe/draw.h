@@ -138,7 +138,6 @@ inline GLuint generateEAB_CPU(GLuint n) {
         indices[i * 6 + 5] = base_index + 0;
     }
 
-    SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
@@ -153,18 +152,15 @@ inline GLuint generateEAB_CPU(GLuint n) {
 inline void handleQuads(GLint first, GLuint count) {
     // no checks because GL_QUADS has been deprecated and is only used by old apps (guaranteed to be FFP)
     LOGI("quads!");
-    GLuint realCount = generateEAB_CPU(count);
-
     SaveUsedProgram sup;
+    SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
+    
     glUseProgram(renderingProgram);
     
     auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
+    GLuint realCount = generateEAB_CPU(count);
 
-    SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
-    
     glDrawElements(GL_TRIANGLES, realCount, GL_UNSIGNED_INT, nullptr);
-
     LOGI("done! drawElements (for quads)");
 }
 
