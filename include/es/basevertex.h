@@ -2,6 +2,7 @@
 
 #include "es/binding_saver.h"
 #include "gles20/shader_overrides.h"
+#include "utils/log.h"
 
 #include <GLES3/gl32.h>
 #include <memory>
