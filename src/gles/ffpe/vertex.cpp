@@ -1,11 +1,10 @@
 #include "es/ffp.h"
+#include "gles/ffp/enums.h"
 #include "gles/ffp/main.h"
 #include "glm/ext/vector_float4.hpp"
 #include "main.h"
 
 #include <GLES3/gl32.h>
-
-typedef double GLdouble;
 
 #pragma region Vertex Short Declarations
 void glVertex2s(GLshort x, GLshort y);
@@ -144,6 +143,7 @@ void glVertex2f(GLfloat x, GLfloat y) {
         glm::vec2(x, y),
         &FFPE::States::VertexData::position
     );
+    FFPE::Rendering::ImmediateMode::advance();
 }
 
 void glVertex3f(GLfloat x, GLfloat y, GLfloat z) {
@@ -152,6 +152,7 @@ void glVertex3f(GLfloat x, GLfloat y, GLfloat z) {
         glm::vec3(x, y, z),
         &FFPE::States::VertexData::position
     );
+    FFPE::Rendering::ImmediateMode::advance();
 }
 
 void glVertex4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w) {
@@ -160,6 +161,7 @@ void glVertex4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w) {
         glm::vec4(x, y, z, w),
         &FFPE::States::VertexData::position
     );
+    FFPE::Rendering::ImmediateMode::advance();
 }
 
 void glVertex2fv(const GLfloat *v) {
