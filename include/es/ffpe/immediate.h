@@ -30,7 +30,7 @@ inline void init() {
 
 inline void begin(GLenum primitive) {
     if (States::primitive != GL_NONE) {
-        LOGW("glBegin has not been ended yet!");
+        LOGE("glBegin has not been ended yet!");
         return;
     }
 
@@ -50,11 +50,17 @@ inline void advance() {
 
 inline void end() {
     if (States::primitive == GL_NONE) {
-        LOGI("glBegin has not been called yet!");
+        LOGE("glEnd has not been called yet!");
         return;
     }
 
     LOGI("glEnd()!");
+
+    if (States::vertices.size() == 0) {
+        LOGW("glEnd called with no vertices??");
+        LOGW("Ignoring!!");
+        return;
+    }
 
     SaveBoundedBuffer sbb(GL_ARRAY_BUFFER);
     OV_glBindBuffer(GL_ARRAY_BUFFER, vbo);
