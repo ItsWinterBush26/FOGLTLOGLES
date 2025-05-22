@@ -1,6 +1,7 @@
 #pragma once
 
 #include "es/binding_saver.h"
+#include "es/ffpe/uniforms.h"
 #include "es/ffpe/vao.h"
 #include "gles20/shader_overrides.h"
 
@@ -21,8 +22,10 @@ layout(location = 2) in vec4 iVertexTexCoord;
 out vec4 vertexColor;
 out vec4 vertexTexCoord;
 
+uniform mat4 uModelViewProjection;
+
 void main() {
-    gl_Position = iVertexPosition;
+    gl_Position = iVertexPosition * uModelViewProjection;
     
     vertexColor = iVertexColor;
     vertexTexCoord = iVertexTexCoord;
@@ -36,11 +39,10 @@ in vec4 vertexTexCoord;
 
 out vec4 fragColor;
 
-// uniform sampler2D texture0;
+uniform sampler2D texture0;
 
 void main() {
-    // texture(texture0, vertexTexCoord.st) * 
-    fragColor = vertexColor;
+    fragColor = texture(texture0, vertexTexCoord.st) * vertexColor;
 })";
 
 inline GLuint renderingProgram;
@@ -157,6 +159,7 @@ inline void handleQuads(GLint first, GLuint count) {
     SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
     
     glUseProgram(renderingProgram);
+    FFPE::Rendering::Uniforms::setupUniformsForRendering(renderingProgram);
     
     auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
     GLuint realCount = generateEAB_CPU(count);
@@ -194,11 +197,12 @@ inline void init() {
 
 inline void drawArrays(GLenum mode, GLint first, GLuint count) {
     if (trackedStates->currentlyUsedProgram == 0) {
+        // immediately assume FFP
         SaveUsedProgram sup;
 
         glUseProgram(renderingProgram);
+        FFPE::Rendering::Uniforms::setupUniformsForRendering(renderingProgram);
 
-        // immediately assume we can do VAO's
         auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
         
         glDrawArrays(mode, first, count);

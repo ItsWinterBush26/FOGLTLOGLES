@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdint>
+#include <unordered_map>
 
 template<typename K>
 class FastHasher {
@@ -14,3 +14,6 @@ public:
 
 // Keys should be builtins only!
 #define FAST_MAP_BI(key, value) std::unordered_map<key, value, FastHasher<key>>
+
+template <typename Key, typename Value>
+using FastMapBI = std::unordered_map<Key, Value, FastHasher<Key>>;

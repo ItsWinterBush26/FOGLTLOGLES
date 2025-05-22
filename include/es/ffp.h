@@ -138,6 +138,10 @@ public:
     const MatrixState getCurrentMatrix() {
         return *this->currentMatrix;
     }
+
+    const glm::mat4 getModelViewProjection() {
+        return getMatrix(GL_MODELVIEW).matrix * getMatrix(GL_PROJECTION).matrix;
+    }
 };
 
 inline std::shared_ptr<MatricesStateManager> matricesStateManager;
