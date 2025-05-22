@@ -36,10 +36,11 @@ in vec4 vertexTexCoord;
 
 out vec4 fragColor;
 
-uniform sampler2D texture0;
+// uniform sampler2D texture0;
 
 void main() {
-    fragColor = texture(texture0, vertexTexCoord.st) * vertexColor;
+    // texture(texture0, vertexTexCoord.st) * 
+    fragColor = vertexColor;
 })";
 
 inline GLuint renderingProgram;
