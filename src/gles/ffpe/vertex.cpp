@@ -1,4 +1,5 @@
 #include "es/ffp.h"
+#include "es/ffpe/immediate.h"
 #include "gles/ffp/enums.h"
 #include "gles/ffp/main.h"
 #include "glm/ext/vector_float4.hpp"
