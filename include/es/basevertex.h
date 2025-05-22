@@ -114,7 +114,7 @@ struct MDElementsBaseVertexBatcher {
         GLsizei drawcount,
         const GLint* basevertex
     ) {
-        // const size_t elemSize = sizeof(GLuint); /* getTypeByteSize(type); */
+        const size_t elemSize = sizeof(GLuint); /* getTypeByteSize(type); */
         if (drawcount <= 0 /* || elemSize != 4 */) return; // force GL_UINT support for now
 
         /* if (!computeReady || drawcount < 1024) {
