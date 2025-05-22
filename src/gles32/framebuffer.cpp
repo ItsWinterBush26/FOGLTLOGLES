@@ -28,7 +28,7 @@ void GLES32::registerFramebufferOverrides() {
     REGISTEROV(glDrawBuffers);
 
     REGISTEROV(glClearBufferfv);
-    REGISTEROV(glClearBufferiv)
+    REGISTEROV(glClearBufferiv);
     REGISTEROV(glClearBufferuiv);
 
     REGISTEROV(glFramebufferTexture2D);

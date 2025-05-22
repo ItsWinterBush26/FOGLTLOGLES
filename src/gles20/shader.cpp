@@ -13,7 +13,7 @@
 
 void GLES20::registerShaderOverrides() {
     REGISTEROV(glShaderSource);
-    REGISTEROV(glCompileShader)
+    REGISTEROV(glCompileShader);
     REGISTEROV(glLinkProgram);
     REGISTEROV(glUseProgram);
     REGISTEROV(glDeleteProgram);
