@@ -1,7 +1,10 @@
 #pragma once
 
 #include "es/state_tracking.h"
-#include "utils/log.h"
+#include "gles20/buffer_tracking.h"
+#include "gles20/framebuffer_tracking.h"
+#include "gles20/shader_overrides.h"
+#include "gles20/texture_tracking.h"
 
 #include <GLES2/gl2.h>
 
@@ -46,7 +49,7 @@ class SaveActiveTextureUnit : public Restorable {
 
 protected:
     void _internal_restore() override {
-        glActiveTexture(this->activeTextureUnit);
+        OV_glActiveTexture(this->activeTextureUnit);
     }
 };
 
@@ -64,7 +67,7 @@ struct SaveBoundedTexture : public Restorable  {
 
 protected:
     void _internal_restore() override {
-        glBindTexture(this->textureType, this->boundedTexture);
+        OV_glBindTexture(this->textureType, this->boundedTexture);
     }
 };
 
@@ -82,8 +85,8 @@ struct SaveBoundedBuffer : public Restorable  {
 
 protected:
     void _internal_restore() override {
-        glBindBuffer(this->bufferType, this->boundedBuffer);
-        LOGI("bufres: type=%u", this->bufferType);
+        OV_glBindBuffer(this->bufferType, this->boundedBuffer);
+        // LOGI("bufres: type=%u", this->bufferType);
     }
 };
 
@@ -110,7 +113,7 @@ struct SaveBoundedFramebuffer : public Restorable  {
 
 protected:
     void _internal_restore() override {
-        glBindFramebuffer(this->framebufferType, this->boundedFramebuffer);
+        OV_glBindFramebuffer(this->framebufferType, this->boundedFramebuffer);
     }
 };
 
@@ -128,6 +131,6 @@ struct SaveUsedProgram : public Restorable {
 protected:
     void _internal_restore() override {
         // LOGI("restore program! current=%u previous=%u", trackedStates->currentlyUsedProgram, this->activeProgram);
-        glUseProgram(this->activeProgram);
+        OV_glUseProgram(this->activeProgram);
     }
 };
