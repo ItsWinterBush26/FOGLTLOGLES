@@ -128,7 +128,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
             currentVABSize, GL_MAP_WRITE_BIT
         );
     } else {
-        LOGI("buffered!");
+        LOGI("buffered! buffer=%u", trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer);
     }
 
     glBindVertexArray(vao);

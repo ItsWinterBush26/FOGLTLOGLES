@@ -26,6 +26,8 @@ inline GLuint vbo;
 
 inline void init() {
     glGenBuffers(1, &vbo);
+
+    LOGI("immediate mode buffer = %u", vbo);
 }
 
 inline void begin(GLenum primitive) {
