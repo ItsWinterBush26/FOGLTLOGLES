@@ -19,11 +19,11 @@ namespace FOGLTLOGLES {
 #endif
 
 #ifndef REGISTEROV
-#define REGISTEROV(func) FOGLTLOGLES::registerFunction(#func, TO_FUNCPTR(OV_##func));
+#define REGISTEROV(func) FOGLTLOGLES::registerFunction(#func, TO_FUNCPTR(OV_##func))
 #endif
 
 #ifndef REGISTERREDIR
-#define REGISTERREDIR(name, target) FOGLTLOGLES::registerFunction(#name, TO_FUNCPTR(target));
+#define REGISTERREDIR(name, target) FOGLTLOGLES::registerFunction(#name, TO_FUNCPTR(target))
 #endif
 
 #ifndef GET_OVFUNC

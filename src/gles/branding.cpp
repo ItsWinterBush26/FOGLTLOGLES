@@ -41,7 +41,7 @@ void GLES::registerBrandingOverride() {
     REGISTEROV(glGetString);
     REGISTEROV(glGetIntegerv);
     REGISTEROV(glGetStringi);
-    REGISTEROV(glEnable)
+    REGISTEROV(glEnable);
     REGISTEROV(glDisable);
 }
 
@@ -101,6 +101,7 @@ void OV_glEnable(GLenum cap) {
     switch (cap) {
         case GL_ALPHA_TEST:
         case GL_TEXTURE_2D:
+        case GL_COLOR_MATERIAL:
             break;
 
         case GL_DEBUG_OUTPUT:
@@ -125,6 +126,7 @@ void OV_glDisable(GLenum cap) {
             break;
     
         default:
+            if (debugEnabled) LOGI("glDisable : cap=%u", cap);
             glDisable(cap);
             break;
     }

@@ -5,6 +5,11 @@ typedef double GLdouble;
 // types
 #define GL_DOUBLE 0x140a
 
+// States
+
+// color
+#define GL_COLOR_MATERIAL 0xb57
+
 // FFP
 
 // arrays
