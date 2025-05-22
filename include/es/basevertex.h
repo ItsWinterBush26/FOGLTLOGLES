@@ -13,7 +13,6 @@
 // Some of the code comes from:
 // https://github.com/MobileGL-Dev/MobileGlues/blob/8727ed43fde193ae595d73e84a8991ee771e43e7/src/main/cpp/gl/multidraw.cpp#L418
 
-/*
 inline const std::string COMPUTE_BATCHER_GLSL_BASE = R"(#version 310 es
 layout(local_size_x = 64) in;
 
@@ -70,7 +69,7 @@ inline GLuint getTypeByteSize(GLenum type) {
 */
 
 struct MDElementsBaseVertexBatcher {
-    /* GLuint computeProgram;
+    GLuint computeProgram;
 
     GLuint indicesSSBO;
     GLuint baseVerticesSSBO;
@@ -85,12 +84,12 @@ struct MDElementsBaseVertexBatcher {
         glDeleteBuffers(1, &baseVerticesSSBO);
         glDeleteBuffers(1, &prefixSSBO);
         glDeleteBuffers(1, &outputIndexSSBO);
-    } */
+    }
     
     void init() {
         LOGI("MDElementsBaseVertexBatcher init!");
 
-        /* computeProgram = glCreateProgram();
+        computeProgram = glCreateProgram();
         GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
         
         const GLchar* castedSource = COMPUTE_BATCHER_GLSL_BASE.c_str();
@@ -105,7 +104,7 @@ struct MDElementsBaseVertexBatcher {
         glGenBuffers(1, &indicesSSBO);
         glGenBuffers(1, &baseVerticesSSBO);
         glGenBuffers(1, &prefixSSBO);
-        glGenBuffers(1, &outputIndexSSBO); */
+        glGenBuffers(1, &outputIndexSSBO);
     }
 
     void batch(
@@ -119,16 +118,16 @@ struct MDElementsBaseVertexBatcher {
         // const size_t elemSize = sizeof(GLuint); /* getTypeByteSize(type); */
         if (drawcount <= 0 /* || elemSize != 4 */) return; // force GL_UINT support for now
 
-        // if (!computeReady || drawcount < 1024) {
+        /* if (!computeReady || drawcount < 1024) {
             for (GLint i = 0; i < drawcount; ++i) {
                 if (counts[i] > 0) glDrawElementsBaseVertex(mode, counts[i], type, indices[i], basevertex[i]);
             }
-        // }
+        } */
 
         // LOGI("batch begin! drawcount=%i", drawcount);
         // LOGI("prepare inputs and output of compute");
 
-        /* std::vector<GLuint> prefix(drawcount);
+        std::vector<GLuint> prefix(drawcount);
         std::inclusive_scan(
             counts, counts + drawcount,
             prefix.begin()
@@ -156,7 +155,7 @@ struct MDElementsBaseVertexBatcher {
         );
 
         GLuint total = prefix.back();
-        LOGI("prefix.back() = %u", total);
+        // LOGI("prefix.back() = %u", total);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, outputIndexSSBO);
         glBufferData(
             GL_SHADER_STORAGE_BUFFER,
@@ -189,7 +188,7 @@ struct MDElementsBaseVertexBatcher {
         glDispatchCompute((total + 63) / 64, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-        LOGI("restore states");
+        // LOGI("restore states");
 
         currentProgramSaver.restore();
         arrayBufferSaver.restore();
@@ -198,7 +197,7 @@ struct MDElementsBaseVertexBatcher {
         // LOGI("DRAW!");
         glDrawElements(mode, total, type, 0);
         
-        LOGI("done"); */
+        LOGI("done");
     }
 };
 
