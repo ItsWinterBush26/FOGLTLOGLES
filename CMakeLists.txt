@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.11)
 
 project(FOGLTLOGLES LANGUAGES C CXX)
 
-set(CMAKE_CXX_STANDARD 20)
-
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -43,26 +41,21 @@ endif()
 ######## DEPENDENCIES ########
 set(SHADERC_SKIP_EXAMPLES ON)
 set(SHADERC_SKIP_TESTS ON)
+## set(SHADERC_SKIP_INSTALL ON)
 set(SPIRV_SKIP_TESTS ON)
 set(SPIRV_CROSS_ENABLE_TESTS OFF)
 set(SPIRV_CROSS_ENABLE_HLSL OFF)
 set(SPIRV_CROSS_ENABLE_MSL OFF)
 set(SPIRV_CROSS_CLI OFF)
 set(SPIRV_CROSS_ENABLE_C_API OFF)
+set(SPIRV_CROSS_ENABLE_REFLECT OFF)
 set(GLSLANG_TESTS OFF)
 ## set(ENABLE_HLSL OFF) ## fails on libshaderc_util
 
 add_subdirectory(deps/shaderc) 
 add_subdirectory(deps/spirv-cross)
-
-include(FetchContent)
-
-FetchContent_Declare(
-	glm
-	GIT_REPOSITORY	https://github.com/g-truc/glm.git
-)
-
-FetchContent_MakeAvailable(glm)
+add_subdirectory(deps/glm)
+add_subdirectory(deps/fmt)
 
 ######## MAIN PROJECT ########
 set(COMMON_FLAGS
@@ -70,6 +63,8 @@ set(COMMON_FLAGS
     -Wextra
     -Wpedantic
     -pipe
+
+    -Wno-error=nan-infinity-disabled
 )
 
 set(RELEASE_FLAGS
@@ -171,7 +166,11 @@ set(DEPENDENCIES
 	-fopenmp
 	-static-openmp
 
+    # GLM
     glm::glm
+
+    # FMT
+    fmt::fmt
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_OPTIONS -fopenmp)

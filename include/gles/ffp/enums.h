@@ -19,6 +19,15 @@ typedef double GLdouble;
 // alpha
 #define GL_ALPHA_TEST 0xbc0
 
+#define GL_NEVER    0x0200
+#define GL_LESS     0x0201
+#define GL_EQUAL    0x0202
+#define GL_LEQUAL   0x0203
+#define GL_GREATER  0x0204
+#define GL_NOTEQUAL 0x0205
+#define GL_GEQUAL   0x0206
+#define GL_ALWAYS   0x0207
+
 // shading
 #define GL_SMOOTH 0x1d01
 

@@ -2,6 +2,7 @@
 
 #include "es/binding_saver.h"
 #include "es/ffpe/uniforms.h"
+#include "es/ffpe/shadergen.h"
 #include "es/ffpe/vao.h"
 #include "gles20/shader_overrides.h"
 
@@ -103,8 +104,8 @@ inline GLuint generateEAB_GPU(GLuint count) {
     LOGI("dispatch eab compute");
     GLuint quadCount = count / 4;
     GLuint eabCount = quadCount * 6;
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, indicesOutputBuffer);
-    glBufferData(
+    OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, indicesOutputBuffer);
+    OV_glBufferData(
         GL_SHADER_STORAGE_BUFFER,
         eabCount * sizeof(GLuint),
         nullptr,
@@ -141,8 +142,8 @@ inline GLuint generateEAB_CPU(GLuint n) {
         indices[i * 6 + 5] = base_index + 0;
     }
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
-    glBufferData(
+    OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
+    OV_glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
         num_indices * sizeof(GLuint),
         indices.data(),
@@ -158,7 +159,7 @@ inline void handleQuads(GLint first, GLuint count) {
     SaveUsedProgram sup;
     SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
     
-    glUseProgram(renderingProgram);
+    OV_glUseProgram(renderingProgram);
     FFPE::Rendering::Uniforms::setupUniformsForRendering(renderingProgram);
     
     auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
@@ -198,14 +199,14 @@ inline void init() {
 inline void drawArrays(GLenum mode, GLint first, GLuint count) {
     if (trackedStates->currentlyUsedProgram == 0) {
         // immediately assume FFP
-        SaveUsedProgram sup;
-
-        glUseProgram(renderingProgram);
+        OV_glUseProgram(renderingProgram);
         FFPE::Rendering::Uniforms::setupUniformsForRendering(renderingProgram);
 
         auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
         
         glDrawArrays(mode, first, count);
+
+        OV_glUseProgram(0);
         LOGI("done! drawArrays");
         return;
     }

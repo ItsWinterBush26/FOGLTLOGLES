@@ -19,6 +19,12 @@ typedef FFPE::States::VertexData::VertexRepresentation VertexData;
 
 namespace FFPE::Rendering::VAO {
 
+namespace AttributeLocations {
+    inline const GLuint POSITION_LOCATION = 0;
+    inline const GLuint COLOR_LOCATION = 1;
+    inline const GLuint TEX_COORD_LOCATION = 2;
+}
+
 inline GLuint vao;
 inline GLuint vab;
 
@@ -27,16 +33,6 @@ inline GLsizei currentVABSize;
 inline void init() {
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vab);
-}
-
-inline void resizeVAB(GLsizei count) {
-    currentVABSize = count * sizeof(VertexData);
-    
-    glBufferData(
-        GL_ARRAY_BUFFER,
-        currentVABSize,
-        nullptr, GL_STATIC_DRAW
-    );
 }
 
 template<typename T1, typename T2>
@@ -117,14 +113,22 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
         LOGI("not buffered! setup our own vab");
         sbb = std::make_unique<SaveBoundedBuffer>(GL_ARRAY_BUFFER);
 
-        glBindBuffer(GL_ARRAY_BUFFER, vab);
-        if ((count * sizeof(VertexData)) > (unsigned long) currentVABSize) {
-            resizeVAB(count);
-        }
+        OV_glBindBuffer(GL_ARRAY_BUFFER, vab);
+        GLsizei newVABSize = count * sizeof(VertexData);
+        // if (newVABSize > currentVABSize) {
+        // resize always
+            OV_glBufferData(
+                GL_ARRAY_BUFFER,
+                newVABSize,
+                nullptr, GL_STATIC_DRAW
+            );
+
+            currentVABSize = newVABSize;
+        // }
 
         vertices = (VertexData*) glMapBufferRange(
             GL_ARRAY_BUFFER, 0,
-            currentVABSize, GL_MAP_WRITE_BIT
+            newVABSize, GL_MAP_WRITE_BIT
         );
     } else {
         LOGI("buffered! buffer=%u", trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer);
@@ -144,7 +148,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
         if (vertexArray->parameters.buffered) {
             LOGI("buffered!");
             glVertexAttribPointer(
-                0,
+                AttributeLocations::POSITION_LOCATION,
                 vertexArray->parameters.size, vertexArray->parameters.type,
                 GL_FALSE,
                 vertexArray->parameters.stride,
@@ -154,9 +158,11 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
             LOGI("not buffered!");
             putVertexData(GL_VERTEX_ARRAY, vertexArray, vertices, count);
             glVertexAttribPointer(
-                0, decltype(VertexData::position)::length(),
+                AttributeLocations::POSITION_LOCATION,
+                decltype(VertexData::position)::length(),
                 vertexArray->parameters.type, GL_FALSE,
-                sizeof(VertexData), (void*) offsetof(VertexData, position)
+                sizeof(VertexData),
+                (void*) offsetof(VertexData, position)
             );
         }
     } else {
@@ -169,7 +175,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
         if (colorArray->parameters.buffered) {
             LOGI("buffered!");
             glVertexAttribPointer(
-                1,
+                AttributeLocations::COLOR_LOCATION,
                 colorArray->parameters.size, colorArray->parameters.type,
                 GL_FALSE,
                 colorArray->parameters.stride,
@@ -179,26 +185,31 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
             LOGI("not buffered!");
             putVertexData(GL_COLOR_ARRAY, colorArray, vertices, count);
             glVertexAttribPointer(
-                1, decltype(VertexData::color)::length(),
+                AttributeLocations::COLOR_LOCATION,
+                decltype(VertexData::color)::length(),
                 colorArray->parameters.type, GL_FALSE,
-                sizeof(VertexData), (void*) offsetof(VertexData, color)
+                sizeof(VertexData),
+                (void*) offsetof(VertexData, color)
             );
         }
     } else {
         LOGI("using global color state!");
-        glDisableVertexAttribArray(1);
-        glVertexAttrib4fv(1, glm::value_ptr(
-            FFPE::States::VertexData::color
-        ));
+        glDisableVertexAttribArray(AttributeLocations::COLOR_LOCATION);
+        glVertexAttrib4fv(
+            AttributeLocations::COLOR_LOCATION,
+            glm::value_ptr(
+                FFPE::States::VertexData::color
+            )
+        );
     }
 
     LOGI("texcoords!");
-    glEnableVertexAttribArray(2);
+    glEnableVertexAttribArray(AttributeLocations::TEX_COORD_LOCATION);
     if (texCoordArray->enabled) {
         if (texCoordArray->parameters.buffered) {
             LOGI("buffered!");
             glVertexAttribPointer(
-                2,
+                AttributeLocations::TEX_COORD_LOCATION,
                 texCoordArray->parameters.size, texCoordArray->parameters.type,
                 GL_FALSE,
                 texCoordArray->parameters.stride,
@@ -208,17 +219,22 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
             LOGI("not buffered!");
             putVertexData(GL_TEXTURE_COORD_ARRAY, texCoordArray, vertices, count);
             glVertexAttribPointer(
-                2, decltype(VertexData::texCoord)::length(),
+                AttributeLocations::TEX_COORD_LOCATION,
+                decltype(VertexData::texCoord)::length(),
                 texCoordArray->parameters.type, GL_FALSE,
-                sizeof(VertexData), (void*) offsetof(VertexData, texCoord)
+                sizeof(VertexData),
+                (void*) offsetof(VertexData, texCoord)
             );
         }
     } else {
         LOGI("using global texCoord state!");
-        glDisableVertexAttribArray(2);
-        glVertexAttrib4fv(2, glm::value_ptr(
-            FFPE::States::VertexData::texCoord
-        ));
+        glDisableVertexAttribArray(AttributeLocations::TEX_COORD_LOCATION);
+        glVertexAttrib4fv(
+            AttributeLocations::TEX_COORD_LOCATION,
+            glm::value_ptr(
+                FFPE::States::VertexData::texCoord
+            )
+        );
     }
 
     if (vertices) glUnmapBuffer(GL_ARRAY_BUFFER);

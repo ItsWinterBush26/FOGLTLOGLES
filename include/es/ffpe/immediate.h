@@ -65,7 +65,7 @@ inline void end() {
 
     SaveBoundedBuffer sbb(GL_ARRAY_BUFFER);
     OV_glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(
+    OV_glBufferData(
         GL_ARRAY_BUFFER,
         States::vertices.size() * sizeof(FFPE::States::VertexData::VertexRepresentation),
         States::vertices.data(),

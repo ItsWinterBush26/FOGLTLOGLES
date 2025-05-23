@@ -32,3 +32,9 @@ inline float half_to_float(const ushort x) { // IEEE-754 16-bit floating-point f
 inline ubyte float_to_ubyte(const float f) {
 	return static_cast<ubyte>(clampf(f, 0.0f, 1.0f) * 255.0f);
 }
+
+inline uint32_t float_to_bits(float f) {
+    uint32_t out;
+    std::memcpy(&out, &f, sizeof(float));
+    return out;
+}

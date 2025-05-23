@@ -2,8 +2,10 @@
 
 #include "gles/ffp/enums.h"
 #include "glm/ext/matrix_float4x4.hpp"
+#include "utils/conversions.h"
 #include "utils/fast_map.h"
 
+#include <bit>
 #include <cstddef>
 #include <GLES3/gl32.h>
 #include <memory>
@@ -75,6 +77,13 @@ namespace ClientState {
 
     inline GLenum currentTexCoordTextureUnit;
     inline std::unordered_set<GLenum> texCoordTextureUnits;
+}
+
+inline GLbitfield buildCurrentStatesBitfield() {
+    return (
+        AlphaTest::op | float_to_bits(AlphaTest::threshold) |
+        ShadeModel::type // |
+    );
 }
 
 }
