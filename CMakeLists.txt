@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.11)
 
 project(FOGLTLOGLES LANGUAGES C CXX)
 
+set(CMAKE_CXX_STANDARD 20)
+
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
