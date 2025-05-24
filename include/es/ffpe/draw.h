@@ -1,6 +1,7 @@
 #pragma once
 
 #include "es/binding_saver.h"
+#include "es/ffp.h"
 #include "es/ffpe/uniforms.h"
 #include "es/ffpe/shadergen.h"
 #include "es/ffpe/vao.h"
@@ -10,43 +11,6 @@
 #include <string>
 
 namespace FFPE::Rendering::Arrays {
-
-// TODO: since vecN, where N is the component
-// and it might change, we need to...
-// SHADERGEN. implement shadergen!
-inline const std::string arrayShaderVS = R"(#version 320 es
-
-layout(location = 0) in vec4 iVertexPosition;
-layout(location = 1) in vec4 iVertexColor;
-layout(location = 2) in vec4 iVertexTexCoord;
-
-out vec4 vertexColor;
-out vec4 vertexTexCoord;
-
-uniform mat4 uModelViewProjection;
-
-void main() {
-    gl_Position = iVertexPosition * uModelViewProjection;
-    
-    vertexColor = iVertexColor;
-    vertexTexCoord = iVertexTexCoord;
-})";
-
-inline const std::string arrayShaderFS = R"(#version 320 es
-precision mediump float;
-
-in vec4 vertexColor;
-in vec4 vertexTexCoord;
-
-out vec4 fragColor;
-
-uniform sampler2D texture0;
-
-void main() {
-    fragColor = texture(texture0, vertexTexCoord.st) * vertexColor;
-})";
-
-inline GLuint renderingProgram;
 
 namespace Quads {
 
@@ -158,10 +122,11 @@ inline void handleQuads(GLint first, GLuint count) {
     LOGI("quads!");
     SaveUsedProgram sup;
     SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
-    
+
+    auto renderingProgram = FFPE::Rendering::ShaderGen::getCachedOrBuildProgram(FFPE::States::buildCurrentStatesBitfield());
     OV_glUseProgram(renderingProgram);
-    FFPE::Rendering::Uniforms::setupUniformsForRendering(renderingProgram);
-    
+    FFPE::Rendering::ShaderGen::Uniforms::setupUniformsForRendering(renderingProgram);
+
     auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
     GLuint realCount = generateEAB_CPU(count);
 
@@ -172,26 +137,6 @@ inline void handleQuads(GLint first, GLuint count) {
 }
 
 inline void init() {
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    const GLchar* vertexShaderSource = arrayShaderVS.c_str();
-    OV_glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
-
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    const GLchar* fragmentShaderSource = arrayShaderFS.c_str();
-    OV_glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
-    
-    OV_glCompileShader(vertexShader);
-    OV_glCompileShader(fragmentShader);
-
-    renderingProgram = glCreateProgram();
-    glAttachShader(renderingProgram, vertexShader);
-    glAttachShader(renderingProgram, fragmentShader);
-    
-    OV_glLinkProgram(renderingProgram);
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-    
     Quads::init();
     FFPE::Rendering::VAO::init();
 }
@@ -199,8 +144,10 @@ inline void init() {
 inline void drawArrays(GLenum mode, GLint first, GLuint count) {
     if (trackedStates->currentlyUsedProgram == 0) {
         // immediately assume FFP
+
+        auto renderingProgram = FFPE::Rendering::ShaderGen::getCachedOrBuildProgram(FFPE::States::buildCurrentStatesBitfield());
         OV_glUseProgram(renderingProgram);
-        FFPE::Rendering::Uniforms::setupUniformsForRendering(renderingProgram);
+        FFPE::Rendering::ShaderGen::Uniforms::setupUniformsForRendering(renderingProgram);
 
         auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
         

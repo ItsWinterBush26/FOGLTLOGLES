@@ -28,10 +28,10 @@
         "--background-index",
         "--pch-storage=memory",
         "--compile-commands-dir=${workspaceFolder}",
-        "--limit-results=500",
+        "--limit-results=300",
         "--use-dirty-headers"
-    ],
-    "clangd.path": "${workspaceFolder}/tools/clangd"
+    ]
+    // "clangd.path": "${workspaceFolder}/tools/clangd"
     /* "clangd.arguments": [
         "-j=6",
         "-pretty",

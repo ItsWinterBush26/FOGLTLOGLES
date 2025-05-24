@@ -8,7 +8,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace FFPE::Rendering::Uniforms {
+namespace FFPE::Rendering::ShaderGen::Uniforms {
 
 namespace Cache {
     inline FastMapBI<GLuint, std::unordered_map<std::string, GLuint>> locations;

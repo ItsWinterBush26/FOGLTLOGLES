@@ -87,13 +87,16 @@ inline const std::string nextLine = "\n\n";
 
 inline uint32_t nextBindingPointSSBO = 0;
 
+// TODO: since vecN, where N is the component
+// and it might change, account for that
+// GL_*_ARRAY.size should do
 inline const std::string renderingShaderTemplateVS = R"(#version 320 es
 
 uniform mat4 uModelViewProjection;
 
 layout(location = 0) in vec4 iVertexPosition;
 layout(location = 1) in vec4 iVertexColor;
-layout(location = 3) in vec4 iVertexTexCoord;
+layout(location = 2) in vec4 iVertexTexCoord;
 
 out vec4 vertexColor;
 out vec4 vertexTexCoord;
@@ -120,7 +123,7 @@ void main() {
 })";
 
 inline std::pair<std::string, std::unordered_map<std::string, uint32_t>> generateShaderVS() {
-    return { };
+    return { renderingShaderTemplateVS, std::unordered_map<std::string, uint32_t>() };
 }
 
 inline std::pair<std::string, std::unordered_map<std::string, uint32_t>> generateShaderFS() {
@@ -181,8 +184,13 @@ inline GLuint getCachedOrBuildProgram(GLbitfield state) {
     OV_glLinkProgram(renderingProgram);
 
     if (debugEnabled) {
+        LOGI("Generated shader for state '%u'", state);
+
         LOGI("ShaderGen | VS :");
         LOGI("%s", vertexShaderSource.first.c_str());
+
+        LOGI("ShaderGen | FS :");
+        LOGI("%s", fragmentShaderSource.first.c_str());
     }
 
     States::currentState = state;
