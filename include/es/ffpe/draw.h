@@ -128,7 +128,7 @@ inline void handleQuads(GLint first, GLuint count) {
     FFPE::Rendering::ShaderGen::Uniforms::setupUniformsForRendering(renderingProgram);
 
     auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
-    GLuint realCount = generateEAB_CPU(count);
+    GLuint realCount = generateEAB_GPU(count);
 
     glDrawElements(GL_TRIANGLES, realCount, GL_UNSIGNED_INT, nullptr);
     LOGI("done! drawElements (for quads)");
