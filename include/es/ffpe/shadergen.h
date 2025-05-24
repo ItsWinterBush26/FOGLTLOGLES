@@ -131,7 +131,7 @@ layout(location = 0) in mediump vec4 iVertexPosition;
 layout(location = 1) in lowp vec4 iVertexColor;
 layout(location = 2) in mediump vec4 iVertexTexCoord;
 
-out lowp int vertexID;
+flat out lowp int vertexID;
 out lowp vec4 vertexColor;
 out mediump vec4 vertexTexCoord;
 
