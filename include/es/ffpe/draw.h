@@ -139,6 +139,7 @@ inline void handleQuads(GLint first, GLuint count) {
 inline void init() {
     Quads::init();
     FFPE::Rendering::VAO::init();
+	FFPE::Rendering::ShaderGen::init();
 }
 
 inline void drawArrays(GLenum mode, GLint first, GLuint count) {
