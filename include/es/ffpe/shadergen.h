@@ -181,7 +181,7 @@ inline std::pair<std::string, std::unordered_map<std::string, uint32_t>> generat
 	std::string shaderUNIF;
     std::string shaderIMPL;
 
-    if (trackedStates->isCapabilityEnabled(GL_TEXTURE_2D)) {
+    /* if (trackedStates->isCapabilityEnabled(GL_TEXTURE_2D)) {
         uint32_t bindPoint1 = nextBindingPointSSBO++;
         fmt::format_to(
             std::back_inserter(shaderSSBO),
@@ -199,7 +199,7 @@ inline std::pair<std::string, std::unordered_map<std::string, uint32_t>> generat
 
         bindPoints.insert({ "activeunits", bindPoint1 });
         bindPoints.insert({ "texcoords", bindPoint2 });
-    }
+    } */
 
     if (trackedStates->isCapabilityEnabled(GL_ALPHA_TEST)) {
         AlphaTest::generateAlphaTestIMPL(shaderIMPL);
@@ -265,10 +265,7 @@ inline void setupUniformsAndSSBO() {
 	glBufferData(
 		GL_SHADER_STORAGE_BUFFER,
 		FFPE::States::ClientState::texCoordArrayTexUnits.size() * sizeof(GLenum),
-		tcb::span(
-			FFPE::States::ClientState::texCoordArrayTexUnits.begin(),
-			FFPE::States::ClientState::texCoordArrayTexUnits.end()
-		).data(),
+        FFPE::States::ClientState::texCoordArrayTexUnits.data(),
 		GL_DYNAMIC_DRAW
 	);
 }

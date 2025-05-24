@@ -85,6 +85,9 @@ inline GLuint generateEAB_GPU(GLuint count) {
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
     LOGI("quadCount=%u eabCount=%u", quadCount, eabCount);
+
+    OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
+
     return eabCount;
 }
 

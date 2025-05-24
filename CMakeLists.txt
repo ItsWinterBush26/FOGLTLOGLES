@@ -19,8 +19,8 @@ if( CMAKE_HOST_WIN32 )
         # slashes. However, CMake as of 3.12.2 passes path to clang with backslashes. To overcome
         # this limitation, a simple batch file wrap-cache.bat is used. This batch file converts
         # back-slashes to forward slashes and then invokes ccache.
-        set( CMAKE_CXX_COMPILER_LAUNCHER ${CMAKE_SOURCE_DIR}/wrap-ccache.bat ${CCACHE} )
-        set( CMAKE_C_COMPILER_LAUNCHER  ${CMAKE_SOURCE_DIR}/wrap-ccache.bat ${CCACHE} )
+        set( CMAKE_CXX_COMPILER_LAUNCHER ${CMAKE_SOURCE_DIR}/tools/wrap-ccache.bat ${CCACHE} )
+        set( CMAKE_C_COMPILER_LAUNCHER  ${CMAKE_SOURCE_DIR}/tools/wrap-ccache.bat ${CCACHE} )
     else()
         message( INFO "\
 Could not find CCache program. \
@@ -159,8 +159,6 @@ set(DEPENDENCIES
 	# Minimal static SPIRV-Cross
 	spirv-cross-core
 	spirv-cross-glsl
-
-    # Static OpenMP
 
 	# OpenMP static
 	-fopenmp

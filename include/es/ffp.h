@@ -17,9 +17,6 @@
 
 // TODO: break out and move to specific files
 
-// lmao
-#define MAX_TEXTURE_UNITS 64
-
 namespace FFPE::States {
 namespace VertexData {
     struct VertexRepresentation {
@@ -66,17 +63,19 @@ namespace ClientState {
         
         inline std::unordered_map<GLenum, ArrayState> arrayStates;
 
+        // GL_TEXTURE_COORD_ARRAY | GL_TEXTUREi 
+        inline std::unordered_map<GLenum, ArrayState> texCoordArrayStates;
+
         inline bool isArrayEnabled(GLenum array) {
-            return arrayStates[array].enabled;
+            return (array & GL_TEXTURE_COORD_ARRAY) ? texCoordArrayStates[array].enabled : arrayStates[array].enabled;
         }
 
         inline ArrayState* getArray(GLenum array) {
-            return &arrayStates[array];
+            return (array & GL_TEXTURE_COORD_ARRAY) ? &texCoordArrayStates[array] : &arrayStates[array];
         }
     }
-
-    inline GLenum currentTexCoordTextureUnit;
-    inline std::unordered_set<GLenum> texCoordTextureUnits;
+ 
+    inline std::vector<GLenum> texCoordArrayTexUnits;
 }
 
 inline GLbitfield buildCurrentStatesBitfield() {
