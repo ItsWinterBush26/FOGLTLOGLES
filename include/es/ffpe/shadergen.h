@@ -94,12 +94,12 @@ inline const std::string renderingShaderTemplateVS = R"(#version 320 es
 
 uniform mat4 uModelViewProjection;
 
-layout(location = 0) in vec4 iVertexPosition;
-layout(location = 1) in vec4 iVertexColor;
-layout(location = 2) in vec4 iVertexTexCoord;
+layout(location = 0) in mediump vec4 iVertexPosition;
+layout(location = 1) in lowp vec4 iVertexColor;
+layout(location = 2) in mediump vec4 iVertexTexCoord;
 
-out vec4 vertexColor;
-out vec4 vertexTexCoord;
+out lowp vec4 vertexColor;
+out mediump vec4 vertexTexCoord;
 
 void main() {
     gl_Position = iVertexPosition * uModelViewProjection;
@@ -110,9 +110,11 @@ void main() {
 
 inline const std::string renderingShaderTemplateFS = R"(#version 320 es
 
-in vec4 vertexColor;
 
-out vec4 oFragColor;
+in lowp vec4 vertexColor;
+in mediump vec4 vertexTexCoord;
+
+out lowp vec4 oFragColor;
 
 {}
 
