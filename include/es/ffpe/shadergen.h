@@ -114,13 +114,13 @@ in vec4 vertexColor;
 
 {}
 
-void main() {
+void main() {{
    vec4 color = vertexColor;
 
    {}
 
    fragColor = color;
-})";
+}})";
 
 inline std::pair<std::string, std::unordered_map<std::string, uint32_t>> generateShaderVS() {
     return { renderingShaderTemplateVS, std::unordered_map<std::string, uint32_t>() };
