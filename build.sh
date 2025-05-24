@@ -10,6 +10,7 @@ if [[ -z "$ANDROID_SDK_ROOT" ]]; then
     exit 1
 fi
 
+echo "Looking for Android NDK..."
 if [[ -z "$ANDROID_NDK_ROOT" ]]; then
     ndk_ver_dir=$(find "$ANDROID_SDK_ROOT/ndk" -maxdepth 1 -type d -printf "%f\n" \
         | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' \
@@ -21,7 +22,7 @@ if [[ -z "$ANDROID_NDK_ROOT" ]]; then
         echo "Trying 'ndk-bundle'"
         ndk_ver_dir="ndk-bundle"
         if [[ ! -d "$ANDROID_SDK_ROOT/$ndk_ver_dir" ]]; then
-            echo "Failed to find a suitable NDK!"
+            echo "Failed to find any NDK!"
             exit 1
         else
             echo "Using 'ndk-bundle' at '$ANDROID_SDK_ROOT/$ndk_ver_dir'"
@@ -48,19 +49,26 @@ else
     export ABI=$1
 fi
 
-echo "Building for '$1'"
-
+export TOOLCHAIN_FILE="$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake"
 export NDK_CCACHE="$(which ccache)"
+
+echo "Building for '$1'"
+echo "Using CCache on $NDK_CCACHE"
+echo "Using toolchain file on $TOOLCHAIN_FILE"
+
 cmake -G Ninja .. \
-    -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake" \
+    -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN_FILE" \
     -DANDROID_ABI="$ABI" \
     -DANDROID_PLATFORM=29 \
     -DANDROID_CCACHE="$NDK_CCACHE" \
     -DCMAKE_BUILD_TYPE=Release
 
+echo "Compiling with $(nproc) core/s"
 ninja -C . -j$(nproc)
 
 cd "$OLD"
+
+echo "All done!"
 
 # if command -v compdb 2>&1 >/dev/null
 # then
