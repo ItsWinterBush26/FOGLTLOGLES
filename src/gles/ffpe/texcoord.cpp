@@ -13,10 +13,6 @@ void FFP::registerTexCoordFunctions() {
 void glTexCoord2f(GLfloat s, GLfloat t) {
     Lists::displayListManager->addCommand<glTexCoord2f>(s, t);
 
-    FFPE::States::ClientState::texCoordTextureUnits.insert({
-        FFPE::States::ClientState::currentTexCoordTextureUnit
-    });
-
     FFPE::States::VertexData::set(
         glm::vec2(s, t),
         &FFPE::States::VertexData::texCoord
