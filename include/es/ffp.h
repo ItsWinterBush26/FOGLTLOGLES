@@ -75,6 +75,7 @@ namespace ClientState {
         }
     }
  
+    inline GLenum currentTexCoordUnit;
     inline std::vector<GLenum> texCoordArrayTexUnits;
 }
 

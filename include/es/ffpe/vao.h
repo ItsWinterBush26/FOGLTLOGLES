@@ -74,8 +74,6 @@ inline void putVertexDataInternal(GLenum arrayType, GLsizei dataSize, GLuint ver
     }
 }
 
-
-
 inline void putVertexData(GLenum arrayType, FFPE::States::ClientState::Arrays::ArrayState* array, VertexData* vertices, GLuint verticesCount) {
     LOGI("putVertexData : arrayType=%u", arrayType);
     
@@ -204,7 +202,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
     }
 
     LOGI("texcoords!");
-    glEnableVertexAttribArray(AttributeLocations::TEX_COORD_LOCATION);
+    /* glEnableVertexAttribArray(AttributeLocations::TEX_COORD_LOCATION);
     if (texCoordArray->enabled) {
         if (texCoordArray->parameters.buffered) {
             LOGI("buffered!");
@@ -226,7 +224,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                 (void*) offsetof(VertexData, texCoord)
             );
         }
-    } else {
+    } else */ {
         LOGI("using global texCoord state!");
         glDisableVertexAttribArray(AttributeLocations::TEX_COORD_LOCATION);
         glVertexAttrib4fv(
