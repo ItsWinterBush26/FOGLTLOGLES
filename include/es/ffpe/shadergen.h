@@ -112,6 +112,8 @@ inline const std::string renderingShaderTemplateFS = R"(#version 320 es
 
 in vec4 vertexColor;
 
+out vec4 oFragColor;
+
 {}
 
 void main() {{
@@ -119,7 +121,7 @@ void main() {{
 
    {}
 
-   fragColor = color;
+   oFragColor = color;
 }})";
 
 inline std::pair<std::string, std::unordered_map<std::string, uint32_t>> generateShaderVS() {
