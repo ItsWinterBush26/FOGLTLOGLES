@@ -109,7 +109,7 @@ void main() {
 })";
 
 inline const std::string renderingShaderTemplateFS = R"(#version 320 es
-
+precision mediump float;
 
 in lowp vec4 vertexColor;
 in mediump vec4 vertexTexCoord;
