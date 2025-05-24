@@ -2,8 +2,8 @@ OLD="$PWD"
 
 set -e
 
-sudo apt update
-sudo apt install ninja-build bison -y
+# sudo apt update
+# sudo apt install ninja-build bison -y
 
 if [[ -z "$ANDROID_SDK_ROOT" ]]; then
     echo "Make sure '\$ANDROID_SDK_ROOT' is set before building!"
