@@ -112,12 +112,12 @@ inline const std::string renderingShaderTemplateFS = R"(#version 320 es
 
 in vec4 vertexColor;
 
-{0}
+{}
 
 void main() {
    vec4 color = vertexColor;
 
-   {1}
+   {}
 
    fragColor = color;
 })";
