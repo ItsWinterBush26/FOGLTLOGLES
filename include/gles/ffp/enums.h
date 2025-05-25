@@ -1,6 +1,7 @@
 #pragma once
 
 typedef double GLdouble;
+typedef long   GLbitfield64;
 
 // types
 #define GL_DOUBLE 0x140a

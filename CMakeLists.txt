@@ -68,10 +68,8 @@ set(COMMON_FLAGS
 )
 
 set(RELEASE_FLAGS
-    -Ofast
+    -O3
     -flto
-    -ffast-math
-    -fomit-frame-pointer
     -ffunction-sections
     -fdata-sections
     -fvisibility=hidden
@@ -97,7 +95,8 @@ set(HEADER_DIRS "include" "build_info")
 file(GLOB_RECURSE HEADERS
 	"include/*.h"
 	"include/*/*.h"
-	"include/*/*/*'h"
+	"include/*/*/*.h"
+    "include/*/*/*/*.h"
 	"build_info/build_info.h"
 )
 

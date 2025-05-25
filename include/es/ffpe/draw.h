@@ -2,8 +2,8 @@
 
 #include "es/binding_saver.h"
 #include "es/ffp.h"
+#include "es/ffpe/shadergen/shadergen.h"
 #include "es/ffpe/uniforms.h"
-#include "es/ffpe/shadergen.h"
 #include "es/ffpe/vao.h"
 #include "gles20/shader_overrides.h"
 
@@ -126,7 +126,7 @@ inline void handleQuads(GLint first, GLuint count) {
     SaveUsedProgram sup;
     SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
 
-    auto renderingProgram = FFPE::Rendering::ShaderGen::getCachedOrBuildProgram(FFPE::States::buildCurrentStatesBitfield());
+    auto renderingProgram = FFPE::Rendering::ShaderGen::getCachedOrNewProgram(FFPE::States::buildCurrentStatesBitfield());
     OV_glUseProgram(renderingProgram);
     FFPE::Rendering::ShaderGen::Uniforms::setupUniformsForRendering(renderingProgram);
 
@@ -142,14 +142,13 @@ inline void handleQuads(GLint first, GLuint count) {
 inline void init() {
     Quads::init();
     FFPE::Rendering::VAO::init();
-	FFPE::Rendering::ShaderGen::init();
 }
 
 inline void drawArrays(GLenum mode, GLint first, GLuint count) {
     if (trackedStates->currentlyUsedProgram == 0) {
         // immediately assume FFP
 
-        auto renderingProgram = FFPE::Rendering::ShaderGen::getCachedOrBuildProgram(FFPE::States::buildCurrentStatesBitfield());
+        auto renderingProgram = FFPE::Rendering::ShaderGen::getCachedOrNewProgram(FFPE::States::buildCurrentStatesBitfield());
         OV_glUseProgram(renderingProgram);
         FFPE::Rendering::ShaderGen::Uniforms::setupUniformsForRendering(renderingProgram);
 

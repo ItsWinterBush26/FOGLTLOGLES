@@ -1,6 +1,7 @@
 #pragma once
 
 #include "es/ffp.h"
+#include "es/ffpe/shadergen/shadergen.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "utils/fast_map.h"
 
@@ -11,17 +12,17 @@
 namespace FFPE::Rendering::ShaderGen::Uniforms {
 
 namespace Cache {
-    inline FastMapBI<GLuint, std::unordered_map<std::string, GLuint>> locations;
+    inline FastMapBI<GLuint, std::unordered_map<std::string, GLint>> locations;
 }
 
-inline GLuint getCachedUniformLocation(GLuint program, std::string name) {
+inline GLint getCachedUniformLocation(GLuint program, std::string name) {
     auto& cachedUniformLocations = Cache::locations[program];
 
-    GLuint uniformLocationLoc = 0;
+    GLint uniformLocationLoc = 0;
     auto uniformLocationIT = cachedUniformLocations.find(name);
     if (uniformLocationIT == cachedUniformLocations.end()) {
         uniformLocationLoc = glGetUniformLocation(program, name.c_str());
-        cachedUniformLocations[name] = uniformLocationLoc;
+        if (uniformLocationLoc != -1) cachedUniformLocations[name] = uniformLocationLoc;
     } else uniformLocationLoc = uniformLocationIT->second;
 
     return uniformLocationLoc;
@@ -36,6 +37,8 @@ inline void setupUniformsForRendering(GLuint program) {
             Matrices::matricesStateManager->getModelViewProjection()
         )
     );
+
+    ShaderGen::prepareInputsForRendering(program);
 }
 
 }

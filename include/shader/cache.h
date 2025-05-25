@@ -75,9 +75,10 @@ namespace ShaderConverter::Cache {
         return false;
     }
 
-    inline size_t getHash(std::string& key) {
+    template<typename T>
+    inline size_t getHash(T key) {
         if (!ENABLE_SHADER_CACHE) return 0;
-        return std::hash<std::string>{}(key);
+        return std::hash<T>{}(key);
     }
 
     inline void init() {
