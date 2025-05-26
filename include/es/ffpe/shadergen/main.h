@@ -68,7 +68,7 @@ void main() {{
 }})";
 
 inline std::string buildVertexShader() {
-    return "";
+    return VS_TEMPLATE;
 }
 
 inline std::string buildFragmentShader() {
@@ -77,7 +77,7 @@ inline std::string buildFragmentShader() {
     std::string operations;
 
     if (trackedStates->isCapabilityEnabled(GL_ALPHA_TEST)) {
-        Feature::alphaTestFeature->build(inputs, outputs, operations);
+        FFPE::Rendering::ShaderGen::Feature::alphaTestFeature->build(inputs, outputs, operations);
     }
 
     return fmt::format(

@@ -11,6 +11,7 @@
 #include <string>
 
 namespace FFPE::Rendering::ShaderGen::Feature {
+
 struct AlphaTestFeature : public Feature::BaseFeature {
 
 const std::string uniforms = "uniform float alphaTestThreshold;";
@@ -74,4 +75,5 @@ void sendData(GLuint program) override {
 };
 
 inline AlphaTestFeature* alphaTestFeature = new AlphaTestFeature();
+
 }
