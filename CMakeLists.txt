@@ -56,6 +56,7 @@ add_subdirectory(deps/shaderc)
 add_subdirectory(deps/spirv-cross)
 add_subdirectory(deps/glm)
 add_subdirectory(deps/fmt)
+add_subdirectory(deps/frozen)
 
 ######## MAIN PROJECT ########
 set(COMMON_FLAGS
@@ -168,6 +169,9 @@ set(DEPENDENCIES
 
     # FMT
     fmt::fmt
+
+    # Frozen
+    frozen::frozen
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_OPTIONS -fopenmp)
