@@ -38,7 +38,7 @@ inline void setupInputsForRendering(GLuint program) {
         )
     );
 
-    alphaTest.sendData(program);
+    alphaTest->sendData(program);
 }
 
 }

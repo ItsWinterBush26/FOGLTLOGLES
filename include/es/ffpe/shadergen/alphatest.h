@@ -7,6 +7,7 @@
 #include "fmt/format.h"
 
 #include <GLES3/gl32.h>
+#include <memory>
 #include <string>
 
 namespace FFPE::Rendering::ShaderGen {
@@ -72,5 +73,5 @@ void sendData(GLuint program) override {
 
 };
 
-inline AlphaTestFeature alphaTest;
+inline AlphaTestFeature* alphaTest = new AlphaTestFeature();
 }
