@@ -1,7 +1,7 @@
 #pragma once
 
 #include "es/ffp.h"
-#include "es/ffpe/shadergen/shadergen.h"
+#include "es/ffpe/shadergen/alphatest.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "utils/fast_map.h"
 
@@ -38,7 +38,8 @@ inline void setupUniformsForRendering(GLuint program) {
         )
     );
 
-    FFPE::Rendering::ShaderGen::prepareInputsForRendering(program);
+    // FFPE::Rendering::ShaderGen::prepareInputsForRendering(program);
+    alphaTest.sendData(program); // yeah f this, compiler being weird (or smth idk)
 }
 
 }
