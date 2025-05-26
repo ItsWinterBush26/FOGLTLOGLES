@@ -7,7 +7,7 @@ namespace FFPE::Rendering::ShaderGen::Feature {
 
 struct BaseFeature {
 
-virtual ~BaseFeature();
+virtual ~BaseFeature() = default;
 
 virtual void build(
     std::string& finalInputs,

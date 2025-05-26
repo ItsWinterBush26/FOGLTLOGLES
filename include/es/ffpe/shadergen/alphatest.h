@@ -74,6 +74,6 @@ void sendData(GLuint program) override {
 
 };
 
-inline AlphaTestFeature* alphaTestFeature = new AlphaTestFeature();
+inline AlphaTestFeature alphaTestFeatureInstance;
 
 }

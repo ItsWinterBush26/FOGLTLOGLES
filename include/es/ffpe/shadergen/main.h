@@ -25,7 +25,7 @@ inline std::string buildFragmentShader() {
     std::string operations;
 
     if (trackedStates->isCapabilityEnabled(GL_ALPHA_TEST)) {
-        FFPE::Rendering::ShaderGen::Feature::alphaTestFeature->build(inputs, outputs, operations);
+        Feature::alphaTestFeatureInstance.build(inputs, outputs, operations);
     }
 
     return fmt::format(
