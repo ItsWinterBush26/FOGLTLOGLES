@@ -62,4 +62,23 @@ inline GLuint getFromCache(GLbitfield64 state) {
 
 }
 
+namespace Uniforms {
+
+inline FastMapBI<GLuint, std::unordered_map<std::string, GLint>> cachedLocations;
+
+inline GLint getCachedUniformLocation(GLuint program, std::string name) {
+    auto& cachedUniformLocations = cachedLocations[program];
+    
+    GLint uniformLocationLoc = 0;
+    auto uniformLocationIT = cachedUniformLocations.find(name);
+    if (uniformLocationIT == cachedUniformLocations.end()) {
+        uniformLocationLoc = glGetUniformLocation(program, name.c_str());
+        if (uniformLocationLoc != -1) cachedUniformLocations[name] = uniformLocationLoc;
+    } else uniformLocationLoc = uniformLocationIT->second;
+        
+    return uniformLocationLoc;
+}
+
+}
+
 }

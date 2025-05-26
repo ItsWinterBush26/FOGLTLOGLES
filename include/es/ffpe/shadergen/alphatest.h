@@ -1,13 +1,13 @@
 #pragma once
 
 #include "es/ffp.h"
+#include "es/ffpe/shadergen/cache.h"
+#include "es/ffpe/shadergen/common.h"
 #include "es/ffpe/shadergen/feature.h"
-#include "es/ffpe/shadergen/main.h"
-#include "es/ffpe/shadergen/uniforms.h"
+#include "es/state_tracking.h"
 #include "fmt/format.h"
 
 #include <GLES3/gl32.h>
-#include <memory>
 #include <string>
 
 namespace FFPE::Rendering::ShaderGen::Feature {
@@ -60,12 +60,12 @@ void build(
         operation
     );
 
-    finalOperations += FFPE::Rendering::ShaderGen::SG_NEWLINE;
+    finalOperations += Common::SG_NEWLINE;
 }
 
 void sendData(GLuint program) override {
     if (trackedStates->isCapabilityEnabled(GL_ALPHA_TEST)) {
-        GLint alphaTestThresholdUniLoc = Uniforms::getCachedUniformLocation(program, "alphaTestThreshold");
+        GLint alphaTestThresholdUniLoc = Cache::Uniforms::getCachedUniformLocation(program, "alphaTestThreshold");
         if (alphaTestThresholdUniLoc == -1) return;
         
         glUniform1f(alphaTestThresholdUniLoc, States::AlphaTest::threshold);
