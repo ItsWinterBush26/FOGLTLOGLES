@@ -25,7 +25,7 @@ void main() {
     gl_Position = iVertexPosition * uModelViewProjection;
 
     vertexID = gl_VertexID;
-    vertexColor = iVertexColor:
+    vertexColor = iVertexColor;
     verexTexCoord = iVertexTexCoord;
 })";
 
