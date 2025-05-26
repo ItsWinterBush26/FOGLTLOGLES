@@ -18,7 +18,8 @@ inline std::unordered_map<GLbitfield64, std::string> lazyCachedSources;
 
 inline size_t tagHash(GLbitfield64 state, shaderc_shader_kind kind) {
 #if INTPTR_MAX == INT64_MAX
-    return (ShaderConverter::Cache::getHash(state) & 0x3FFFFFFFFFFFFFFF) | (kind << 62);
+#   include <cstdint>
+    return (ShaderConverter::Cache::getHash(state) & 0x3FFFFFFFFFFFFFFF) | (uint64_t(kind) << 62);
 #else
     return (ShaderConverter::Cache::getHash(state) & 0x3FFFFFFF) | (kind << 30);
 #endif
