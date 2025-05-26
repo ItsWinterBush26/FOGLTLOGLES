@@ -26,8 +26,8 @@ inline bool isDepthFormat(GLenum format) {
 inline void swizzleBGRA(GLenum& type) {
     switch (type) {
         case 0x8035: // GL_UNSIGNED_INT_8_8_8_8
-            currentSwizzleOperations.push_back(ENDIANNESS_SWAP);
-            currentSwizzleOperations.push_back(BGRA2RGBA);
+            currentSwizzleOperations.emplace_back(ENDIANNESS_SWAP);
+            currentSwizzleOperations.emplace_back(BGRA2RGBA);
         
             // fall through
         case 0x8367: // GL_UNSIGNED_INT_8_8_8_8_REV

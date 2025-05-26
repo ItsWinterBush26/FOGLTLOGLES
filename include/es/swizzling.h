@@ -9,23 +9,23 @@ enum SwizzleOperation {
     ENDIANNESS_SWAP
 };
 
-inline const std::unordered_map<SwizzleOperation, std::vector<GLint>> swizzleArrayMap = {
+inline const std::unordered_map<SwizzleOperation, std::array<GLint, 4>> swizzleArrayMap = {
     { BGRA2RGBA,           { GL_BLUE, GL_GREEN, GL_RED, GL_ALPHA } },
     { ENDIANNESS_SWAP,     { GL_ALPHA, GL_BLUE, GL_GREEN, GL_RED } }
 };
 
-// here to avoid recreating a new vector for each swizzlesZ
+// here to avoid recreating a new vector for each swizzles
 // do not forget to resize this to match the
 // number of swizzle operations
 inline std::vector<SwizzleOperation> currentSwizzleOperations(2);
 
 // hardcoded to 4 channels only
 // avoid recreations!
-inline std::vector<GLint> transformedComponents(4);
+inline std::array<GLint, 4> transformedComponents;
 
-inline std::vector<GLint> transformComponents(
-    const std::vector<GLint>& current, 
-    const std::vector<GLint>& transform
+inline std::array<GLint, 4> transformComponents(
+    const std::array<GLint, 4>& current, 
+    const std::array<GLint, 4>& transform
 ) {
     for (int i = 0; i < 4; i++) {
         GLint component = transform[i];
@@ -43,11 +43,11 @@ inline std::vector<GLint> transformComponents(
 
 inline void doSwizzling(GLenum target) {
     if (currentSwizzleOperations.empty()) return;
-    std::vector<GLint> currentSwizzle = swizzleArrayMap.at(currentSwizzleOperations[0]);
+    auto currentSwizzle = swizzleArrayMap.at(currentSwizzleOperations[0]);
     
     if (currentSwizzleOperations.size() == 1) goto swizzle;
     for (size_t i = 1; i < currentSwizzleOperations.size(); i++) {
-        const std::vector<GLint>& nextTransform = swizzleArrayMap.at(currentSwizzleOperations[i]);
+        auto& nextTransform = swizzleArrayMap.at(currentSwizzleOperations[i]);
         currentSwizzle = transformComponents(currentSwizzle, nextTransform);
     }
     
