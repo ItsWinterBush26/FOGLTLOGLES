@@ -13,8 +13,9 @@ virtual void build(
     std::string& finalInputs,
     std::string& finalOutputs,
     std::string& finalOperations
-);
-virtual void sendData(GLuint program);
+) = 0;
+
+virtual void sendData(GLuint program) = 0;
 
 };
 
