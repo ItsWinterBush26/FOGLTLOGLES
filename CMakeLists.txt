@@ -67,8 +67,6 @@ set(COMMON_FLAGS
     -Wextra
     -Wpedantic
     -pipe
-
-    -Wno-error=nan-infinity-disabled
 )
 
 set(RELEASE_FLAGS
@@ -174,7 +172,7 @@ set(DEPENDENCIES
     fmt::fmt
 
     # Frozen
-    frozen::frozen
+    frozen::frozen-headers
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_OPTIONS -fopenmp)

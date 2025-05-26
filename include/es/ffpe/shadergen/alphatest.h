@@ -6,7 +6,6 @@
 #include "es/ffpe/shadergen/feature.h"
 #include "es/state_tracking.h"
 #include "fmt/ostream.h"
-#include "fmt/format.h"
 
 #include <GLES3/gl32.h>
 #include <sstream>
