@@ -14,6 +14,8 @@ namespace FFPE::Rendering::ShaderGen::Feature {
 
 struct AlphaTestFeature : public Feature::BaseFeature {
 
+~AlphaTestFeature() override { }
+
 const std::string uniforms = "uniform float alphaTestThreshold;";
 
 const std::string baseOperation = "if (color.a {} alphaTestThreshold) discard;";
