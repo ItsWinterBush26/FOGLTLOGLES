@@ -18,8 +18,8 @@ inline void setupInputsForRendering(GLuint program) {
             Matrices::matricesStateManager->getModelViewProjection()
         )
     );
-
-    FFPE::Rendering::ShaderGen::Feature::alphaTestFeature->sendData(program);
+    
+    Feature::alphaTestFeatureInstance.sendData(program);
 }
 
 }
