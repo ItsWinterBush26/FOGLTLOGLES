@@ -28,7 +28,7 @@ inline GLint getCachedUniformLocation(GLuint program, std::string name) {
     return uniformLocationLoc;
 }
 
-inline void setupUniformsForRendering(GLuint program) {
+inline void setupInputsForRendering(GLuint program) {
     glUniformMatrix4fv(
         getCachedUniformLocation(
             program, "uModelViewProjection"
@@ -38,8 +38,7 @@ inline void setupUniformsForRendering(GLuint program) {
         )
     );
 
-    // FFPE::Rendering::ShaderGen::prepareInputsForRendering(program);
-    alphaTest.sendData(program); // yeah f this, compiler being weird (or smth idk)
+    alphaTest.sendData(program);
 }
 
 }

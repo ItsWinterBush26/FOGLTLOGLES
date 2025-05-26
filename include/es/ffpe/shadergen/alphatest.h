@@ -2,8 +2,8 @@
 
 #include "es/ffp.h"
 #include "es/ffpe/shadergen/feature.h"
-#include "es/ffpe/shadergen/shadergen.h"
-#include "es/ffpe/uniforms.h"
+#include "es/ffpe/shadergen/main.h"
+#include "es/ffpe/shadergen/uniforms.h"
 #include "fmt/format.h"
 
 #include <GLES3/gl32.h>
@@ -58,7 +58,7 @@ void build(
         operation
     );
 
-    finalOperations += "\n\n"; // FFPE::Rendering::ShaderGen::SG_NEWLINE;
+    finalOperations += FFPE::Rendering::ShaderGen::SG_NEWLINE;
 }
 
 void sendData(GLuint program) override {

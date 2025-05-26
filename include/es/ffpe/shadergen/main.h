@@ -139,8 +139,4 @@ inline GLuint getCachedOrNewProgram(GLbitfield64 state) {
     return renderingProgram;
 }
 
-inline void prepareInputsForRendering(GLuint program) {
-    alphaTest.sendData(program);
-}
-
 }

@@ -2,8 +2,8 @@
 
 #include "es/binding_saver.h"
 #include "es/ffp.h"
-#include "es/ffpe/shadergen/shadergen.h"
-#include "es/ffpe/uniforms.h"
+#include "es/ffpe/shadergen/main.h"
+#include "es/ffpe/shadergen/uniforms.h"
 #include "es/ffpe/vao.h"
 #include "gles20/shader_overrides.h"
 
@@ -128,7 +128,7 @@ inline void handleQuads(GLint first, GLuint count) {
 
     auto renderingProgram = FFPE::Rendering::ShaderGen::getCachedOrNewProgram(FFPE::States::buildCurrentStatesBitfield());
     OV_glUseProgram(renderingProgram);
-    FFPE::Rendering::ShaderGen::Uniforms::setupUniformsForRendering(renderingProgram);
+    FFPE::Rendering::ShaderGen::Uniforms::setupInputsForRendering(renderingProgram);
 
     auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
     GLuint realCount = generateEAB_GPU(count);
@@ -150,7 +150,7 @@ inline void drawArrays(GLenum mode, GLint first, GLuint count) {
 
         auto renderingProgram = FFPE::Rendering::ShaderGen::getCachedOrNewProgram(FFPE::States::buildCurrentStatesBitfield());
         OV_glUseProgram(renderingProgram);
-        FFPE::Rendering::ShaderGen::Uniforms::setupUniformsForRendering(renderingProgram);
+        FFPE::Rendering::ShaderGen::Uniforms::setupInputsForRendering(renderingProgram);
 
         auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
         
