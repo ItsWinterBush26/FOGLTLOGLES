@@ -38,7 +38,7 @@ inline void setupUniformsForRendering(GLuint program) {
         )
     );
 
-    ShaderGen::prepareInputsForRendering(program);
+    FFPE::Rendering::ShaderGen::prepareInputsForRendering(program);
 }
 
 }

@@ -58,7 +58,7 @@ void build(
         operation
     );
 
-    finalOperations += SG_NEWLINE;
+    finalOperations += FFPE::Rendering::ShaderGen::SG_NEWLINE;
 }
 
 void sendData(GLuint program) override {
