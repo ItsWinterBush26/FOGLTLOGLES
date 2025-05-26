@@ -20,9 +20,9 @@ inline std::string buildVertexShader() {
 }
 
 inline std::string buildFragmentShader() {
-    std::string inputs;
-    std::string outputs;
-    std::string operations;
+    std::stringstream inputs;
+    std::stringstream outputs;
+    std::stringstream operations;
 
     if (trackedStates->isCapabilityEnabled(GL_ALPHA_TEST)) {
         Feature::alphaTestFeatureInstance.build(inputs, outputs, operations);
@@ -30,7 +30,7 @@ inline std::string buildFragmentShader() {
 
     return fmt::format(
         Common::FS_TEMPLATE,
-        inputs, outputs, operations
+        inputs.str(), outputs.str(), operations.str()
     );
 }
 
@@ -82,6 +82,9 @@ inline GLuint getCachedOrNewProgram(GLbitfield64 state) {
     glAttachShader(renderingProgram, fragmentShader);
 
     OV_glLinkProgram(renderingProgram);
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
 
     Cache::Programs::putToCache(state, renderingProgram);
     return renderingProgram;

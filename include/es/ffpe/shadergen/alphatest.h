@@ -5,9 +5,11 @@
 #include "es/ffpe/shadergen/common.h"
 #include "es/ffpe/shadergen/feature.h"
 #include "es/state_tracking.h"
+#include "fmt/ostream.h"
 #include "fmt/format.h"
 
 #include <GLES3/gl32.h>
+#include <sstream>
 #include <string>
 
 namespace FFPE::Rendering::ShaderGen::Feature {
@@ -19,10 +21,12 @@ const std::string uniforms = "uniform float alphaTestThreshold;";
 const std::string baseOperation = "if (color.a {} alphaTestThreshold) discard;";
 
 void build(
-    [[maybe_unused]] std::string& finalInputs,
-    [[maybe_unused]] std::string& finalOutputs,
-    std::string& finalOperations
+    [[maybe_unused]] std::stringstream& finalInputs,
+    [[maybe_unused]] std::stringstream& finalOutputs,
+    std::stringstream& finalOperations
 ) override {
+    finalInputs << uniforms << Common::SG_NEWLINE;
+
     std::string operation;
 
     switch (States::AlphaTest::op) {
@@ -50,17 +54,17 @@ void build(
             operation = ">=";
         break;
 
-        case GL_NEVER: finalOperations += "discard;"; return;
+        case GL_NEVER: finalOperations << "discard;"; return;
         case GL_ALWAYS: return;
     }
 
-    fmt::format_to(
-        std::back_inserter(finalOperations),
+    fmt::print(
+        finalOperations,
         baseOperation,
         operation
     );
 
-    finalOperations += Common::SG_NEWLINE;
+    finalOperations << Common::SG_NEWLINE;
 }
 
 void sendData(GLuint program) override {
