@@ -69,7 +69,7 @@ const GLubyte* OV_glGetString(GLenum name) {
 }
 
 void OV_glGetIntegerv(GLenum pname, int* v) {
-    LOGI("OV_glGetIntegerv: pname=%u", pname);
+    if (debugEnabled) LOGI("OV_glGetIntegerv: pname=%u", pname);
     switch (pname) {
         case GL_NUM_EXTENSIONS:
             (*v) = ESUtils::fakeExtensions.size();

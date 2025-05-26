@@ -196,7 +196,7 @@ struct MDElementsBaseVertexBatcher {
         // LOGI("DRAW!");
         glDrawElements(mode, total, type, 0);
         
-        LOGI("done");
+        // LOGI("done");
     }
 };
 
