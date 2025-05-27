@@ -96,7 +96,9 @@ inline GLuint generateEAB_CPU(GLuint n) {
     GLuint num_quads = n / 4;
     GLuint num_indices = num_quads * 6;
 
-    std::vector<GLuint> indices(num_indices, 0);
+    std::vector<GLuint> indices;
+    indices.resize(num_indices);
+    
     for (GLuint i = 0; i < num_quads; i++) {
         GLuint base_index = i * 4;
 
@@ -131,7 +133,7 @@ inline void handleQuads(GLint first, GLuint count) {
     FFPE::Rendering::ShaderGen::Uniforms::setupInputsForRendering(renderingProgram);
 
     auto buffer = FFPE::Rendering::VAO::prepareVAOForRendering(count);
-    GLuint realCount = generateEAB_GPU(count);
+    GLuint realCount = generateEAB_CPU(count);
 
     glDrawElements(GL_TRIANGLES, realCount, GL_UNSIGNED_INT, nullptr);
     LOGI("done! drawElements (for quads)");
