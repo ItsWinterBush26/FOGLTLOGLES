@@ -16,7 +16,7 @@
 namespace FFPE::Rendering::ShaderGen {
 
 inline std::string buildVertexShader() {
-    return Common::VS_TEMPLATE;
+    return Common::VS_TEMPLATE + ""; // why is the source not updating...
 }
 
 inline std::string buildFragmentShader() {
