@@ -10,10 +10,13 @@ inline const std::string VS_TEMPLATE = R"(#version 320 es
 // FOGLTLOGLES ShaderGen : Vertex Shader
 
 // default inputs
+
+// vertex buffer data
 layout(location = 0) in mediump vec4 iVertexPosition;
 layout(location = 1) in lowp vec4 iVertexColor;
 layout(location = 2) in mediump vec4 iVertexTexCoord;
 
+// uniforms
 uniform mat4 uModelViewProjection;
 
 // default outputs
