@@ -75,6 +75,18 @@ void OV_glGetIntegerv(GLenum pname, int* v) {
             (*v) = ESUtils::fakeExtensions.size();
             break;
 
+        case 0x9126: // GL_CONTEXT_PROFILE_MASK
+            (*v) = 0x1 // GL_CONTEXT_CORE_PROFILE_BIT (this could probably be compat profile but idrc)
+            break;
+
+        case GL_MAJOR_VERSION:
+            return 4
+            break;
+
+        case GL_MINOR_VERSION:
+            return 0
+            break;
+
         default:
             glGetIntegerv(pname, v);
             break;
