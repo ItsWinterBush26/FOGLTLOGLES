@@ -27,7 +27,7 @@ inline std::string fakeExtensionsJoined;
 
 void GLES::registerBrandingOverride() {
     glVersion = string_format(
-        "4.0.0 (on ES %i.%i)",
+        "4.0 (on ES %i.%i)",
         ESUtils::version.first,
         ESUtils::version.second
     );
