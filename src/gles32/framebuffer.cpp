@@ -181,7 +181,8 @@ void OV_glGetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, 
 }
 
 GLenum OV_glCheckFramebufferStatus(GLenum target) {
-    GLenum framebufferStatus = glCheckFramebufferStatus(target);
+    return GL_FRAMEBUFFER_COMPLETE;
+    /* GLenum framebufferStatus = glCheckFramebufferStatus(target);
     if (framebufferStatus == GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT) {
         auto framebuffer = getFramebufferObject(target);
         for (GLint i = 0; i < MAX_FBTARGETS; ++i) {
@@ -190,5 +191,5 @@ GLenum OV_glCheckFramebufferStatus(GLenum target) {
         }
     }
 
-    return framebufferStatus;
+    return framebufferStatus; */
 }
