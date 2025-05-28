@@ -26,6 +26,7 @@ namespace ShaderConverter {
 
         GLSLRegexPreprocessor::moveVariableInitialization(source);
         GLSLRegexPreprocessor::removeLineDirectives(source);
+        GLSLRegexPreprocessor::removeUselessExtensions(source);
 
         if (shaderVersion <= 120) {
             GLSLRegexPreprocessor::fixDeprecatedTextureFunction(source);

@@ -4,12 +4,19 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 inline const std::regex uniformRegex("uniform\\s+mat4\\s+(\\w+)\\s*=\\s*([^;]+);");
 inline const std::regex uniformRegex2("(uniform\\s+mat4\\s+\\w+)\\s*=\\s*[^;]+;");
 inline const std::regex texture2DRegex(R"(\btexture2D\s*\()");
 inline const std::regex glFragColorRegex(R"(\bgl_FragColor\b)");
 inline const std::regex lineDirectiveRegex(R"(^\s*#line.*$)");
+
+inline const std::unordered_set<std::string> uselessExtensionsSet = {
+    "GL_ARB_compute_shader",
+    "GL_ARB_shader_atomic_counters",
+    "GL_ARB_shader_storage_buffer_object"
+};
 
 namespace ShaderConverter::GLSLRegexPreprocessor {
     // This assumes the GLSL is not malformed.
@@ -94,5 +101,19 @@ namespace ShaderConverter::GLSLRegexPreprocessor {
 
     inline void fixDeprecatedTextureFunction(std::string& source) {
         source = std::regex_replace(source, texture2DRegex, "texture(");
+    }
+
+    inline void removeUselessExtensions(std::string& source) {
+        std::istringstream iss(source);
+        std::ostringstream out;
+        std::string curLine;
+
+        while (std::getline(iss, curLine)) {
+            for (const auto& extension : uselessExtensionsSet) {
+                if (curLine.find(extension) != std::string::npos) {
+                    out << curLine << '\n';
+                }
+            }
+        }
     }
 }
