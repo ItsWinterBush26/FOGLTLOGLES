@@ -39,78 +39,58 @@ inline void swizzleBGRA(GLenum& type) {
     }
 }
 
-inline void fixTexArguments(GLenum& target, GLint& internalFormat, GLenum& type, GLenum& format) {
-    // Special cases for depth, depth-stencil, red and RG unsized formats.
-    switch (format) {
+inline void fixTexArguments(
+    GLenum& target,
+    GLint& internalFormat,
+    GLenum& type,
+    GLenum& format,
+    bool isShadowMap
+) {
+    // Workarounds
+    // https://github.com/artdeell/LTW/blob/0a0567659fe4e2ade04313061ac8c9aaa5240e53/ltw/src/main/tinywrapper/glformats.c#L77
+    switch (internalFormat) {
+        case 0x805a: // GL_RGBA12
+        case 0x805b: // GL_RGBA16
+            internalFormat = GL_RGBA16F;
+            break;
+
         case GL_DEPTH_COMPONENT:
-            switch (type) {
-                case GL_UNSIGNED_SHORT:
-                case GL_UNSIGNED_INT:
-                    internalFormat = GL_DEPTH_COMPONENT16;
-                    break;
-                case GL_FLOAT:
-                    internalFormat = GL_DEPTH_COMPONENT32F;
-                    break;
-                default:
-                    break;
-            }
+            if (isShadowMap) internalFormat = GL_DEPTH_COMPONENT32F;
             break;
-        
-        case GL_DEPTH_STENCIL: {
-            switch (type) {
-                case GL_UNSIGNED_INT_24_8:
-                    internalFormat = GL_DEPTH24_STENCIL8;
-                    break;
-                case GL_FLOAT_32_UNSIGNED_INT_24_8_REV:
-                    internalFormat = GL_DEPTH32F_STENCIL8;
-                    break;
-                default:
-                    break;
-            }
+
+        case 0x81a7: // GL_DEPTH_COMPONENT32
+            internalFormat = GL_DEPTH_COMPONENT32F;
             break;
-        }
-        // Single-channel (red) unsized format
-        case GL_RED: {
-            switch (type) {
-                case GL_BYTE:
-                    internalFormat = GL_R8_SNORM;
-                    break;
-                case GL_UNSIGNED_BYTE:
-                    internalFormat = GL_R8;
-                    break;
-                case GL_HALF_FLOAT:
-                    internalFormat = GL_R16F;
-                    break;
-                case GL_FLOAT:
-                    internalFormat = GL_R32F;
-                    break;
-                default:
-                    break;
-            }
+
+        case GL_DEPTH_STENCIL:
+            internalFormat = GL_DEPTH24_STENCIL8;
             break;
-        }
-        // Two-channel (RG) unsized format
-        case GL_RG: {
-            switch (type) {
-                case GL_BYTE:
-                    internalFormat = GL_RG8_SNORM;
-                    break;
-                case GL_UNSIGNED_BYTE:
-                    internalFormat = GL_RG8;
-                    break;
-                case GL_HALF_FLOAT:
-                    internalFormat = GL_RG16F;
-                    break;
-                case GL_FLOAT:
-                    internalFormat = GL_RG32F;
-                    break;
-                default:
-                    break;
-            }
+
+        case GL_R8_SNORM:
+            internalFormat = GL_R16F;
             break;
-        }
-        default:
-            // Other internal formats will be handled in the large mapping below.
+
+        case GL_RG8_SNORM:
+            internalFormat = GL_RG16F;
+            break;
+
+        case GL_RGBA8_SNORM:
+            internalFormat = GL_RGBA16F;
+            break;
+
+        case GL_RGB8I:
+        case GL_RGB16I:
+        case GL_RGB32I:
+        case GL_RGB8_SNORM:
+        case 0x8053: // GL_RGB12
+        case 0x8054: // GL_RGB16
+        case GL_RGB16F:
+        case GL_RGB32F:
+            internalFormat = GL_R11F_G11F_B10F;
+            break;
+
+        case GL_RGB8UI:
+            internalFormat = GL_RGB8;
             break;
     }
 
@@ -366,6 +346,80 @@ inline void fixTexArguments(GLenum& target, GLint& internalFormat, GLenum& type,
             }
             break;
         }
+    }
+
+    // Special cases for depth, depth-stencil, red and RG unsized formats.
+    switch (format) {
+        case GL_DEPTH_COMPONENT:
+            switch (type) {
+                case GL_UNSIGNED_SHORT:
+                case GL_UNSIGNED_INT:
+                    internalFormat = GL_DEPTH_COMPONENT16;
+                    break;
+                case GL_FLOAT:
+                    internalFormat = GL_DEPTH_COMPONENT32F;
+                    break;
+                default:
+                    break;
+            }
+            break;
+        
+        case GL_DEPTH_STENCIL: {
+            switch (type) {
+                case GL_UNSIGNED_INT_24_8:
+                    internalFormat = GL_DEPTH24_STENCIL8;
+                    break;
+                case GL_FLOAT_32_UNSIGNED_INT_24_8_REV:
+                    internalFormat = GL_DEPTH32F_STENCIL8;
+                    break;
+                default:
+                    break;
+            }
+            break;
+        }
+        // Single-channel (red) unsized format
+        case GL_RED: {
+            switch (type) {
+                case GL_BYTE:
+                    internalFormat = GL_R8_SNORM;
+                    break;
+                case GL_UNSIGNED_BYTE:
+                    internalFormat = GL_R8;
+                    break;
+                case GL_HALF_FLOAT:
+                    internalFormat = GL_R16F;
+                    break;
+                case GL_FLOAT:
+                    internalFormat = GL_R32F;
+                    break;
+                default:
+                    break;
+            }
+            break;
+        }
+        // Two-channel (RG) unsized format
+        case GL_RG: {
+            switch (type) {
+                case GL_BYTE:
+                    internalFormat = GL_RG8_SNORM;
+                    break;
+                case GL_UNSIGNED_BYTE:
+                    internalFormat = GL_RG8;
+                    break;
+                case GL_HALF_FLOAT:
+                    internalFormat = GL_RG16F;
+                    break;
+                case GL_FLOAT:
+                    internalFormat = GL_RG32F;
+                    break;
+                default:
+                    break;
+            }
+            break;
+        }
+        default:
+            // Other internal formats will be handled in the large mapping below.
+            break;
     }
 
     doSwizzling(target);
