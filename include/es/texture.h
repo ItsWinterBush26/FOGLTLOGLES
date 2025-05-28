@@ -352,6 +352,7 @@ inline void fixTexArguments(
     switch (format) {
         case GL_DEPTH_COMPONENT:
             switch (type) {
+                case GL_UNSIGNED_BYTE:
                 case GL_UNSIGNED_SHORT:
                 case GL_UNSIGNED_INT:
                     internalFormat = GL_DEPTH_COMPONENT16;
