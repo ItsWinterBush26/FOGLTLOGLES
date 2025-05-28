@@ -10,6 +10,11 @@ inline void trackTextureFormat(GLint& internalFormat) {
     trackedStates->activeTextureState->textureInternalFormats.insert({ trackedStates->activeTextureState->boundTextures[GL_TEXTURE_2D], internalFormat });
 }
 
+// nuke the format fixer
+// rewrite it to be more
+// extensible and readable
+// frozen lib constexpr ???
+
 inline bool isDepthFormat(GLenum format) {
     switch (format) {
         case GL_DEPTH_COMPONENT:
@@ -353,6 +358,8 @@ inline void fixTexArguments(
         case GL_DEPTH_COMPONENT:
             switch (type) {
                 case GL_UNSIGNED_BYTE:
+                    type = GL_UNSIGNED_SHORT;
+                    // byte to short eta?
                 case GL_UNSIGNED_SHORT:
                 case GL_UNSIGNED_INT:
                     internalFormat = GL_DEPTH_COMPONENT16;
