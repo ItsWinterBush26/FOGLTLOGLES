@@ -32,7 +32,9 @@ void OV_glBindFramebuffer(GLenum target, GLuint framebuffer) {
     glBindFramebuffer(target, framebuffer);
 
     switch (target) {
-        case GL_FRAMEBUFFER: // fallthrough
+        case GL_FRAMEBUFFER:
+            trackedStates->framebufferState.boundDrawFramebuffer = trackedStates->framebufferState.boundReadFramebuffer = framebuffer;
+        break;
         case GL_DRAW_FRAMEBUFFER: trackedStates->framebufferState.boundDrawFramebuffer = framebuffer; break;
         case GL_READ_FRAMEBUFFER: trackedStates->framebufferState.boundReadFramebuffer = framebuffer; break;
     }
