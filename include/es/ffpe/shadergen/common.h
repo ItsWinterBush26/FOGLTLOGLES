@@ -29,7 +29,7 @@ void main() {
 
     vertexID = gl_VertexID;
     vertexColor = iVertexColor;
-    verexTexCoord = iVertexTexCoord;
+    vertexTexCoord = iVertexTexCoord;
 })";
 
 inline const std::string FS_TEMPLATE = R"(#version 320 es
