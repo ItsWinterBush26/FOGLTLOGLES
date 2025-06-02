@@ -47,7 +47,7 @@ void OV_glTexImage2D(
             internalFormat
         );
     } else {
-        LOGI("glTexImage2D (before): internalformat=%i border=%i format=%i type=%u", internalFormat, border, format, type);
+        // LOGI("glTexImage2D (before): internalformat=%i border=%i format=%i type=%u", internalFormat, border, format, type);
         
         fixTexArguments(target, internalFormat, type, format, (width == height));
         glTexImage2D(
@@ -56,7 +56,7 @@ void OV_glTexImage2D(
             border, format, type, pixels
         );
 
-        LOGI("glTexImage2D (after): internalformat=%i border=%i format=%i type=%u", internalFormat, border, format, type);
+        // LOGI("glTexImage2D (after): internalformat=%i border=%i format=%i type=%u", internalFormat, border, format, type);
     }
 
     trackTextureFormat(internalFormat);
