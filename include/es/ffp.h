@@ -63,18 +63,26 @@ namespace ClientState {
         
         inline std::unordered_map<GLenum, ArrayState> arrayStates;
 
-        // GL_TEXTURE_COORD_ARRAY | GL_TEXTUREi 
+        // GL_TEXTUREi, ArrayState
         inline std::unordered_map<GLenum, ArrayState> texCoordArrayStates;
 
         inline bool isArrayEnabled(GLenum array) {
-            return (array & GL_TEXTURE_COORD_ARRAY) ? texCoordArrayStates[array].enabled : arrayStates[array].enabled;
+            return arrayStates[array].enabled;
+        }
+
+        inline bool isTexCoordArrayEnabled(GLenum unit) {
+            return texCoordArrayStates[unit].enabled;
         }
 
         inline ArrayState* getArray(GLenum array) {
-            return (array & GL_TEXTURE_COORD_ARRAY) ? &texCoordArrayStates[array] : &arrayStates[array];
+            return &arrayStates[array];
+        }
+
+        inline ArrayState* getTexCoordArray(GLenum unit) {
+            return &texCoordArrayStates[unit];
         }
     }
- 
+
     inline GLenum currentTexCoordUnit;
     inline std::vector<GLenum> texCoordArrayTexUnits;
 }
@@ -103,6 +111,8 @@ private:
     std::unordered_map<GLenum, MatrixState> matrices;
     MatrixState* currentMatrix;
 
+    glm::mat4 modelViewProjection;
+
 public:
     MatricesStateManager() {
         matrices.insert({
@@ -128,6 +138,10 @@ public:
 
     void modifyCurrentMatrix(const std::function<glm::mat4(glm::mat4)>& newMatrix) {
         currentMatrix->matrix = newMatrix(currentMatrix->matrix);
+
+        if (currentMatrixType == GL_MODELVIEW || currentMatrixType == GL_PROJECTION) {
+            modelViewProjection = getMatrix(GL_MODELVIEW).matrix * getMatrix(GL_PROJECTION).matrix;
+        }
     }
 
     void pushCurrentMatrix() {
@@ -136,6 +150,7 @@ public:
 
     void popTopMatrix() {
         if (currentMatrix->stack.empty()) return;
+        
         currentMatrix->matrix = currentMatrix->stack.top();
         currentMatrix->stack.pop();
     }
@@ -149,7 +164,7 @@ public:
     }
 
     const glm::mat4 getModelViewProjection() {
-        return getMatrix(GL_MODELVIEW).matrix * getMatrix(GL_PROJECTION).matrix;
+        return modelViewProjection;
     }
 };
 

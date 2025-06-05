@@ -115,13 +115,13 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
         GLsizei newVABSize = count * sizeof(VertexData);
         // if (newVABSize > currentVABSize) {
         // resize always
-            OV_glBufferData(
-                GL_ARRAY_BUFFER,
-                newVABSize,
-                nullptr, GL_STATIC_DRAW
-            );
+        OV_glBufferData(
+            GL_ARRAY_BUFFER,
+            newVABSize,
+            nullptr, GL_STATIC_DRAW
+        );
 
-            currentVABSize = newVABSize;
+        currentVABSize = newVABSize;
         // }
 
         vertices = (VertexData*) glMapBufferRange(
@@ -137,7 +137,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
     LOGI("vertexattribs!");
     auto vertexArray = FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
     auto colorArray = FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
-    auto texCoordArray = FFPE::States::ClientState::Arrays::getArray(GL_TEXTURE_COORD_ARRAY);
+    auto texCoordArray = FFPE::States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0);
 
     LOGI("vertices!");
     if (vertexArray->enabled) {

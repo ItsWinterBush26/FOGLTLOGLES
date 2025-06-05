@@ -146,8 +146,8 @@ void glOrtho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdou
         return;
     }
 
-    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4) {
-        return glm::ortho(
+    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
+        return currentMatrix * glm::ortho(
             left, right,
             bottom, top,
             near_val, far_val
@@ -161,8 +161,8 @@ void glFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLd
         return;
     }
 
-    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4) {
-        return glm::frustum(
+    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
+        return currentMatrix * glm::frustum(
             left, right,
             bottom, top,
             near_val, far_val
