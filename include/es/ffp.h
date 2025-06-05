@@ -140,7 +140,7 @@ public:
         currentMatrix->matrix = newMatrix(currentMatrix->matrix);
 
         if (currentMatrixType == GL_MODELVIEW || currentMatrixType == GL_PROJECTION) {
-            modelViewProjection = getMatrix(GL_MODELVIEW).matrix * getMatrix(GL_PROJECTION).matrix;
+            modelViewProjection = getMatrix(GL_PROJECTION).matrix * getMatrix(GL_MODELVIEW).matrix;
         }
     }
 
