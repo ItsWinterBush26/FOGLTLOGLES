@@ -50,6 +50,10 @@ inline void advance() {
 }
 
 inline void end() {
+    // TODO:
+    // use the built vertex data instead of
+    // literally replaying the display list
+
     if (States::primitive == GL_NONE) {
         LOGE("glEnd has not been called yet!");
         return;

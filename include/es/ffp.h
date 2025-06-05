@@ -5,14 +5,12 @@
 #include "utils/conversions.h"
 #include "utils/fast_map.h"
 
-#include <bit>
 #include <cstddef>
 #include <GLES3/gl32.h>
 #include <memory>
 #include <stack>
 #include <type_traits>
 #include <unordered_map>
-#include <unordered_set>
 #include <vector>
 
 // TODO: break out and move to specific files
