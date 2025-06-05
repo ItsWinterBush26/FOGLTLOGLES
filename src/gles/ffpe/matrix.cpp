@@ -18,8 +18,9 @@ void glLoadIdentity();
 
 void glLoadMatrixd(const GLdouble *m);
 void glLoadMatrixf(const GLfloat *m);
- 
+
 void glOrtho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val);
+void glOrthof(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near_val, GLfloat far_val);
 void glFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val);
 
 void glMultMatrixd(const GLdouble *m);
@@ -45,6 +46,7 @@ void FFP::registerMatrixFunctions() {
     REGISTER(glLoadMatrixf);
 
     REGISTER(glOrtho);
+    REGISTER(glOrthof);
     REGISTER(glFrustum);
 
     REGISTER(glMultMatrixd);
@@ -141,16 +143,20 @@ void glLoadMatrixf(const GLfloat *m) {
 }
 
 void glOrtho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val) {
+    glOrthof(left, right, bottom, top, near_val, far_val);
+}
+
+void glOrthof(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near_val, GLfloat far_val)  {
     if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<glOrtho>(left, right, bottom, top, near_val, far_val);
+        Lists::displayListManager->addCommand<glOrthof>(left, right, bottom, top, near_val, far_val);
         return;
     }
 
     Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
         return currentMatrix * glm::ortho(
-            (GLfloat) left, (GLfloat) right,
-            (GLfloat) bottom, (GLfloat) top,
-            (GLfloat) near_val, (GLfloat) far_val
+            left, right,
+            bottom, top,
+            near_val, far_val
         );
     });
 }
