@@ -136,7 +136,7 @@ public:
         currentMatrix = &matrices[mode];
     }
 
-    void modifyCurrentMatrix(const std::function<glm::mat4(glm::mat4)>& newMatrix) {
+    void modifyCurrentMatrix(const std::function<glm::mat4(glm::mat4)> newMatrix) {
         currentMatrix->matrix = newMatrix(currentMatrix->matrix);
 
         if (currentMatrixType == GL_MODELVIEW || currentMatrixType == GL_PROJECTION) {
