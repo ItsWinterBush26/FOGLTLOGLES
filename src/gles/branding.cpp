@@ -76,7 +76,7 @@ void OV_glGetIntegerv(GLenum pname, int* v) {
             break;
 
         case 0x9126: // GL_CONTEXT_PROFILE_MASK
-            (*v) = 0x1; // GL_CONTEXT_CORE_PROFILE_BIT (this could probably be compat profile but idrc)
+            (*v) = 0x2; // dawg
             break;
 
         case GL_MAJOR_VERSION:
