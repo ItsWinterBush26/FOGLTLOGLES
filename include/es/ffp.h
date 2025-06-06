@@ -178,8 +178,9 @@ private:
     GLenum mode = GL_NONE;
 
 public:
-    void addCommand(const std::function<void()>& command) {
-        commands.push_back(command);
+    template<typename Func>
+    void addCommand(const Func&& command) {
+        commands.emplace_back(std::forward<Func>(command));
     }
 
     void setMode(GLenum newMode) {
@@ -250,8 +251,8 @@ public:
         }
         
         activeDisplayList.addCommand(
-            [a = std::make_tuple(std::forward<Args>(args)...)]() mutable {
-                std::apply(F, a);
+            [a = std::forward_as_tuple(std::forward<Args>(args)...)]() mutable {
+                std::apply(F, std::move(a));
             }
         );
     }

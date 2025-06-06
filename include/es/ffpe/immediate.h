@@ -35,6 +35,24 @@ inline void begin(GLenum primitive) {
         return;
     }
 
+    switch (primitive) {
+        case GL_POINTS:
+        case GL_LINES:
+        case GL_LINE_STRIP:
+        case GL_LINE_LOOP:
+        case GL_TRIANGLES:
+        case GL_TRIANGLE_STRIP:
+        case GL_TRIANGLE_FAN:
+        case 0x7: // GL_QUADS
+        case 0x8: // GL_QUAD_STRIP
+        case 0x9: // GL_POLYGON
+            break;
+        default:
+            return;
+    }
+
+    Lists::displayListManager->addCommand<begin>(primitive);
+
     LOGI("glBegin()!");
 
     States::primitive = primitive;
@@ -42,18 +60,16 @@ inline void begin(GLenum primitive) {
 
 inline void advance() {
     LOGI("glVertex*()! advancing!");
-    States::vertices.push_back({
+    States::vertices.emplace_back(
         FFPE::States::VertexData::position,
         FFPE::States::VertexData::color,
         FFPE::States::VertexData::texCoord
-    });
+    );
 }
 
-inline void end() {
-    // TODO:
-    // use the built vertex data instead of
-    // literally replaying the display list
-
+inline void endInternal(
+    const std::vector<FFPE::States::VertexData::VertexRepresentation>& vertices
+) {
     if (States::primitive == GL_NONE) {
         LOGE("glEnd has not been called yet!");
         return;
@@ -61,18 +77,22 @@ inline void end() {
 
     LOGI("glEnd()!");
 
-    if (States::vertices.size() == 0) {
+    if (vertices.size() == 0) {
         LOGW("glEnd called with no vertices??");
         LOGW("Ignoring!!");
         return;
     }
 
+    Lists::displayListManager->addCommand<endInternal>(
+        std::vector<FFPE::States::VertexData::VertexRepresentation>(vertices)
+    );
+
     SaveBoundedBuffer sbb(GL_ARRAY_BUFFER);
     OV_glBindBuffer(GL_ARRAY_BUFFER, vbo);
     OV_glBufferData(
         GL_ARRAY_BUFFER,
-        States::vertices.size() * sizeof(FFPE::States::VertexData::VertexRepresentation),
-        States::vertices.data(),
+        vertices.size() * sizeof(FFPE::States::VertexData::VertexRepresentation),
+        vertices.data(),
         GL_STATIC_DRAW
     );
 
@@ -133,6 +153,10 @@ inline void end() {
     States::vertices.clear();
 
     LOGI("glEnd() [END]!");
+}
+
+inline void end() {
+    endInternal(States::vertices);
 }
 
 }
