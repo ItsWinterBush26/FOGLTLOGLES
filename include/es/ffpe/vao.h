@@ -103,6 +103,8 @@ inline void putVertexData(GLenum arrayType, FFPE::States::ClientState::Arrays::A
 [[nodiscard]]
 inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) {
     LOGI("vao setup!");
+    glBindVertexArray(vao);
+
     // TODO: bind gl*Pointer here as VAO's (doing this with no physical keyboard is making me mentally insane, ease send help)
     std::unique_ptr<SaveBoundedBuffer> sbb;
 
@@ -131,8 +133,6 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
     } else {
         LOGI("buffered! buffer=%u", trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer);
     }
-
-    glBindVertexArray(vao);
 
     LOGI("vertexattribs!");
     auto vertexArray = FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
@@ -168,8 +168,8 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
     }
 
     LOGI("colors!");
-    glEnableVertexAttribArray(1);
     if (colorArray->enabled) {
+        glEnableVertexAttribArray(AttributeLocations::COLOR_LOCATION);
         if (colorArray->parameters.buffered) {
             LOGI("buffered!");
             glVertexAttribPointer(
@@ -202,8 +202,8 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
     }
 
     LOGI("texcoords!");
-    /* glEnableVertexAttribArray(AttributeLocations::TEX_COORD_LOCATION);
     if (texCoordArray->enabled) {
+        glEnableVertexAttribArray(AttributeLocations::TEX_COORD_LOCATION);
         if (texCoordArray->parameters.buffered) {
             LOGI("buffered!");
             glVertexAttribPointer(
@@ -224,7 +224,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                 (void*) offsetof(VertexData, texCoord)
             );
         }
-    } else */ {
+    } else {
         LOGI("using global texCoord state!");
         glDisableVertexAttribArray(AttributeLocations::TEX_COORD_LOCATION);
         glVertexAttrib4fv(

@@ -122,8 +122,7 @@ inline GLuint generateEAB_CPU(GLuint n) {
     return num_indices;
 }
 
-inline void handleQuads(GLint first, GLuint count) {
-    // no checks because GL_QUADS has been deprecated and is only used by old apps (guaranteed to be FFP)
+inline void drawQuads(GLuint count) {
     LOGI("quads!");
     SaveUsedProgram sup;
     SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
