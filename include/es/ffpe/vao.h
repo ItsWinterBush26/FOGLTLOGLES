@@ -9,13 +9,16 @@
 #include "es/utils.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/string_cast.hpp"
-#include "utils/span.h"
 
 #include <cstddef>
 #include <GLES3/gl32.h>
 #include <memory>
+#include <span>
 
-typedef FFPE::States::VertexData::VertexRepresentation VertexData;
+struct VertexData { };
+
+template<typename P, typename C>
+using VertexDataTyped = FFPE::States::VertexData::VertexRepresentation<P, C>;
 
 namespace FFPE::Rendering::VAO {
 
@@ -35,8 +38,40 @@ inline void init() {
     glGenBuffers(1, &vab);
 }
 
+template<typename F>
+inline void mapVertexData(
+    GLsizei count,
+    States::ClientState::Arrays::ArrayState* vertex,
+    States::ClientState::Arrays::ArrayState* color,
+    F&& callback
+) {
+    ESUtils::TypeTraits::dispatchAsType(vertex->parameters.type, [&]<typename POS>() {
+        ESUtils::TypeTraits::dispatchAsType(color->parameters.type, [&]<typename COL>() {
+            GLsizei newVABSize = count * sizeof(VertexDataTyped<POS, COL>);
+            
+            OV_glBindBuffer(GL_ARRAY_BUFFER, vab);
+            OV_glBufferData(
+                GL_ARRAY_BUFFER,
+                newVABSize,
+                nullptr, GL_STATIC_DRAW
+            );
+
+            auto* v = static_cast<
+                VertexDataTyped<POS, COL>*
+            >(glMapBufferRange(
+                GL_ARRAY_BUFFER, 0,
+                newVABSize, GL_MAP_WRITE_BIT
+            ));
+
+            callback(v);
+
+            if (v) glUnmapBuffer(v);
+        });
+    });
+}
+
 template<typename T1, typename T2>
-inline void fillDataComponents(GLuint& offsetTracker, tcb::span<const T1> src, T2* dst) {
+inline void fillDataComponents(GLuint& offsetTracker, std::span<const T1> src, T2* dst) {
     for (size_t i = 0; i < src.size(); i++) (*dst)[i] = static_cast<typename T2::value_type>(src[i]);
     offsetTracker += src.size();
 }
@@ -50,7 +85,7 @@ inline void putVertexDataInternal(GLenum arrayType, GLsizei dataSize, GLuint ver
             for (GLuint i = 0; i < verticesCount; ++i) {
                 fillDataComponents(
                     srcOffset,
-                    tcb::span(src + srcOffset, dataSize),
+                    std::span(src + srcOffset, dataSize),
                     &dst[i].position
                 );
             }
@@ -60,7 +95,7 @@ inline void putVertexDataInternal(GLenum arrayType, GLsizei dataSize, GLuint ver
             for (GLuint i = 0; i < verticesCount; ++i) {
                 fillDataComponents(
                     srcOffset,
-                    tcb::span(src + srcOffset, dataSize),
+                    std::span(src + srcOffset, dataSize),
                     &dst[i].color
                 );
             }
@@ -70,7 +105,7 @@ inline void putVertexDataInternal(GLenum arrayType, GLsizei dataSize, GLuint ver
             for (GLuint i = 0; i < verticesCount; ++i) {
                 fillDataComponents(
                     srcOffset,
-                    tcb::span(src + srcOffset, dataSize),
+                    std::span(src + srcOffset, dataSize),
                     &dst[i].texCoord
                 );
             }
@@ -119,40 +154,40 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
     LOGI("vao setup!");
     glBindVertexArray(vao);
 
-    // TODO: bind gl*Pointer here as VAO's (doing this with no physical keyboard is making me mentally insane, ease send help)
-    std::unique_ptr<SaveBoundedBuffer> sbb;
-
-    VertexData* vertices = nullptr;
-    if (trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer == 0) {
-        LOGI("not buffered! setup our own vab");
-        sbb = std::make_unique<SaveBoundedBuffer>(GL_ARRAY_BUFFER);
-
-        OV_glBindBuffer(GL_ARRAY_BUFFER, vab);
-        GLsizei newVABSize = count * sizeof(VertexData);
-        // if (newVABSize > currentVABSize) {
-        // resize always
-        OV_glBufferData(
-            GL_ARRAY_BUFFER,
-            newVABSize,
-            nullptr, GL_STATIC_DRAW
-        );
-
-        currentVABSize = newVABSize;
-        // }
-
-        vertices = (VertexData*) glMapBufferRange(
-            GL_ARRAY_BUFFER, 0,
-            newVABSize, GL_MAP_WRITE_BIT
-        );
-    } else {
-        LOGI("buffered! buffer=%u", trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer);
-    }
-
-    LOGI("vertexattribs!");
     auto vertexArray = FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
     auto colorArray = FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
     auto texCoordArray = FFPE::States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0);
 
+    // TODO: bind gl*Pointer here as VAO's (doing this with no physical keyboard is making me mentally insane, ease send help)
+    std::unique_ptr<SaveBoundedBuffer> sbb;
+    
+    if (trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer == 0) {
+        LOGI("not buffered! setup our own vab");
+        sbb = std::make_unique<SaveBoundedBuffer>(GL_ARRAY_BUFFER);
+        
+        mapVertexData(
+            count, vertexArray, colorArray,
+            [&](auto* vertices) {
+                if (vertexArray->enabled) {
+
+                } else {
+
+                }
+
+                if (colorArray->enabled) {
+
+                } else {
+                    
+                }
+            }
+        );
+
+        return sbb;
+    }
+    
+    LOGI("buffered! buffer=%u", trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer);
+    LOGI("vertexattribs!");
+    
     LOGI("vertices!");
     if (vertexArray->enabled) {
         glEnableVertexAttribArray(0);
@@ -249,7 +284,6 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
         );
     }
 
-    if (vertices) glUnmapBuffer(GL_ARRAY_BUFFER);
     return sbb;
 }
 

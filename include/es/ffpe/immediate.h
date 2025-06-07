@@ -13,12 +13,14 @@
 #include <cstddef>
 #include <vector>
 
+using VertexData = FFPE::States::VertexData::VertexRepresentation<GLfloat, GLfloat>;
+
 namespace FFPE::Rendering::ImmediateMode {
 
 namespace States {
     inline GLenum primitive;
 
-    inline std::vector<FFPE::States::VertexData::VertexRepresentation> vertices;
+    inline std::vector<VertexData> vertices;
 }
 
 inline GLuint vbo;
@@ -72,7 +74,7 @@ inline void advance() {
 }
 
 inline void endInternal(
-    const std::vector<FFPE::States::VertexData::VertexRepresentation>& vertices
+    const std::vector<VertexData>& vertices
 ) {
     if (!isActive()) {
         LOGE("glEnd has not been called yet!");
@@ -88,62 +90,56 @@ inline void endInternal(
     }
 
     Lists::displayListManager->addCommand<endInternal>(
-        std::vector<FFPE::States::VertexData::VertexRepresentation>(vertices)
+        std::vector<VertexData>(vertices)
     );
 
     SaveBoundedBuffer sbb(GL_ARRAY_BUFFER);
     OV_glBindBuffer(GL_ARRAY_BUFFER, vbo);
     OV_glBufferData(
         GL_ARRAY_BUFFER,
-        vertices.size() * sizeof(FFPE::States::VertexData::VertexRepresentation),
+        vertices.size() * sizeof(VertexData),
         vertices.data(),
         GL_STATIC_DRAW
     );
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(
-        decltype(FFPE::States::VertexData::VertexRepresentation::position)::length(),
+        decltype(VertexData::position)::length(),
         ESUtils::TypeTraits::GLTypeEnum<
             decltype(
-                FFPE::States::VertexData::VertexRepresentation::position
+                VertexData::position
             )::value_type
         >::value,
-        sizeof(
-            FFPE::States::VertexData::VertexRepresentation
-        ), (void*) offsetof(
-            FFPE::States::VertexData::VertexRepresentation, position
+        sizeof(VertexData), (void*) offsetof(
+            VertexData, position
         )
     );
 
     glEnableClientState(GL_COLOR_ARRAY);
     glColorPointer(
-        decltype(FFPE::States::VertexData::VertexRepresentation::color)::length(),
+        decltype(VertexData::color)::length(),
         ESUtils::TypeTraits::GLTypeEnum<
             decltype(
-                FFPE::States::VertexData::VertexRepresentation::color
+                VertexData::color
             )::value_type
         >::value,
-        sizeof(
-            FFPE::States::VertexData::VertexRepresentation
-        ),
+        sizeof(VertexData),
         (void*) offsetof(
-            FFPE::States::VertexData::VertexRepresentation, color
+            VertexData, color
         )
     );
 
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glTexCoordPointer(
-        decltype(FFPE::States::VertexData::VertexRepresentation::texCoord)::length(),
+        decltype(VertexData::texCoord)::length(),
         ESUtils::TypeTraits::GLTypeEnum<
             decltype(
-                FFPE::States::VertexData::VertexRepresentation::texCoord
+                VertexData::texCoord
             )::value_type
         >::value,
-        sizeof(
-            FFPE::States::VertexData::VertexRepresentation
-        ),
+        sizeof(VertexData),
         (void*) offsetof(
-            FFPE::States::VertexData::VertexRepresentation, texCoord
+            VertexData, texCoord
         )
     );
 

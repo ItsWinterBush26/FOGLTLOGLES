@@ -178,13 +178,21 @@ namespace TypeTraits {
 template <typename T>
 struct GLTypeEnum;
 
-#define GL_TYPE_ENUM(podt, glt) template <> struct GLTypeEnum<podt> { static constexpr GLenum value = glt; }
+template<GLenum T>
+struct GLPrimitive;
+
+#define GL_TYPE_ENUM(podt, glt) template<> struct GLTypeEnum<podt> { static constexpr GLenum value = glt; }
+#define GL_PRIMITIVE(glt, podt) template<> struct GLPrimitive<glt> { using type = podt; }
 
 GL_TYPE_ENUM(GLubyte, GL_UNSIGNED_BYTE);
 GL_TYPE_ENUM(GLshort, GL_SHORT);
 GL_TYPE_ENUM(GLint, GL_INT);
 GL_TYPE_ENUM(GLfloat, GL_FLOAT);
 GL_TYPE_ENUM(GLdouble, GL_DOUBLE);
+
+GL_PRIMITIVE(GL_UNSIGNED_BYTE, GLubyte);
+GL_PRIMITIVE(GL_SHORT, GLshort);
+GL_PRIMITIVE(GL_FLOAT, GLfloat);
 
 inline GLsizei getTypeSize(GLenum type) {
     switch (type) {
@@ -194,14 +202,38 @@ inline GLsizei getTypeSize(GLenum type) {
         case GL_FLOAT: return sizeof(GLfloat);
         case GL_DOUBLE: return sizeof(GLdouble);
         default:
-            LOGI("Unhandled type! (type=%u)", type);
-            return 0;
+            LOGE("Unhandled type! (type=%u)", type);
+            throw std::runtime_error("Unsupported GL type");
     }
 }
 
 template<typename T>
 inline const T* asTypedArray(const void* array) {
     return static_cast<const T*>(array);
+}
+
+template<typename Func>
+void dispatchAsType(GLenum type, const Func&& func) {
+    switch (type) {
+        case GL_FLOAT: {
+            using T = typename GLPrimitive<GL_FLOAT>::type;
+            func.template operator()<T>();
+            break;
+        }
+        case GL_UNSIGNED_BYTE: {
+            using T = typename GLPrimitive<GL_UNSIGNED_BYTE>::type;
+            func.template operator()<T>();
+            break;
+        }
+        case GL_SHORT: {
+            using T = typename GLPrimitive<GL_SHORT>::type;
+            func.template operator()<T>();
+            break;
+        }
+        default:
+            LOGE("Unhandled type! (type=%u)", type);
+            throw std::runtime_error("Unsupported GL type");
+    }
 }
 
 }
