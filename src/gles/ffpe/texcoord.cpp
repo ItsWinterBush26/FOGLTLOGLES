@@ -1,6 +1,7 @@
 #include "es/ffp.h"
 #include "es/ffpe/immediate.h"
 #include "gles/ffp/main.h"
+#include "glm/ext/vector_float2.hpp"
 #include "main.h"
 
 #include <GLES3/gl32.h>
