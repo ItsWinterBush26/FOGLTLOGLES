@@ -1,6 +1,6 @@
 #pragma once
 
-#include "es/ffp.h"
+#include "es/ffpe/matrices.h"
 #include "es/ffpe/shadergen/alphatest.h"
 #include "es/ffpe/shadergen/cache.h"
 #include "glm/gtc/type_ptr.hpp"
@@ -15,7 +15,7 @@ inline void setupInputsForRendering(GLuint program) {
             program, "uModelViewProjection"
         ), 1, GL_FALSE,
         glm::value_ptr(
-            Matrices::matricesStateManager->getModelViewProjection()
+            Matrices::getModelViewProjection()
         )
     );
     

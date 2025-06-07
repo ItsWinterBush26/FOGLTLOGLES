@@ -29,8 +29,12 @@ inline void init() {
     LOGI("immediate mode buffer = %u", vbo);
 }
 
+inline bool isActive() {
+    return States::primitive != GL_NONE;
+}
+
 inline void begin(GLenum primitive) {
-    if (States::primitive != GL_NONE) {
+    if (isActive()) {
         LOGE("glBegin has not been ended yet!");
         return;
     }
@@ -70,7 +74,7 @@ inline void advance() {
 inline void endInternal(
     const std::vector<FFPE::States::VertexData::VertexRepresentation>& vertices
 ) {
-    if (States::primitive == GL_NONE) {
+    if (!isActive()) {
         LOGE("glEnd has not been called yet!");
         return;
     }

@@ -94,81 +94,6 @@ inline GLbitfield buildCurrentStatesBitfield() {
 
 }
 
-namespace Matrices {
-struct MatrixState {
-    GLenum type;
-    glm::mat4 matrix;
-
-    std::stack<glm::mat4> stack;
-}; 
-
-class MatricesStateManager {
-private:
-    GLenum currentMatrixType = GL_MODELVIEW;
-
-    std::unordered_map<GLenum, MatrixState> matrices;
-    MatrixState* currentMatrix;
-
-    glm::mat4 modelViewProjection;
-
-public:
-    MatricesStateManager() {
-        matrices.insert({
-            GL_MODELVIEW,
-            { GL_MODELVIEW, glm::mat4(1.0f), std::stack<glm::mat4>() }
-        });
-
-        matrices.insert({
-            GL_PROJECTION,
-            { GL_PROJECTION, glm::mat4(1.0f), std::stack<glm::mat4>() }
-        });
-
-        matrices.insert({
-            GL_TEXTURE,
-            { GL_TEXTURE, glm::mat4(1.0f), std::stack<glm::mat4>() }
-        });
-    }
-
-    void setCurrentMatrix(GLenum mode) {
-        currentMatrixType = mode;
-        currentMatrix = &matrices[mode];
-    }
-
-    void modifyCurrentMatrix(const std::function<glm::mat4(glm::mat4)>& newMatrix) {
-        currentMatrix->matrix = newMatrix(currentMatrix->matrix);
-
-        if (currentMatrixType == GL_MODELVIEW || currentMatrixType == GL_PROJECTION) {
-            modelViewProjection = getMatrix(GL_PROJECTION).matrix * getMatrix(GL_MODELVIEW).matrix;
-        }
-    }
-
-    void pushCurrentMatrix() {
-        currentMatrix->stack.push(currentMatrix->matrix);
-    }
-
-    void popTopMatrix() {
-        if (currentMatrix->stack.empty()) return;
-        
-        currentMatrix->matrix = currentMatrix->stack.top();
-        currentMatrix->stack.pop();
-    }
-
-    const MatrixState getMatrix(GLenum mode) {
-        return this->matrices[mode];
-    }
-
-    const MatrixState getCurrentMatrix() {
-        return *this->currentMatrix;
-    }
-
-    const glm::mat4 getModelViewProjection() {
-        return modelViewProjection;
-    }
-};
-
-inline std::shared_ptr<MatricesStateManager> matricesStateManager;
-}
-
 namespace Lists {
 
 class DisplayList {
@@ -179,7 +104,7 @@ private:
 
 public:
     template<typename Func>
-    void addCommand(const Func&& command) {
+    void addCommand(Func&& command) {
         commands.emplace_back(std::forward<Func>(command));
     }
 

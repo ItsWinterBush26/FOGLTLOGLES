@@ -1,4 +1,5 @@
 #include "es/ffp.h"
+#include "es/ffpe/matrices.h"
 #include "gles/ffp/enums.h"
 #include "gles/ffp/main.h"
 #include "glm/ext/matrix_clip_space.hpp"
@@ -6,7 +7,6 @@
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/trigonometric.hpp"
 #include "main.h"
-#include "utils/pointers.h"
 
 #include <GLES3/gl32.h>
 
@@ -60,8 +60,6 @@ void FFP::registerMatrixFunctions() {
 
     REGISTER(glTranslated);
     REGISTER(glTranslatef);
-
-    Matrices::matricesStateManager = MakeAggregateShared<Matrices::MatricesStateManager>();
 }
 
 void glMatrixMode(GLenum mode) {
@@ -79,7 +77,7 @@ void glMatrixMode(GLenum mode) {
             return;
     }
     
-    Matrices::matricesStateManager->setCurrentMatrix(mode);
+    FFPE::Rendering::Matrices::setCurrentMatrix(mode);
 }
 
 void glPushMatrix() {
@@ -88,7 +86,7 @@ void glPushMatrix() {
         return;
     }
 
-    Matrices::matricesStateManager->pushCurrentMatrix();
+    FFPE::Rendering::Matrices::pushCurrentMatrix();
 }
 
 void glPopMatrix() {
@@ -97,7 +95,7 @@ void glPopMatrix() {
         return;
     }
 
-    Matrices::matricesStateManager->popTopMatrix();
+    FFPE::Rendering::Matrices::popTopMatrix();
 }
 
 void glLoadIdentity() {
@@ -106,7 +104,7 @@ void glLoadIdentity() {
         return;
     }
 
-    Matrices::matricesStateManager->modifyCurrentMatrix([](glm::mat4) { return glm::mat4(1.0f); });
+    FFPE::Rendering::Matrices::modifyCurrentMatrix([](glm::mat4) { return glm::mat4(1.0f); });
 }
 
 void glLoadMatrixd(const GLdouble *m) {
@@ -115,7 +113,7 @@ void glLoadMatrixd(const GLdouble *m) {
         return;
     }
     
-    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4) {
+    FFPE::Rendering::Matrices::modifyCurrentMatrix([&](glm::mat4) {
         return glm::mat4(
             m[0], m[1], m[2], m[3],
             m[4], m[5], m[6], m[7],
@@ -132,7 +130,7 @@ void glLoadMatrixf(const GLfloat *m) {
         return;
     }
 
-    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4) {
+    FFPE::Rendering::Matrices::modifyCurrentMatrix([&](glm::mat4) {
         return glm::mat4(
             m[0], m[1], m[2], m[3],
             m[4], m[5], m[6], m[7],
@@ -152,7 +150,7 @@ void glOrthof(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat 
         return;
     }
 
-    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
+    FFPE::Rendering::Matrices::modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
         return currentMatrix * glm::ortho(
             left, right,
             bottom, top,
@@ -167,7 +165,7 @@ void glFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLd
         return;
     }
 
-    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
+    FFPE::Rendering::Matrices::modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
         return currentMatrix * glm::frustum(
             (GLfloat) left, (GLfloat) right,
             (GLfloat) bottom, (GLfloat) top,
@@ -182,7 +180,7 @@ void glMultMatrixd(const GLdouble *m) {
         return;
     }
     
-    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
+    FFPE::Rendering::Matrices::modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
         return currentMatrix * glm::mat4(
             m[0], m[1], m[2], m[3],
             m[4], m[5], m[6], m[7],
@@ -198,7 +196,7 @@ void glMultMatrixf(const GLfloat *m) {
         return;
     }
 
-    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
+    FFPE::Rendering::Matrices::modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
         return currentMatrix * glm::mat4(
             m[0], m[1], m[2], m[3],
             m[4], m[5], m[6], m[7],
@@ -218,7 +216,7 @@ void glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z) {
         return;
     }
 
-    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
+    FFPE::Rendering::Matrices::modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
         return glm::rotate(currentMatrix, glm::radians(angle), glm::vec3(x, y, z));
     });
 }
@@ -233,7 +231,7 @@ void glScalef(GLfloat x, GLfloat y, GLfloat z) {
         return;
     }
 
-    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
+    FFPE::Rendering::Matrices::modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
         return glm::scale(currentMatrix, glm::vec3(x, y, z));
     });
 }
@@ -248,7 +246,7 @@ void glTranslatef(GLfloat x, GLfloat y, GLfloat z) {
         return;
     }
     
-    Matrices::matricesStateManager->modifyCurrentMatrix([&](glm::mat4 currentMatrix) { 
+    FFPE::Rendering::Matrices::modifyCurrentMatrix([&](glm::mat4 currentMatrix) { 
         return glm::translate(currentMatrix, glm::vec3(x, y, z));
     });
 }

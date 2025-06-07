@@ -1,4 +1,5 @@
 #include "es/ffp.h"
+#include "es/ffpe/immediate.h"
 #include "gles/ffp/main.h"
 #include "main.h"
 
@@ -11,7 +12,9 @@ void FFP::registerTexCoordFunctions() {
 }
 
 void glTexCoord2f(GLfloat s, GLfloat t) {
-    Lists::displayListManager->addCommand<glTexCoord2f>(s, t);
+    if (!FFPE::Rendering::ImmediateMode::isActive()) {
+        Lists::displayListManager->addCommand<glTexCoord2f>(s, t);
+    }
 
     FFPE::States::VertexData::set(
         glm::vec2(s, t),
