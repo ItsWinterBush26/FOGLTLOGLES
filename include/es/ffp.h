@@ -1,14 +1,14 @@
 #pragma once
 
 #include "gles/ffp/enums.h"
-#include "glm/ext/matrix_float4x4.hpp"
+#include "glm/ext/vector_float3.hpp"
+#include "glm/ext/vector_float4.hpp"
 #include "utils/conversions.h"
 #include "utils/fast_map.h"
 
 #include <cstddef>
 #include <GLES3/gl32.h>
 #include <memory>
-#include <stack>
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
@@ -18,6 +18,11 @@
 namespace FFPE::States {
 namespace VertexData {
     struct VertexRepresentation {
+        VertexRepresentation() = default;
+        VertexRepresentation(
+            glm::vec4 p, glm::vec4 c, glm::vec4 tc
+        ) : position(p), color(c), texCoord(tc) { }
+
         glm::vec4 position = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
         glm::vec4 texCoord = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
