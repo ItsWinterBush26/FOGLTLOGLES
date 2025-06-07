@@ -15,8 +15,6 @@
 #include <memory>
 #include <span>
 
-struct VertexData { };
-
 template<typename P, typename C>
 using VertexDataTyped = FFPE::States::VertexData::VertexRepresentation<P, C>;
 
@@ -43,7 +41,7 @@ inline void mapVertexData(
     GLsizei count,
     States::ClientState::Arrays::ArrayState* vertex,
     States::ClientState::Arrays::ArrayState* color,
-    F&& callback
+    const F&& callback
 ) {
     ESUtils::TypeTraits::dispatchAsType(vertex->parameters.type, [&]<typename POS>() {
         ESUtils::TypeTraits::dispatchAsType(color->parameters.type, [&]<typename COL>() {
@@ -56,9 +54,7 @@ inline void mapVertexData(
                 nullptr, GL_STATIC_DRAW
             );
 
-            auto* v = static_cast<
-                VertexDataTyped<POS, COL>*
-            >(glMapBufferRange(
+            auto* v = static_cast<VertexDataTyped<POS, COL>*>(glMapBufferRange(
                 GL_ARRAY_BUFFER, 0,
                 newVABSize, GL_MAP_WRITE_BIT
             ));
@@ -158,26 +154,85 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
     auto colorArray = FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
     auto texCoordArray = FFPE::States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0);
 
+    if (vertexArray->enabled) {
+        glEnableVertexAttribArray(AttributeLocations::POSITION_LOCATION);
+    } else {
+        LOGW("no vertex array?? should we bail?");
+    }
+
+    if (colorArray->enabled) {
+        glEnableVertexAttribArray(AttributeLocations::COLOR_LOCATION);
+    } else {
+        glDisableVertexAttribArray(AttributeLocations::COLOR_LOCATION);
+        LOGI("using global color state!");
+        glVertexAttrib4fv(
+            AttributeLocations::COLOR_LOCATION,
+            glm::value_ptr(
+                FFPE::States::VertexData::color
+            )
+        );
+    }
+
+    if (texCoordArray->enabled) {
+        glEnableVertexAttribArray(AttributeLocations::TEX_COORD_LOCATION);
+    } else {
+        glDisableVertexAttribArray(AttributeLocations::TEX_COORD_LOCATION);
+        LOGI("using global texCoord state!");
+        glVertexAttrib4fv(
+            AttributeLocations::TEX_COORD_LOCATION,
+            glm::value_ptr(
+                FFPE::States::VertexData::texCoord
+            )
+        );
+    }
+
     // TODO: bind gl*Pointer here as VAO's (doing this with no physical keyboard is making me mentally insane, ease send help)
     std::unique_ptr<SaveBoundedBuffer> sbb;
     
     if (trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer == 0) {
         LOGI("not buffered! setup our own vab");
         sbb = std::make_unique<SaveBoundedBuffer>(GL_ARRAY_BUFFER);
-        
+
+        LOGI("vertexattribs!");
         mapVertexData(
             count, vertexArray, colorArray,
             [&](auto* vertices) {
+                using VertexData = decltype(*vertices);
+
+                LOGI("vertices!");
                 if (vertexArray->enabled) {
-
-                } else {
-
+                    putVertexData(GL_VERTEX_ARRAY, vertexArray, vertices, count);
+                    glVertexAttribPointer(
+                        AttributeLocations::POSITION_LOCATION,
+                        decltype(VertexData::position)::length(),
+                        vertexArray->parameters.type, GL_FALSE,
+                        sizeof(VertexData),
+                        (void*) offsetof(VertexData, position)
+                    );
                 }
 
+                LOGI("colors!");
                 if (colorArray->enabled) {
+                    putVertexData(GL_COLOR_ARRAY, colorArray, vertices, count);
+                    glVertexAttribPointer(
+                        AttributeLocations::POSITION_LOCATION,
+                        decltype(VertexData::color)::length(),
+                        colorArray->parameters.type, GL_FALSE,
+                        sizeof(VertexData),
+                        (void*) offsetof(VertexData, color)
+                    );
+                }
 
-                } else {
-                    
+                LOGI("texcoords!");
+                if (texCoordArray->enabled) {
+                    putVertexData(GL_TEXTURE_COORD_ARRAY, texCoordArray, vertices, count);
+                    glVertexAttribPointer(
+                        AttributeLocations::TEX_COORD_LOCATION,
+                        decltype(VertexData::texCoord)::length(),
+                        colorArray->parameters.type, GL_FALSE,
+                        sizeof(VertexData),
+					    (void*) offsetof(VertexData, texCoord)
+                    );
                 }
             }
         );
@@ -190,97 +245,34 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
     
     LOGI("vertices!");
     if (vertexArray->enabled) {
-        glEnableVertexAttribArray(0);
-        
-        if (vertexArray->parameters.buffered) {
-            LOGI("buffered!");
-            glVertexAttribPointer(
-                AttributeLocations::POSITION_LOCATION,
-                vertexArray->parameters.size, vertexArray->parameters.type,
-                GL_FALSE,
-                vertexArray->parameters.stride,
-                vertexArray->parameters.firstElement
-            );
-        } else {
-            LOGI("not buffered!");
-            putVertexData(GL_VERTEX_ARRAY, vertexArray, vertices, count);
-            glVertexAttribPointer(
-                AttributeLocations::POSITION_LOCATION,
-                decltype(VertexData::position)::length(),
-                vertexArray->parameters.type, GL_FALSE,
-                sizeof(VertexData),
-                (void*) offsetof(VertexData, position)
-            );
-        }
-    } else {
-        LOGW("no vertex array?? should we bail?");
+        glVertexAttribPointer(
+            AttributeLocations::POSITION_LOCATION,
+            vertexArray->parameters.size, vertexArray->parameters.type,
+            GL_FALSE,
+            vertexArray->parameters.stride,
+            vertexArray->parameters.firstElement
+        );
     }
 
     LOGI("colors!");
     if (colorArray->enabled) {
-        glEnableVertexAttribArray(AttributeLocations::COLOR_LOCATION);
-        if (colorArray->parameters.buffered) {
-            LOGI("buffered!");
-            glVertexAttribPointer(
-                AttributeLocations::COLOR_LOCATION,
-                colorArray->parameters.size, colorArray->parameters.type,
-                GL_FALSE,
-                colorArray->parameters.stride,
-                colorArray->parameters.firstElement
-            );
-        } else {
-            LOGI("not buffered!");
-            putVertexData(GL_COLOR_ARRAY, colorArray, vertices, count);
-            glVertexAttribPointer(
-                AttributeLocations::COLOR_LOCATION,
-                decltype(VertexData::color)::length(),
-                colorArray->parameters.type, GL_FALSE,
-                sizeof(VertexData),
-                (void*) offsetof(VertexData, color)
-            );
-        }
-    } else {
-        LOGI("using global color state!");
-        glDisableVertexAttribArray(AttributeLocations::COLOR_LOCATION);
-        glVertexAttrib4fv(
+        glVertexAttribPointer(
             AttributeLocations::COLOR_LOCATION,
-            glm::value_ptr(
-                FFPE::States::VertexData::color
-            )
+            colorArray->parameters.size, colorArray->parameters.type,
+            GL_FALSE,
+            colorArray->parameters.stride,
+            colorArray->parameters.firstElement
         );
     }
 
     LOGI("texcoords!");
     if (texCoordArray->enabled) {
-        glEnableVertexAttribArray(AttributeLocations::TEX_COORD_LOCATION);
-        if (texCoordArray->parameters.buffered) {
-            LOGI("buffered!");
-            glVertexAttribPointer(
-                AttributeLocations::TEX_COORD_LOCATION,
-                texCoordArray->parameters.size, texCoordArray->parameters.type,
-                GL_FALSE,
-                texCoordArray->parameters.stride,
-                texCoordArray->parameters.firstElement
-            );
-        } else {
-            LOGI("not buffered!");
-            putVertexData(GL_TEXTURE_COORD_ARRAY, texCoordArray, vertices, count);
-            glVertexAttribPointer(
-                AttributeLocations::TEX_COORD_LOCATION,
-                decltype(VertexData::texCoord)::length(),
-                texCoordArray->parameters.type, GL_FALSE,
-                sizeof(VertexData),
-                (void*) offsetof(VertexData, texCoord)
-            );
-        }
-    } else {
-        LOGI("using global texCoord state!");
-        glDisableVertexAttribArray(AttributeLocations::TEX_COORD_LOCATION);
-        glVertexAttrib4fv(
+        glVertexAttribPointer(
             AttributeLocations::TEX_COORD_LOCATION,
-            glm::value_ptr(
-                FFPE::States::VertexData::texCoord
-            )
+            texCoordArray->parameters.size, texCoordArray->parameters.type,
+            GL_FALSE,
+            texCoordArray->parameters.stride,
+            texCoordArray->parameters.firstElement
         );
     }
 
