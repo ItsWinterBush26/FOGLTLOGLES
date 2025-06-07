@@ -206,7 +206,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                     putVertexData(GL_VERTEX_ARRAY, vertexArray, vertices, count);
                     glVertexAttribPointer(
                         AttributeLocations::POSITION_LOCATION,
-                        VertexData::position::length(),
+                        decltype(VertexData::position)::length(),
                         vertexArray->parameters.type, GL_FALSE,
                         sizeof(VertexData),
                         (void*) offsetof(VertexData, position)
@@ -218,7 +218,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                     putVertexData(GL_COLOR_ARRAY, colorArray, vertices, count);
                     glVertexAttribPointer(
                         AttributeLocations::POSITION_LOCATION,
-                        VertexData::color::length(),
+                        decltype(VertexData::color)::length(),
                         colorArray->parameters.type, GL_FALSE,
                         sizeof(VertexData),
                         (void*) offsetof(VertexData, color)
@@ -230,7 +230,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                     putVertexData(GL_TEXTURE_COORD_ARRAY, texCoordArray, vertices, count);
                     glVertexAttribPointer(
                         AttributeLocations::TEX_COORD_LOCATION,
-                        VertexData::texCoord::length(),
+                        decltype(VertexData::texCoord)::length(),
                         colorArray->parameters.type, GL_FALSE,
                         sizeof(VertexData),
                         (void*) offsetof(VertexData, texCoord)
