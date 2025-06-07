@@ -198,7 +198,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
         mapVertexData(
             count, vertexArray, colorArray,
             [&](auto* vertices) {
-                using VertexData = decltype(*vertices);
+                using VertexData = std::remove_pointer_t<decltype(vertices)>;
                 LOGI("vertex type is %s", typeid(VertexData).name());
 
                 LOGI("vertices!");
