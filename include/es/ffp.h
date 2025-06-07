@@ -176,7 +176,7 @@ public:
         }
         
         activeDisplayList.addCommand(
-            [a = std::forward_as_tuple(std::forward<Args>(args)...)]() mutable {
+            [a = std::make_tuple(std::forward<Args>(args)...)]() mutable {
                 std::apply(F, std::move(a));
             }
         );
