@@ -199,6 +199,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
             count, vertexArray, colorArray,
             [&](auto* vertices) {
                 using VertexData = decltype(*vertices);
+                LOGI("vertex type is %s", typeid(VertexData).name());
 
                 LOGI("vertices!");
                 if (vertexArray->enabled) {
