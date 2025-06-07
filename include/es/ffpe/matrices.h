@@ -37,12 +37,12 @@ inline const glm::mat4 getModelViewProjection() {
     return States::modelViewProjection;
 }
 
-void setCurrentMatrix(GLenum mode) {
+inline void setCurrentMatrix(GLenum mode) {
     States::currentMatrixType = mode;
     States::currentMatrix = &States::matrices[mode];
 }
 
-void modifyCurrentMatrix(const std::function<glm::mat4(glm::mat4)>& newMatrix) {
+inline void modifyCurrentMatrix(const std::function<glm::mat4(glm::mat4)>& newMatrix) {
     States::currentMatrix->matrix = newMatrix(States::currentMatrix->matrix);
 
     if (States::currentMatrixType == GL_MODELVIEW || States::currentMatrixType == GL_PROJECTION) {
@@ -50,11 +50,11 @@ void modifyCurrentMatrix(const std::function<glm::mat4(glm::mat4)>& newMatrix) {
     }
 }
 
-void pushCurrentMatrix() {
+inline void pushCurrentMatrix() {
     States::currentMatrix->stack.push(States::currentMatrix->matrix);
 }
 
-void popTopMatrix() {
+inline void popTopMatrix() {
     if (States::currentMatrix->stack.empty()) return;
         
     States::currentMatrix->matrix = States::currentMatrix->stack.top();
