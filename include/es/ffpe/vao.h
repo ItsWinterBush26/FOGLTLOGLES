@@ -72,8 +72,8 @@ inline void fillDataComponents(GLuint& offsetTracker, std::span<const T1> src, T
     offsetTracker += src.size();
 }
 
-template<typename T>
-inline void putVertexDataInternal(GLenum arrayType, GLsizei dataSize, GLuint verticesCount, const T* src, VertexData* dst) {
+template<typename T, typename VD>
+inline void putVertexDataInternal(GLenum arrayType, GLsizei dataSize, GLuint verticesCount, const T* src, VD* dst) {
     GLuint srcOffset = 0;
 
     switch (arrayType) {
@@ -109,7 +109,8 @@ inline void putVertexDataInternal(GLenum arrayType, GLsizei dataSize, GLuint ver
     }
 }
 
-inline void putVertexData(GLenum arrayType, FFPE::States::ClientState::Arrays::ArrayState* array, VertexData* vertices, GLuint verticesCount) {
+template<typename VD>
+inline void putVertexData(GLenum arrayType, FFPE::States::ClientState::Arrays::ArrayState* array, VD* vertices, GLuint verticesCount) {
     LOGI("putVertexData : arrayType=%u", arrayType);
     
     switch (array->parameters.type) {
