@@ -37,7 +37,7 @@ inline void init() {
 
 template<typename T1, typename T2>
 inline void fillDataComponents(GLuint& offsetTracker, tcb::span<const T1> src, T2* dst) {
-    for (size_t i = 0; i < src.size(); i++) (*dst)[i] = src[i];
+    for (size_t i = 0; i < src.size(); i++) (*dst)[i] = static_cast<typename T2::value_type>(src[i]);
     offsetTracker += src.size();
 }
 
@@ -45,32 +45,36 @@ template<typename T>
 inline void putVertexDataInternal(GLenum arrayType, GLsizei dataSize, GLuint verticesCount, const T* src, VertexData* dst) {
     GLuint srcOffset = 0;
 
-    for (GLuint i = 0; i < verticesCount; ++i) {
-        switch (arrayType) {
-            case GL_VERTEX_ARRAY:
+    switch (arrayType) {
+        case GL_VERTEX_ARRAY:
+            for (GLuint i = 0; i < verticesCount; ++i) {
                 fillDataComponents(
                     srcOffset,
                     tcb::span(src + srcOffset, dataSize),
                     &dst[i].position
                 );
-            break;
+            }
+        break;
             
-            case GL_COLOR_ARRAY:
+        case GL_COLOR_ARRAY:
+            for (GLuint i = 0; i < verticesCount; ++i) {
                 fillDataComponents(
                     srcOffset,
                     tcb::span(src + srcOffset, dataSize),
                     &dst[i].color
                 );
-            break;
+            }
+        break;
 
-            case GL_TEXTURE_COORD_ARRAY:
+        case GL_TEXTURE_COORD_ARRAY:
+            for (GLuint i = 0; i < verticesCount; ++i) {
                 fillDataComponents(
                     srcOffset,
                     tcb::span(src + srcOffset, dataSize),
                     &dst[i].texCoord
                 );
-            break;
-        }
+            }
+        break;
     }
 }
 
@@ -78,6 +82,16 @@ inline void putVertexData(GLenum arrayType, FFPE::States::ClientState::Arrays::A
     LOGI("putVertexData : arrayType=%u", arrayType);
     
     switch (array->parameters.type) {
+        case GL_UNSIGNED_BYTE:
+            putVertexDataInternal(
+                arrayType, array->parameters.size, verticesCount,
+                ESUtils::TypeTraits::asTypedArray<GLubyte>(
+                    array->parameters.firstElement
+                ),
+                vertices
+            );
+        break;
+
         case GL_SHORT:
             putVertexDataInternal(
                 arrayType, array->parameters.size, verticesCount,

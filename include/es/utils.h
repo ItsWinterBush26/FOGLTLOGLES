@@ -180,13 +180,15 @@ struct GLTypeEnum;
 
 #define GL_TYPE_ENUM(podt, glt) template <> struct GLTypeEnum<podt> { static constexpr GLenum value = glt; }
 
-GL_TYPE_ENUM(short, GL_SHORT);
-GL_TYPE_ENUM(int, GL_INT);
-GL_TYPE_ENUM(float, GL_FLOAT);
-GL_TYPE_ENUM(double, GL_DOUBLE);
+GL_TYPE_ENUM(GLubyte, GL_UNSIGNED_BYTE);
+GL_TYPE_ENUM(GLshort, GL_SHORT);
+GL_TYPE_ENUM(GLint, GL_INT);
+GL_TYPE_ENUM(GLfloat, GL_FLOAT);
+GL_TYPE_ENUM(GLdouble, GL_DOUBLE);
 
 inline GLsizei getTypeSize(GLenum type) {
     switch (type) {
+        case GL_UNSIGNED_BYTE: return sizeof(GLubyte);
         case GL_SHORT: return sizeof(GLshort);
         case GL_INT: return sizeof(GLint);
         case GL_FLOAT: return sizeof(GLfloat);

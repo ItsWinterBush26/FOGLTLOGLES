@@ -23,9 +23,9 @@ namespace VertexData {
             glm::vec4 p, glm::vec4 c, glm::vec4 tc
         ) : position(p), color(c), texCoord(tc) { }
 
-        glm::vec4 position = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-        glm::vec4 color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-        glm::vec4 texCoord = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        glm::vec4 position = glm::vec4(0, 0, 0, 1);
+        glm::vec4 color = glm::vec4(255, 255, 255, 255);
+        glm::vec4 texCoord = glm::vec4(0, 0, 0, 0);
     };
 
     inline glm::vec4 position = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
