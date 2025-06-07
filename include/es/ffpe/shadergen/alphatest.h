@@ -5,6 +5,7 @@
 #include "es/ffpe/shadergen/common.h"
 #include "es/ffpe/shadergen/feature.h"
 #include "es/state_tracking.h"
+#include "fmt/base.h"
 #include "fmt/ostream.h"
 
 #include <GLES3/gl32.h>
@@ -59,7 +60,7 @@ void build(
 
     fmt::print(
         finalOperations,
-        baseOperation,
+        fmt::runtime(baseOperation),
         operation
     );
 

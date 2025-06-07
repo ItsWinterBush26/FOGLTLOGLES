@@ -4,6 +4,7 @@
 #include "es/ffpe/shadergen/alphatest.h"
 #include "es/ffpe/shadergen/common.h"
 #include "es/state_tracking.h"
+#include "fmt/base.h"
 #include "fmt/format.h"
 #include "gles/ffp/enums.h"
 #include "gles/main.h"
@@ -29,7 +30,7 @@ inline std::string buildFragmentShader() {
     }
 
     return fmt::format(
-        Common::FS_TEMPLATE,
+        fmt::runtime(Common::FS_TEMPLATE),
         inputs.str(), outputs.str(), operations.str()
     );
 }
