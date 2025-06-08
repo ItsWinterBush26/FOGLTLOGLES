@@ -69,7 +69,7 @@ inline void mapVertexData(
 
 template<typename T1, typename T2>
 inline void fillDataComponents(GLuint& offsetTracker, std::span<const T1> src, T2* dst) {
-    for (size_t i = 0; i < src.size(); i++) (*dst)[i] = static_cast<typename T2::value_type>(src[i]);
+    for (size_t i = 0; i < src.size(); i++) (*dst)[i] = src[i];
     offsetTracker += src.size();
 }
 
@@ -218,7 +218,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                 if (colorArray->enabled) {
                     putVertexData(GL_COLOR_ARRAY, colorArray, vertices, count);
                     glVertexAttribPointer(
-                        AttributeLocations::POSITION_LOCATION,
+                        AttributeLocations::COLOR_LOCATION,
                         decltype(VertexData::color)::length(),
                         colorArray->parameters.type, GL_FALSE,
                         sizeof(VertexData),
@@ -232,7 +232,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                     glVertexAttribPointer(
                         AttributeLocations::TEX_COORD_LOCATION,
                         decltype(VertexData::texCoord)::length(),
-                        colorArray->parameters.type, GL_FALSE,
+                        texCoordArray->parameters.type, GL_FALSE,
                         sizeof(VertexData),
                         (void*) offsetof(VertexData, texCoord)
                     );
