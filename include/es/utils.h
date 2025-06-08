@@ -192,7 +192,9 @@ GL_TYPE_ENUM(GLdouble, GL_DOUBLE);
 
 GL_PRIMITIVE(GL_UNSIGNED_BYTE, GLubyte);
 GL_PRIMITIVE(GL_SHORT, GLshort);
+GL_PRIMITIVE(GL_INT, GLint);
 GL_PRIMITIVE(GL_FLOAT, GLfloat);
+GL_PRIMITIVE(GL_DOUBLE, GLdouble);
 
 inline GLsizei getTypeSize(GLenum type) {
     switch (type) {
@@ -207,18 +209,9 @@ inline GLsizei getTypeSize(GLenum type) {
     }
 }
 
-template<typename T>
-inline const T* asTypedArray(const void* array) {
-    return static_cast<const T*>(array);
-}
-
 template<typename Func>
 void dispatchAsType(GLenum type, const Func&& func) {
     switch (type) {
-        case GL_FLOAT:
-            func.template operator()<GLPrimitive<GL_FLOAT>::type>();
-            break;
-        
         case GL_UNSIGNED_BYTE:
             func.template operator()<GLPrimitive<GL_UNSIGNED_BYTE>::type>();
             break;
@@ -226,11 +219,28 @@ void dispatchAsType(GLenum type, const Func&& func) {
         case GL_SHORT:
             func.template operator()<GLPrimitive<GL_SHORT>::type>();
             break;
+
+        case GL_INT:
+            func.template operator()<GLPrimitive<GL_INT>::type>();
+            break;
+
+        case GL_FLOAT:
+            func.template operator()<GLPrimitive<GL_FLOAT>::type>();
+            break;
+
+        case GL_DOUBLE:
+            func.template operator()<GLPrimitive<GL_DOUBLE>::type>();
+            break;
             
         default:
             LOGE("Unhandled type! (type=%u)", type);
             throw std::runtime_error("Unsupported GL type");
     }
+}
+
+template<typename T>
+inline const T* asTypedArray(const void* array) {
+    return static_cast<const T*>(array);
 }
 
 }
