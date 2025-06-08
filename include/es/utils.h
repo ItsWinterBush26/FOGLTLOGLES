@@ -215,21 +215,18 @@ inline const T* asTypedArray(const void* array) {
 template<typename Func>
 void dispatchAsType(GLenum type, const Func&& func) {
     switch (type) {
-        case GL_FLOAT: {
-            using T = typename GLPrimitive<GL_FLOAT>::type;
-            func.template operator()<T>();
+        case GL_FLOAT:
+            func.template operator()<GLPrimitive<GL_FLOAT>::type>();
             break;
-        }
-        case GL_UNSIGNED_BYTE: {
-            using T = typename GLPrimitive<GL_UNSIGNED_BYTE>::type;
-            func.template operator()<T>();
+        
+        case GL_UNSIGNED_BYTE:
+            func.template operator()<GLPrimitive<GL_UNSIGNED_BYTE>::type>();
             break;
-        }
-        case GL_SHORT: {
-            using T = typename GLPrimitive<GL_SHORT>::type;
-            func.template operator()<T>();
+        
+        case GL_SHORT:
+            func.template operator()<GLPrimitive<GL_SHORT>::type>();
             break;
-        }
+            
         default:
             LOGE("Unhandled type! (type=%u)", type);
             throw std::runtime_error("Unsupported GL type");

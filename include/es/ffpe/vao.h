@@ -61,7 +61,7 @@ inline void mapVertexData(
 
             callback(v);
 
-            if (v) glUnmapBuffer(v);
+            if (v) glUnmapBuffer(GL_ARRAY_BUFFER);
         });
     });
 }
