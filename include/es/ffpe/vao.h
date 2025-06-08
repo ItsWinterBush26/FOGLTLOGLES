@@ -45,7 +45,8 @@ inline void mapVertexData(
 ) {
     ESUtils::TypeTraits::dispatchAsType(vertex->parameters.type, [&]<typename POS>() {
         ESUtils::TypeTraits::dispatchAsType(color->parameters.type, [&]<typename COL>() {
-            GLsizei newVABSize = count * sizeof(VertexDataTyped<POS, COL>);
+            using VertexData = VertexDataTyped<POS, COL>;
+            GLsizei newVABSize = count * sizeof(VertexData);
             
             OV_glBindBuffer(GL_ARRAY_BUFFER, vab);
             OV_glBufferData(
@@ -54,7 +55,7 @@ inline void mapVertexData(
                 nullptr, GL_STATIC_DRAW
             );
 
-            auto* v = static_cast<VertexDataTyped<POS, COL>*>(glMapBufferRange(
+            auto* v = static_cast<VertexData*>(glMapBufferRange(
                 GL_ARRAY_BUFFER, 0,
                 newVABSize, GL_MAP_WRITE_BIT
             ));
