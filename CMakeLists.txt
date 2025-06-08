@@ -15,28 +15,28 @@ endif()
 ## https://github.com/jomof/android-ccache-example/blob/master/app/src/main/cpp/CMakeLists.txt
 if( CMAKE_HOST_WIN32 )
     # Find ccache on Windows. Edit PATHS variable if MSYS2 is installed in a different location.
-    find_program( CCACHE ccache PATHS C:/msys64/usr/bin )
+    find_program( CCACHE ccache PATHS "C:/msys64/usr/bin" )
     if (CCACHE)
-        set( ENV{CCACHE_BASEDIR} ${CMAKE_BINARY_DIR} )
+        set( ENV{CCACHE_BASEDIR} "${CMAKE_BINARY_DIR}" )
         # As of ccache 3.4.3 there is a bug that requires the compiler path to clang have forward
         # slashes. However, CMake as of 3.12.2 passes path to clang with backslashes. To overcome
         # this limitation, a simple batch file wrap-cache.bat is used. This batch file converts
         # back-slashes to forward slashes and then invokes ccache.
-        set( CMAKE_CXX_COMPILER_LAUNCHER ${CMAKE_SOURCE_DIR}/tools/wrap-ccache.bat ${CCACHE} )
-        set( CMAKE_C_COMPILER_LAUNCHER  ${CMAKE_SOURCE_DIR}/tools/wrap-ccache.bat ${CCACHE} )
+        set( CMAKE_CXX_COMPILER_LAUNCHER "${CMAKE_SOURCE_DIR}/tools/wrap-ccache.bat ${CCACHE}" )
+        set( CMAKE_C_COMPILER_LAUNCHER  "${CMAKE_SOURCE_DIR}/tools/wrap-ccache.bat ${CCACHE}" )
     else()
         message( INFO "\
 Could not find CCache program. \
 One way to get CCache on Windows is to install MSYS2 at https://www.msys2.org/. \
 Once installed, use the pacman package manager to install ccache: \
-pacman --sync ccache." )
+pacman --sync ccache. ")
     endif()
 else()
     find_program( CCACHE ccache )
     if ( CCACHE )
-        message( INFO "ccache found!" )
-        set( CMAKE_CXX_COMPILER_LAUNCHER ${CMAKE_SOURCE_DIR}/tools/clang++-ccache.sh )
-        set( CMAKE_C_COMPILER_LAUNCHER ${CMAKE_SOURCE_DIR}/tools/clang-ccache.sh )
+        message( INFO "ccache found! path=${CCACHE}" )
+        set( CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE}" )
+        set( CMAKE_C_COMPILER_LAUNCHER "${CCACHE}" )
     else()
         message( INFO "Could not find CCache program." )
     endif()
