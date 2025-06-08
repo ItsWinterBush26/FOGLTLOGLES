@@ -24,6 +24,7 @@ void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointe
     LOGI("glVertexPointer : size=%i type=%u stride=%i pointer=%p", size, type, stride, pointer);
     FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY)->parameters = {
         trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer != 0,
+        !stride,
         size, type,
         stride ? stride : size * ESUtils::TypeTraits::getTypeSize(type),
         pointer
@@ -35,6 +36,7 @@ void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer
     LOGI("glColorPointer : size=%i type=%u stride=%i pointer=%p", size, type, stride, pointer);
     FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY)->parameters = {
         trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer != 0,
+        !stride,
         size, type,
         stride ? stride : size * ESUtils::TypeTraits::getTypeSize(type),
         pointer
@@ -48,6 +50,7 @@ void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void* poin
         GL_TEXTURE0 // FFPE::States::ClientState::currentTexCoordUnit
     )->parameters = {
         trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer != 0,
+        !stride,
         size, type,
         stride ? stride : size * ESUtils::TypeTraits::getTypeSize(type),
         pointer
@@ -55,12 +58,10 @@ void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void* poin
 }
 
 void glEnableClientState(GLenum array) {
-    // Lists::displayListManager->addCommand<glEnableClientState>(array);
-    FFPE::States::ClientState::Arrays::getArray(array)->enabled = true;
+    FFPE::States::ClientState::Arrays::getArray(array == GL_TEXTURE_COORD_ARRAY ? GL_TEXTURE0 : array)->enabled = true;
 }
 
 void glDisableClientState(GLenum array) {
-    // Lists::displayListManager->addCommand<glDisableClientState>(array);
-    FFPE::States::ClientState::Arrays::getArray(array)->enabled = false;
+    FFPE::States::ClientState::Arrays::getArray(array == GL_TEXTURE_COORD_ARRAY ? GL_TEXTURE0 : array)->enabled = false;
 }
 

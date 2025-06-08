@@ -1,6 +1,8 @@
 #pragma once
 
 #include "gles/ffp/enums.h"
+#include <cstdint>
+#include <stdexcept>
 #define GLM_ENABLE_EXPERIMENTAL
 
 #include "es/binding_saver.h"
@@ -52,7 +54,8 @@ inline void mapVertexData(
             OV_glBufferData(
                 GL_ARRAY_BUFFER,
                 newVABSize,
-                nullptr, GL_STATIC_DRAW
+                nullptr,
+                GL_DYNAMIC_DRAW
             );
 
             auto* v = static_cast<VertexData*>(glMapBufferRange(
@@ -147,6 +150,8 @@ inline void putVertexData(GLenum arrayType, FFPE::States::ClientState::Arrays::A
     }
 }
 
+// TODO: bind gl*Pointer here as VAO's (doing this with no physical keyboard is making me mentally insane, please send help)
+
 [[nodiscard]]
 inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) {
     LOGI("vao setup!");
@@ -159,7 +164,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
     if (vertexArray->enabled) {
         glEnableVertexAttribArray(AttributeLocations::POSITION_LOCATION);
     } else {
-        LOGW("no vertex array?? should we bail?");
+        throw std::runtime_error("Vertex Pointer not enabled! Don't know what to do.");
     }
 
     if (colorArray->enabled) {
@@ -188,12 +193,52 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
         );
     }
 
-    // TODO: bind gl*Pointer here as VAO's (doing this with no physical keyboard is making me mentally insane, ease send help)
     std::unique_ptr<SaveBoundedBuffer> sbb;
-    
     if (trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer == 0) {
         LOGI("not buffered! setup our own vab");
         sbb = std::make_unique<SaveBoundedBuffer>(GL_ARRAY_BUFFER);
+
+        if (!vertexArray->parameters.planar) {
+            LOGI("interleaved arrays (not buffered)!");
+            GLsizei newVABSize = count * vertexArray->parameters.stride;
+
+            OV_glBindBuffer(GL_ARRAY_BUFFER, vab);
+            OV_glBufferData(
+                GL_ARRAY_BUFFER,
+                newVABSize,
+                vertexArray->parameters.firstElement,
+                GL_DYNAMIC_DRAW
+            );
+
+            if (vertexArray->enabled) {
+                glVertexAttribPointer(
+                    AttributeLocations::POSITION_LOCATION,
+                    vertexArray->parameters.size, vertexArray->parameters.type,
+                    GL_FALSE, vertexArray->parameters.stride,
+                    nullptr
+                );
+            }
+
+            if (colorArray->enabled) {
+                glVertexAttribPointer(
+                    AttributeLocations::COLOR_LOCATION,
+                    colorArray->parameters.size, colorArray->parameters.type,
+                    GL_FALSE, colorArray->parameters.stride,
+                    (void*) (reinterpret_cast<uintptr_t>(colorArray->parameters.firstElement) - reinterpret_cast<uintptr_t>(vertexArray->parameters.firstElement))
+                );
+            }
+
+            if (texCoordArray->enabled) {
+                glVertexAttribPointer(
+                    AttributeLocations::TEX_COORD_LOCATION,
+                    texCoordArray->parameters.size, texCoordArray->parameters.type,
+                    GL_FALSE, texCoordArray->parameters.stride,
+                    (void*) (reinterpret_cast<uintptr_t>(texCoordArray->parameters.firstElement) - reinterpret_cast<uintptr_t>(vertexArray->parameters.firstElement))
+                );
+            }
+
+            return sbb;
+        }
 
         LOGI("vertexattribs!");
         mapVertexData(
