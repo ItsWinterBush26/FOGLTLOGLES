@@ -68,9 +68,9 @@ inline GLuint generateEAB_GPU(GLuint count) {
     LOGI("dispatch eab compute");
     GLuint quadCount = count / 4;
     GLuint eabCount = quadCount * 6;
-    OV_glBindBuffer(GL_SHADER_STORAGE_BUFFER, indicesOutputBuffer);
+    OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
     OV_glBufferData(
-        GL_SHADER_STORAGE_BUFFER,
+        GL_ELEMENT_ARRAY_BUFFER,
         eabCount * sizeof(GLuint),
         nullptr,
         GL_DYNAMIC_DRAW
@@ -82,11 +82,11 @@ inline GLuint generateEAB_GPU(GLuint count) {
     glUniform1ui(numQuadsUniLoc, quadCount);
     
     glDispatchCompute((count + 63) / 64, 1, 1);
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_ELEMENT_ARRAY_BARRIER_BIT);
 
-    LOGI("quadCount=%u eabCount=%u", quadCount, eabCount);
+    // LOGI("quadCount=%u eabCount=%u", quadCount, eabCount);
 
-    OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
+    // OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
 
     return eabCount;
 }
@@ -135,7 +135,7 @@ inline void drawQuads(GLuint count) {
     GLuint realCount = generateEAB_GPU(count);
 
     glDrawElements(GL_TRIANGLES, realCount, GL_UNSIGNED_INT, nullptr);
-    LOGI("done! drawElements (for quads)");
+    LOGI("done quads!");
 }
 
 }
