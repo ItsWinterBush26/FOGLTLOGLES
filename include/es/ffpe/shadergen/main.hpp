@@ -2,13 +2,15 @@
 
 #include "es/ffpe/shadergen/cache.hpp"
 #include "es/ffpe/shadergen/common.hpp"
+#include "es/ffpe/shadergen/features/alphatest.hpp"
+#include "es/ffpe/shadergen/features/mvp.hpp"
 #include "es/ffpe/shadergen/features/registry.hpp"
+#include "es/ffpe/shadergen/features/vertexbuffer.hpp"
 #include "fmt/base.h"
 #include "fmt/format.h"
 #include "gles/ffp/enums.hpp"
 #include "gles/main.hpp"
 #include "gles20/shader_overrides.hpp"
-#include "shaderc/shaderc.hpp"
 
 #include <GLES3/gl32.h>
 #include <string>
@@ -99,6 +101,15 @@ inline GLuint getCachedOrNewProgram(GLbitfield64 state) {
 
     Cache::Programs::putToCache(state, renderingProgram);
     return renderingProgram;
+}
+
+inline void initFeatures() {
+    // NOTE: order matters!
+    Feature::Registry::registerFeature<Feature::VertexAttrib::VertexAttribFeature>();
+    Feature::Registry::registerFeature<Feature::MVP::MVPFeature>();
+    // Feature::Registry::registerFeature<Feature::Texture::TextureFeature>();
+
+    Feature::Registry::registerFeature<Feature::AlphaTest::AlphaTestFeature>();
 }
 
 }

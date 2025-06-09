@@ -1,14 +1,20 @@
 #pragma once
 
+
+#include "es/ffpe/matrices.hpp"
 #include "es/ffpe/shadergen/cache.hpp"
+#include "es/ffpe/shadergen/common.hpp"
 #include "es/ffpe/shadergen/features/base.hpp"
+#include "es/ffpe/shadergen/features/registry.hpp"
+#include "glm/gtc/type_ptr.hpp"
+
 
 #include <GLES3/gl32.h>
 #include <sstream>
 
 namespace FFPE::Rendering::ShaderGen::Feature::MVP {
 
-struct VertexBufferFeature : public Feature::BaseFeature {
+struct MVPFeature : public Feature::BaseFeature {
 
 void buildVS(
     [[maybe_unused]] std::stringstream& finalInputs,
@@ -27,6 +33,8 @@ void sendData(GLuint program) const override {
             Matrices::getModelViewProjection()
         )
     );
+}
+
 };
 
 }

@@ -53,11 +53,11 @@ namespace ShadeModel {
 namespace ClientState {
     namespace Arrays {
         struct ArrayParameters {
-            bool buffered; // is this even on spec ???
             bool planar; // 1> = TRUE, !1 = !TRUE
 
             GLint size;
             GLenum type;
+            bool normalized;
             GLsizei stride; // if stride == 0 then stride = size * sizeof(type) else stride = stride
             const void* firstElement;
         };

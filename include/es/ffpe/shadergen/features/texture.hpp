@@ -15,7 +15,7 @@ void buildVS(
 
 }
 
-virtual void buildFS(
+void buildFS(
     std::stringstream& finalInputs,
     std::stringstream& finalOutputs,
     std::stringstream& finalOperations
@@ -28,10 +28,5 @@ void sendData(GLuint program) const override {
 }
 
 };
-
-__attribute__((constructor(65535)))
-inline void _doRegister() {
-    Registry::registerFeature<TextureFeature>();
-}
 
 }

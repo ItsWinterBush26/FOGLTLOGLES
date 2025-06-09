@@ -82,9 +82,4 @@ void sendData(GLuint program) const override {
 
 };
 
-__attribute__((constructor(65535)))
-inline void _doRegister() {
-    Registry::registerFeature<AlphaTestFeature>();
-}
-
 }
