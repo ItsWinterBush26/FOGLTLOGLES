@@ -2,17 +2,21 @@
 
 #include "es/ffpe/shadergen/features/base.hpp"
 
-#include <unordered_set>
+#include <type_traits>
+#include <vector>
 
 namespace FFPE::Rendering::ShaderGen::Feature::Registry {
 
 namespace Data {
-    inline std::unordered_set<BaseFeature*> registeredFeatures;
+    inline std::vector<BaseFeature*> registeredFeatures;
 }
 
-template<typename F>
+template <typename O, typename D>
+concept DerivedFrom = std::is_base_of<D, O>::value;
+
+template<DerivedFrom<BaseFeature> F>
 inline void registerFeature() {
-    Data::registeredFeatures.insert(new F());
+    Data::registeredFeatures.push_back(new F());
 }
 
 }
