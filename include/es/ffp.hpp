@@ -96,7 +96,12 @@ namespace ClientState {
 inline GLbitfield buildCurrentStatesBitfield() {
     return (
         AlphaTest::op | float_to_bits(AlphaTest::threshold) |
-        ShadeModel::type // |
+        ShadeModel::type |
+        (
+            ClientState::Arrays::getArray(GL_VERTEX_ARRAY)->parameters.size *
+            ClientState::Arrays::getArray(GL_COLOR_ARRAY)->parameters.size *
+            ClientState::Arrays::getTexCoordArray(GL_TEXTURE0)->parameters.size
+        )
     );
 }
 
