@@ -31,7 +31,7 @@ out mediump vec2 vertexTexCoord;
 // feature outputs
 {}
 
-void main() {
+void main() {{
     gl_Position = uModelViewProjection * vec4(iVertexPosition, 1);
 
     // feature operations
@@ -40,7 +40,7 @@ void main() {
     vertexID = gl_VertexID;
     vertexColor = iVertexColor;
     vertexTexCoord = iVertexTexCoord;
-})";
+}})";
 
 inline const std::string FS_TEMPLATE = R"(#version 320 es
 precision mediump float;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "es/ffpe/shadergen/features/base.h"
+#include "es/ffpe/shadergen/features/registry.h"
 
 namespace FFPE::Rendering::ShaderGen::Feature::Texture {
 
@@ -10,7 +11,7 @@ void buildVS(
     [[maybe_unused]] std::stringstream& finalInputs,
     [[maybe_unused]] std::stringstream& finalOutputs,
     std::stringstream& finalOperations
-) override {
+) const override {
 
 }
 
@@ -18,17 +19,20 @@ virtual void buildFS(
     std::stringstream& finalInputs,
     std::stringstream& finalOutputs,
     std::stringstream& finalOperations
-) override {
+) const override {
     
 }
 
 
-void sendData(GLuint program) override {
+void sendData(GLuint program) const override {
     
 }
 
 };
 
-inline TextureFeature instance;
+__attribute__((constructor(65535)))
+inline void _doRegister() {
+    Registry::registerFeature<TextureFeature>();
+}
 
 }

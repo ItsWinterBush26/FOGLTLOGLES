@@ -4,8 +4,11 @@
 #include "es/ffpe/shadergen/cache.h"
 #include "es/ffpe/shadergen/common.h"
 #include "es/ffpe/shadergen/features/base.h"
+#include "es/ffpe/shadergen/features/registry.h"
+#include "es/state_tracking.h"
 #include "fmt/base.h"
 #include "fmt/ostream.h"
+#include "gles/ffp/enums.h"
 
 #include <GLES3/gl32.h>
 #include <sstream>
@@ -19,15 +22,13 @@ const std::string uniforms = "uniform float alphaTestThreshold;";
 
 const std::string baseOperation = "if (color.a {} alphaTestThreshold) discard;";
 
-void buildVS(
-    std::stringstream&, std::stringstream&, std::stringstream&
-) override { }
-
 void buildFS(
     [[maybe_unused]] std::stringstream& finalInputs,
     [[maybe_unused]] std::stringstream& finalOutputs,
     std::stringstream& finalOperations
-) override {
+) const override {
+    if (!trackedStates->isCapabilityEnabled(GL_ALPHA_TEST)) return;
+
     finalInputs << uniforms << Common::SG_NEWLINE;
 
     std::string operation;
@@ -70,7 +71,9 @@ void buildFS(
     finalOperations << Common::SG_NEWLINE;
 }
 
-void sendData(GLuint program) override {
+void sendData(GLuint program) const override {
+    if (!trackedStates->isCapabilityEnabled(GL_ALPHA_TEST)) return;
+
     GLint alphaTestThresholdUniLoc = Cache::Uniforms::getCachedUniformLocation(program, "alphaTestThreshold");
     if (alphaTestThresholdUniLoc == -1) return;
         
@@ -79,6 +82,9 @@ void sendData(GLuint program) override {
 
 };
 
-inline AlphaTestFeature instance;
+__attribute__((constructor(65535)))
+inline void _doRegister() {
+    Registry::registerFeature<AlphaTestFeature>();
+}
 
 }

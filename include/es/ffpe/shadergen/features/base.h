@@ -13,15 +13,15 @@ virtual void buildVS(
     std::stringstream& finalInputs,
     std::stringstream& finalOutputs,
     std::stringstream& finalOperations
-) = 0;
+) const { }
 
 virtual void buildFS(
     std::stringstream& finalInputs,
     std::stringstream& finalOutputs,
     std::stringstream& finalOperations
-) = 0;
+) const { }
 
-virtual void sendData(GLuint program) = 0;
+virtual void sendData(GLuint program) const { }
 
 };
 

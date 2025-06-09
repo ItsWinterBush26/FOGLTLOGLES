@@ -2,9 +2,7 @@
 
 #include "es/ffpe/shadergen/cache.h"
 #include "es/ffpe/shadergen/common.h"
-#include "es/ffpe/shadergen/features/alphatest.h"
-#include "es/ffpe/shadergen/features/texture.h"
-#include "es/state_tracking.h"
+#include "es/ffpe/shadergen/features/registry.h"
 #include "fmt/base.h"
 #include "fmt/format.h"
 #include "gles/ffp/enums.h"
@@ -22,9 +20,8 @@ inline std::string buildVertexShader() {
     std::stringstream outputs;
     std::stringstream operations;
 
-    // TODO: do a register for feature type impl, so we can just loop on a vector or something
-    if (trackedStates->isCapabilityEnabled(GL_TEXTURE_2D)) {
-        Feature::Texture::instance.buildVS(inputs, outputs, operations);
+    for (const auto& feature : Feature::Registry::Data::registeredFeatures) {
+        feature.buildVS(inputs, outputs, operations);
     }
 
     return fmt::format(
@@ -38,12 +35,8 @@ inline std::string buildFragmentShader() {
     std::stringstream outputs;
     std::stringstream operations;
 
-    if (trackedStates->isCapabilityEnabled(GL_ALPHA_TEST)) {
-        Feature::AlphaTest::instance.buildFS(inputs, outputs, operations);
-    }
-
-    if (trackedStates->isCapabilityEnabled(GL_TEXTURE_2D)) {
-        Feature::Texture::instance.buildFS(inputs, outputs, operations);
+    for (const auto& feature : Feature::Registry::Data::registeredFeatures) {
+        feature.buildFS(inputs, outputs, operations);
     }
 
     return fmt::format(
