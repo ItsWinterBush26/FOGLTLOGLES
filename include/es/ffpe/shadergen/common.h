@@ -25,7 +25,7 @@ out lowp vec4 vertexColor;
 out mediump vec2 vertexTexCoord;
 
 void main() {
-    gl_Position = uModelViewProjection * iVertexPosition;
+    gl_Position = uModelViewProjection * vec4(iVertexPosition, 1);
 
     vertexID = gl_VertexID;
     vertexColor = iVertexColor;

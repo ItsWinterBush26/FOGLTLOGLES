@@ -15,8 +15,4 @@ void FFP::FFPWrapper::init() {
     FFP::registerAlphaTestFunctions();
     FFP::registerTextureFunctions();
     FFP::registerArrayFunctions();
-
-    auto* force = &FFPE::Rendering::ShaderGen::Common::VS_TEMPLATE;
-    auto* force2 = &FFPE::Rendering::ShaderGen::Common::FS_TEMPLATE;
 }
-    
