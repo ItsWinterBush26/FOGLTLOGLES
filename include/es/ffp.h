@@ -17,16 +17,16 @@
 
 namespace FFPE::States {
 namespace VertexData {
-    template<typename P, typename C>
+    template<int PC, typename P, int CC, typename C, int TCC, typename TC>
     struct VertexRepresentation {
         VertexRepresentation() = default;
         VertexRepresentation(
-            glm::vec<4, P> p, glm::vec<4, C> c, glm::vec4 tc
+            glm::vec<PC, P> p, glm::vec<CC, C> c, glm::vec<TCC, TC> tc
         ) : position(p), color(c), texCoord(tc) { }
 
-        glm::vec<4, P> position = glm::vec4(0, 0, 0, 1);
-        glm::vec<4, C> color = glm::vec4(255, 255, 255, 255);
-        glm::vec4 texCoord = glm::vec4(0, 0, 0, 0);
+        glm::vec<PC, P> position = glm::vec4(0, 0, 0, 1);
+        glm::vec<CC, C> color = glm::vec4(255, 255, 255, 255);
+        glm::vec<TCC, TC> texCoord = glm::vec4(0, 0, 0, 0);
     };
 
     inline glm::vec4 position = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);

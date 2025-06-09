@@ -17,8 +17,8 @@
 #include <span>
 #include <stdexcept>
 
-template<typename P, typename C>
-using VertexDataTyped = FFPE::States::VertexData::VertexRepresentation<P, C>;
+template<int PC, typename P, int CC, typename C, int TCC, typename TC>
+using VertexDataTyped = FFPE::States::VertexData::VertexRepresentation<PC, P, CC, C, TCC, TC>;
 
 namespace FFPE::Rendering::VAO {
 
@@ -43,11 +43,14 @@ inline void mapVertexData(
     GLsizei count,
     States::ClientState::Arrays::ArrayState* vertex,
     States::ClientState::Arrays::ArrayState* color,
+    States::ClientState::Arrays::ArrayState* texCoord,
     const F&& callback
 ) {
     ESUtils::TypeTraits::dispatchAsType(vertex->parameters.type, [&]<typename POS>() {
         ESUtils::TypeTraits::dispatchAsType(color->parameters.type, [&]<typename COL>() {
-            using VertexData = VertexDataTyped<POS, COL>;
+            ESUtils::TypeTraits::dispatchAsType(texCoord->parameters.type, [&]<typename TEX>() {
+        
+            using VertexData = VertexDataTyped<4, POS, 4, COL, 4, TEX>;
             GLsizei newVABSize = count * sizeof(VertexData);
             
             OV_glBindBuffer(GL_ARRAY_BUFFER, vab);
@@ -66,6 +69,7 @@ inline void mapVertexData(
             callback(v);
 
             if (v) glUnmapBuffer(GL_ARRAY_BUFFER);
+            });
         });
     });
 }
@@ -242,7 +246,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
 
         LOGI("vertexattribs!");
         mapVertexData(
-            count, vertexArray, colorArray,
+            count, vertexArray, colorArray, texCoordArray,
             [&](auto* vertices) {
                 using VertexData = std::remove_pointer_t<decltype(vertices)>;
                 LOGI("vertex type is %s", typeid(VertexData).name());
