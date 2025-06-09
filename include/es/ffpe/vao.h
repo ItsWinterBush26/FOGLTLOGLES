@@ -1,21 +1,21 @@
 #pragma once
 
-#include "gles/ffp/enums.h"
-#include <cstdint>
-#include <stdexcept>
 #define GLM_ENABLE_EXPERIMENTAL
 
 #include "es/binding_saver.h"
 #include "es/ffp.h"
 #include "es/state_tracking.h"
 #include "es/utils.h"
+#include "gles/ffp/enums.h"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/string_cast.hpp"
 
 #include <cstddef>
+#include <cstdint>
 #include <GLES3/gl32.h>
 #include <memory>
 #include <span>
+#include <stdexcept>
 
 template<typename P, typename C>
 using VertexDataTyped = FFPE::States::VertexData::VertexRepresentation<P, C>;
@@ -223,7 +223,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                 glVertexAttribPointer(
                     AttributeLocations::COLOR_LOCATION,
                     colorArray->parameters.size, colorArray->parameters.type,
-                    GL_FALSE, colorArray->parameters.stride,
+                    GL_TRUE, colorArray->parameters.stride,
                     (void*) (reinterpret_cast<uintptr_t>(colorArray->parameters.firstElement) - reinterpret_cast<uintptr_t>(vertexArray->parameters.firstElement))
                 );
             }
@@ -265,7 +265,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                     glVertexAttribPointer(
                         AttributeLocations::COLOR_LOCATION,
                         decltype(VertexData::color)::length(),
-                        colorArray->parameters.type, GL_FALSE,
+                        colorArray->parameters.type, GL_TRUE,
                         sizeof(VertexData),
                         (void*) offsetof(VertexData, color)
                     );
@@ -307,7 +307,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
         glVertexAttribPointer(
             AttributeLocations::COLOR_LOCATION,
             colorArray->parameters.size, colorArray->parameters.type,
-            GL_FALSE,
+            GL_TRUE,
             colorArray->parameters.stride,
             colorArray->parameters.firstElement
         );
