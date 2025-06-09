@@ -81,7 +81,7 @@ inline void fillDataComponents(GLuint& offsetTracker, std::span<const T1> src, T
 }
 
 template<typename T, typename VD>
-inline void putVertexDataInternal(GLenum arrayType, GLsizei dataSize, GLuint verticesCount, const T* src, VD* dst) {
+inline void putVertexDataInternal(GLenum arrayType, GLsizei componentSize, GLuint verticesCount, const T* src, VD* dst) {
     GLuint srcOffset = 0;
 
     switch (arrayType) {
@@ -89,7 +89,7 @@ inline void putVertexDataInternal(GLenum arrayType, GLsizei dataSize, GLuint ver
             for (GLuint i = 0; i < verticesCount; ++i) {
                 fillDataComponents(
                     srcOffset,
-                    std::span(src + srcOffset, dataSize),
+                    std::span(src + srcOffset, componentSize),
                     &dst[i].position
                 );
             }
@@ -99,7 +99,7 @@ inline void putVertexDataInternal(GLenum arrayType, GLsizei dataSize, GLuint ver
             for (GLuint i = 0; i < verticesCount; ++i) {
                 fillDataComponents(
                     srcOffset,
-                    std::span(src + srcOffset, dataSize),
+                    std::span(src + srcOffset, componentSize),
                     &dst[i].color
                 );
             }
@@ -109,7 +109,7 @@ inline void putVertexDataInternal(GLenum arrayType, GLsizei dataSize, GLuint ver
             for (GLuint i = 0; i < verticesCount; ++i) {
                 fillDataComponents(
                     srcOffset,
-                    std::span(src + srcOffset, dataSize),
+                    std::span(src + srcOffset, componentSize),
                     &dst[i].texCoord
                 );
             }
@@ -119,8 +119,6 @@ inline void putVertexDataInternal(GLenum arrayType, GLsizei dataSize, GLuint ver
 
 template<typename VD>
 inline void putVertexData(GLenum arrayType, FFPE::States::ClientState::Arrays::ArrayState* array, VD* vertices, GLuint verticesCount) {
-    LOGI("putVertexData : arrayType=%u dataType=%u", arrayType, array->parameters.type);
-    
     switch (array->parameters.type) {
         case GL_UNSIGNED_BYTE:
             putVertexDataInternal(
@@ -158,12 +156,11 @@ inline void putVertexData(GLenum arrayType, FFPE::States::ClientState::Arrays::A
 
 [[nodiscard]]
 inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) {
-    LOGI("vao setup!");
-    glBindVertexArray(vao);
-
     auto* vertexArray = States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
     auto* colorArray = States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
     auto* texCoordArray = States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0);
+
+    glBindVertexArray(vao);
 
     if (vertexArray->enabled) {
         glEnableVertexAttribArray(AttributeLocations::POSITION_LOCATION);
@@ -175,7 +172,6 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
         glEnableVertexAttribArray(AttributeLocations::COLOR_LOCATION);
     } else {
         glDisableVertexAttribArray(AttributeLocations::COLOR_LOCATION);
-        LOGI("using global color state!");
         glVertexAttrib4fv(
             AttributeLocations::COLOR_LOCATION,
             glm::value_ptr(
@@ -188,7 +184,6 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
         glEnableVertexAttribArray(AttributeLocations::TEX_COORD_LOCATION);
     } else {
         glDisableVertexAttribArray(AttributeLocations::TEX_COORD_LOCATION);
-        LOGI("using global texCoord state!");
         glVertexAttrib4fv(
             AttributeLocations::TEX_COORD_LOCATION,
             glm::value_ptr(
@@ -199,11 +194,9 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
 
     std::unique_ptr<SaveBoundedBuffer> sbb;
     if (trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer == 0) {
-        LOGI("not buffered! setup our own vab");
         sbb = std::make_unique<SaveBoundedBuffer>(GL_ARRAY_BUFFER);
 
         if (!vertexArray->parameters.planar) {
-            LOGI("interleaved arrays!");
             GLsizei newVABSize = count * vertexArray->parameters.stride;
 
             OV_glBindBuffer(GL_ARRAY_BUFFER, vab);
@@ -243,7 +236,6 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
             goto buffered;
         }
 
-        LOGI("planar arrays!");
         mapVertexData(
             count, vertexArray, colorArray, texCoordArray,
             [&](auto* vertices) {
@@ -284,10 +276,6 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
     }
     
 buffered:
-    LOGI("now we're buffered!");
-    LOGI("vertexattribs!");
-    
-    LOGI("vertices!");
     glVertexAttribPointer(
         AttributeLocations::POSITION_LOCATION,
         vertexArray->parameters.size, vertexArray->parameters.type,
@@ -296,7 +284,6 @@ buffered:
         vertexArray->parameters.firstElement
     );
 
-    LOGI("colors!");
     if (colorArray->enabled) {
         glVertexAttribPointer(
             AttributeLocations::COLOR_LOCATION,
@@ -307,7 +294,6 @@ buffered:
         );
     }
 
-    LOGI("texcoords!");
     if (texCoordArray->enabled) {
         glVertexAttribPointer(
             AttributeLocations::TEX_COORD_LOCATION,

@@ -132,7 +132,7 @@ inline void drawQuads(GLuint count) {
     OV_glUseProgram(renderingProgram);
     Rendering::ShaderGen::Uniforms::setupInputsForRendering(renderingProgram);
 
-    GLuint realCount = generateEAB_CPU(count);
+    GLuint realCount = generateEAB_GPU(count);
 
     glDrawElements(GL_TRIANGLES, realCount, GL_UNSIGNED_INT, nullptr);
     LOGI("done! drawElements (for quads)");
