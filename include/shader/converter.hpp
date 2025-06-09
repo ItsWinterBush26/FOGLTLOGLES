@@ -5,8 +5,8 @@
 #include "preprocess.hpp"
 #include "es/utils.hpp"
 #include "gl/shader.hpp"
-#include "shaderc/shaderc.hpp"
-#include "shaderc/status.hpp"
+#include "shaderc/shaderc.h"
+#include "shaderc/status.h"
 #include "spirv_glsl.hpp"
 #include "utils.hpp"
 

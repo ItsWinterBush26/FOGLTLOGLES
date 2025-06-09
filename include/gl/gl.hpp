@@ -1,9 +1,9 @@
 #pragma once
 
-#include "GLES3/gl32.hpp"
-
 #include "utils/types.hpp"
 #include "utils/defines.hpp"
+
+#include <GLES3/gl32.h>
 
 PUBLIC_API FunctionPtr glXGetProcAddress(const GLchar* pn);
 
