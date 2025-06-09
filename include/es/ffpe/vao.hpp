@@ -214,6 +214,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                 GL_DYNAMIC_DRAW
             );
 
+            uintptr_t base = reinterpret_cast<uintptr_t>(vertexArray->parameters.firstElement);
             vertexArray->parameters = {
                 vertexArray->parameters.planar,
                 vertexArray->parameters.size, vertexArray->parameters.type,
@@ -221,13 +222,12 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                 nullptr
             };
             
-
             if (colorArray->enabled) {
                 colorArray->parameters = {
                     colorArray->parameters.planar,
                     colorArray->parameters.size, colorArray->parameters.type,
                     GL_TRUE, colorArray->parameters.stride,
-                    (void*) (reinterpret_cast<uintptr_t>(colorArray->parameters.firstElement) - reinterpret_cast<uintptr_t>(vertexArray->parameters.firstElement))
+                    (void*) (reinterpret_cast<uintptr_t>(colorArray->parameters.firstElement) - base)
                 };
             }
 
@@ -236,7 +236,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                     texCoordArray->parameters.planar,
                     texCoordArray->parameters.size, texCoordArray->parameters.type,
                     GL_FALSE, texCoordArray->parameters.stride,
-                    (void*) (reinterpret_cast<uintptr_t>(texCoordArray->parameters.firstElement) - reinterpret_cast<uintptr_t>(vertexArray->parameters.firstElement))
+                    (void*) (reinterpret_cast<uintptr_t>(texCoordArray->parameters.firstElement) - base)
                 };
             }
 
