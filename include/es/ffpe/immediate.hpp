@@ -103,6 +103,9 @@ inline void endInternal(
     );
 
     glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
     glVertexPointer(
         decltype(VertexData::position)::length(),
         ESUtils::TypeTraits::GLTypeEnum<
@@ -110,12 +113,9 @@ inline void endInternal(
                 VertexData::position
             )::value_type
         >::value,
-        sizeof(VertexData), (void*) offsetof(
-            VertexData, position
-        )
+        sizeof(VertexData), (void*) offsetof(VertexData, position)
     );
 
-    glEnableClientState(GL_COLOR_ARRAY);
     glColorPointer(
         decltype(VertexData::color)::length(),
         ESUtils::TypeTraits::GLTypeEnum<
@@ -123,13 +123,9 @@ inline void endInternal(
                 VertexData::color
             )::value_type
         >::value,
-        sizeof(VertexData),
-        (void*) offsetof(
-            VertexData, color
-        )
+        sizeof(VertexData), (void*) offsetof(VertexData, color)
     );
 
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glTexCoordPointer(
         decltype(VertexData::texCoord)::length(),
         ESUtils::TypeTraits::GLTypeEnum<
@@ -137,10 +133,7 @@ inline void endInternal(
                 VertexData::texCoord
             )::value_type
         >::value,
-        sizeof(VertexData),
-        (void*) offsetof(
-            VertexData, texCoord
-        )
+        sizeof(VertexData), (void*) offsetof(VertexData, texCoord)
     );
 
     Lists::displayListManager->ignoreNextCall();

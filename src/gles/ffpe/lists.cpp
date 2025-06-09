@@ -1,4 +1,5 @@
 #include "es/ffp.hpp"
+#include "es/utils.hpp"
 #include "gles/ffp/main.hpp"
 #include "main.hpp"
 #include "utils/log.hpp"
@@ -52,23 +53,11 @@ void glCallList(GLuint list) {
 }
 
 void glCallLists(GLsizei n, GLenum type, const void* lists) {
-    if (type == GL_UNSIGNED_INT) {
-        const GLuint* listArray = static_cast<const GLuint*>(lists);
-
-        Lists::displayListManager->callBeginBatch();
-        for (GLsizei i = 0; i < n; ++i) {
-            Lists::displayListManager->callDisplayList(listArray[i]);
-        }
-        Lists::displayListManager->callEndBatch();
-    } else if (type == GL_UNSIGNED_BYTE) {
-        const GLubyte* listArray = static_cast<const GLubyte*>(lists);
-
-        Lists::displayListManager->callBeginBatch();
-        for (GLsizei i = 0; i < n; ++i) {
-            Lists::displayListManager->callDisplayList(listArray[i]);
-        }
-        Lists::displayListManager->callEndBatch();
-    }
+    ESUtils::TypeTraits::dispatchAsType(type, [&]<typename T>() {
+        Lists::displayListManager->callDisplayLists(
+            n, ESUtils::TypeTraits::asTypedArray<T>(lists)
+        );
+    });
 }
 
 void glListBase(GLuint base) {

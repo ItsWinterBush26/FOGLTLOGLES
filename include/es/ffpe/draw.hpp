@@ -156,7 +156,6 @@ inline void drawArrays(GLenum mode, GLint first, GLuint count) {
         glDrawArrays(mode, first, count);
 
         OV_glUseProgram(0);
-        LOGI("done! drawArrays");
         return;
     }
 

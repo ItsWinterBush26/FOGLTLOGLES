@@ -205,7 +205,7 @@ inline GLsizei getTypeSize(GLenum type) {
         case GL_DOUBLE: return sizeof(GLdouble);
         default:
             LOGE("Unhandled type! (type=%u)", type);
-            throw std::runtime_error("Unsupported GL type");
+            throw std::runtime_error("getTypeSize : Unsupported GL type");
     }
 }
 
@@ -234,7 +234,7 @@ void dispatchAsType(GLenum type, const Func&& func) {
             
         default:
             LOGE("Unhandled type! (type=%u)", type);
-            throw std::runtime_error("Unsupported GL type");
+            throw std::runtime_error("dispatchAsType : Unsupported GL type");
     }
 }
 

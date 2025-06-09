@@ -140,8 +140,7 @@ public:
 class DisplayListManager {
 private:
     GLuint nextListIndex = 1;
-    bool isExecuting;
-    bool isCallBatched;
+    bool executingDisplayList;
 
     bool ignoreNextCallFlag;
 
@@ -165,10 +164,8 @@ public:
     }
 
     void startDisplayList(GLuint list, GLenum mode) {
-        if (activeDisplayListIndex != 0) return;
-        if (displayLists.find(list) != displayLists.end()) {
-            return;
-        }
+        if (isRecording() || isExecuting()) return;
+        if (!isList(list)) return;
 
         activeDisplayListIndex = list;
         activeDisplayList = DisplayList();
@@ -176,78 +173,62 @@ public:
     }
 
     void ignoreNextCall() {
-        if (activeDisplayListIndex == 0) return;
+        if (!isRecording() || isExecuting()) return;
         ignoreNextCallFlag = true;
     }
 
     template<auto F, typename... Args>
+    requires std::invocable<decltype(F), Args...>
     void addCommand(Args&&... args) {
-        static_assert(std::is_invocable_v<decltype(F), Args...>, "addCommand<...>(args...) must match the function signature");
-        if (activeDisplayListIndex == 0) return;
+        if (!isRecording() || isExecuting()) return;
         if (ignoreNextCallFlag) {
             ignoreNextCallFlag = false;
             return;
         }
         
         activeDisplayList.addCommand(
-            [a = std::make_tuple(std::forward<Args>(args)...)]() mutable {
-                std::apply(F, std::move(a));
+            [...args = std::forward<Args>(args)]() {
+                F(args...);
             }
         );
     }
 
     void endDisplayList() {
-        if (activeDisplayListIndex == 0) return;
+        if (!isRecording() || isExecuting()) return;
+        if (activeDisplayList.getMode() == GL_COMPILE_AND_EXECUTE) activeDisplayList.execute();
 
         displayLists.insert({ activeDisplayListIndex, activeDisplayList });
-
-        if (activeDisplayList.getMode() == GL_COMPILE_AND_EXECUTE) {
-            callDisplayList(activeDisplayList);
-        }
 
         activeDisplayListIndex = 0;
         activeDisplayList = DisplayList();
     }
 
     void deleteDisplayLists(GLuint list, GLsizei range) {
-        if (displayLists.find(list) == displayLists.end()) return;
         if (range <= 0) return;
 
         for (GLsizei i = 0; i < range; ++i) {
+            if (!isList(list)) continue;
             displayLists.erase(list + i);
         }
     }
 
-    void callBeginBatch() {
-        isExecuting = true;
-        isCallBatched = true;
-    }
-
     void callDisplayList(GLuint list) {
-        if (activeDisplayListIndex != 0) return;
-        if (displayLists.find(list) == displayLists.end()) return;
+        if (isRecording() || isExecuting()) return;
+        if (!isList(list)) return;
 
-        if (!isCallBatched) {
-            isExecuting = true;
-        }
+        executingDisplayList = true;
         displayLists[list].execute();
-        if (!isCallBatched) {
-            isExecuting = false;
-        }
+        executingDisplayList = false;
     }
 
-    void callDisplayList(DisplayList list) {
-        if (!isCallBatched) {
-            isExecuting = true;
+    template<typename T>
+    void callDisplayLists(GLsizei n, const T* lists) {
+        executingDisplayList = true;
+        for (GLsizei i = 0; i < n; ++i) {
+            if (!isList(i)) continue;
+            displayLists[static_cast<GLuint>(lists[i])].execute();
         }
-        list.execute();
-        if (!isCallBatched) {
-            isExecuting = false;
-        }
-    }
-
-    void callEndBatch() {
-        isExecuting = false;
+        executingDisplayList = false;
     }
 
     bool isList(GLuint list) {
@@ -255,7 +236,11 @@ public:
     }
 
     bool isRecording() {
-        return activeDisplayListIndex != 0 && !isExecuting;
+        return activeDisplayListIndex != 0;
+    }
+
+    bool isExecuting() {
+        return executingDisplayList;
     }
 };
 
