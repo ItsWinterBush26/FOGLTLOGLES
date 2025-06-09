@@ -1,5 +1,5 @@
-#include "gles30/main.h"
-#include "utils/log.h"
+#include "gles30/main.hpp"
+#include "utils/log.hpp"
 
 void GLES30::GLES30Wrapper::init() {
     LOGI("GLES 3.0 entrypoint!");

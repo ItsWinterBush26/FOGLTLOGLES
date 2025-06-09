@@ -1,6 +1,6 @@
-#include "gles30/main.h"
-#include "main.h"
-#include "utils/log.h"
+#include "gles30/main.hpp"
+#include "main.hpp"
+#include "utils/log.hpp"
 
 #include <GLES3/gl3.h>
 

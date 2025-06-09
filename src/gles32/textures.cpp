@@ -1,11 +1,11 @@
-#include "es/framebuffer.h"
-#include "es/proxy.h"
-#include "es/state_tracking.h"
-#include "gles20/framebuffer_tracking.h"
-#include "gles30/read_pixels.h"
-#include "gles32/main.h"
-#include "main.h"
-#include "utils/log.h"
+#include "es/framebuffer.hpp"
+#include "es/proxy.hpp"
+#include "es/state_tracking.hpp"
+#include "gles20/framebuffer_tracking.hpp"
+#include "gles30/read_pixels.hpp"
+#include "gles32/main.hpp"
+#include "main.hpp"
+#include "utils/log.hpp"
 
 #include <GLES3/gl32.h>
 

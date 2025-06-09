@@ -1,6 +1,6 @@
-#include "gles20/main.h"
-#include "main.h"
-#include "utils/log.h"
+#include "gles20/main.hpp"
+#include "main.hpp"
+#include "utils/log.hpp"
 
 #include <GLES2/gl2.h>
 

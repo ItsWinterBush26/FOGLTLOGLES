@@ -1,10 +1,10 @@
-#include "es/ffp.h"
-#include "es/ffpe/draw.h"
-#include "es/utils.h"
-#include "gles/ffp/enums.h"
-#include "gles/ffp/main.h"
-#include "gles/ffp/arrays.h"
-#include "main.h"
+#include "es/ffp.hpp"
+#include "es/ffpe/draw.hpp"
+#include "es/utils.hpp"
+#include "gles/ffp/enums.hpp"
+#include "gles/ffp/main.hpp"
+#include "gles/ffp/arrays.hpp"
+#include "main.hpp"
 
 #include <GLES3/gl32.h>
 

@@ -1,11 +1,11 @@
 // Based on:
 // https://github.com/artdeell/LTW/blob/master/ltw/src/main/tinywrapper/framebuffer.c
 
-#include "es/framebuffer.h"
-#include "es/state_tracking.h"
-#include "es/utils.h"
-#include "gles32/main.h"
-#include "main.h"
+#include "es/framebuffer.hpp"
+#include "es/state_tracking.hpp"
+#include "es/utils.hpp"
+#include "gles32/main.hpp"
+#include "main.hpp"
 
 #include <GLES3/gl3.h>
 

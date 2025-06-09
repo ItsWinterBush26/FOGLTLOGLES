@@ -1,5 +1,5 @@
-#include "gles20/ext/main.h"
-#include "utils/log.h"
+#include "gles20/ext/main.hpp"
+#include "utils/log.hpp"
 
 void GLES20Ext::GLES20ExtWrapper::init() {
     LOGI("GLES 2.0 extension entrypoint!");

@@ -1,12 +1,12 @@
-#include "build_info.h"
-#include "main.h"
-#include "es/utils.h"
-#include "gles/main.h"
-#include "gles20/main.h"
-#include "gles30/main.h"
-#include "gles32/main.h"
-#include "shader/cache.h"
-#include "utils/log.h"
+#include "build_info.hpp"
+#include "main.hpp"
+#include "es/utils.hpp"
+#include "gles/main.hpp"
+#include "gles20/main.hpp"
+#include "gles30/main.hpp"
+#include "gles32/main.hpp"
+#include "shader/cache.hpp"
+#include "utils/log.hpp"
 
 #include <GLES3/gl32.h>
 #include <unordered_map>

@@ -1,6 +1,6 @@
-#include "es/renderbuffer.h"
-#include "gles20/main.h"
-#include "main.h"
+#include "es/renderbuffer.hpp"
+#include "gles20/main.hpp"
+#include "main.hpp"
 
 #include <GLES2/gl2.h>
 

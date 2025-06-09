@@ -1,7 +1,7 @@
-#include "egl/egl.h"
-#include "es/utils.h"
-#include "gles20/ext/main.h"
-#include "main.h"
+#include "egl/egl.hpp"
+#include "es/utils.hpp"
+#include "gles20/ext/main.hpp"
+#include "main.hpp"
 
 void* glMapBuffer(GLenum target, GLenum access);
 

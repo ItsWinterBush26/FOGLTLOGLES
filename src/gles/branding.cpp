@@ -1,11 +1,11 @@
-#include "build_info.h"
-#include "es/ffp.h"
-#include "es/state_tracking.h"
-#include "es/utils.h"
-#include "gles/ffp/enums.h"
-#include "gles/main.h"
-#include "main.h"
-#include "utils/strings.h"
+#include "build_info.hpp"
+#include "es/ffp.hpp"
+#include "es/state_tracking.hpp"
+#include "es/utils.hpp"
+#include "gles/ffp/enums.hpp"
+#include "gles/main.hpp"
+#include "main.hpp"
+#include "utils/strings.hpp"
 
 #include <GLES3/gl32.h>
 #include <string>

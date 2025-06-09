@@ -1,8 +1,8 @@
-#include "es/ffp.h"
-#include "es/state_tracking.h"
-#include "gles/ffp/enums.h"
-#include "gles/ffp/main.h"
-#include "main.h"
+#include "es/ffp.hpp"
+#include "es/state_tracking.hpp"
+#include "gles/ffp/enums.hpp"
+#include "gles/ffp/main.hpp"
+#include "main.hpp"
 
 #include <GLES3/gl32.h>
 

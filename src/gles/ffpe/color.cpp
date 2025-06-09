@@ -1,8 +1,8 @@
-#include "es/ffp.h"
-#include "es/ffpe/immediate.h"
-#include "gles/ffp/main.h"
+#include "es/ffp.hpp"
+#include "es/ffpe/immediate.hpp"
+#include "gles/ffp/main.hpp"
 #include "glm/ext/vector_float4.hpp"
-#include "main.h"
+#include "main.hpp"
 
 #include <GLES3/gl32.h>
 

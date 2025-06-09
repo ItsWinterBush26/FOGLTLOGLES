@@ -1,6 +1,6 @@
-#include "gles/ffp/main.h"
-#include "main.h"
-#include "utils/log.h"
+#include "gles/ffp/main.hpp"
+#include "main.hpp"
+#include "utils/log.hpp"
 
 #include <GLES3/gl32.h>
 

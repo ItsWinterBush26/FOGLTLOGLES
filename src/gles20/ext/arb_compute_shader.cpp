@@ -1,6 +1,6 @@
-#include "es/utils.h"
-#include "gles20/ext/main.h"
-#include "utils/log.h"
+#include "es/utils.hpp"
+#include "gles20/ext/main.hpp"
+#include "utils/log.hpp"
 
 void GLES20Ext::register_GL_ARB_compute_shader() {
     LOGI("Not exposing GL_ARB_compute_shader.");

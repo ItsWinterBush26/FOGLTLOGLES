@@ -1,7 +1,7 @@
-#include "es/framebuffer.h"
-#include "gles30/main.h"
-#include "gles30/read_pixels.h"
-#include "main.h"
+#include "es/framebuffer.hpp"
+#include "gles30/main.hpp"
+#include "gles30/read_pixels.hpp"
+#include "main.hpp"
 
 void GLES30::registerTextureOverrides() {
     REGISTEROV(glReadPixels);

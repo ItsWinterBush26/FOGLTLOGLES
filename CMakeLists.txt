@@ -96,12 +96,12 @@ file(GLOB_RECURSE SOURCES
 
 set(HEADER_DIRS "include" "build_info")
 file(GLOB_RECURSE HEADERS
-	"include/*.h"
-	"include/*/*.h"
-	"include/*/*/*.h"
-    "include/*/*/*/*.h"
-    "include/*/*/*/*/*.h"
-	"build_info/build_info.h"
+	"include/*.hpp"
+	"include/*/*.hpp"
+	"include/*/*/*.hpp"
+    "include/*/*/*/*.hpp"
+    "include/*/*/*/*/*.hpp"
+	"build_info/build_info.hpp"
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
@@ -189,8 +189,8 @@ message("Dependencies : ${DEPENDENCIES}")
 set(BUILD_INFO_DIR ${CMAKE_SOURCE_DIR}/build_info)
 
 add_custom_target(generateBuildInfo
-    ${CMAKE_COMMAND} -D SRC=${BUILD_INFO_DIR}/build_info.h.in
-                     -D DST=${BUILD_INFO_DIR}/build_info.h
+    ${CMAKE_COMMAND} -D SRC=${BUILD_INFO_DIR}/build_info.hpp.in
+                     -D DST=${BUILD_INFO_DIR}/build_info.hpp
                      -D GIT_EXECUTABLE=${GIT_EXECUTABLE}
                      -P ${BUILD_INFO_DIR}/GenerateBuildInfo.cmake
 )

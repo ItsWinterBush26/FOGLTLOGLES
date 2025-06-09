@@ -15,10 +15,10 @@
  * For vector versions, we dereference the pointer and call the scalar version.
 */
 
-#include "es/vertexattrib.h"
+#include "es/vertexattrib.hpp"
 
-#include "gles30/main.h"
-#include "main.h"
+#include "gles30/main.hpp"
+#include "main.hpp"
 
 #include <GLES3/gl3.h>
 

@@ -1,7 +1,7 @@
-#include "gles/main.h"
-#include "gles/ffp/main.h"
-#include "es/limits.h"
-#include "utils/log.h"
+#include "gles/main.hpp"
+#include "gles/ffp/main.hpp"
+#include "es/limits.hpp"
+#include "utils/log.hpp"
 
 void GLES::GLESWrapper::init() {
     LOGI("GLES 1.0 entrypoint!");

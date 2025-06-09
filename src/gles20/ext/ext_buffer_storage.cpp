@@ -1,9 +1,9 @@
-#include "egl/egl.h"
-#include "es/state_tracking.h"
-#include "es/utils.h"
-#include "gles20/ext/main.h"
-#include "gles20/ext/ext_buffer_storage.h"
-#include "main.h"
+#include "egl/egl.hpp"
+#include "es/state_tracking.hpp"
+#include "es/utils.hpp"
+#include "gles20/ext/main.hpp"
+#include "gles20/ext/ext_buffer_storage.hpp"
+#include "main.hpp"
 
 #include <GLES2/gl2ext.h>
 

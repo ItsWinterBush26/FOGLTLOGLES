@@ -1,11 +1,11 @@
-#include "es/state_tracking.h"
-#include "shader/cache.h"
-#include "shader/converter.h"
-#include "shader/utils.h"
-#include "gles20/main.h"
-#include "gles20/shader_overrides.h"
-#include "main.h"
-#include "utils/env.h"
+#include "es/state_tracking.hpp"
+#include "shader/cache.hpp"
+#include "shader/converter.hpp"
+#include "shader/utils.hpp"
+#include "gles20/main.hpp"
+#include "gles20/shader_overrides.hpp"
+#include "main.hpp"
+#include "utils/env.hpp"
 
 #include <GLES2/gl2.h>
 #include <stdexcept>

@@ -1,12 +1,12 @@
-#include "es/ffp.h"
-#include "es/ffpe/matrices.h"
-#include "gles/ffp/enums.h"
-#include "gles/ffp/main.h"
+#include "es/ffp.hpp"
+#include "es/ffpe/matrices.hpp"
+#include "gles/ffp/enums.hpp"
+#include "gles/ffp/main.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_float4x4.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/trigonometric.hpp"
-#include "main.h"
+#include "main.hpp"
 
 #include <GLES3/gl32.h>
 

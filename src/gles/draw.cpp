@@ -1,9 +1,9 @@
-#include "es/ffpe/draw.h"
-#include "es/ffp.h"
-#include "gles/draw_overrides.h"
-#include "gles/main.h"
-#include "main.h"
-#include "utils/log.h"
+#include "es/ffpe/draw.hpp"
+#include "es/ffp.hpp"
+#include "gles/draw_overrides.hpp"
+#include "gles/main.hpp"
+#include "main.hpp"
+#include "utils/log.hpp"
 
 #include <GLES3/gl32.h>
 

@@ -1,6 +1,6 @@
-#include "es/ffpe/immediate.h"
-#include "gles/ffp/main.h"
-#include "main.h"
+#include "es/ffpe/immediate.hpp"
+#include "gles/ffp/main.hpp"
+#include "main.hpp"
 
 #include <GLES3/gl32.h>
 

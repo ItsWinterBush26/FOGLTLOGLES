@@ -1,6 +1,6 @@
-#include "gles20/main.h"
-#include "gles20/ext/main.h"
-#include "utils/log.h"
+#include "gles20/main.hpp"
+#include "gles20/ext/main.hpp"
+#include "utils/log.hpp"
 
 void GLES20::GLES20Wrapper::init() {
     LOGI("GLES 2.0 entrypoint!");

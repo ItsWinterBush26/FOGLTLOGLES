@@ -1,11 +1,11 @@
-#include "es/ffp.h"
-#include "es/state_tracking.h"
-#include "gles20/buffer_tracking.h"
-#include "gles20/framebuffer_tracking.h"
-#include "gles20/main.h"
-#include "gles20/texture_tracking.h"
-#include "gles20/renderbuffer_tracking.h"
-#include "main.h"
+#include "es/ffp.hpp"
+#include "es/state_tracking.hpp"
+#include "gles20/buffer_tracking.hpp"
+#include "gles20/framebuffer_tracking.hpp"
+#include "gles20/main.hpp"
+#include "gles20/texture_tracking.hpp"
+#include "gles20/renderbuffer_tracking.hpp"
+#include "main.hpp"
 
 #include <GLES2/gl2.h>
 #include <utility>

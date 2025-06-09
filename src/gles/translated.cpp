@@ -1,5 +1,5 @@
-#include "gles/main.h"
-#include "main.h"
+#include "gles/main.hpp"
+#include "main.hpp"
 
 #include <GLES3/gl32.h>
 

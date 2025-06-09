@@ -1,6 +1,6 @@
-#include "gles/main.h"
-#include "main.h"
-#include "utils/env.h"
+#include "gles/main.hpp"
+#include "main.hpp"
+#include "utils/env.hpp"
 
 #include <GLES3/gl32.h>
 

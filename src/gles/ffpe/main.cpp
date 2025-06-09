@@ -1,6 +1,6 @@
-#include "gles/ffp/main.h"
-#include "es/ffpe/shadergen/common.h"
-#include "utils/log.h"
+#include "gles/ffp/main.hpp"
+#include "es/ffpe/shadergen/common.hpp"
+#include "utils/log.hpp"
 
 void FFP::FFPWrapper::init() {
     LOGI("GLES 1.0 :: FFP entrypoint!");
