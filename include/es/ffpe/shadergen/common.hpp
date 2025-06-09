@@ -23,6 +23,8 @@ void main() {{
     // feature operations
     {}
 
+    // feature output operations
+    {}
     vertexID = gl_VertexID;
 }})";
 
@@ -39,9 +41,6 @@ flat in lowp int vertexID;
 
 uniform sampler2D tex0;
 
-// default output
-out lowp vec4 oFragColor;
-
 // feature outputs
 {}
 
@@ -51,7 +50,8 @@ void main() {{
 
     color *= texture(tex0, vertexTexCoord);
 
-    oFragColor = color; // gotta do smth about this in the template
+    // feature output operations
+    {}
 }})";
 
 }

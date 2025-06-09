@@ -4,7 +4,6 @@
 #include "es/ffpe/shadergen/cache.hpp"
 #include "es/ffpe/shadergen/common.hpp"
 #include "es/ffpe/shadergen/features/base.hpp"
-#include "es/ffpe/shadergen/features/registry.hpp"
 #include "es/state_tracking.hpp"
 #include "fmt/base.h"
 #include "fmt/ostream.h"
@@ -25,7 +24,8 @@ const std::string baseOperation = "if (color.a {} alphaTestThreshold) discard;";
 void buildFS(
     [[maybe_unused]] std::stringstream& finalInputs,
     [[maybe_unused]] std::stringstream& finalOutputs,
-    std::stringstream& finalOperations
+    std::stringstream& finalOperations,
+    [[maybe_unused]] std::stringstream& finalOutputOperations
 ) const override {
     if (!trackedStates->isCapabilityEnabled(GL_ALPHA_TEST)) return;
 

@@ -10,18 +10,20 @@ struct BaseFeature {
 virtual ~BaseFeature() = default;
 
 virtual void buildVS(
-    std::stringstream& finalInputs,
-    std::stringstream& finalOutputs,
-    std::stringstream& finalOperations
+    [[maybe_unused]] std::stringstream& finalInputs,
+    [[maybe_unused]] std::stringstream& finalOutputs,
+    [[maybe_unused]] std::stringstream& finalOperations,
+    [[maybe_unused]] std::stringstream& finalOutputOperations
 ) const { }
 
 virtual void buildFS(
-    std::stringstream& finalInputs,
-    std::stringstream& finalOutputs,
-    std::stringstream& finalOperations
+    [[maybe_unused]] std::stringstream& finalInputs,
+    [[maybe_unused]] std::stringstream& finalOutputs,
+    [[maybe_unused]] std::stringstream& finalOperations,
+    [[maybe_unused]] std::stringstream& finalOutputOperations
 ) const { }
 
-virtual void sendData(GLuint program) const { }
+virtual void sendData([[maybe_unused]] GLuint program) const { }
 
 };
 

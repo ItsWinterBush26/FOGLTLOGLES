@@ -1,11 +1,9 @@
 #pragma once
 
-
 #include "es/ffpe/matrices.hpp"
 #include "es/ffpe/shadergen/cache.hpp"
 #include "es/ffpe/shadergen/common.hpp"
 #include "es/ffpe/shadergen/features/base.hpp"
-#include "es/ffpe/shadergen/features/registry.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
 
@@ -17,9 +15,10 @@ namespace FFPE::Rendering::ShaderGen::Feature::MVP {
 struct MVPFeature : public Feature::BaseFeature {
 
 void buildVS(
-    [[maybe_unused]] std::stringstream& finalInputs,
+    std::stringstream& finalInputs,
     [[maybe_unused]] std::stringstream& finalOutputs,
-    std::stringstream& finalOperations
+    [[maybe_unused]] std::stringstream& finalOperations,
+    [[maybe_unused]] std::stringstream& finalOutputOperations
 ) const override {
     finalInputs << "uniform mat4 uModelViewProjection;" << Common::SG_VAR_NEWLINE;
 }

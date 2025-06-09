@@ -3,7 +3,6 @@
 #include "es/ffp.hpp"
 #include "es/ffpe/shadergen/common.hpp"
 #include "es/ffpe/shadergen/features/base.hpp"
-#include "es/ffpe/shadergen/features/registry.hpp"
 #include "fmt/base.h"
 #include "fmt/format.h"
 
@@ -24,11 +23,13 @@ const std::string vertexTexCoordOutputVS = "out mediump vec{} vertexTexCoord;";
 
 const std::string vertexColorInputFS = "in lowp vec{} vertexColor;";
 const std::string vertexTexCoordInputFS = "in mediump vec{} vertexTexCoord;";
+const std::string fragColorOutputFS = "out vec4 oFragColor;";
 
 void buildVS(
     [[maybe_unused]] std::stringstream& finalInputs,
     [[maybe_unused]] std::stringstream& finalOutputs,
-    std::stringstream& finalOperations
+    std::stringstream& finalOperations,
+    std::stringstream& finalOutputOperations
 ) const override {
     auto* vertexArray = States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
     auto* colorArray = States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
@@ -61,14 +62,15 @@ void buildVS(
 
     finalOperations << getPositionExpression(vertexArray->parameters.size) << Common::SG_VAR_NEWLINE;
 
-    finalOperations << "vertexColor = iVertexColor;" << Common::SG_STMT_NEWLINE;
-    finalOperations << "vertexTexCoord = iVertexTexCoord;" << Common::SG_VAR_NEWLINE;
+    finalOutputOperations << "vertexColor = iVertexColor;" << Common::SG_STMT_NEWLINE;
+    finalOutputOperations << "vertexTexCoord = iVertexTexCoord;" << Common::SG_VAR_NEWLINE;
 }
 
 void buildFS(
     std::stringstream& finalInputs,
-    [[maybe_unused]] std::stringstream& finalOutputs,
-    std::stringstream& finalOperations
+    std::stringstream& finalOutputs,
+    std::stringstream& finalOperations,
+    std::stringstream& finalOutputOperations
 ) const override {
     auto* colorArray = States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
     auto* texCoordArray = States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0);
@@ -83,10 +85,16 @@ void buildFS(
         texCoordArray->enabled ? texCoordArray->parameters.size : decltype(States::VertexData::texCoord)::length()
     ) << Common::SG_VAR_NEWLINE;
 
+    finalOutputs << fragColorOutputFS << Common::SG_VAR_NEWLINE;
+
     finalOperations << fmt::format(
         fmt::runtime("lowp vec{} color = vertexColor;"),
         colorArray->enabled ? colorArray->parameters.size : decltype(States::VertexData::color)::length()
     ) << Common::SG_VAR_NEWLINE;
+
+    finalOutputOperations << getOutputColorExpression(
+        colorArray->enabled ? colorArray->parameters.size : decltype(States::VertexData::color)::length()
+    ) << Common::SG_STMT_NEWLINE;
 }
 
 std::string getPositionExpression(GLint componentSize) const {
@@ -96,6 +104,16 @@ std::string getPositionExpression(GLint componentSize) const {
         case 3: return "gl_Position = uModelViewProjection * vec4(iVertexPosition, 1);";
         case 4: return "gl_Position = uModelViewProjection * iVertexPosition;";
         default: throw std::runtime_error("Failed to determine position expression! Is componentSize bigger than 4?");
+    }
+}
+
+std::string getOutputColorExpression(GLint componentSize) const {
+    switch (componentSize) {
+        case 1: return "oFragColor = vec4(color, 0, 0, 1);";
+        case 2: return "oFragColor = vec4(color, 0, 1);";
+        case 3: return "oFragColor = vec4(color, 1);";
+        case 4: return "oFragColor = color;";
+        default: throw std::runtime_error("Failed to determine output color expression! Is componentSize bigger than 4?");
     }
 }
 

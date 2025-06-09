@@ -21,14 +21,15 @@ inline std::string buildVertexShader() {
     std::stringstream inputs;
     std::stringstream outputs;
     std::stringstream operations;
+    std::stringstream outputOperations;
 
     for (const auto* feature : Feature::Registry::Data::registeredFeatures) {
-        feature->buildVS(inputs, outputs, operations);
+        feature->buildVS(inputs, outputs, operations, outputOperations);
     }
 
     return fmt::format(
         fmt::runtime(Common::VS_TEMPLATE),
-        inputs.str(), outputs.str(), operations.str()
+        inputs.str(), outputs.str(), operations.str(), outputOperations.str()
     );
 }
 
@@ -36,14 +37,15 @@ inline std::string buildFragmentShader() {
     std::stringstream inputs;
     std::stringstream outputs;
     std::stringstream operations;
+    std::stringstream outputOperations;
 
     for (const auto* feature : Feature::Registry::Data::registeredFeatures) {
-        feature->buildFS(inputs, outputs, operations);
+        feature->buildFS(inputs, outputs, operations, outputOperations);
     }
 
     return fmt::format(
         fmt::runtime(Common::FS_TEMPLATE),
-        inputs.str(), outputs.str(), operations.str()
+        inputs.str(), outputs.str(), operations.str(), outputOperations.str()
     );
 }
 
