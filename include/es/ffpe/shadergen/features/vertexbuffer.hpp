@@ -23,6 +23,7 @@ const std::string vertexTexCoordOutputVS = "out mediump vec{} vertexTexCoord;";
 
 const std::string vertexColorInputFS = "in lowp vec{} vertexColor;";
 const std::string vertexTexCoordInputFS = "in mediump vec{} vertexTexCoord;";
+const std::string colorVariableFS = "lowp vec{} color = vertexColor;";
 const std::string fragColorOutputFS = "out vec4 oFragColor;";
 
 void buildVS(
@@ -88,7 +89,7 @@ void buildFS(
     finalOutputs << fragColorOutputFS << Common::SG_VAR_NEWLINE;
 
     finalOperations << fmt::format(
-        fmt::runtime("lowp vec{} color = vertexColor;"),
+        fmt::runtime(colorVariableFS),
         colorArray->enabled ? colorArray->parameters.size : decltype(States::VertexData::color)::length()
     ) << Common::SG_VAR_NEWLINE;
 

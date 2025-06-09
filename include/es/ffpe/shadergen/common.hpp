@@ -48,7 +48,7 @@ void main() {{
     // feature operations
     {}
 
-    color *= texture(tex0, vertexTexCoord);
+    color *= texture(tex0, vertexTexCoord.xy);
 
     // feature output operations
     {}
