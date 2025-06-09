@@ -93,6 +93,7 @@ namespace ClientState {
     inline std::vector<GLenum> texCoordArrayTexUnits;
 }
 
+// TODO: incremental hashing
 inline GLbitfield buildCurrentStatesBitfield() {
     return (
         AlphaTest::op | float_to_bits(AlphaTest::threshold) |
