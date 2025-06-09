@@ -1,8 +1,9 @@
 #pragma once
 
 #include "es/ffpe/shadergen/cache.h"
-#include "es/ffpe/shadergen/alphatest.h"
 #include "es/ffpe/shadergen/common.h"
+#include "es/ffpe/shadergen/features/alphatest.h"
+#include "es/ffpe/shadergen/features/texture.h"
 #include "es/state_tracking.h"
 #include "fmt/base.h"
 #include "fmt/format.h"
@@ -17,7 +18,19 @@
 namespace FFPE::Rendering::ShaderGen {
 
 inline std::string buildVertexShader() {
-    return Common::VS_TEMPLATE + ""; // why is the source not updating...
+    std::stringstream inputs;
+    std::stringstream outputs;
+    std::stringstream operations;
+
+    // TODO: do a register for feature type impl, so we can just loop on a vector or something
+    if (trackedStates->isCapabilityEnabled(GL_TEXTURE_2D)) {
+        Feature::Texture::instance.buildVS(inputs, outputs, operations);
+    }
+
+    return fmt::format(
+        fmt::runtime(Common::VS_TEMPLATE),
+        inputs.str(), outputs.str(), operations.str()
+    );
 }
 
 inline std::string buildFragmentShader() {
@@ -26,7 +39,11 @@ inline std::string buildFragmentShader() {
     std::stringstream operations;
 
     if (trackedStates->isCapabilityEnabled(GL_ALPHA_TEST)) {
-        Feature::alphaTestFeatureInstance.build(inputs, outputs, operations);
+        Feature::AlphaTest::instance.buildFS(inputs, outputs, operations);
+    }
+
+    if (trackedStates->isCapabilityEnabled(GL_TEXTURE_2D)) {
+        Feature::Texture::instance.buildFS(inputs, outputs, operations);
     }
 
     return fmt::format(

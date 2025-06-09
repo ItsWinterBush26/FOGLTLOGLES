@@ -45,6 +45,8 @@ in mediump vec2 vertexTexCoord;
 // feature inputs
 {}
 
+uniform sampler2D tex0;
+
 // default output/s
 out lowp vec4 oFragColor;
 
@@ -56,6 +58,8 @@ void main() {{
 
     // feature operations
     {}
+
+    color *= texture(tex0, vertexTexCoord);
 
     oFragColor = color;
 }})";

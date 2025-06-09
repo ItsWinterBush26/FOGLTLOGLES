@@ -3,8 +3,7 @@
 #include "es/ffp.h"
 #include "es/ffpe/shadergen/cache.h"
 #include "es/ffpe/shadergen/common.h"
-#include "es/ffpe/shadergen/feature.h"
-#include "es/state_tracking.h"
+#include "es/ffpe/shadergen/features/base.h"
 #include "fmt/base.h"
 #include "fmt/ostream.h"
 
@@ -12,7 +11,7 @@
 #include <sstream>
 #include <string>
 
-namespace FFPE::Rendering::ShaderGen::Feature {
+namespace FFPE::Rendering::ShaderGen::Feature::AlphaTest {
 
 struct AlphaTestFeature : public Feature::BaseFeature {
 
@@ -20,7 +19,11 @@ const std::string uniforms = "uniform float alphaTestThreshold;";
 
 const std::string baseOperation = "if (color.a {} alphaTestThreshold) discard;";
 
-void build(
+void buildVS(
+    std::stringstream&, std::stringstream&, std::stringstream&
+) override { }
+
+void buildFS(
     [[maybe_unused]] std::stringstream& finalInputs,
     [[maybe_unused]] std::stringstream& finalOutputs,
     std::stringstream& finalOperations
@@ -68,16 +71,14 @@ void build(
 }
 
 void sendData(GLuint program) override {
-    if (trackedStates->isCapabilityEnabled(GL_ALPHA_TEST)) {
-        GLint alphaTestThresholdUniLoc = Cache::Uniforms::getCachedUniformLocation(program, "alphaTestThreshold");
-        if (alphaTestThresholdUniLoc == -1) return;
+    GLint alphaTestThresholdUniLoc = Cache::Uniforms::getCachedUniformLocation(program, "alphaTestThreshold");
+    if (alphaTestThresholdUniLoc == -1) return;
         
-        glUniform1f(alphaTestThresholdUniLoc, States::AlphaTest::threshold);
-    }
+    glUniform1f(alphaTestThresholdUniLoc, States::AlphaTest::threshold);
 }
 
 };
 
-inline AlphaTestFeature alphaTestFeatureInstance;
+inline AlphaTestFeature instance;
 
 }

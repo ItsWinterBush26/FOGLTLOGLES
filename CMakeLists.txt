@@ -100,6 +100,7 @@ file(GLOB_RECURSE HEADERS
 	"include/*/*.h"
 	"include/*/*/*.h"
     "include/*/*/*/*.h"
+    "include/*/*/*/*/*.h"
 	"build_info/build_info.h"
 )
 
