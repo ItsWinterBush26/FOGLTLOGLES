@@ -1,7 +1,8 @@
 #pragma once
 
 #include <shaderc/shaderc.hpp>
-#include "shaderc/env.hpp"
+
+#include "shaderc/env.h"
 #include "spirv_glsl.hpp"
 
 inline shaderc::CompileOptions generateGLSL2SPVOptions(int glslVersion) {
