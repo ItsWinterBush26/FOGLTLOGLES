@@ -6,6 +6,7 @@
 #include "gles20/texture_tracking.hpp"
 #include "gles20/renderbuffer_tracking.hpp"
 #include "main.hpp"
+#include "utils/log.hpp"
 
 #include <GLES2/gl2.h>
 #include <utility>
@@ -64,6 +65,7 @@ void OV_glBindTexture(GLenum target, GLuint texture) {
     glBindTexture(target, texture);
 
     trackedStates->activeTextureState->bindTextureToTarget(target, texture);
+    LOGI("glBindTexture : target=%u texture=%u", target, texture);
 }
 
 void OV_glDeleteTextures(GLsizei n, const GLuint *textures) {
