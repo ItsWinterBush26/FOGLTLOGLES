@@ -1,6 +1,6 @@
 .cache/
 build/
 compile_commands.json
-build_info/*.h
+build_info/*.hpp
 .vscode
 .idea
