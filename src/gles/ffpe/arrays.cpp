@@ -58,10 +58,26 @@ void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void* poin
 }
 
 void glEnableClientState(GLenum array) {
-    FFPE::States::ClientState::Arrays::getArray(array == GL_TEXTURE_COORD_ARRAY ? GL_TEXTURE0 : array)->enabled = true;
+    switch (array) {
+        case GL_TEXTURE_COORD_ARRAY:
+            FFPE::States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0)->enabled = true;
+        return;
+
+        default:
+            FFPE::States::ClientState::Arrays::getArray(array)->enabled = true;
+        return;
+    }
 }
 
 void glDisableClientState(GLenum array) {
-    FFPE::States::ClientState::Arrays::getArray(array == GL_TEXTURE_COORD_ARRAY ? GL_TEXTURE0 : array)->enabled = false;
+    switch (array) {
+        case GL_TEXTURE_COORD_ARRAY:
+            FFPE::States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0)->enabled = false;
+        return;
+
+        default:
+            FFPE::States::ClientState::Arrays::getArray(array)->enabled = false;
+        return;
+    }
 }
 
