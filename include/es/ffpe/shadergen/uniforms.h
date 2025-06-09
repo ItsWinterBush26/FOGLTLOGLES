@@ -24,7 +24,7 @@ inline void setupInputsForRendering(GLuint program) {
         Feature::AlphaTest::instance.sendData(program);
 
     if (trackedStates->isCapabilityEnabled(GL_TEXTURE_2D)) 
-        Feature::Textures::instance.sendData(program);
+        Feature::Texture::instance.sendData(program);
 
 }
 
