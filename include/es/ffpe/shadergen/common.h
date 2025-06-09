@@ -22,7 +22,6 @@ uniform mat4 uModelViewProjection;
 // feature inputs
 {}
 
-
 // default outputs
 flat out lowp int vertexID;
 out lowp vec4 vertexColor;

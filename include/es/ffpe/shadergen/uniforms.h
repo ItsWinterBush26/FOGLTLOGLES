@@ -19,8 +19,8 @@ inline void setupInputsForRendering(GLuint program) {
         )
     );
     
-    for (const auto& feature : Feature::Registry::Data::registeredFeatures) {
-        feature.sendData(program);
+    for (const auto* feature : Feature::Registry::Data::registeredFeatures) {
+        feature->sendData(program);
     }
 }
 

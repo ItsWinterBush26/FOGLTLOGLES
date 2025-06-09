@@ -7,12 +7,12 @@
 namespace FFPE::Rendering::ShaderGen::Feature::Registry {
 
 namespace Data {
-    std::unordered_set<BaseFeature> registeredFeatures;
+    std::unordered_set<BaseFeature*> registeredFeatures;
 }
 
 template<typename F>
 inline void registerFeature() {
-    Data::registeredFeatures.insert(F());
+    Data::registeredFeatures.insert(new F());
 }
 
 

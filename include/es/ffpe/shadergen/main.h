@@ -20,8 +20,8 @@ inline std::string buildVertexShader() {
     std::stringstream outputs;
     std::stringstream operations;
 
-    for (const auto& feature : Feature::Registry::Data::registeredFeatures) {
-        feature.buildVS(inputs, outputs, operations);
+    for (const auto* feature : Feature::Registry::Data::registeredFeatures) {
+        feature->buildVS(inputs, outputs, operations);
     }
 
     return fmt::format(
@@ -35,8 +35,8 @@ inline std::string buildFragmentShader() {
     std::stringstream outputs;
     std::stringstream operations;
 
-    for (const auto& feature : Feature::Registry::Data::registeredFeatures) {
-        feature.buildFS(inputs, outputs, operations);
+    for (const auto* feature : Feature::Registry::Data::registeredFeatures) {
+        feature->buildFS(inputs, outputs, operations);
     }
 
     return fmt::format(
