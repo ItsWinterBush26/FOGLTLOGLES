@@ -46,7 +46,7 @@ void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer
 void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
     // Lists::displayListManager->addCommand<glTexCoordPointer>(size, type, stride, pointer);
     LOGI("glTexCoordPointer : size=%i type=%u stride=%i pointer=%p", size, type, stride, pointer);
-    FFPE::States::ClientState::Arrays::getArray(
+    FFPE::States::ClientState::Arrays::getTexCoordArray(
         GL_TEXTURE0 // FFPE::States::ClientState::currentTexCoordUnit
     )->parameters = {
         trackedStates->boundBuffers[GL_ARRAY_BUFFER].buffer != 0,
