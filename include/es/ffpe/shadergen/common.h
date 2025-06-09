@@ -19,13 +19,23 @@ layout(location = 2) in mediump vec2 iVertexTexCoord;
 // uniforms
 uniform mat4 uModelViewProjection;
 
+// feature inputs
+{}
+
+
 // default outputs
 flat out lowp int vertexID;
 out lowp vec4 vertexColor;
 out mediump vec2 vertexTexCoord;
 
+// feature outputs
+{}
+
 void main() {
     gl_Position = uModelViewProjection * vec4(iVertexPosition, 1);
+
+    // feature operations
+    {}
 
     vertexID = gl_VertexID;
     vertexColor = iVertexColor;
