@@ -65,9 +65,9 @@ inline void init() {
 }
 
 inline GLuint generateEAB_GPU(GLuint count) {
-    LOGI("dispatch eab compute");
     GLuint quadCount = count / 4;
     GLuint eabCount = quadCount * 6;
+
     OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
     OV_glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
@@ -81,10 +81,8 @@ inline GLuint generateEAB_GPU(GLuint count) {
     glUseProgram(eabGeneratorProgram);
     glUniform1ui(numQuadsUniLoc, quadCount);
     
-    glDispatchCompute((count + 63) / 64, 1, 1);
+    glDispatchCompute((quadCount + 63) / 64, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_ELEMENT_ARRAY_BARRIER_BIT);
-
-    // LOGI("quadCount=%u eabCount=%u", quadCount, eabCount);
 
     // OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
 
