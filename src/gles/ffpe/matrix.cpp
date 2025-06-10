@@ -1,4 +1,4 @@
-#include "es/ffp.hpp"
+#include "es/ffpe/states.hpp"
 #include "es/ffpe/matrices.hpp"
 #include "gles/ffp/enums.hpp"
 #include "gles/ffp/main.hpp"
@@ -63,8 +63,8 @@ void FFP::registerMatrixFunctions() {
 }
 
 void glMatrixMode(GLenum mode) {
-    if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<glMatrixMode>(mode);
+    if (FFPE::List::isRecording()) {
+        FFPE::List::addCommand<glMatrixMode>(mode);
         return;
     }
     
@@ -81,8 +81,8 @@ void glMatrixMode(GLenum mode) {
 }
 
 void glPushMatrix() {
-    if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<glPushMatrix>();
+    if (FFPE::List::isRecording()) {
+        FFPE::List::addCommand<glPushMatrix>();
         return;
     }
 
@@ -90,8 +90,8 @@ void glPushMatrix() {
 }
 
 void glPopMatrix() {
-    if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<glPopMatrix>();
+    if (FFPE::List::isRecording()) {
+        FFPE::List::addCommand<glPopMatrix>();
         return;
     }
 
@@ -99,8 +99,8 @@ void glPopMatrix() {
 }
 
 void glLoadIdentity() {
-    if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<glLoadIdentity>();
+    if (FFPE::List::isRecording()) {
+        FFPE::List::addCommand<glLoadIdentity>();
         return;
     }
 
@@ -108,8 +108,8 @@ void glLoadIdentity() {
 }
 
 void glLoadMatrixd(const GLdouble *m) {
-    if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<glLoadMatrixd>(m);
+    if (FFPE::List::isRecording()) {
+        FFPE::List::addCommand<glLoadMatrixd>(m);
         return;
     }
     
@@ -125,8 +125,8 @@ void glLoadMatrixd(const GLdouble *m) {
 }
 
 void glLoadMatrixf(const GLfloat *m) {
-    if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<glLoadMatrixf>(m);
+    if (FFPE::List::isRecording()) {
+        FFPE::List::addCommand<glLoadMatrixf>(m);
         return;
     }
 
@@ -145,8 +145,8 @@ void glOrtho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdou
 }
 
 void glOrthof(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near_val, GLfloat far_val)  {
-    if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<glOrthof>(left, right, bottom, top, near_val, far_val);
+    if (FFPE::List::isRecording()) {
+        FFPE::List::addCommand<glOrthof>(left, right, bottom, top, near_val, far_val);
         return;
     }
 
@@ -160,8 +160,8 @@ void glOrthof(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat 
 }
 
 void glFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val) {
-    if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<glFrustum>(left, right, bottom, top, near_val, far_val);
+    if (FFPE::List::isRecording()) {
+        FFPE::List::addCommand<glFrustum>(left, right, bottom, top, near_val, far_val);
         return;
     }
 
@@ -175,8 +175,8 @@ void glFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLd
 }
 
 void glMultMatrixd(const GLdouble *m) {
-    if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<glMultMatrixd>(m);
+    if (FFPE::List::isRecording()) {
+        FFPE::List::addCommand<glMultMatrixd>(m);
         return;
     }
     
@@ -191,8 +191,8 @@ void glMultMatrixd(const GLdouble *m) {
 }
 
 void glMultMatrixf(const GLfloat *m) {
-    if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<glMultMatrixf>(m);
+    if (FFPE::List::isRecording()) {
+        FFPE::List::addCommand<glMultMatrixf>(m);
         return;
     }
 
@@ -211,8 +211,8 @@ void glRotated(GLdouble angle, GLdouble x, GLdouble y, GLdouble z) {
 }
 
 void glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z) {
-    if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<glRotatef>(angle, x, y, z);
+    if (FFPE::List::isRecording()) {
+        FFPE::List::addCommand<glRotatef>(angle, x, y, z);
         return;
     }
 
@@ -226,8 +226,8 @@ void glScaled(GLdouble x, GLdouble y, GLdouble z) {
 }
 
 void glScalef(GLfloat x, GLfloat y, GLfloat z) {
-    if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<glScalef>(x, y, z);
+    if (FFPE::List::isRecording()) {
+        FFPE::List::addCommand<glScalef>(x, y, z);
         return;
     }
 
@@ -241,8 +241,8 @@ void glTranslated(GLdouble x, GLdouble y, GLdouble z) {
 }
 
 void glTranslatef(GLfloat x, GLfloat y, GLfloat z) {
-    if (Lists::displayListManager->isRecording()) {
-        Lists::displayListManager->addCommand<glTranslatef>(x, y, z);
+    if (FFPE::List::isRecording()) {
+        FFPE::List::addCommand<glTranslatef>(x, y, z);
         return;
     }
     

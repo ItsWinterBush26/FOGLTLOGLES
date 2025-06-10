@@ -3,9 +3,9 @@
 #define GLM_ENABLE_EXPERIMENTAL
 
 #include "es/binding_saver.hpp"
-#include "es/ffp.hpp"
 #include "es/state_tracking.hpp"
 #include "es/utils.hpp"
+#include "es/ffpe/states.hpp"
 #include "gles/ffp/enums.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/string_cast.hpp"
@@ -18,7 +18,7 @@
 #include <stdexcept>
 
 template<int PC, typename P, int CC, typename C, int TCC, typename TC>
-using VertexDataTyped = FFPE::States::VertexData::VertexRepresentation<PC, P, CC, C, TCC, TC>;
+using TypedVertexData = FFPE::States::VertexData::VertexRepresentation<PC, P, CC, C, TCC, TC>;
 
 namespace FFPE::Rendering::VAO {
 
@@ -50,7 +50,7 @@ inline void mapVertexData(
         ESUtils::TypeTraits::dispatchAsType(color->parameters.type, [&]<typename COL>() {
             ESUtils::TypeTraits::dispatchAsType(texCoord->parameters.type, [&]<typename TEX>() {
         
-            using VertexData = VertexDataTyped<4, POS, 4, COL, 4, TEX>;
+            using VertexData = TypedVertexData<4, POS, 4, COL, 4, TEX>;
             GLsizei newVABSize = count * sizeof(VertexData);
             
             OV_glBindBuffer(GL_ARRAY_BUFFER, vab);

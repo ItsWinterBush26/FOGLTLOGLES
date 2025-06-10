@@ -1,4 +1,4 @@
-#include "es/ffp.hpp"
+#include "es/ffpe/states.hpp"
 #include "es/ffpe/immediate.hpp"
 #include "gles/ffp/main.hpp"
 #include "glm/ext/vector_float4.hpp"
@@ -14,7 +14,7 @@ void FFP::registerColorFunctions() {
 
 void glColor4f(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) {
     if (!FFPE::Rendering::ImmediateMode::isActive()) {
-        Lists::displayListManager->addCommand<glColor4f>(red, green, blue, alpha);
+        FFPE::List::addCommand<glColor4f>(red, green, blue, alpha);
     }
 
     FFPE::States::VertexData::set(

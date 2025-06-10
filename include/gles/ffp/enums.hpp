@@ -1,7 +1,9 @@
 #pragma once
 
-typedef double GLdouble;
-typedef long   GLbitfield64;
+#include <cstdint>
+
+typedef double   GLdouble;
+typedef uint64_t GLbitfield64;
 
 // types
 #define GL_DOUBLE 0x140a
@@ -30,6 +32,7 @@ typedef long   GLbitfield64;
 #define GL_ALWAYS   0x0207
 
 // shading
+#define GL_FLAT   0x1d00
 #define GL_SMOOTH 0x1d01
 
 // draw array

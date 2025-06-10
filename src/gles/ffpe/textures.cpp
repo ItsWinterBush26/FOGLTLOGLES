@@ -1,4 +1,4 @@
-#include "es/ffp.hpp"
+#include "es/ffpe/states.hpp"
 #include "gles/ffp/main.hpp"
 #include "main.hpp"
 #include "utils/log.hpp"
@@ -13,7 +13,7 @@ void FFP::registerTextureFunctions() {
 
 void glClientActiveTexture(GLenum unit) {
     LOGI("glClientActiveTexture : unit=%u", unit);
-    Lists::displayListManager->addCommand<glClientActiveTexture>(unit);
+    FFPE::List::addCommand<glClientActiveTexture>(unit);
     FFPE::States::ClientState::currentTexCoordUnit = unit;
     FFPE::States::ClientState::texCoordArrayTexUnits.push_back(unit);
 }

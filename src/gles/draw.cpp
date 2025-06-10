@@ -1,5 +1,5 @@
 #include "es/ffpe/draw.hpp"
-#include "es/ffp.hpp"
+#include "es/ffpe/states.hpp"
 #include "gles/draw_overrides.hpp"
 #include "gles/main.hpp"
 #include "main.hpp"
@@ -15,7 +15,7 @@ void OV_glDrawArrays(GLenum mode, GLint first, GLsizei count) {
     if (count <= 0) return;
     
     if (debugEnabled) LOGI("OV_glDrawArrays : mode=%u count=%i", mode, count);
-    Lists::displayListManager->addCommand<OV_glDrawArrays>(mode, first, count);
+    FFPE::List::addCommand<OV_glDrawArrays>(mode, first, count);
 
     switch (mode) {
         case GL_QUADS:

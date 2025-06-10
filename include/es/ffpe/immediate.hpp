@@ -1,7 +1,8 @@
 #pragma once
 
 #include "es/binding_saver.hpp"
-#include "es/ffp.hpp"
+#include "es/ffpe/lists.hpp"
+#include "es/ffpe/states.hpp"
 #include "es/utils.hpp"
 #include "gles/draw_overrides.hpp"
 #include "gles/ffp/arrays.hpp"
@@ -57,9 +58,9 @@ inline void begin(GLenum primitive) {
             return;
     }
 
-    Lists::displayListManager->addCommand<begin>(primitive);
+    FFPE::List::addCommand<begin>(primitive);
 
-    LOGI("glBegin()!");
+    // LOGI("glBegin()!");
 
     States::primitive = primitive;
 }
@@ -81,7 +82,7 @@ inline void endInternal(
         return;
     }
 
-    LOGI("glEnd()!");
+    // LOGI("glEnd()!");
 
     if (vertices.size() == 0) {
         LOGW("glEnd called with no vertices??");
@@ -89,7 +90,7 @@ inline void endInternal(
         return;
     }
 
-    Lists::displayListManager->addCommand<endInternal>(
+    FFPE::List::addCommand<endInternal>(
         std::vector<VertexData>(vertices)
     );
 
@@ -136,7 +137,7 @@ inline void endInternal(
         sizeof(VertexData), (void*) offsetof(VertexData, texCoord)
     );
 
-    Lists::displayListManager->ignoreNextCall();
+    FFPE::List::ignoreNextCall();
     OV_glDrawArrays(States::primitive, 0, States::vertices.size());
 
     glDisableClientState(GL_VERTEX_ARRAY);

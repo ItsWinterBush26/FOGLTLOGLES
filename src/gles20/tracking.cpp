@@ -1,4 +1,4 @@
-#include "es/ffp.hpp"
+#include "es/ffpe/states.hpp"
 #include "es/state_tracking.hpp"
 #include "gles/main.hpp"
 #include "gles20/buffer_tracking.hpp"
@@ -62,7 +62,7 @@ void OV_glDeleteFramebuffers(GLsizei n, const GLuint* framebuffers) {
 }
 
 void OV_glBindTexture(GLenum target, GLuint texture) {
-    Lists::displayListManager->addCommand<OV_glBindTexture>(target, texture);
+    FFPE::List::addCommand<OV_glBindTexture>(target, texture);
     glBindTexture(target, texture);
 
     trackedStates->activeTextureState->bindTextureToTarget(target, texture);

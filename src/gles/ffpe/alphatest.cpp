@@ -1,4 +1,4 @@
-#include "es/ffp.hpp"
+#include "es/ffpe/states.hpp"
 #include "es/state_tracking.hpp"
 #include "gles/ffp/enums.hpp"
 #include "gles/ffp/main.hpp"
@@ -13,7 +13,7 @@ void FFP::registerAlphaTestFunctions() {
 }
 
 void glAlphaFunc(GLenum op, GLclampf threshold) {
-    Lists::displayListManager->addCommand<glAlphaFunc>(op, threshold);
+    FFPE::List::addCommand<glAlphaFunc>(op, threshold);
     
     if (!trackedStates->isCapabilityEnabled(GL_ALPHA_TEST)) return;
     

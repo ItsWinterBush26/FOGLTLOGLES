@@ -1,4 +1,4 @@
-#include "es/ffp.hpp"
+#include "es/ffpe/states.hpp"
 #include "es/ffpe/immediate.hpp"
 #include "gles/ffp/main.hpp"
 #include "glm/ext/vector_float2.hpp"
@@ -14,7 +14,7 @@ void FFP::registerTexCoordFunctions() {
 
 void glTexCoord2f(GLfloat s, GLfloat t) {
     if (!FFPE::Rendering::ImmediateMode::isActive()) {
-        Lists::displayListManager->addCommand<glTexCoord2f>(s, t);
+        FFPE::List::addCommand<glTexCoord2f>(s, t);
     }
 
     FFPE::States::VertexData::set(

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "es/binding_saver.hpp"
-#include "es/ffp.hpp"
 #include "es/ffpe/shadergen/main.hpp"
 #include "es/ffpe/shadergen/uniforms.hpp"
+#include "es/ffpe/states.hpp"
 #include "es/ffpe/vao.hpp"
 #include "gles20/shader_overrides.hpp"
 
@@ -126,7 +126,7 @@ inline void drawQuads(GLuint count) {
     SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
 
     auto buffer = Rendering::VAO::prepareVAOForRendering(count);
-    auto renderingProgram = Rendering::ShaderGen::getCachedOrNewProgram(FFPE::States::buildCurrentStatesBitfield());
+    auto renderingProgram = Rendering::ShaderGen::getCachedOrNewProgram(States::Manager::getOrBuildState());
     OV_glUseProgram(renderingProgram);
     Rendering::ShaderGen::Uniforms::setupInputsForRendering(renderingProgram);
 
@@ -149,7 +149,7 @@ inline void drawArrays(GLenum mode, GLint first, GLuint count) {
         // immediately assume FFP
 
         auto buffer = Rendering::VAO::prepareVAOForRendering(count);
-        auto renderingProgram = Rendering::ShaderGen::getCachedOrNewProgram(FFPE::States::buildCurrentStatesBitfield());
+        auto renderingProgram = Rendering::ShaderGen::getCachedOrNewProgram(FFPE::States::Manager::getOrBuildState());
         OV_glUseProgram(renderingProgram);
         Rendering::ShaderGen::Uniforms::setupInputsForRendering(renderingProgram);
 

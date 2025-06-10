@@ -1,4 +1,4 @@
-#include "es/ffp.hpp"
+#include "es/ffpe/states.hpp"
 #include "es/framebuffer.hpp"
 #include "es/proxy.hpp"
 #include "es/state_tracking.hpp"
@@ -135,7 +135,7 @@ void OV_glCopyTexSubImage2D(
 
 void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param) {
     // LOGI("glTexParameterf: target=%u pname=%u param=%f", target, pname, param);
-    Lists::displayListManager->addCommand<OV_glTexParameterf>(target, pname, param);
+    FFPE::List::addCommand<OV_glTexParameterf>(target, pname, param);
 
     selectProperTexParamf(target, pname, param);
     glTexParameterf(target, pname, param);
@@ -143,7 +143,7 @@ void OV_glTexParameterf(GLenum target, GLenum pname, GLfloat param) {
 
 void OV_glTexParameteri(GLenum target, GLenum pname, GLint param) {
     // LOGI("glTexParameteri: target=%u pname=%u param=%d", target, pname, param);
-    Lists::displayListManager->addCommand<OV_glTexParameteri>(target, pname, param);
+    FFPE::List::addCommand<OV_glTexParameteri>(target, pname, param);
 
     selectProperTexParami(target, pname, param);
     glTexParameteri(target, pname, param);

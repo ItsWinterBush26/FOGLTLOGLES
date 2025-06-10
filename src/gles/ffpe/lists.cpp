@@ -1,4 +1,4 @@
-#include "es/ffp.hpp"
+#include "es/ffpe/states.hpp"
 #include "es/utils.hpp"
 #include "gles/ffp/main.hpp"
 #include "main.hpp"
@@ -33,28 +33,28 @@ void FFP::registerListsFunctions() {
 }
 
 GLuint glGenLists(GLsizei range) {
-    return Lists::displayListManager->genDisplayLists(range);
+    return FFPE::List::genDisplayLists(range);
 }
 
 void glDeleteLists(GLuint list, GLsizei range) {
-    Lists::displayListManager->deleteDisplayLists(list, range);
+    FFPE::List::deleteDisplayLists(list, range);
 }
 
 void glNewList(GLuint list, GLenum mode) {
-    Lists::displayListManager->startDisplayList(list, mode);
+    FFPE::List::startDisplayList(list, mode);
 }
 
 void glEndList() {
-    Lists::displayListManager->endDisplayList();
+    FFPE::List::endDisplayList();
 }
 
 void glCallList(GLuint list) {
-    Lists::displayListManager->callDisplayList(list);
+    FFPE::List::callDisplayList(list);
 }
 
 void glCallLists(GLsizei n, GLenum type, const void* lists) {
     ESUtils::TypeTraits::dispatchAsType(type, [&]<typename T>() {
-        Lists::displayListManager->callDisplayLists(
+        FFPE::List::callDisplayLists(
             n, ESUtils::TypeTraits::asTypedArray<T>(lists)
         );
     });
@@ -65,5 +65,5 @@ void glListBase(GLuint base) {
 }
 
 GLboolean glIsList(GLuint list) {
-    return Lists::displayListManager->isList(list);
+    return FFPE::List::isList(list);
 }
