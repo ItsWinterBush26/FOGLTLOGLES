@@ -146,6 +146,6 @@ void OV_glTexParameteri(GLenum target, GLenum pname, GLint param) {
     // LOGI("glTexParameteri: target=%u pname=%u param=%d", target, pname, param);
     FFPE::List::addCommand<OV_glTexParameteri>(target, pname, param);
 
-    selectProperTexParami(target, pname, param);
+    // selectProperTexParami(target, pname, param);
     glTexParameteri(target, pname, param);
 }
