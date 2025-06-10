@@ -23,8 +23,9 @@ static constexpr std::string_view vertexTexCoordOutputVS = "out mediump vec{} ve
 
 static constexpr std::string_view vertexColorInputFS = "in lowp vec{} vertexColor;";
 static constexpr std::string_view vertexTexCoordInputFS = "in mediump vec{} vertexTexCoord;";
-static constexpr std::string_view colorVariableFS = "lowp vec{} color = vertexColor;";
 static constexpr std::string_view fragColorOutputFS = "out vec4 oFragColor;";
+
+static constexpr std::string_view colorVariableFS = "lowp vec{} color = vertexColor;";
 
 void buildVS(
     [[maybe_unused]] std::stringstream& finalInputs,
@@ -37,27 +38,27 @@ void buildVS(
     auto* texCoordArray = States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0);
 
     finalInputs << fmt::format(
-        fmt::runtime(vertexPositionInputVS),
+        vertexPositionInputVS,
         vertexArray->parameters.size
     ) << Common::Whitespaces::SINGLE_NEWLINE;
 
     finalInputs << fmt::format(
-        fmt::runtime(vertexColorInputVS),
+        vertexColorInputVS,
         colorArray->enabled ? colorArray->parameters.size : decltype(States::VertexData::color)::length()
     ) << Common::Whitespaces::SINGLE_NEWLINE;
 
     finalInputs << fmt::format(
-        fmt::runtime(vertexTexCoordInputVS),
+        vertexTexCoordInputVS,
         texCoordArray->enabled ? texCoordArray->parameters.size : decltype(States::VertexData::texCoord)::length()
     ) << Common::Whitespaces::DOUBLE_NEWLINE;
 
     finalOutputs << fmt::format(
-        fmt::runtime(vertexColorOutputVS),
+        vertexColorOutputVS,
         colorArray->enabled ? colorArray->parameters.size : decltype(States::VertexData::color)::length()
     ) << Common::Whitespaces::SINGLE_NEWLINE;
 
     finalOutputs << fmt::format(
-        fmt::runtime(vertexTexCoordOutputVS),
+        vertexTexCoordOutputVS,
         texCoordArray->enabled ? texCoordArray->parameters.size : decltype(States::VertexData::texCoord)::length()
     ) << Common::Whitespaces::DOUBLE_NEWLINE;
 
@@ -77,25 +78,25 @@ void buildFS(
     auto* texCoordArray = States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0);
 
     finalInputs << fmt::format(
-        fmt::runtime(vertexColorInputFS),
+        vertexColorInputFS,
         colorArray->enabled ? colorArray->parameters.size : decltype(States::VertexData::color)::length()
     ) << Common::Whitespaces::SINGLE_NEWLINE;
 
     finalInputs << fmt::format(
-        fmt::runtime(vertexTexCoordInputFS),
+        vertexTexCoordInputFS,
         texCoordArray->enabled ? texCoordArray->parameters.size : decltype(States::VertexData::texCoord)::length()
     ) << Common::Whitespaces::DOUBLE_NEWLINE;
 
     finalOutputs << fragColorOutputFS << Common::Whitespaces::DOUBLE_NEWLINE;
 
     finalOperations << fmt::format(
-        fmt::runtime(colorVariableFS),
+        colorVariableFS,
         colorArray->enabled ? colorArray->parameters.size : decltype(States::VertexData::color)::length()
     ) << Common::Whitespaces::DOUBLE_NEWLINE;
 
     finalOutputOperations << getOutputColorExpression(
         colorArray->enabled ? colorArray->parameters.size : decltype(States::VertexData::color)::length()
-    ) << Common::Whitespaces::SINGLE_NEWLINE;
+    ) << Common::Whitespaces::DOUBLE_NEWLINE_TAB;
 }
 
 std::string getPositionExpression(GLint componentSize) const {

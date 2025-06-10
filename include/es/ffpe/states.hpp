@@ -97,7 +97,7 @@ namespace States {
             GLuint64 shadeType : 1; // 0-1 (2 possible values)
             
             union ComponentSizes {
-                union Data {
+                struct Data {
                     GLuint64 vertex : 2; // 0-3 (4 possible values)
                     GLuint64 color : 2; // 0-3 (4 possible values)
                     GLuint64 texCoord : 2; // 0-3 (4 possible values)
