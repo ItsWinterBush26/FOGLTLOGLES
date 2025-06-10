@@ -20,7 +20,8 @@ void FFP::registerArrayFunctions() {
 }
 
 void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
-    if (FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY)->parameters.size != size)
+    if (!FFPE::States::ClientState::Arrays::isArrayEnabled(GL_VERTEX_ARRAY)) return;
+    if (FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY)->parameters.size != size)
     { FFPE::States::Manager::markStateAsDirty(); }
     
     FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY)->parameters = {
@@ -31,6 +32,7 @@ void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointe
 }
 
 void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
+    if (!FFPE::States::ClientState::Arrays::isArrayEnabled(GL_COLOR_ARRAY)) return;
     if (FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY)->parameters.size != size)
     { FFPE::States::Manager::markStateAsDirty(); }
 
@@ -42,6 +44,7 @@ void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer
 }
 
 void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
+    if (!FFPE::States::ClientState::Arrays::isTexCoordArrayEnabled(GL_TEXTURE0)) return;
     if (FFPE::States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0)->parameters.size != size)
     { FFPE::States::Manager::markStateAsDirty(); }
 
