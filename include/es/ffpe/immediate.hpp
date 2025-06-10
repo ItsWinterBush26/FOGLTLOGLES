@@ -65,7 +65,7 @@ inline void begin(GLenum primitive) {
 }
 
 inline void advance() {
-    LOGI("glVertex*()! advancing!");
+    //LOGI("glVertex*()! advancing!");
     States::vertices.emplace_back(
         FFPE::States::VertexData::position,
         FFPE::States::VertexData::color,
