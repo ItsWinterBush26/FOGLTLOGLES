@@ -1,6 +1,7 @@
 #include "es/ffpe/lists.hpp"
 #include "es/ffpe/states.hpp"
 #include "es/framebuffer.hpp"
+#include "es/limits.hpp"
 #include "es/proxy.hpp"
 #include "es/state_tracking.hpp"
 #include "es/swizzling.hpp"
