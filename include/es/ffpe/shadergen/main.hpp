@@ -83,7 +83,7 @@ inline GLuint getCachedOrNewProgram(GLbitfield64 state) {
     OV_glCompileShader(fragmentShader);
 
     if (debugEnabled) {
-        LOGI("Generated shader for state '%ld'", state);
+        LOGI("Generated shader for state '%lld'", state);
 
         LOGI("ShaderGen | VS :");
         LOGI("%s", vertexSource.c_str());
