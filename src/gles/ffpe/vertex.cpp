@@ -143,7 +143,7 @@ void glVertex4iv(const GLint *v) {
 void glVertex2f(GLfloat x, GLfloat y) {
     FFPE::States::VertexData::set(
         glm::vec2(x, y),
-        &FFPE::States::VertexData::position
+        FFPE::States::VertexData::position
     );
     FFPE::Rendering::ImmediateMode::advance();
 }
@@ -151,7 +151,7 @@ void glVertex2f(GLfloat x, GLfloat y) {
 void glVertex3f(GLfloat x, GLfloat y, GLfloat z) {
     FFPE::States::VertexData::set(
         glm::vec3(x, y, z),
-        &FFPE::States::VertexData::position
+        FFPE::States::VertexData::position
     );
     FFPE::Rendering::ImmediateMode::advance();
 }
@@ -159,7 +159,7 @@ void glVertex3f(GLfloat x, GLfloat y, GLfloat z) {
 void glVertex4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w) {
     FFPE::States::VertexData::set(
         glm::vec4(x, y, z, w),
-        &FFPE::States::VertexData::position
+        FFPE::States::VertexData::position
     );
     FFPE::Rendering::ImmediateMode::advance();
 }

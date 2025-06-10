@@ -27,13 +27,13 @@ namespace VertexData {
     inline glm::vec3 normal = glm::vec3(0.0f, 0.0f, 1.0f);
     inline glm::vec4 texCoord = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f); // TODO: make a <texunit, texcoord> map
 
-    template<typename VT, typename CT>
-    inline void set(CT val, VT* dst) {
+    template<typename SRC, typename DST>
+    inline void set(SRC src, DST& to) {
         static_assert(
-            CT::length() <= VT::length(),
+            SRC::length() > DST::length(),
             "'src' components must be less than or equal to 'dst' components"
         );
-        for (size_t i = 0; i < CT::length(); ++i) (*dst)[i] = val[i];
+        for (size_t i = 0; i < SRC::length(); ++i) to[i] = src[i];
     }
 }
 namespace AlphaTest {

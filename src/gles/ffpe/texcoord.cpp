@@ -20,6 +20,6 @@ void glTexCoord2f(GLfloat s, GLfloat t) {
 
     FFPE::States::VertexData::set(
         glm::vec2(s, t),
-        &FFPE::States::VertexData::texCoord
+        FFPE::States::VertexData::texCoord
     );
 }
