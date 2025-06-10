@@ -1,13 +1,11 @@
 #pragma once
 
-#include "es/binding_saver.hpp"
 #include "es/ffpe/lists.hpp"
 #include "es/ffpe/states.hpp"
 #include "es/utils.hpp"
 #include "gles/draw_overrides.hpp"
 #include "gles/ffp/arrays.hpp"
 #include "gles/ffp/enums.hpp"
-#include "gles20/buffer_tracking.hpp"
 #include "utils/log.hpp"
 
 #include <GLES3/gl32.h>
@@ -22,12 +20,6 @@ namespace States {
     inline GLenum primitive;
 
     inline std::vector<VertexData> vertices;
-}
-
-inline GLuint vbo;
-
-inline void init() {
-    glGenBuffers(1, &vbo);
 }
 
 inline bool isActive() {
@@ -72,6 +64,7 @@ inline void advance() {
     );
 }
 
+// TODO: merge with other immediates on display list end record
 inline void endInternal(
     const std::vector<VertexData>& vertices
 ) {
@@ -92,15 +85,6 @@ inline void endInternal(
         std::vector<VertexData>(vertices)
     );
 
-    SaveBoundedBuffer sbb(GL_ARRAY_BUFFER);
-    OV_glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    OV_glBufferData(
-        GL_ARRAY_BUFFER,
-        vertices.size() * sizeof(VertexData),
-        vertices.data(),
-        GL_STATIC_DRAW
-    );
-
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -112,7 +96,7 @@ inline void endInternal(
                 VertexData::position
             )::value_type
         >::value,
-        sizeof(VertexData), (void*) offsetof(VertexData, position)
+        sizeof(VertexData), vertices.data()
     );
 
     glColorPointer(
@@ -122,7 +106,7 @@ inline void endInternal(
                 VertexData::color
             )::value_type
         >::value,
-        sizeof(VertexData), (void*) offsetof(VertexData, color)
+        sizeof(VertexData), vertices.data() + offsetof(VertexData, color)
     );
 
     glTexCoordPointer(
@@ -132,7 +116,7 @@ inline void endInternal(
                 VertexData::texCoord
             )::value_type
         >::value,
-        sizeof(VertexData), (void*) offsetof(VertexData, texCoord)
+        sizeof(VertexData), vertices.data() + offsetof(VertexData, texCoord)
     );
 
     FFPE::List::ignoreNextCall();
@@ -140,6 +124,7 @@ inline void endInternal(
 
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
     States::primitive = GL_NONE;
     States::vertices.clear();
