@@ -49,7 +49,7 @@ void buildVS(
 
     finalInputs << fmt::format(
         vertexTexCoordInputVS,
-        texCoordArray->enabled ? texCoordArray->parameters.size : decltype(States::VertexData::texCoord)::length()
+        texCoordArray->enabled ? texCoordArray->parameters.size : 2 // decltype(States::VertexData::texCoord)::length()
     ) << Common::Whitespaces::DOUBLE_NEWLINE;
 
     finalOutputs << fmt::format(
