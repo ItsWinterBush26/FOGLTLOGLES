@@ -10,7 +10,4 @@ void glEnd();
 void FFP::registerImmediateFunctions() {
     REGISTERREDIR("glBegin", FFPE::Rendering::ImmediateMode::begin);
     REGISTERREDIR("glEnd", FFPE::Rendering::ImmediateMode::end);
-
-    FFPE::Rendering::ImmediateMode::init();
 }
-
