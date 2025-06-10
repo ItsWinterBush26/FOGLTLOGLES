@@ -8,7 +8,7 @@
 #include <GLES3/gl31.h>
 #include <unordered_set>
 
-inline std::atomic_bool esUtilsInitialized = ATOMIC_VAR_INIT(false);
+inline std::atomic_bool esUtilsInitialized = false;
 
 namespace ESUtils {
 
