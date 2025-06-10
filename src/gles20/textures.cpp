@@ -1,5 +1,4 @@
 #include "es/ffpe/lists.hpp"
-#include "es/ffpe/states.hpp"
 #include "es/framebuffer.hpp"
 #include "es/limits.hpp"
 #include "es/proxy.hpp"
@@ -7,6 +6,7 @@
 #include "es/swizzling.hpp"
 #include "es/texture.hpp"
 #include "es/texparam.hpp"
+#include "gles/main.hpp"
 #include "gles20/main.hpp"
 #include "main.hpp"
 #include "utils/log.hpp"
@@ -49,7 +49,7 @@ void OV_glTexImage2D(
             internalFormat
         );
     } else {
-        // LOGI("glTexImage2D (before): internalformat=%i border=%i format=%i type=%u", internalFormat, border, format, type);
+        if (debugEnabled) LOGI("glTexImage2D (before): internalformat=%i border=%i format=%i type=%u", internalFormat, border, format, type);
         
         fixTexArguments(target, internalFormat, type, format, (width == height));
         glTexImage2D(
@@ -58,7 +58,7 @@ void OV_glTexImage2D(
             border, format, type, pixels
         );
 
-        // LOGI("glTexImage2D (after): internalformat=%i border=%i format=%i type=%u", internalFormat, border, format, type);
+        if (debugEnabled) LOGI("glTexImage2D (after): internalformat=%i border=%i format=%i type=%u", internalFormat, border, format, type);
     }
 
     trackTextureFormat(internalFormat);

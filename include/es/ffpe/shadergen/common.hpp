@@ -4,10 +4,7 @@
 
 namespace FFPE::Rendering::ShaderGen::Common {
 
-inline const std::string SG_VAR_NEWLINE = "\n\n";
-inline const std::string SG_STMT_NEWLINE = "\n";
-
-inline const std::string VS_TEMPLATE = R"(#version 320 es
+inline constexpr std::string_view VS_TEMPLATE = R"(#version 320 es
 // FOGLTLOGLES ShaderGen : Vertex Shader
 
 // feature inputs
@@ -28,7 +25,7 @@ void main() {{
     vertexID = gl_VertexID;
 }})";
 
-inline const std::string FS_TEMPLATE = R"(#version 320 es
+inline constexpr std::string_view FS_TEMPLATE = R"(#version 320 es
 precision mediump float;
 
 // FOGLTLOGLES ShaderGen : Fragment Shader
@@ -53,5 +50,13 @@ void main() {{
     // feature output operations
     {}
 }})";
+
+namespace Whitespaces {
+inline constexpr std::string DOUBLE_NEWLINE = "\n\n";
+inline constexpr std::string SINGLE_NEWLINE = "\n";
+
+inline constexpr std::string DOUBLE_NEWLINE_TAB = "\n\n\t";
+inline constexpr std::string SINGLE_NEWLINE_TAB = "\n\t";
+}
 
 }

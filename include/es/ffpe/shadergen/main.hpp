@@ -28,7 +28,7 @@ inline std::string buildVertexShader() {
     }
 
     return fmt::format(
-        fmt::runtime(Common::VS_TEMPLATE),
+        Common::VS_TEMPLATE,
         inputs.str(), outputs.str(), operations.str(), outputOperations.str()
     );
 }
@@ -44,7 +44,7 @@ inline std::string buildFragmentShader() {
     }
 
     return fmt::format(
-        fmt::runtime(Common::FS_TEMPLATE),
+        Common::FS_TEMPLATE,
         inputs.str(), outputs.str(), operations.str(), outputOperations.str()
     );
 }

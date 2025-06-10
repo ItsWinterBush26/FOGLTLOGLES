@@ -30,10 +30,10 @@ namespace VertexData {
     template<typename VT, typename CT>
     inline void set(CT val, VT* dst) {
         static_assert(
-            decltype(val)::length() <= std::remove_reference_t<decltype(*dst)>::length(),
-            "'src' components must only be less than or equals of 'dst' components"
+            CT::length() <= VT::length(),
+            "'src' components must be less than or equal to 'dst' components"
         );
-        for (size_t i = 0; i < decltype(val)::length(); ++i) (*dst)[i] = val[i];
+        for (size_t i = 0; i < CT::length(); ++i) (*dst)[i] = val[i];
     }
 }
 namespace AlphaTest {
@@ -98,9 +98,9 @@ namespace States {
             
             union ComponentSizes {
                 union Data {
-                    GLuint64 vertex : 2;
-                    GLuint64 color : 2;
-                    GLuint64 texCoord : 2;
+                    GLuint64 vertex : 2; // 0-3 (4 possible values)
+                    GLuint64 color : 2; // 0-3 (4 possible values)
+                    GLuint64 texCoord : 2; // 0-3 (4 possible values)
                     // TODO: multitexcoord
                 } data;
                 GLuint64 value : 6;
@@ -122,9 +122,9 @@ inline GLbitfield64 getOrBuildState() {
     result.fields.alphaOp = AlphaTest::op - GL_NEVER;
     result.fields.shadeType = ShadeModel::type - GL_FLAT;
     
-    result.fields.components.data.vertex = ClientState::Arrays::getArray(GL_VERTEX_ARRAY)->parameters.size;
-    result.fields.components.data.color = ClientState::Arrays::getArray(GL_COLOR_ARRAY)->parameters.size;
-    result.fields.components.data.texCoord = ClientState::Arrays::getTexCoordArray(GL_TEXTURE0)->parameters.size;
+    result.fields.components.data.vertex = ClientState::Arrays::getArray(GL_VERTEX_ARRAY)->parameters.size - 1;
+    result.fields.components.data.color = ClientState::Arrays::getArray(GL_COLOR_ARRAY)->parameters.size - 1;
+    result.fields.components.data.texCoord = ClientState::Arrays::getTexCoordArray(GL_TEXTURE0)->parameters.size - 1;
     // TODO: multitexcoord
 
     States::isDirty = false;

@@ -64,7 +64,9 @@ inline void init() {
     glDeleteShader(computeShader);
 }
 
-inline GLuint generateEAB_GPU(GLuint count) {
+// TODO: cache generated indices values
+// we dont need to regen indices for each quad
+inline GLuint generateEAB(GLuint count) {
     GLuint quadCount = count / 4;
     GLuint eabCount = quadCount * 6;
 
@@ -84,44 +86,10 @@ inline GLuint generateEAB_GPU(GLuint count) {
     glDispatchCompute((quadCount + 63) / 64, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_ELEMENT_ARRAY_BARRIER_BIT);
 
-    // OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
-
     return eabCount;
 }
 
-// https://github.com/MobileGL-Dev/MobileGlues/blob/4902f3a629629ad17ad34165c7eec17a3a2d46b6/src/main/cpp/gl/fpe/fpe.cpp#L31
-inline GLuint generateEAB_CPU(GLuint n) {
-    GLuint num_quads = n / 4;
-    GLuint num_indices = num_quads * 6;
-
-    std::vector<GLuint> indices;
-    indices.resize(num_indices);
-    
-    for (GLuint i = 0; i < num_quads; i++) {
-        GLuint base_index = i * 4;
-
-        indices[i * 6 + 0] = base_index + 0;
-        indices[i * 6 + 1] = base_index + 1;
-        indices[i * 6 + 2] = base_index + 2;
-
-        indices[i * 6 + 3] = base_index + 2;
-        indices[i * 6 + 4] = base_index + 3;
-        indices[i * 6 + 5] = base_index + 0;
-    }
-
-    OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
-    OV_glBufferData(
-        GL_ELEMENT_ARRAY_BUFFER,
-        num_indices * sizeof(GLuint),
-        indices.data(),
-        GL_DYNAMIC_DRAW
-    );
-
-    return num_indices;
-}
-
 inline void drawQuads(GLuint count) {
-    LOGI("quads!");
     SaveUsedProgram sup;
     SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
 
@@ -130,10 +98,9 @@ inline void drawQuads(GLuint count) {
     OV_glUseProgram(renderingProgram);
     Rendering::ShaderGen::Uniforms::setupInputsForRendering(renderingProgram);
 
-    GLuint realCount = generateEAB_GPU(count);
+    GLuint realCount = generateEAB(count);
 
     glDrawElements(GL_TRIANGLES, realCount, GL_UNSIGNED_INT, nullptr);
-    LOGI("done quads!");
 }
 
 }

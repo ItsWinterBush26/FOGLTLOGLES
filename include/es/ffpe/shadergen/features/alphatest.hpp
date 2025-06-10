@@ -17,9 +17,8 @@ namespace FFPE::Rendering::ShaderGen::Feature::AlphaTest {
 
 struct AlphaTestFeature : public Feature::BaseFeature {
 
-const std::string uniforms = "uniform float alphaTestThreshold;";
-
-const std::string baseOperation = "if (color.a {} alphaTestThreshold) discard;";
+static constexpr std::string_view uniforms = "uniform float alphaTestThreshold;";
+static constexpr std::string_view baseOperation = "if (color.a {} alphaTestThreshold) discard;";
 
 void buildFS(
     [[maybe_unused]] std::stringstream& finalInputs,
@@ -29,7 +28,7 @@ void buildFS(
 ) const override {
     if (!trackedStates->isCapabilityEnabled(GL_ALPHA_TEST)) return;
 
-    finalInputs << uniforms << Common::SG_VAR_NEWLINE;
+    finalInputs << uniforms << Common::Whitespaces::DOUBLE_NEWLINE;
 
     std::string operation;
 
@@ -64,11 +63,11 @@ void buildFS(
 
     fmt::print(
         finalOperations,
-        fmt::runtime(baseOperation),
+        baseOperation,
         operation
     );
 
-    finalOperations << Common::SG_VAR_NEWLINE;
+    finalOperations << Common::Whitespaces::DOUBLE_NEWLINE_TAB;
 }
 
 void sendData(GLuint program) const override {

@@ -20,7 +20,7 @@ void buildVS(
     [[maybe_unused]] std::stringstream& finalOperations,
     [[maybe_unused]] std::stringstream& finalOutputOperations
 ) const override {
-    finalInputs << "uniform mat4 uModelViewProjection;" << Common::SG_VAR_NEWLINE;
+    finalInputs << "uniform mat4 uModelViewProjection;" << Common::Whitespaces::DOUBLE_NEWLINE;
 }
 
 void sendData(GLuint program) const override {

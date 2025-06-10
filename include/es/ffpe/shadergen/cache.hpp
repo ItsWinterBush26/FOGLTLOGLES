@@ -2,7 +2,7 @@
 
 #include "gles/ffp/enums.hpp"
 #include "shader/cache.hpp"
-#include "shaderc/shaderc.hpp"
+#include "shaderc/shaderc.h"
 #include "utils/fast_map.hpp"
 
 #include <GLES3/gl32.h>
