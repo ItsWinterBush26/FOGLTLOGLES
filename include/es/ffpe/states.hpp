@@ -30,7 +30,7 @@ namespace VertexData {
     template<typename SRC, typename DST>
     inline void set(SRC src, DST& to) {
         static_assert(
-            SRC::length() > DST::length(),
+            SRC::length() <= DST::length(),
             "'src' components must be less than or equal to 'dst' components"
         );
         for (size_t i = 0; i < SRC::length(); ++i) to[i] = src[i];
