@@ -28,8 +28,6 @@ inline GLuint vbo;
 
 inline void init() {
     glGenBuffers(1, &vbo);
-
-    LOGI("immediate mode buffer = %u", vbo);
 }
 
 inline bool isActive() {
@@ -66,7 +64,7 @@ inline void begin(GLenum primitive) {
 }
 
 inline void advance() {
-    //LOGI("glVertex*()! advancing!");
+    if (!isActive()) return;
     States::vertices.emplace_back(
         FFPE::States::VertexData::position,
         FFPE::States::VertexData::color,

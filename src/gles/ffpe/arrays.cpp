@@ -20,7 +20,7 @@ void FFP::registerArrayFunctions() {
 }
 
 void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
-    LOGI("glVertexPointer : size=%i type=%u stride=%i pointer=%p", size, type, stride, pointer);
+    // LOGI("glVertexPointer : size=%i type=%u stride=%i pointer=%p", size, type, stride, pointer);
     FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY)->parameters = {
         !stride, size, type, GL_FALSE,
         stride ? stride : size * ESUtils::TypeTraits::getTypeSize(type),
@@ -29,7 +29,7 @@ void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointe
 }
 
 void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
-    LOGI("glColorPointer : size=%i type=%u stride=%i pointer=%p", size, type, stride, pointer);
+    // LOGI("glColorPointer : size=%i type=%u stride=%i pointer=%p", size, type, stride, pointer);
     FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY)->parameters = {
         !stride, size, type, GL_TRUE,
         stride ? stride : size * ESUtils::TypeTraits::getTypeSize(type),
@@ -38,7 +38,7 @@ void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer
 }
 
 void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
-    LOGI("glTexCoordPointer : size=%i type=%u stride=%i pointer=%p", size, type, stride, pointer);
+    // LOGI("glTexCoordPointer : size=%i type=%u stride=%i pointer=%p", size, type, stride, pointer);
     FFPE::States::ClientState::Arrays::getTexCoordArray(
         GL_TEXTURE0 // FFPE::States::ClientState::currentTexCoordUnit
     )->parameters = {

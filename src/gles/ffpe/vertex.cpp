@@ -141,7 +141,6 @@ void glVertex4iv(const GLint *v) {
 
 #pragma region Vertex Float Implementations
 void glVertex2f(GLfloat x, GLfloat y) {
-    // FFPE::List::addCommand<glVertex2f>(x, y);
     FFPE::States::VertexData::set(
         glm::vec2(x, y),
         &FFPE::States::VertexData::position
@@ -150,7 +149,6 @@ void glVertex2f(GLfloat x, GLfloat y) {
 }
 
 void glVertex3f(GLfloat x, GLfloat y, GLfloat z) {
-    // FFPE::List::addCommand<glVertex3f>(x, y, z);
     FFPE::States::VertexData::set(
         glm::vec3(x, y, z),
         &FFPE::States::VertexData::position
@@ -159,7 +157,6 @@ void glVertex3f(GLfloat x, GLfloat y, GLfloat z) {
 }
 
 void glVertex4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w) {
-    // FFPE::List::addCommand<glVertex4f>(x, y, z, w);
     FFPE::States::VertexData::set(
         glm::vec4(x, y, z, w),
         &FFPE::States::VertexData::position
