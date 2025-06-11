@@ -89,7 +89,7 @@ namespace ClientState {
 namespace Manager {
 
 namespace States {
-    inline bool isDirty;
+    inline bool isDirty = true;
 
     inline union StateRepresentation {
         struct Fields {
