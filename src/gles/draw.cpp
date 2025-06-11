@@ -17,6 +17,8 @@ void OV_glDrawArrays(GLenum mode, GLint first, GLsizei count) {
     if (debugEnabled) LOGI("OV_glDrawArrays : mode=%u count=%i", mode, count);
     if (FFPE::List::addCommand<OV_glDrawArrays>(mode, first, count)) return;
 
+    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Draw Arrays");
+
     switch (mode) {
         case GL_QUADS:
             FFPE::Rendering::Arrays::Quads::drawQuads(count);
@@ -25,4 +27,6 @@ void OV_glDrawArrays(GLenum mode, GLint first, GLsizei count) {
         default:
             FFPE::Rendering::Arrays::drawArrays(mode, first, count);
     }
+
+    glPopDebugGroup();
 }

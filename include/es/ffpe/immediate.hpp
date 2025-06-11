@@ -85,6 +85,8 @@ inline void endInternal(
         std::vector<VertexData>(vertices)
     )) return;
 
+    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Immediate mode : draw!");
+
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -129,7 +131,7 @@ inline void endInternal(
     States::primitive = GL_NONE;
     States::vertices.clear();
 
-    LOGI("glEnd() [END]!");
+    glPopDebugGroup();
 }
 
 inline void end() {

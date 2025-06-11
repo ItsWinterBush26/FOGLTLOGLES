@@ -2,8 +2,10 @@
 
 #include "gles/ffp/enums.hpp"
 #include "utils/fast_map.hpp"
+
 #include <GLES3/gl32.h>
 #include <functional>
+#include <string>
 #include <vector>
 
 namespace FFPE::List {
@@ -81,6 +83,9 @@ inline void startDisplayList(GLuint list, GLenum mode) {
 
     States::activeDisplayListIndex = list;
     States::activeDisplayList = DisplayList(mode);
+
+    std::string dbgMes = "Recording list : " + std::to_string(list);
+    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, dbgMes.c_str());
 }
 
 inline void ignoreNextCall() {
@@ -117,6 +122,8 @@ inline void endDisplayList() {
 
     States::activeDisplayListIndex = 0;
     States::activeDisplayList = DisplayList();
+
+    glPopDebugGroup();
 }
 
 inline void deleteDisplayLists(GLuint list, GLsizei range) {
@@ -132,9 +139,14 @@ inline void callDisplayList(GLuint list) {
     if (isRecording() || isExecuting()) return;
     if (!isList(list)) return;
 
+    std::string dbgMes = "List replay : " + std::to_string(list);
+    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, dbgMes.c_str());
+
     States::executingDisplayList = true;
     States::displayLists[list].execute();
     States::executingDisplayList = false;
+
+    glPopDebugGroup();
 }
 
 template<typename T>
@@ -142,7 +154,13 @@ inline void callDisplayLists(GLsizei n, const T* lists) {
     States::executingDisplayList = true;
     for (GLsizei i = 0; i < n; ++i) {
         if (!isList(i)) continue;
+
+        std::string dbgMes = "List replay : " + std::to_string(lists[i]);
+        glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, dbgMes.c_str());
+
         States::displayLists[static_cast<GLuint>(lists[i])].execute();
+
+        glPopDebugGroup();
     }
     States::executingDisplayList = false;
 }

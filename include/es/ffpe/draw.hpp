@@ -90,7 +90,6 @@ inline GLuint generateEAB(GLuint count) {
 }
 
 inline void drawQuads(GLuint count) {
-    SaveUsedProgram sup;
     SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
 
     auto buffer = Rendering::VAO::prepareVAOForRendering(count);
@@ -101,6 +100,7 @@ inline void drawQuads(GLuint count) {
     GLuint realCount = generateEAB(count);
 
     glDrawElements(GL_TRIANGLES, realCount, GL_UNSIGNED_INT, nullptr);
+    OV_glUseProgram(0);
 }
 
 }

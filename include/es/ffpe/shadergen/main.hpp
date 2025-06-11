@@ -54,7 +54,8 @@ inline GLuint getCachedOrNewProgram(GLbitfield64 state) {
     if (cachedProgram) return cachedProgram;
 
     if (debugEnabled) LOGI("Generating shader for state '%lld'", state);
-    
+    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "ShaderGen!");
+
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     std::string vertexSource = Cache::Shaders::getFromCache(state, shaderc_vertex_shader);
     if (vertexSource.empty()) {
@@ -102,6 +103,8 @@ inline GLuint getCachedOrNewProgram(GLbitfield64 state) {
     glDeleteShader(fragmentShader);
 
     Cache::Programs::putToCache(state, renderingProgram);
+
+    glPopDebugGroup();
     return renderingProgram;
 }
 
