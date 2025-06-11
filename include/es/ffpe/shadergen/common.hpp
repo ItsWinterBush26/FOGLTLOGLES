@@ -22,6 +22,7 @@ void main() {{
 
     // feature output operations
     {}
+    
     vertexID = gl_VertexID;
 }})";
 
@@ -55,8 +56,8 @@ namespace Whitespaces {
 inline constexpr std::string DOUBLE_NEWLINE = "\n\n";
 inline constexpr std::string SINGLE_NEWLINE = "\n";
 
-inline constexpr std::string DOUBLE_NEWLINE_TAB = "\n\n\t";
-inline constexpr std::string SINGLE_NEWLINE_TAB = "\n\t";
+inline constexpr std::string DOUBLE_NEWLINE_TAB = "\n\n\t\t";
+inline constexpr std::string SINGLE_NEWLINE_TAB = "\n\t\t";
 }
 
 }

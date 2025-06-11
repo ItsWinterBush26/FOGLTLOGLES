@@ -28,8 +28,8 @@ static constexpr std::string_view fragColorOutputFS = "out vec4 oFragColor;";
 static constexpr std::string_view colorVariableFS = "lowp vec{} color = vertexColor;";
 
 void buildVS(
-    [[maybe_unused]] std::stringstream& finalInputs,
-    [[maybe_unused]] std::stringstream& finalOutputs,
+    std::stringstream& finalInputs,
+    std::stringstream& finalOutputs,
     std::stringstream& finalOperations,
     std::stringstream& finalOutputOperations
 ) const override {
@@ -49,7 +49,7 @@ void buildVS(
 
     finalInputs << fmt::format(
         vertexTexCoordInputVS,
-        /* texCoordArray->enabled ? */ texCoordArray->parameters.size // : decltype(States::VertexData::texCoord)::length()
+        texCoordArray->enabled ? texCoordArray->parameters.size : decltype(States::VertexData::texCoord)::length()
     ) << Common::Whitespaces::DOUBLE_NEWLINE;
 
     finalOutputs << fmt::format(
@@ -59,7 +59,7 @@ void buildVS(
 
     finalOutputs << fmt::format(
         vertexTexCoordOutputVS,
-        /* texCoordArray->enabled ? */ texCoordArray->parameters.size // : decltype(States::VertexData::texCoord)::length()
+        texCoordArray->enabled ? texCoordArray->parameters.size : decltype(States::VertexData::texCoord)::length()
     ) << Common::Whitespaces::DOUBLE_NEWLINE;
 
     finalOperations << getPositionExpression(vertexArray->parameters.size) << Common::Whitespaces::DOUBLE_NEWLINE_TAB;
@@ -84,7 +84,7 @@ void buildFS(
 
     finalInputs << fmt::format(
         vertexTexCoordInputFS,
-        /* texCoordArray->enabled ? */ texCoordArray->parameters.size // : decltype(States::VertexData::texCoord)::length()
+        texCoordArray->enabled ? texCoordArray->parameters.size : decltype(States::VertexData::texCoord)::length()
     ) << Common::Whitespaces::DOUBLE_NEWLINE;
 
     finalOutputs << fragColorOutputFS << Common::Whitespaces::DOUBLE_NEWLINE;

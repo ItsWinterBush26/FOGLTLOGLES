@@ -12,7 +12,7 @@
 #include <cstddef>
 #include <vector>
 
-using VertexData = FFPE::States::VertexData::VertexRepresentation<4, GLfloat, 4, GLfloat, 2, GLfloat>;
+using VertexData = FFPE::States::VertexData::VertexRepresentation<4, GLfloat, 4, GLfloat, 4, GLfloat>;
 
 namespace FFPE::Rendering::ImmediateMode {
 

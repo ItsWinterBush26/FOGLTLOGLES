@@ -2,7 +2,6 @@
 
 #include "gles/ffp/enums.hpp"
 #include "glm/detail/qualifier.hpp"
-#include "glm/ext/vector_float2.hpp"
 #include "glm/ext/vector_float3.hpp"
 #include "glm/ext/vector_float4.hpp"
 
@@ -26,7 +25,7 @@ namespace VertexData {
     inline glm::vec4 position = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     inline glm::vec4 color = glm::vec4(1.0f);
     inline glm::vec3 normal = glm::vec3(0.0f, 0.0f, 1.0f);
-    inline glm::vec2 texCoord = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f); // TODO: make a <texunit, texcoord> map
+    inline glm::vec4 texCoord = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f); // TODO: make a <texunit, texcoord> map
 
     template<typename SRC, typename DST>
     inline void set(SRC src, DST& to) {

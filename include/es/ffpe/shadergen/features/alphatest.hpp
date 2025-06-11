@@ -21,7 +21,7 @@ static constexpr std::string_view uniforms = "uniform float alphaTestThreshold;"
 static constexpr std::string_view baseOperation = "if (color.a {} alphaTestThreshold) discard;";
 
 void buildFS(
-    [[maybe_unused]] std::stringstream& finalInputs,
+    std::stringstream& finalInputs,
     [[maybe_unused]] std::stringstream& finalOutputs,
     std::stringstream& finalOperations,
     [[maybe_unused]] std::stringstream& finalOutputOperations
@@ -31,7 +31,6 @@ void buildFS(
     finalInputs << uniforms << Common::Whitespaces::DOUBLE_NEWLINE;
 
     std::string operation;
-
     switch (States::AlphaTest::op) {
         case GL_LESS:
             operation = "<";
