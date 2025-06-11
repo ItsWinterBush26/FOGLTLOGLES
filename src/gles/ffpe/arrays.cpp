@@ -21,9 +21,11 @@ void FFP::registerArrayFunctions() {
 
 void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
     LOGI("glVertexPointer : size=%i mode=%u stride=%i start=%p", size, type, stride, pointer);
-    FFPE::States::Manager::markStateAsDirty();
     
-    FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY)->parameters = {
+    auto* vertex = FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
+    if (vertex->parameters.size != size) FFPE::States::Manager::markStateAsDirty();
+    
+    vertex->parameters = {
         !stride, size, type, GL_FALSE,
         stride ? stride : size * ESUtils::TypeTraits::getTypeSize(type),
         pointer
@@ -32,9 +34,11 @@ void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointe
 
 void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
     LOGI("glColorPointer : size=%i mode=%u stride=%i start=%p", size, type, stride, pointer);
-    FFPE::States::Manager::markStateAsDirty();
     
-    FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY)->parameters = {
+    auto* color = FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
+    if (color->parameters.size != size) FFPE::States::Manager::markStateAsDirty();
+    
+    color->parameters = {
         !stride, size, type, GL_TRUE,
         stride ? stride : size * ESUtils::TypeTraits::getTypeSize(type),
         pointer
@@ -43,9 +47,11 @@ void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer
 
 void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
     LOGI("glTexCoordPointer : size=%i mode=%u stride=%i start=%p", size, type, stride, pointer);
-    FFPE::States::Manager::markStateAsDirty();
+
+    auto* texCoord = FFPE::States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0);
+    if (texCoord->parameters.size != size) FFPE::States::Manager::markStateAsDirty();
     
-    FFPE::States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0)->parameters = {
+    texCoord->parameters = {
         !stride, size, type, GL_FALSE,
         stride ? stride : size * ESUtils::TypeTraits::getTypeSize(type),
         pointer
@@ -53,6 +59,8 @@ void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void* poin
 }
 
 void glEnableClientState(GLenum array) {
+    FFPE::States::Manager::markStateAsDirty();
+
     switch (array) {
         case GL_TEXTURE_COORD_ARRAY:
             FFPE::States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0)->enabled = true;
@@ -62,11 +70,11 @@ void glEnableClientState(GLenum array) {
             FFPE::States::ClientState::Arrays::getArray(array)->enabled = true;
         return;
     }
-
-    FFPE::States::Manager::markStateAsDirty();
 }
 
 void glDisableClientState(GLenum array) {
+    FFPE::States::Manager::markStateAsDirty();
+
     switch (array) {
         case GL_TEXTURE_COORD_ARRAY:
             FFPE::States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0)->enabled = false;
@@ -76,7 +84,5 @@ void glDisableClientState(GLenum array) {
             FFPE::States::ClientState::Arrays::getArray(array)->enabled = false;
         return;
     }
-
-    FFPE::States::Manager::markStateAsDirty();
 }
 

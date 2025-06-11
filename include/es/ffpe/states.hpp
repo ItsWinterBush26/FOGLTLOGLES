@@ -96,10 +96,14 @@ namespace States {
             GLuint64 alphaOp : 4; // 0-7 (8 possible values)
             GLuint64 shadeType : 1; // 0-1 (2 possible values)
 
-            GLuint64 vertexComponentSize : 2; // 0-3 (4 possible values)
-            GLuint64 colorComponentSize : 2; // 0-3 (4 possible values)
-            GLuint64 texCoordComponentSize : 2; // 0-3 (4 possible values)
-            // TODO: multitexcoord
+            GLuint64 vertexArrayEnabled : 1; // 0-1 (2 possible values)
+            GLuint64 vertexArrayComponentSize : 2; // 0-3 (4 possible values)
+
+            GLuint64 colorArrayEnabled : 1; // 0-1 (2 possible values)
+            GLuint64 colorArrayComponentSize : 2; // 0-3 (4 possible values)
+
+            GLuint64 texCoordArrayEnabled : 1; // 0-1 (2 possible values)
+            GLuint64 texCoordArrayComponentSize : 2; // 0-3 (4 possible values)
         } fields;
         GLbitfield64 value;
     } currentState;
@@ -117,11 +121,18 @@ inline GLbitfield64 getOrBuildState() {
     result.fields.alphaOp = AlphaTest::op - GL_NEVER;
     result.fields.shadeType = ShadeModel::type - GL_FLAT;
     
-    result.fields.vertexComponentSize = ClientState::Arrays::getArray(GL_VERTEX_ARRAY)->parameters.size - 1;
-    result.fields.colorComponentSize = ClientState::Arrays::getArray(GL_COLOR_ARRAY)->parameters.size - 1;
-    result.fields.texCoordComponentSize = ClientState::Arrays::getTexCoordArray(GL_TEXTURE0)->parameters.size - 1;
-    // TODO: multitexcoord
+    auto* vertex = ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
+    result.fields.vertexArrayEnabled = vertex->enabled;
+    result.fields.vertexArrayComponentSize = vertex->parameters.size - 1;
+    
+    auto* color = ClientState::Arrays::getArray(GL_COLOR_ARRAY);
+    result.fields.colorArrayEnabled = color->enabled;
+    result.fields.colorArrayComponentSize = color->parameters.size - 1;
 
+    auto* texCoord = ClientState::Arrays::getTexCoordArray(GL_TEXTURE0);
+    result.fields.texCoordArrayEnabled = texCoord->enabled;
+    result.fields.texCoordArrayComponentSize = texCoord->parameters.size - 1;
+    
     States::isDirty = false;
     States::currentState = result;
 
