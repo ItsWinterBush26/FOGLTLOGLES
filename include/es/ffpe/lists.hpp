@@ -173,14 +173,11 @@ inline void callDisplayList(GLuint list) {
     if (isRecording() || isExecuting()) return;
     if (!isList(list)) return;
 
-    std::string dbgMes = "List replay : " + std::to_string(list);
-    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, dbgMes.c_str());
-
+    GLDebugGroup gldg("List replay : " + std::to_string(list));
+    
     States::executingDisplayList = true;
     States::displayLists[list].execute();
     States::executingDisplayList = false;
-
-    glPopDebugGroup();
 }
 
 template<typename T>
