@@ -29,7 +29,7 @@ void sendData(GLuint program) const override {
             program, "uModelViewProjection"
         ), 1, GL_FALSE,
         glm::value_ptr(
-            Matrices::getModelViewProjection()
+            Matrices::MVP::getModelViewProjection()
         )
     );
 }

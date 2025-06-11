@@ -23,7 +23,7 @@ void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointe
     LOGI("glVertexPointer : size=%i mode=%u stride=%i start=%p", size, type, stride, pointer);
     
     auto* vertex = FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
-    if (vertex->parameters.size != size) FFPE::States::Manager::markStateAsDirty();
+    if (vertex->parameters.size != size) FFPE::States::Manager::invalidateCurrentState();
     
     vertex->parameters = {
         !stride, size, type, GL_FALSE,
@@ -36,7 +36,7 @@ void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer
     LOGI("glColorPointer : size=%i mode=%u stride=%i start=%p", size, type, stride, pointer);
     
     auto* color = FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
-    if (color->parameters.size != size) FFPE::States::Manager::markStateAsDirty();
+    if (color->parameters.size != size) FFPE::States::Manager::invalidateCurrentState();
     
     color->parameters = {
         !stride, size, type, GL_TRUE,
@@ -49,7 +49,7 @@ void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void* poin
     LOGI("glTexCoordPointer : size=%i mode=%u stride=%i start=%p", size, type, stride, pointer);
 
     auto* texCoord = FFPE::States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0);
-    if (texCoord->parameters.size != size) FFPE::States::Manager::markStateAsDirty();
+    if (texCoord->parameters.size != size) FFPE::States::Manager::invalidateCurrentState();
     
     texCoord->parameters = {
         !stride, size, type, GL_FALSE,
@@ -59,7 +59,7 @@ void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void* poin
 }
 
 void glEnableClientState(GLenum array) {
-    FFPE::States::Manager::markStateAsDirty();
+    FFPE::States::Manager::invalidateCurrentState();
 
     switch (array) {
         case GL_TEXTURE_COORD_ARRAY:
@@ -73,7 +73,7 @@ void glEnableClientState(GLenum array) {
 }
 
 void glDisableClientState(GLenum array) {
-    FFPE::States::Manager::markStateAsDirty();
+    FFPE::States::Manager::invalidateCurrentState();
 
     switch (array) {
         case GL_TEXTURE_COORD_ARRAY:

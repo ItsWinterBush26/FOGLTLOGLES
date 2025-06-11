@@ -89,8 +89,6 @@ namespace ClientState {
 namespace Manager {
 
 namespace States {
-    inline bool isDirty = true;
-
     inline union StateRepresentation {
         struct Fields {
             GLuint64 alphaOp : 4; // 0-7 (8 possible values)
@@ -107,14 +105,16 @@ namespace States {
         } fields;
         GLbitfield64 value;
     } currentState;
+
+    inline bool shouldRecalculate = true;
 }
 
-inline void markStateAsDirty() {
-    States::isDirty = true;
+inline void invalidateCurrentState() {
+    States::shouldRecalculate = true;
 }
 
 inline GLbitfield64 getOrBuildState() {
-    if (!States::isDirty) return States::currentState.value;
+    if (!States::shouldRecalculate) return States::currentState.value;
 
     States::StateRepresentation result { };
 
@@ -133,7 +133,7 @@ inline GLbitfield64 getOrBuildState() {
     result.fields.texCoordArrayEnabled = texCoord->enabled;
     result.fields.texCoordArrayComponentSize = texCoord->parameters.size - 1;
     
-    States::isDirty = false;
+    States::shouldRecalculate = false;
     States::currentState = result;
 
     return result.value;

@@ -20,5 +20,5 @@ void glAlphaFunc(GLenum op, GLclampf threshold) {
     FFPE::States::AlphaTest::op = op;
     FFPE::States::AlphaTest::threshold = threshold;
 
-    FFPE::States::Manager::markStateAsDirty();
+    FFPE::States::Manager::invalidateCurrentState();
 }
