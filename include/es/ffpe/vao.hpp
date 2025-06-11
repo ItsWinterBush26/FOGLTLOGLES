@@ -184,7 +184,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
         glEnableVertexAttribArray(AttributeLocations::TEX_COORD_LOCATION);
     } else {
         glDisableVertexAttribArray(AttributeLocations::TEX_COORD_LOCATION);
-        glVertexAttrib4fv(
+        glVertexAttrib2fv(
             AttributeLocations::TEX_COORD_LOCATION,
             glm::value_ptr(
                 States::VertexData::texCoord
