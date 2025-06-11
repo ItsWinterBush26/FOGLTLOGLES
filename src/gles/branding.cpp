@@ -109,7 +109,7 @@ const GLubyte* OV_glGetStringi(GLenum pname, int index) {
 }
 
 void OV_glEnable(GLenum cap) {
-    FFPE::List::addCommand<OV_glEnable>(cap);
+    if (FFPE::List::addCommand<OV_glEnable>(cap)) return;
     switch (cap) {
         case GL_ALPHA_TEST:
         case GL_TEXTURE_2D:
@@ -131,7 +131,7 @@ void OV_glEnable(GLenum cap) {
 }
 
 void OV_glDisable(GLenum cap) {
-    FFPE::List::addCommand<OV_glDisable>(cap);
+    if (FFPE::List::addCommand<OV_glDisable>(cap)) return;
     switch (cap) {
         case GL_ALPHA_TEST:
         case GL_TEXTURE_2D:

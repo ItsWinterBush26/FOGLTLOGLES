@@ -20,10 +20,10 @@ void FFP::registerArrayFunctions() {
 }
 
 void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
-    if (FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY)->parameters.size != size)
-    { FFPE::States::Manager::markStateAsDirty(); }
+    auto* vertex = FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
+    if (vertex->parameters.size != size) FFPE::States::Manager::markStateAsDirty();
     
-    FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY)->parameters = {
+    vertex->parameters = {
         !stride, size, type, GL_FALSE,
         stride ? stride : size * ESUtils::TypeTraits::getTypeSize(type),
         pointer
@@ -31,10 +31,10 @@ void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointe
 }
 
 void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
-    if (FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY)->parameters.size != size)
-    { FFPE::States::Manager::markStateAsDirty(); }
+    auto* color = FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
+    if (color->parameters.size != size) FFPE::States::Manager::markStateAsDirty();
 
-    FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY)->parameters = {
+    color->parameters = {
         !stride, size, type, GL_TRUE,
         stride ? stride : size * ESUtils::TypeTraits::getTypeSize(type),
         pointer
@@ -42,12 +42,10 @@ void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer
 }
 
 void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
-    if (FFPE::States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0)->parameters.size != size)
-    { FFPE::States::Manager::markStateAsDirty(); }
+    auto* texCoord = FFPE::States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0);
+    if (texCoord->parameters.size != size) FFPE::States::Manager::markStateAsDirty();
 
-    FFPE::States::ClientState::Arrays::getTexCoordArray(
-        GL_TEXTURE0 // FFPE::States::ClientState::currentTexCoordUnit
-    )->parameters = {
+    texCoord->parameters = {
         !stride, size, type, GL_FALSE,
         stride ? stride : size * ESUtils::TypeTraits::getTypeSize(type),
         pointer

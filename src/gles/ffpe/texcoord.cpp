@@ -16,6 +16,7 @@ void FFP::registerTexCoordFunctions() {
 void glTexCoord2f(GLfloat s, GLfloat t) {
     if (!FFPE::Rendering::ImmediateMode::isActive()) {
         FFPE::List::addCommand<glTexCoord2f>(s, t);
+        return;
     }
 
     FFPE::States::VertexData::set(

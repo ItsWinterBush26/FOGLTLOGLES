@@ -15,7 +15,7 @@ void OV_glDrawArrays(GLenum mode, GLint first, GLsizei count) {
     if (count <= 0) return;
     
     if (debugEnabled) LOGI("OV_glDrawArrays : mode=%u count=%i", mode, count);
-    FFPE::List::addCommand<OV_glDrawArrays>(mode, first, count);
+    if (FFPE::List::addCommand<OV_glDrawArrays>(mode, first, count)) return;
 
     switch (mode) {
         case GL_QUADS:

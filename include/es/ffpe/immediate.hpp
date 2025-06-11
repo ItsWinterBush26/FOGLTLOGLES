@@ -48,7 +48,7 @@ inline void begin(GLenum primitive) {
             return;
     }
 
-    FFPE::List::addCommand<begin>(primitive);
+    if (FFPE::List::addCommand<begin>(primitive)) return;
 
     // LOGI("glBegin()!");
 
@@ -81,9 +81,9 @@ inline void endInternal(
         return;
     }
 
-    FFPE::List::addCommand<endInternal>(
+    if (FFPE::List::addCommand<endInternal>(
         std::vector<VertexData>(vertices)
-    );
+    )) return;
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);

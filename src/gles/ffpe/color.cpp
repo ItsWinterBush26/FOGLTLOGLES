@@ -17,6 +17,7 @@ void FFP::registerColorFunctions() {
 void glColor4f(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) {
     if (!FFPE::Rendering::ImmediateMode::isActive()) {
         FFPE::List::addCommand<glColor4f>(red, green, blue, alpha);
+        return;
     }
 
     FFPE::States::VertexData::set(

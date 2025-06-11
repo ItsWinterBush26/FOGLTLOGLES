@@ -62,7 +62,7 @@ void OV_glDeleteFramebuffers(GLsizei n, const GLuint* framebuffers) {
 }
 
 void OV_glBindTexture(GLenum target, GLuint texture) {
-    FFPE::List::addCommand<OV_glBindTexture>(target, texture);
+    if (FFPE::List::addCommand<OV_glBindTexture>(target, texture)) return;
     glBindTexture(target, texture);
 
     trackedStates->activeTextureState->bindTextureToTarget(target, texture);

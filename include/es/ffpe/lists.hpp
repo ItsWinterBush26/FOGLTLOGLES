@@ -90,18 +90,20 @@ inline void ignoreNextCall() {
 
 template<auto F, typename... Args>
 requires std::invocable<decltype(F), Args...>
-inline void addCommand(Args&&... args) {
-    if (!isRecording() || isExecuting()) return;
+inline bool addCommand(Args&&... args) {
+    if (!isRecording() || isExecuting()) return false;
     if (States::ignoreNextCallFlag) {
-            States::ignoreNextCallFlag = false;
-            return;
+        States::ignoreNextCallFlag = false;
+        return false;
     }
-        
+    
     States::activeDisplayList.addCommand(
         [...args = std::forward<Args>(args)]() {
             F(args...);
         }
     );
+
+    return true;
 }
 
 inline void endDisplayList() {
