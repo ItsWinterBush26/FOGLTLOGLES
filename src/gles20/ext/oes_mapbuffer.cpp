@@ -3,6 +3,8 @@
 #include "gles20/ext/main.hpp"
 #include "main.hpp"
 
+#include <GLES2/gl2.h>
+
 void* glMapBuffer(GLenum target, GLenum access);
 
 void GLES20Ext::register_OES_mapbuffer() {
