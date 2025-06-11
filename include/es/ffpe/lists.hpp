@@ -9,11 +9,40 @@
 #include <string>
 #include <vector>
 
+template<auto Func>
+constexpr std::string_view getTypeNameFromTemplate() {
+#if defined(__clang__) || defined(__GNUC__)
+    constexpr std::string_view fn = __PRETTY_FUNCTION__;
+    constexpr std::string_view key = "Func = ";
+    auto start = fn.find(key) + key.size();
+    auto end = fn.find_first_of("];", start);
+    return fn.substr(start, end - start);
+#elif defined(_MSC_VER)
+    constexpr std::string_view fn = __FUNCSIG__;
+    constexpr std::string_view key = "Func=";
+    auto start = fn.find(key) + key.size();
+    auto end = fn.find_first_of(">,", start);
+    return fn.substr(start, end - start);
+#else
+    return "unknown";
+#endif
+}
+
 namespace FFPE::List {
 
+struct Command {
+    const std::string name;
+    const std::function<void()> func;
+
+    void operator() () const {
+        this->func();
+    }
+};
+
+// TODO: an optimize function
 class DisplayList {
 private:
-    std::vector<const std::function<void()>> commands;
+    std::vector<Command> commands;
 
     GLenum mode = GL_NONE;
 
@@ -21,9 +50,12 @@ public:
     DisplayList() { }
     DisplayList(GLenum mode) : mode(mode) { }
     
-    template<typename Func>
-    void addCommand(Func&& command) {
-        commands.emplace_back(std::forward<Func>(command));
+    template<typename NameT, typename FuncT>
+    void addCommand(NameT&& name, FuncT&& func) {
+        commands.emplace_back(Command{
+            std::forward<NameT>(name),
+            std::forward<FuncT>(func)
+        });
     }
     
     void setMode(GLenum mode) {
@@ -94,8 +126,8 @@ inline void ignoreNextCall() {
     States::ignoreNextCallFlag = true;
 }
 
-template<auto F, typename... Args>
-requires std::invocable<decltype(F), Args...>
+template<auto Func, typename... Args>
+requires std::invocable<decltype(Func), Args...>
 inline bool addCommand(Args&&... args) {
     if (!isRecording() || isExecuting()) return false;
     if (States::ignoreNextCallFlag) {
@@ -104,8 +136,9 @@ inline bool addCommand(Args&&... args) {
     }
     
     States::activeDisplayList.addCommand(
+        getTypeNameFromTemplate<Func>(),
         [...args = std::forward<Args>(args)]() {
-            F(args...);
+            Func(args...);
         }
     );
 
