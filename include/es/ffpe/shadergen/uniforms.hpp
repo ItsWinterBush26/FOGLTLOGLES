@@ -2,13 +2,14 @@
 
 #include "es/ffpe/shadergen/cache.hpp"
 #include "es/ffpe/shadergen/features/registry.hpp"
+#include "es/raii_helpers.hpp"
 
 #include <GLES3/gl32.h>
 
 namespace FFPE::Rendering::ShaderGen::Uniforms {
 
 inline void setupInputsForRendering(GLuint program) {
-    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Bind uniforms");
+    GLDebugGroup gldg("Bind uniforms");
 
     for (const auto* feature : Feature::Registry::Data::registeredFeatures) {
         feature->sendData(program);
@@ -19,8 +20,6 @@ inline void setupInputsForRendering(GLuint program) {
             program, "tex0"
         ), 0
     );
-
-    glPopDebugGroup();
 }
 
 }

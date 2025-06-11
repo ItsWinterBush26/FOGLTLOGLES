@@ -1,5 +1,6 @@
 #pragma once
 
+#include "es/raii_helpers.hpp"
 #include "gles/ffp/enums.hpp"
 #include "utils/fast_map.hpp"
 
@@ -154,13 +155,9 @@ inline void callDisplayLists(GLsizei n, const T* lists) {
     States::executingDisplayList = true;
     for (GLsizei i = 0; i < n; ++i) {
         if (!isList(i)) continue;
-
-        std::string dbgMes = "List replay : " + std::to_string(lists[i]);
-        glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, dbgMes.c_str());
-
+        GLDebugGroup gldg("List replay : " + std::to_string(lists[i]));
+        
         States::displayLists[static_cast<GLuint>(lists[i])].execute();
-
-        glPopDebugGroup();
     }
     States::executingDisplayList = false;
 }

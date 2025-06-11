@@ -6,7 +6,9 @@
 #include "gles20/shader_overrides.hpp"
 #include "gles20/texture_tracking.hpp"
 
-#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+#include <GLES3/gl32.h>
+#include <string>
 
 // TODO:
 // What if we keep track of bounded textures, buffer, etc ourselves
@@ -132,5 +134,20 @@ protected:
     void _internal_restore() override {
         // LOGI("restore program! current=%u previous=%u", trackedStates->currentlyUsedProgram, this->activeProgram);
         OV_glUseProgram(this->activeProgram);
+    }
+};
+
+struct GLDebugGroup : public Restorable {
+    GLDebugGroup(std::string name) {
+        glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION_KHR, 0, -1, name.c_str());
+    }
+
+    ~GLDebugGroup() {
+        restore();
+    }
+
+protected:
+    void _internal_restore() override {
+        glPopDebugGroup();
     }
 };

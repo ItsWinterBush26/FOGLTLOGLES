@@ -2,6 +2,7 @@
 
 #include "es/ffpe/lists.hpp"
 #include "es/ffpe/states.hpp"
+#include "es/raii_helpers.hpp"
 #include "es/utils.hpp"
 #include "gles/draw_overrides.hpp"
 #include "gles/ffp/arrays.hpp"
@@ -85,7 +86,7 @@ inline void endInternal(
         std::vector<VertexData>(vertices)
     )) return;
 
-    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "Immediate mode : draw!");
+    GLDebugGroup gldg("Immediate mode rendering");
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
@@ -130,8 +131,6 @@ inline void endInternal(
 
     States::primitive = GL_NONE;
     States::vertices.clear();
-
-    glPopDebugGroup();
 }
 
 inline void end() {

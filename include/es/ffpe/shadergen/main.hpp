@@ -6,6 +6,7 @@
 #include "es/ffpe/shadergen/features/mvp.hpp"
 #include "es/ffpe/shadergen/features/registry.hpp"
 #include "es/ffpe/shadergen/features/vertexbuffer.hpp"
+#include "es/raii_helpers.hpp"
 #include "fmt/base.h"
 #include "fmt/format.h"
 #include "gles/ffp/enums.hpp"
@@ -54,7 +55,7 @@ inline GLuint getCachedOrNewProgram(GLbitfield64 state) {
     if (cachedProgram) return cachedProgram;
 
     if (debugEnabled) LOGI("Generating shader for state '%lld'", state);
-    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "ShaderGen!");
+    GLDebugGroup gldg("ShaderGen : state=" + std::to_string(state));
 
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     std::string vertexSource = Cache::Shaders::getFromCache(state, shaderc_vertex_shader);
@@ -104,7 +105,6 @@ inline GLuint getCachedOrNewProgram(GLbitfield64 state) {
 
     Cache::Programs::putToCache(state, renderingProgram);
 
-    glPopDebugGroup();
     return renderingProgram;
 }
 

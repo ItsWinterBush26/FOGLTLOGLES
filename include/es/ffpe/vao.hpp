@@ -156,7 +156,7 @@ inline void putVertexData(GLenum arrayType, FFPE::States::ClientState::Arrays::A
 
 [[nodiscard]]
 inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) {
-    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "VAO preparations");
+    GLDebugGroup gldg("VAO preparations");
 
     auto* vertexArray = States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
     auto* colorArray = States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
@@ -306,7 +306,6 @@ buffered:
         );
     }
 
-    glPopDebugGroup();
     return sbb;
 }
 

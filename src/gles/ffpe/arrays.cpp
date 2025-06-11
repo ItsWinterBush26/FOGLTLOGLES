@@ -20,7 +20,7 @@ void FFP::registerArrayFunctions() {
 }
 
 void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
-    LOGI("glVertexPointer : size=%i mode=%u stride=%i start=%p", size, type, stride, pointer);
+    // LOGI("glVertexPointer : size=%i mode=%u stride=%i start=%p", size, type, stride, pointer);
     
     auto* vertex = FFPE::States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
     if (vertex->parameters.size != size) FFPE::States::Manager::invalidateCurrentState();
@@ -33,7 +33,7 @@ void glVertexPointer(GLint size, GLenum type, GLsizei stride, const void* pointe
 }
 
 void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
-    LOGI("glColorPointer : size=%i mode=%u stride=%i start=%p", size, type, stride, pointer);
+    // LOGI("glColorPointer : size=%i mode=%u stride=%i start=%p", size, type, stride, pointer);
     
     auto* color = FFPE::States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
     if (color->parameters.size != size) FFPE::States::Manager::invalidateCurrentState();
@@ -46,7 +46,7 @@ void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer
 }
 
 void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
-    LOGI("glTexCoordPointer : size=%i mode=%u stride=%i start=%p", size, type, stride, pointer);
+    // LOGI("glTexCoordPointer : size=%i mode=%u stride=%i start=%p", size, type, stride, pointer);
 
     auto* texCoord = FFPE::States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0);
     if (texCoord->parameters.size != size) FFPE::States::Manager::invalidateCurrentState();
