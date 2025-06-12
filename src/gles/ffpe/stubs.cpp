@@ -62,9 +62,9 @@ STUB_FUNC(glClipPlane, (GLenum plane, const GLdouble *equation))
 STUB_FUNC(glCopyPixels, (GLint x, GLint y, GLsizei width, GLsizei height, GLenum type))
 STUB_FUNC(glDrawPixels, (GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels))
 STUB_FUNC(glFeedbackBuffer, (GLsizei size, GLenum type, GLfloat *buffer))
-STUB_FUNC(glFogf, (GLenum pname, GLfloat param))
-STUB_FUNC(glFogfv, (GLenum pname, const GLfloat *params))
-STUB_FUNC(glFogi, (GLenum pname, GLint param))
+// STUB_FUNC(glFogf, (GLenum pname, GLfloat param))
+// STUB_FUNC(glFogfv, (GLenum pname, const GLfloat *params))
+// STUB_FUNC(glFogi, (GLenum pname, GLint param))
 STUB_FUNC(glFogiv, (GLenum pname, const GLint *params))
 STUB_FUNC(glGetClipPlane, (GLenum plane, GLdouble *equation))
 STUB_FUNC(glGetMapdv, (GLenum target, GLenum query, GLdouble *v))
@@ -221,9 +221,9 @@ void FFP::registerStubFunctions() {
     REGISTER(glCopyPixels);
     REGISTER(glDrawPixels);
     REGISTER(glFeedbackBuffer);
-    REGISTER(glFogf);
-    REGISTER(glFogfv);
-    REGISTER(glFogi);
+    // REGISTER(glFogf);
+    // REGISTER(glFogfv);
+    // REGISTER(glFogi);
     REGISTER(glFogiv);
     REGISTER(glGetClipPlane);
     REGISTER(glGetMapdv);

@@ -14,13 +14,17 @@ namespace FFPE::Rendering::ShaderGen::Feature::MVP {
 
 struct MVPFeature : public Feature::BaseFeature {
 
+static constexpr std::string_view modelViewProjectionUniformVS= "uniform mat4 uModelViewProjection;";
+
+bool isEnabled() const override { return true; }
+
 void buildVS(
     std::stringstream& finalInputs,
     [[maybe_unused]] std::stringstream& finalOutputs,
     [[maybe_unused]] std::stringstream& finalOperations,
     [[maybe_unused]] std::stringstream& finalOutputOperations
 ) const override {
-    finalInputs << "uniform mat4 uModelViewProjection;" << Common::Whitespaces::DOUBLE_NEWLINE;
+    finalInputs << modelViewProjectionUniformVS << Common::Whitespaces::DOUBLE_NEWLINE;
 }
 
 void sendData(GLuint program) const override {

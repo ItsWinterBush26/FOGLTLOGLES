@@ -20,14 +20,14 @@ struct AlphaTestFeature : public Feature::BaseFeature {
 static constexpr std::string_view uniforms = "uniform float alphaTestThreshold;";
 static constexpr std::string_view baseOperation = "if (color.a {} alphaTestThreshold) discard;";
 
+bool isEnabled() const override { return trackedStates->isCapabilityEnabled(GL_ALPHA_TEST); }
+
 void buildFS(
     std::stringstream& finalInputs,
     [[maybe_unused]] std::stringstream& finalOutputs,
     std::stringstream& finalOperations,
     [[maybe_unused]] std::stringstream& finalOutputOperations
 ) const override {
-    if (!trackedStates->isCapabilityEnabled(GL_ALPHA_TEST)) return;
-
     finalInputs << uniforms << Common::Whitespaces::DOUBLE_NEWLINE;
 
     std::string operation;
@@ -70,8 +70,6 @@ void buildFS(
 }
 
 void sendData(GLuint program) const override {
-    if (!trackedStates->isCapabilityEnabled(GL_ALPHA_TEST)) return;
-
     GLint alphaTestThresholdUniLoc = Cache::Uniforms::getCachedUniformLocation(program, "alphaTestThreshold");
     if (alphaTestThresholdUniLoc == -1) return;
         

@@ -3,6 +3,7 @@
 #include "es/ffpe/states.hpp"
 #include "es/ffpe/shadergen/common.hpp"
 #include "es/ffpe/shadergen/features/base.hpp"
+#include "es/state_tracking.hpp"
 #include "fmt/base.h"
 #include "fmt/format.h"
 #include "gles/ffp/enums.hpp"
@@ -27,6 +28,8 @@ static constexpr std::string_view vertexTexCoordInputFS = "in mediump vec{} vert
 static constexpr std::string_view fragColorOutputFS = "{} out vec4 oFragColor;";
 
 static constexpr std::string_view colorVariableFS = "{} lowp vec{} color = vertexColor;";
+
+bool isEnabled() const override { return true; }
 
 void buildVS(
     std::stringstream& finalInputs,
@@ -100,9 +103,15 @@ void buildFS(
         colorArray->enabled ? colorArray->parameters.size : decltype(States::VertexData::color)::length()
     ) << Common::Whitespaces::DOUBLE_NEWLINE;
 
-    finalOutputOperations << getOutputColorExpression(
-        colorArray->enabled ? colorArray->parameters.size : decltype(States::VertexData::color)::length()
-    ) << Common::Whitespaces::DOUBLE_NEWLINE_TAB;
+
+    if (trackedStates->isCapabilityEnabled(GL_FOG)) {
+        finalOutputOperations << "// getOutputColorExpression() says 'its up to you Feature::Fog!'";
+    } else {
+        finalOutputOperations << getOutputColorExpression(
+            colorArray->enabled ? colorArray->parameters.size : decltype(States::VertexData::color)::length()
+        );
+    }
+    finalOutputOperations << Common::Whitespaces::DOUBLE_NEWLINE_TAB;
 }
 
 std::string getPositionExpression(GLint componentSize) const {

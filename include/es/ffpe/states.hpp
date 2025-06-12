@@ -43,6 +43,19 @@ namespace AlphaTest {
 namespace ShadeModel {
     inline GLenum type = GL_SMOOTH;
 }
+namespace Fog {
+    inline GLenum fogMode = GL_LINEAR;
+    inline glm::vec4 fogColor = glm::vec4(1.0f);
+
+    namespace Linear {
+        inline float fogStart = 0.0f;
+        inline float fogEnd = 0.0f;
+    }
+
+    namespace Exp {
+        inline float fogDensity = 0.0f;
+    }
+}
 namespace ClientState {
     namespace Arrays {
         struct ArrayParameters {

@@ -25,6 +25,8 @@ virtual void buildFS(
 
 virtual void sendData([[maybe_unused]] GLuint program) const { }
 
+virtual bool isEnabled() const { return false; }
+
 };
 
 }

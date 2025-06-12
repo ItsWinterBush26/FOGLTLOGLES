@@ -16,7 +16,7 @@ typedef uint64_t GLbitfield64;
 // FFP
 
 // arrays
-#define GL_COLOR_ARRAY 0x8076
+#define GL_COLOR_ARRAY         0x8076
 #define GL_TEXTURE_COORD_ARRAY 0x8078
 
 // alpha
@@ -33,16 +33,27 @@ typedef uint64_t GLbitfield64;
 
 // shading
 #define GL_FLAT   0x1d00
-#define GL_SMOOTH 0x1d01
+#define GL_SMOOTH 0x1d0
+
+// fog
+#define GL_FOG         0x0B60
+#define GL_FOG_MODE    0x0B65
+#define GL_FOG_COLOR   0x0B66
+#define GL_FOG_START   0x0B63
+#define GL_FOG_END     0x0B64
+#define GL_FOG_DENSITY 0x0B62
+
+#define GL_EXP  0x0800
+#define GL_EXP2 0x0801
 
 // draw array
 // #define GL_QUADS 0x7
 
 // Matrices
-#define GL_MODELVIEW 0x1700
+#define GL_MODELVIEW  0x1700
 #define GL_PROJECTION 0x1701
-#define GL_TEXTURE 0x1702
+#define GL_TEXTURE    0x1702
 
 // Lists
-#define GL_COMPILE 0x1300
+#define GL_COMPILE             0x1300
 #define GL_COMPILE_AND_EXECUTE 0x1301

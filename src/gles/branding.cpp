@@ -114,6 +114,7 @@ void OV_glEnable(GLenum cap) {
         case GL_ALPHA_TEST:
         case GL_TEXTURE_2D:
         case GL_COLOR_MATERIAL:
+        case GL_FOG:
             break;
 
         case GL_DEBUG_OUTPUT:
@@ -136,6 +137,7 @@ void OV_glDisable(GLenum cap) {
         case GL_ALPHA_TEST:
         case GL_TEXTURE_2D:
         case GL_COLOR_MATERIAL:
+        case GL_FOG:
             break;
     
         default:

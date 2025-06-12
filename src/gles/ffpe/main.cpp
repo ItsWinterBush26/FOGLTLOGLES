@@ -1,5 +1,4 @@
 #include "gles/ffp/main.hpp"
-#include "es/ffpe/shadergen/common.hpp"
 #include "utils/log.hpp"
 
 void FFP::FFPWrapper::init() {
@@ -16,4 +15,5 @@ void FFP::FFPWrapper::init() {
     FFP::registerTextureFunctions();
     FFP::registerArrayFunctions();
     FFP::registerShadingFunction();
+    FFP::registerFogFunctions();
 }
