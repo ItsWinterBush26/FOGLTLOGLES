@@ -44,7 +44,7 @@ void glFogf(GLenum pname, GLfloat param) {
 }
 
 
-void glFogfv(GLenum pname, GLfloat* param) {
+void glFogfv(GLenum pname, const GLfloat* param) {
     switch (pname) {
         case GL_FOG_COLOR:
             FFPE::States::Fog::fogColor = glm::make_vec4(param);
