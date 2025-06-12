@@ -79,7 +79,7 @@ inline GLuint generateEAB(GLuint count) {
     if (cached != cachedIndices.end()) {
         OV_glBufferData(
             GL_ELEMENT_ARRAY_BUFFER,
-            cached->second.size(),
+            cached->second.size() * sizeof(GLuint),
             cached->second.data(),
             GL_DYNAMIC_DRAW
         );

@@ -25,7 +25,7 @@ inline std::string buildVertexShader() {
     std::stringstream operations;
     std::stringstream outputOperations;
 
-    for (const auto* feature : Feature::Registry::Data::registeredFeatures) {
+    for (const auto& feature : Feature::Registry::Data::registeredFeatures) {
         if (feature->isEnabled()) feature->buildVS(inputs, outputs, operations, outputOperations);
     }
 
@@ -41,7 +41,7 @@ inline std::string buildFragmentShader() {
     std::stringstream operations;
     std::stringstream outputOperations;
 
-    for (const auto* feature : Feature::Registry::Data::registeredFeatures) {
+    for (const auto& feature : Feature::Registry::Data::registeredFeatures) {
         if (feature->isEnabled()) feature->buildFS(inputs, outputs, operations, outputOperations);
     }
 

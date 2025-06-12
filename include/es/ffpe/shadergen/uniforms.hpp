@@ -11,7 +11,7 @@ namespace FFPE::Rendering::ShaderGen::Uniforms {
 inline void setupInputsForRendering(GLuint program) {
     GLDebugGroup gldg("Bind uniforms");
 
-    for (const auto* feature : Feature::Registry::Data::registeredFeatures) {
+    for (const auto& feature : Feature::Registry::Data::registeredFeatures) {
         if (feature->isEnabled()) feature->sendData(program);
     }
 
