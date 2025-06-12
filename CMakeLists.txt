@@ -55,6 +55,8 @@ set(SPIRV_CROSS_ENABLE_C_API OFF)
 set(SPIRV_CROSS_ENABLE_REFLECT OFF)
 set(GLSLANG_TESTS OFF)
 ## set(ENABLE_HLSL OFF) ## fails on libshaderc_util
+set(GLM_ENABLE_SIMD_NEON ON)
+set(GLM_ENABLE_FAST_MATH ON)
 
 add_subdirectory(deps/shaderc) 
 add_subdirectory(deps/spirv-cross)
