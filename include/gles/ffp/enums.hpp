@@ -46,6 +46,9 @@ typedef uint64_t GLbitfield64;
 #define GL_EXP  0x0800
 #define GL_EXP2 0x0801
 
+// lighting
+#define GL_LIGHTING 0xb50
+
 // draw array
 // #define GL_QUADS 0x7
 

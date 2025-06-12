@@ -50,7 +50,9 @@ void customDebugCallback(
     const GLchar* message,
     const void* userParam
 ) {
-    LOGD("[GL DEBUG] Source: %u, Type: %u, ID: %u, Severity: %u", source, type, id, severity);
+    if (severity != GL_DEBUG_SEVERITY_HIGH) return;
+
+    LOGD("[GL DEBUG] Source: %u, Type: %u, ID: %u, Severity: GL_DEBUG_SEVERITY_HIGH", source, type, id);
     LOGD("[GL DEBUG] Message: %s", message);
 }
 
