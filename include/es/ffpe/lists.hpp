@@ -10,19 +10,19 @@
 #include <vector>
 
 template<auto Func>
-constexpr std::string_view getTypeNameFromTemplate() {
+constexpr std::string getTypeNameFromTemplate() {
 #if defined(__clang__) || defined(__GNUC__)
     constexpr std::string_view fn = __PRETTY_FUNCTION__;
     constexpr std::string_view key = "Func = ";
     auto start = fn.find(key) + key.size();
     auto end = fn.find_first_of("];", start);
-    return fn.substr(start, end - start);
+    return std::string(fn.substr(start, end - start));
 #elif defined(_MSC_VER)
     constexpr std::string_view fn = __FUNCSIG__;
     constexpr std::string_view key = "Func=";
     auto start = fn.find(key) + key.size();
     auto end = fn.find_first_of(">,", start);
-    return fn.substr(start, end - start);
+    return std::string(fn.substr(start, end - start));
 #else
     return "unknown";
 #endif

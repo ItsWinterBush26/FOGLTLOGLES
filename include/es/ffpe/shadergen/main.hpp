@@ -55,7 +55,7 @@ inline GLuint getCachedOrNewProgram(GLbitfield64 state) {
     GLuint cachedProgram = Cache::Programs::getFromCache(state);
     if (cachedProgram) return cachedProgram;
 
-    if (debugEnabled) LOGI("Generating shader for state '%lld'", state);
+    if (debugEnabled) LOGI("Generating shader for state '%llu'", state);
     GLDebugGroup gldg("ShaderGen : state=" + std::to_string(state));
 
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
