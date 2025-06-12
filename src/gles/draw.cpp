@@ -13,12 +13,10 @@ void GLES::registerDrawOverride() {
 
 void OV_glDrawArrays(GLenum mode, GLint first, GLsizei count) {
     if (count <= 0) return;
-    
-    if (debugEnabled) LOGI("OV_glDrawArrays : mode=%u count=%i", mode, count);
     if (FFPE::List::addCommand<OV_glDrawArrays>(mode, first, count)) return;
+    if (debugEnabled) LOGI("OV_glDrawArrays : mode=%u count=%i", mode, count);
 
     GLDebugGroup gldg("Draw Arrays");
-
     switch (mode) {
         case GL_QUADS:
             FFPE::Rendering::Arrays::Quads::drawQuads(count);

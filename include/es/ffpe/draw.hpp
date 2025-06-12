@@ -9,6 +9,8 @@
 
 #include <GLES3/gl32.h>
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 namespace FFPE::Rendering::Arrays {
 
@@ -47,6 +49,9 @@ inline GLuint eabGeneratorProgram;
 inline GLuint indicesOutputBuffer;
 inline GLuint numQuadsUniLoc;
 
+// quad amount, indices
+inline std::unordered_map<GLuint, std::vector<GLuint>> cachedIndices;
+
 inline void init() {
     glGenBuffers(1, &indicesOutputBuffer);
 
@@ -64,13 +69,24 @@ inline void init() {
     glDeleteShader(computeShader);
 }
 
-// TODO: cache generated indices values
-// we dont need to regen indices for each quad
 inline GLuint generateEAB(GLuint count) {
     GLuint quadCount = count / 4;
     GLuint eabCount = quadCount * 6;
 
     OV_glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicesOutputBuffer);
+
+    auto cached = cachedIndices.find(quadCount);
+    if (cached != cachedIndices.end()) {
+        OV_glBufferData(
+            GL_ELEMENT_ARRAY_BUFFER,
+            cached->second.size(),
+            cached->second.data(),
+            GL_DYNAMIC_DRAW
+        );
+
+        return eabCount;
+    }
+
     OV_glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
         eabCount * sizeof(GLuint),
@@ -85,6 +101,20 @@ inline GLuint generateEAB(GLuint count) {
     
     glDispatchCompute((quadCount + 63) / 64, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_ELEMENT_ARRAY_BARRIER_BIT);
+
+    GLuint* indices = (GLuint*) glMapBufferRange(
+        GL_ELEMENT_ARRAY_BUFFER,
+        0,
+        eabCount * sizeof(GLuint),
+        GL_MAP_READ_BIT
+    );
+
+    cachedIndices.emplace(
+        quadCount,
+        std::vector<GLuint>(indices, indices + eabCount)
+    );
+
+    glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 
     return eabCount;
 }

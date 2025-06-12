@@ -1,6 +1,8 @@
 #pragma once
 
+#include "es/ffpe/states.hpp"
 #include "es/state_tracking.hpp"
+#include "gles/ffp/arrays.hpp"
 #include "gles20/buffer_tracking.hpp"
 #include "gles20/framebuffer_tracking.hpp"
 #include "gles20/shader_overrides.hpp"
@@ -149,5 +151,43 @@ struct GLDebugGroup : public Restorable {
 protected:
     void _internal_restore() override {
         glPopDebugGroup();
+    }
+};
+
+struct SaveClientArray : public Restorable {
+    GLenum targetArray;
+    bool isEnabled;
+    
+    SaveClientArray(GLenum array) : targetArray(array) {
+        this->isEnabled = FFPE::States::ClientState::Arrays::getArray(array)->enabled;
+    }
+
+    ~SaveClientArray() {
+        restore();
+    }
+
+protected:
+    void _internal_restore() override {
+        if (isEnabled) glEnableClientState(targetArray);
+        else glDisableClientState(targetArray);
+    }
+};
+
+struct SaveTexCoordClientArray : public Restorable {
+    GLenum targetUnit;
+    bool isEnabled;
+    
+    SaveTexCoordClientArray(GLenum unit) : targetUnit(unit) {
+        this->isEnabled = FFPE::States::ClientState::Arrays::getTexCoordArray(unit)->enabled;
+    }
+
+    ~SaveTexCoordClientArray() {
+        restore();
+    }
+
+protected:
+    void _internal_restore() override {
+        if (isEnabled) FFPE::States::ClientState::Arrays::getTexCoordArray(targetUnit)->enabled = true;
+        else FFPE::States::ClientState::Arrays::getTexCoordArray(targetUnit)->enabled = false;
     }
 };

@@ -67,6 +67,7 @@ inline void advance() {
 
 // TODO: merge with other immediates on display list end record
 inline void endInternal(
+    const GLenum primitive,
     const std::vector<VertexData>& vertices
 ) {
     if (!isActive()) {
@@ -83,10 +84,15 @@ inline void endInternal(
     }
 
     if (FFPE::List::addCommand<endInternal>(
+        primitive,
         std::vector<VertexData>(vertices)
     )) return;
 
     GLDebugGroup gldg("Immediate mode rendering");
+
+    SaveClientArray sca1(GL_VERTEX_ARRAY);
+    SaveClientArray sca2(GL_COLOR_ARRAY);
+    SaveTexCoordClientArray stcca(GL_TEXTURE0);
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
@@ -123,18 +129,14 @@ inline void endInternal(
     );
 
     FFPE::List::ignoreNextCall();
-    OV_glDrawArrays(States::primitive, 0, States::vertices.size());
-
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_COLOR_ARRAY);
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-    States::primitive = GL_NONE;
-    States::vertices.clear();
+    OV_glDrawArrays(primitive, 0, vertices.size());
 }
 
 inline void end() {
-    endInternal(States::vertices);
+    endInternal(States::primitive, States::vertices);
+
+    States::primitive = GL_NONE;
+    States::vertices.clear();
 }
 
 }
