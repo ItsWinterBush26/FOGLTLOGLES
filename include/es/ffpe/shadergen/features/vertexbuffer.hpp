@@ -23,11 +23,11 @@ static constexpr std::string_view vertexTexCoordInputVS = "layout(location = 2) 
 static constexpr std::string_view vertexColorOutputVS = "{} out lowp vec{} vertexColor;";
 static constexpr std::string_view vertexTexCoordOutputVS = "out mediump vec{} vertexTexCoord;";
 
-static constexpr std::string_view vertexColorInputFS = "in lowp vec{} vertexColor;";
+static constexpr std::string_view vertexColorInputFS = "{} in lowp vec{} vertexColor;";
 static constexpr std::string_view vertexTexCoordInputFS = "in mediump vec{} vertexTexCoord;";
 static constexpr std::string_view fragColorOutputFS = "out vec4 oFragColor;";
 
-static constexpr std::string_view colorVariableFS = "{} lowp vec{} color = vertexColor;";
+static constexpr std::string_view colorVariableFS = "lowp vec{} color = vertexColor;";
 
 bool isEnabled() const override { return true; }
 
@@ -84,6 +84,7 @@ void buildFS(
 
     finalInputs << fmt::format(
         vertexColorInputFS,
+        getColorInterpolation(),
         colorArray->enabled ? colorArray->parameters.size : decltype(States::VertexData::color)::length()
     ) << Common::Whitespaces::SINGLE_NEWLINE;
 
@@ -92,13 +93,12 @@ void buildFS(
         texCoordArray->enabled ? texCoordArray->parameters.size : decltype(States::VertexData::texCoord)::length()
     ) << Common::Whitespaces::DOUBLE_NEWLINE;
 
-    finalOutputs << fragColorOutputFS << Common::Whitespaces::DOUBLE_NEWLINE;
+    finalOutputs << fragColorOutputFS << Common::Whitespaces::SINGLE_NEWLINE_TAB;
 
     finalOperations << fmt::format(
         colorVariableFS,
-        getColorInterpolation(),
         colorArray->enabled ? colorArray->parameters.size : decltype(States::VertexData::color)::length()
-    ) << Common::Whitespaces::DOUBLE_NEWLINE;
+    ) << Common::Whitespaces::DOUBLE_NEWLINE_TAB;
 
 
     if (trackedStates->isCapabilityEnabled(GL_FOG)) {
