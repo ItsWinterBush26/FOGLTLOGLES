@@ -5,6 +5,7 @@
 #include "es/ffpe/shadergen/features/base.hpp"
 #include "fmt/base.h"
 #include "fmt/format.h"
+#include "gles/ffp/enums.hpp"
 
 #include <GLES3/gl32.h>
 #include <sstream>
@@ -18,14 +19,14 @@ struct VertexAttribFeature : public Feature::BaseFeature {
 static constexpr std::string_view vertexPositionInputVS = "layout(location = 0) in mediump vec{} iVertexPosition;";
 static constexpr std::string_view vertexColorInputVS = "layout(location = 1) in lowp vec{} iVertexColor;";
 static constexpr std::string_view vertexTexCoordInputVS = "layout(location = 2) in mediump vec{} iVertexTexCoord;";
-static constexpr std::string_view vertexColorOutputVS = "out lowp vec{} vertexColor;";
+static constexpr std::string_view vertexColorOutputVS = "{} out lowp vec{} vertexColor;";
 static constexpr std::string_view vertexTexCoordOutputVS = "out mediump vec{} vertexTexCoord;";
 
 static constexpr std::string_view vertexColorInputFS = "in lowp vec{} vertexColor;";
 static constexpr std::string_view vertexTexCoordInputFS = "in mediump vec{} vertexTexCoord;";
-static constexpr std::string_view fragColorOutputFS = "out vec4 oFragColor;";
+static constexpr std::string_view fragColorOutputFS = "{} out vec4 oFragColor;";
 
-static constexpr std::string_view colorVariableFS = "lowp vec{} color = vertexColor;";
+static constexpr std::string_view colorVariableFS = "{} lowp vec{} color = vertexColor;";
 
 void buildVS(
     std::stringstream& finalInputs,
@@ -54,6 +55,7 @@ void buildVS(
 
     finalOutputs << fmt::format(
         vertexColorOutputVS,
+        getColorInterpolation(),
         colorArray->enabled ? colorArray->parameters.size : decltype(States::VertexData::color)::length()
     ) << Common::Whitespaces::SINGLE_NEWLINE;
 
@@ -87,10 +89,14 @@ void buildFS(
         texCoordArray->enabled ? texCoordArray->parameters.size : decltype(States::VertexData::texCoord)::length()
     ) << Common::Whitespaces::DOUBLE_NEWLINE;
 
-    finalOutputs << fragColorOutputFS << Common::Whitespaces::DOUBLE_NEWLINE;
+    finalOutputs << fmt::format(
+        fragColorOutputFS,
+        getColorInterpolation()
+    ) << Common::Whitespaces::DOUBLE_NEWLINE;
 
     finalOperations << fmt::format(
         colorVariableFS,
+        getColorInterpolation(),
         colorArray->enabled ? colorArray->parameters.size : decltype(States::VertexData::color)::length()
     ) << Common::Whitespaces::DOUBLE_NEWLINE;
 
@@ -116,6 +122,14 @@ std::string getOutputColorExpression(GLint componentSize) const {
         case 3: return "oFragColor = vec4(color, 1);";
         case 4: return "oFragColor = color;";
         default: throw std::runtime_error("Failed to determine output color expression! Is componentSize bigger than 4?");
+    }
+}
+
+std::string getColorInterpolation() const {
+    switch (FFPE::States::ShadeModel::type) {
+        case GL_SMOOTH: return "smooth";
+        case GL_FLAT: return "flat";
+        default: throw std::runtime_error("Failed to determine color interpolation! Is ShadeModel::type not GL_FLAT nor GL_SMOOTH?");
     }
 }
 

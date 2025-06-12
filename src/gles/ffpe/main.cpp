@@ -15,4 +15,5 @@ void FFP::FFPWrapper::init() {
     FFP::registerAlphaTestFunctions();
     FFP::registerTextureFunctions();
     FFP::registerArrayFunctions();
+    FFP::registerShadingFunction();
 }

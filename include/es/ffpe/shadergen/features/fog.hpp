@@ -2,9 +2,9 @@
 
 #include "es/ffpe/shadergen/features/base.hpp"
 
-namespace FFPE::Rendering::ShaderGen::Feature::Texture {
+namespace FFPE::Rendering::ShaderGen::Feature::Fog {
 
-struct TextureFeature : public Feature::BaseFeature {
+struct FogFeature : public Feature::BaseFeature {
 
 void buildVS(
     [[maybe_unused]] std::stringstream& finalInputs,

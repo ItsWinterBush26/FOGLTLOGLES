@@ -22,4 +22,5 @@ namespace FFP {
     void registerAlphaTestFunctions();
     void registerTextureFunctions();
     void registerArrayFunctions();
+    void registerShadingFunction();
 }

@@ -142,7 +142,7 @@ STUB_FUNC(glLightModeli, (GLenum pname, GLint param))
 STUB_FUNC(glLightModeliv, (GLenum pname, const GLint *params))
 STUB_FUNC(glPopAttrib, (void))
 STUB_FUNC(glPushAttrib, (GLbitfield mask))
-STUB_FUNC(glShadeModel, (GLenum mode))
+// STUB_FUNC(glShadeModel, (GLenum mode))
 STUB_FUNC(glTexEnvf, (GLenum target, GLenum pname, GLfloat param))
 STUB_FUNC(glTexEnvfv, (GLenum target, GLenum pname, const GLfloat *params))
 STUB_FUNC(glTexEnvi, (GLenum target, GLenum pname, GLint param))
@@ -301,7 +301,7 @@ void FFP::registerStubFunctions() {
     REGISTER(glLightModeliv);
     REGISTER(glPopAttrib);
     REGISTER(glPushAttrib);
-    REGISTER(glShadeModel);
+    // REGISTER(glShadeModel);
     REGISTER(glTexEnvf);
     REGISTER(glTexEnvfv);
     REGISTER(glTexEnvi);

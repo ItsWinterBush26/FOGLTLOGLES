@@ -113,6 +113,7 @@ inline void initFeatures() {
     Feature::Registry::registerFeature<Feature::VertexAttrib::VertexAttribFeature>();
     Feature::Registry::registerFeature<Feature::MVP::MVPFeature>();
     // Feature::Registry::registerFeature<Feature::Texture::TextureFeature>();
+    // Feature::Registry::registerFeature<Feature::Texture::TextureFeature>();
 
     Feature::Registry::registerFeature<Feature::AlphaTest::AlphaTestFeature>();
 }
