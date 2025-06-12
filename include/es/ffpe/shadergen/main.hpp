@@ -3,6 +3,7 @@
 #include "es/ffpe/shadergen/cache.hpp"
 #include "es/ffpe/shadergen/common.hpp"
 #include "es/ffpe/shadergen/features/alphatest.hpp"
+#include "es/ffpe/shadergen/features/fog.hpp"
 #include "es/ffpe/shadergen/features/mvp.hpp"
 #include "es/ffpe/shadergen/features/registry.hpp"
 #include "es/ffpe/shadergen/features/vertexbuffer.hpp"
@@ -113,7 +114,7 @@ inline void initFeatures() {
     Feature::Registry::registerFeature<Feature::VertexAttrib::VertexAttribFeature>();
     Feature::Registry::registerFeature<Feature::MVP::MVPFeature>();
     // Feature::Registry::registerFeature<Feature::Texture::TextureFeature>();
-    // Feature::Registry::registerFeature<Feature::Texture::TextureFeature>();
+    Feature::Registry::registerFeature<Feature::Fog::FogFeature>();
 
     Feature::Registry::registerFeature<Feature::AlphaTest::AlphaTestFeature>();
 }
