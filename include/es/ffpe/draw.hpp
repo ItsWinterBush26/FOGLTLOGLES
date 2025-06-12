@@ -120,6 +120,7 @@ inline GLuint generateEAB(GLuint count) {
 }
 
 inline void drawQuads(GLuint count) {
+    SaveUsedProgram sup;
     SaveBoundedBuffer sbb(GL_ELEMENT_ARRAY_BUFFER);
 
     auto buffer = Rendering::VAO::prepareVAOForRendering(count);
@@ -130,7 +131,6 @@ inline void drawQuads(GLuint count) {
     GLuint realCount = generateEAB(count);
 
     glDrawElements(GL_TRIANGLES, realCount, GL_UNSIGNED_INT, nullptr);
-    OV_glUseProgram(0);
 }
 
 }
@@ -144,6 +144,7 @@ inline void init() {
 inline void drawArrays(GLenum mode, GLint first, GLuint count) {
     if (trackedStates->currentlyUsedProgram == 0) {
         // immediately assume FFP
+        SaveUsedProgram sup;
 
         auto buffer = Rendering::VAO::prepareVAOForRendering(count);
         auto renderingProgram = Rendering::ShaderGen::getCachedOrNewProgram(FFPE::States::Manager::getOrBuildState());
@@ -152,7 +153,6 @@ inline void drawArrays(GLenum mode, GLint first, GLuint count) {
 
         glDrawArrays(mode, first, count);
 
-        OV_glUseProgram(0);
         return;
     }
 
