@@ -6,6 +6,7 @@
 #include "glm/ext/vector_float4.hpp"
 
 #include <GLES3/gl32.h>
+#include <stdexcept>
 
 namespace FFPE::States {
 
@@ -115,6 +116,8 @@ namespace States {
 
             GLuint64 texCoordArrayEnabled : 1; // 0-1 (2 possible values)
             GLuint64 texCoordArrayComponentSize : 2; // 0-3 (4 possible values)
+
+            GLuint64 fogMode : 2; // 0-3 (4 possible values)
         } fields;
         GLbitfield64 value;
     } currentState;
@@ -145,6 +148,15 @@ inline GLbitfield64 getOrBuildState() {
     auto* texCoord = ClientState::Arrays::getTexCoordArray(GL_TEXTURE0);
     result.fields.texCoordArrayEnabled = texCoord->enabled;
     result.fields.texCoordArrayComponentSize = texCoord->parameters.size - 1;
+
+    result.fields.fogMode = ([]() {
+        switch (Fog::fogMode) {
+            case GL_LINEAR: return 0;
+            case GL_EXP: return 1;
+            case GL_EXP2: return 2;
+            default: throw std::runtime_error("Invalid Fog::fogMode!");
+        }
+    })();
     
     States::shouldRecalculate = false;
     States::currentState = result;
