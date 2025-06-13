@@ -42,7 +42,7 @@ STUB_FUNC(glMultiTexCoord3f, (GLenum target, GLfloat s, GLfloat t, GLfloat r))
 STUB_FUNC(glMultiTexCoord3fv, (GLenum target, const GLfloat *v))
 STUB_FUNC(glMultiTexCoord4f, (GLenum target, GLfloat s, GLfloat t, GLfloat r, GLfloat q))
 STUB_FUNC(glMultiTexCoord4fv, (GLenum target, const GLfloat *v))
-STUB_FUNC(glNormal3f, (GLfloat nx, GLfloat ny, GLfloat nz))
+// STUB_FUNC(glNormal3f, (GLfloat nx, GLfloat ny, GLfloat nz))
 STUB_FUNC(glNormal3fv, (const GLfloat *v))
 STUB_FUNC(glSecondaryColor3f, (GLfloat red, GLfloat green, GLfloat blue))
 STUB_FUNC(glSecondaryColor3fv, (const GLfloat *v))
@@ -201,7 +201,7 @@ void FFP::registerStubFunctions() {
     REGISTER(glMultiTexCoord3fv);
     REGISTER(glMultiTexCoord4f);
     REGISTER(glMultiTexCoord4fv);
-    REGISTER(glNormal3f);
+    // REGISTER(glNormal3f);
     REGISTER(glNormal3fv);
     REGISTER(glSecondaryColor3f);
     REGISTER(glSecondaryColor3fv);
