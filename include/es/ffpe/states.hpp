@@ -1,5 +1,6 @@
 #pragma once
 
+#include "es/state_tracking.hpp"
 #include "gles/ffp/enums.hpp"
 #include "glm/detail/qualifier.hpp"
 #include "glm/ext/vector_float3.hpp"
@@ -117,6 +118,7 @@ namespace States {
             GLuint64 texCoordArrayEnabled : 1; // 0-1 (2 possible values)
             GLuint64 texCoordArrayComponentSize : 2; // 0-3 (4 possible values)
 
+            GLuint fogEnabled : 1; // 0-1 (2 possible values)
             GLuint64 fogMode : 2; // 0-3 (4 possible values)
         } fields;
         GLbitfield64 value;
@@ -149,6 +151,7 @@ inline GLbitfield64 getOrBuildState() {
     result.fields.texCoordArrayEnabled = texCoord->enabled;
     result.fields.texCoordArrayComponentSize = texCoord->parameters.size - 1;
 
+    result.fields.fogEnabled = trackedStates->isCapabilityEnabled(GL_FOG);
     result.fields.fogMode = ([]() {
         switch (Fog::fogMode) {
             case GL_LINEAR: return 0;
