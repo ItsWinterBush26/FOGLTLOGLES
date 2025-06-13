@@ -1,6 +1,5 @@
 #pragma once
 
-#include "es/ffpe/matrices.hpp"
 #include "es/ffpe/shadergen/cache.hpp"
 #include "es/ffpe/shadergen/common.hpp"
 #include "es/ffpe/shadergen/features/base.hpp"
@@ -17,7 +16,6 @@ namespace FFPE::Rendering::ShaderGen::Feature::Fog {
 struct FogFeature : public Feature::BaseFeature {
 
 static constexpr std::string_view depthValueOutputVS = "out float depthValue;";
-static constexpr std::string_view modelViewUniformVS = "uniform mat4 uModelView;";
 
 static constexpr std::string_view depthValueInputFS = "in float depthValue;";
 static constexpr std::string_view fogDefaultUniformsFS = "uniform vec4 uFogColor;";
@@ -28,15 +26,13 @@ static constexpr std::string_view fogExpUniformFS = "uniform float uFogDensity;"
 bool isEnabled() const override { return trackedStates->isCapabilityEnabled(GL_FOG); }
 
 void buildVS(
-    std::stringstream& finalInputs,
+    [[maybe_unused]] std::stringstream& finalInputs,
     std::stringstream& finalOutputs,
     [[maybe_unused]] std::stringstream& finalOperations,
     std::stringstream& finalOutputOperations
 ) const override {
     auto* vertexArray = States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
     
-    finalInputs << modelViewUniformVS << Common::Whitespaces::DOUBLE_NEWLINE;
-
     finalOutputs << depthValueOutputVS << Common::Whitespaces::DOUBLE_NEWLINE;
 
     finalOutputOperations << getDepthValueExpression(
@@ -64,15 +60,6 @@ void buildFS(
 }
 
 void sendData(GLuint program) const override {
-    glUniformMatrix4fv(
-        Cache::Uniforms::getCachedUniformLocation(
-            program, "uModelView"
-        ), 1, GL_FALSE,
-        glm::value_ptr(
-            Matrices::getMatrix(GL_MODELVIEW).matrix
-        )
-    );
-
     glUniform4fv(
         Cache::Uniforms::getCachedUniformLocation(
             program, "uFogColor"
@@ -122,10 +109,10 @@ std::string getFogUniforms() const {
 
 std::string getDepthValueExpression(GLint componentSize) const {
     switch (componentSize) {
-        case 1: return "depthValue = uModelView * vec4(iVertexPosition, 0, 0, 1);";
-        case 2: return "depthValue = uModelView * vec4(iVertexPosition, 0, 1);";
-        case 3: return "depthValue = uModelView * vec4(iVertexPosition, 1);";
-        case 4: return "depthValue = uModelView * iVertexPosition;";
+        case 1: return "depthValue = (uModelView * vec4(iVertexPosition, 0, 0, 1)).z;";
+        case 2: return "depthValue = (uModelView * vec4(iVertexPosition, 0, 1)).z;";
+        case 3: return "depthValue = (uModelView * vec4(iVertexPosition, 1)).z;";
+        case 4: return "depthValue = (uModelView * iVertexPosition).z;";
         default: throw std::runtime_error("Failed to determine position expression! Is componentSize bigger than 4?");
     }
 }

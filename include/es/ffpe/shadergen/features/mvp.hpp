@@ -4,6 +4,8 @@
 #include "es/ffpe/shadergen/cache.hpp"
 #include "es/ffpe/shadergen/common.hpp"
 #include "es/ffpe/shadergen/features/base.hpp"
+#include "es/ffpe/shadergen/features/fog.hpp"
+#include "es/ffpe/shadergen/features/registry.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
 
@@ -14,7 +16,8 @@ namespace FFPE::Rendering::ShaderGen::Feature::MVP {
 
 struct MVPFeature : public Feature::BaseFeature {
 
-static constexpr std::string_view modelViewProjectionUniformVS= "uniform mat4 uModelViewProjection;";
+static constexpr std::string_view modelViewProjectionUniformVS = "uniform mat4 uModelViewProjection;";
+static constexpr std::string_view modelViewUniformVS = "uniform mat4 uModelView;";
 
 bool isEnabled() const override { return true; }
 
@@ -25,6 +28,10 @@ void buildVS(
     [[maybe_unused]] std::stringstream& finalOutputOperations
 ) const override {
     finalInputs << modelViewProjectionUniformVS << Common::Whitespaces::DOUBLE_NEWLINE;
+
+    if (Registry::getFeatureInstance<Fog::FogFeature>()->isEnabled()) {
+        finalInputs << modelViewUniformVS << Common::Whitespaces::DOUBLE_NEWLINE;
+    }
 }
 
 void sendData(GLuint program) const override {
@@ -36,6 +43,17 @@ void sendData(GLuint program) const override {
             Matrices::MVP::getModelViewProjection()
         )
     );
+
+    if (Registry::getFeatureInstance<Fog::FogFeature>()->isEnabled()) {
+        glUniformMatrix4fv(
+            Cache::Uniforms::getCachedUniformLocation(
+                program, "uModelView"
+            ), 1, GL_FALSE,
+            glm::value_ptr(
+                Matrices::getMatrix(GL_MODELVIEW).matrix
+            )
+        );
+    }
 }
 
 };

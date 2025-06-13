@@ -84,6 +84,7 @@ void buildVS(
     finalOperations << getPositionExpression(vertexArray->parameters.size) << Common::Whitespaces::DOUBLE_NEWLINE_TAB;
 
     finalOutputOperations << "vertexColor = iVertexColor;" << Common::Whitespaces::SINGLE_NEWLINE_TAB;
+    finalOutputOperations << "vertexNormal = iVertexNormal;" << Common::Whitespaces::SINGLE_NEWLINE_TAB;
     finalOutputOperations << "vertexTexCoord = iVertexTexCoord;" << Common::Whitespaces::DOUBLE_NEWLINE_TAB;
 }
 
