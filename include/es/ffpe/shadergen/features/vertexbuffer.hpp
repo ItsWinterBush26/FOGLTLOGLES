@@ -19,11 +19,14 @@ struct VertexAttribFeature : public Feature::BaseFeature {
 
 static constexpr std::string_view vertexPositionInputVS = "layout(location = 0) in mediump vec{} iVertexPosition;";
 static constexpr std::string_view vertexColorInputVS = "layout(location = 1) in lowp vec{} iVertexColor;";
-static constexpr std::string_view vertexTexCoordInputVS = "layout(location = 2) in mediump vec{} iVertexTexCoord;";
+static constexpr std::string_view vertexNormalInputVS = "layout(location = 2) in lowp vec{} iNormalColor;";
+static constexpr std::string_view vertexTexCoordInputVS = "layout(location = 3) in mediump vec{} iVertexTexCoord;";
 static constexpr std::string_view vertexColorOutputVS = "{} out lowp vec{} vertexColor;";
+static constexpr std::string_view vertexNormalOutputVS = "out lowp vec{} vertexNormal;";
 static constexpr std::string_view vertexTexCoordOutputVS = "out mediump vec{} vertexTexCoord;";
 
 static constexpr std::string_view vertexColorInputFS = "{} in lowp vec{} vertexColor;";
+static constexpr std::string_view vertexNormalInputFS = "in lowp vec{} vertexNormal;";
 static constexpr std::string_view vertexTexCoordInputFS = "in mediump vec{} vertexTexCoord;";
 static constexpr std::string_view fragColorOutputFS = "out vec4 oFragColor;";
 
@@ -39,6 +42,7 @@ void buildVS(
 ) const override {
     auto* vertexArray = States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
     auto* colorArray = States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
+    auto* normalArray = States::ClientState::Arrays::getArray(GL_NORMAL_ARRAY);
     auto* texCoordArray = States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0);
 
     finalInputs << fmt::format(
@@ -52,6 +56,11 @@ void buildVS(
     ) << Common::Whitespaces::SINGLE_NEWLINE;
 
     finalInputs << fmt::format(
+        vertexNormalInputVS,
+        normalArray->enabled ? normalArray->parameters.size : decltype(States::VertexData::normal)::length()
+    ) << Common::Whitespaces::SINGLE_NEWLINE;
+
+    finalInputs << fmt::format(
         vertexTexCoordInputVS,
         texCoordArray->enabled ? texCoordArray->parameters.size : decltype(States::VertexData::texCoord)::length()
     ) << Common::Whitespaces::DOUBLE_NEWLINE;
@@ -60,6 +69,11 @@ void buildVS(
         vertexColorOutputVS,
         getColorInterpolation(),
         colorArray->enabled ? colorArray->parameters.size : decltype(States::VertexData::color)::length()
+    ) << Common::Whitespaces::SINGLE_NEWLINE;
+
+    finalOutputs << fmt::format(
+        vertexNormalOutputVS,
+        normalArray->enabled ? normalArray->parameters.size : decltype(States::VertexData::normal)::length()
     ) << Common::Whitespaces::SINGLE_NEWLINE;
 
     finalOutputs << fmt::format(
@@ -80,12 +94,18 @@ void buildFS(
     std::stringstream& finalOutputOperations
 ) const override {
     auto* colorArray = States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
+    auto* normalArray = States::ClientState::Arrays::getArray(GL_NORMAL_ARRAY);
     auto* texCoordArray = States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0);
 
     finalInputs << fmt::format(
         vertexColorInputFS,
         getColorInterpolation(),
         colorArray->enabled ? colorArray->parameters.size : decltype(States::VertexData::color)::length()
+    ) << Common::Whitespaces::SINGLE_NEWLINE;
+
+    finalInputs << fmt::format(
+        vertexNormalInputFS,
+        normalArray->enabled ? normalArray->parameters.size : decltype(States::VertexData::normal)::length()
     ) << Common::Whitespaces::SINGLE_NEWLINE;
 
     finalInputs << fmt::format(

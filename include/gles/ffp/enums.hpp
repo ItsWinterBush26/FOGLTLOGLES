@@ -17,6 +17,7 @@ typedef uint64_t GLbitfield64;
 
 // arrays
 #define GL_COLOR_ARRAY         0x8076
+#define GL_NORMAL_ARRAY        0x8075
 #define GL_TEXTURE_COORD_ARRAY 0x8078
 
 // alpha

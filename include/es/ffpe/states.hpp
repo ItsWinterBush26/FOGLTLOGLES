@@ -12,15 +12,16 @@
 namespace FFPE::States {
 
 namespace VertexData {
-    template<int PC, typename P, int CC, typename C, int TCC, typename TC>
+    template<int PC, typename P, int CC, typename C, int NC, typename N, int TCC, typename TC>
     struct VertexRepresentation {
         VertexRepresentation() = default;
         VertexRepresentation(
-            glm::vec<PC, P> p, glm::vec<CC, C> c, glm::vec<TCC, TC> tc
-        ) : position(p), color(c), texCoord(tc) { }
+            glm::vec<PC, P> p, glm::vec<CC, C> c, glm::vec<NC, N> n, glm::vec<TCC, TC> tc
+        ) : position(p), color(c), normal(n), texCoord(tc) { }
 
         glm::vec<PC, P> position = glm::vec4(0, 0, 0, 1);
         glm::vec<CC, C> color = glm::vec4(255, 255, 255, 255);
+        glm::vec<NC, N> normal = glm::vec3(0.0f, 0.0f, 1.0f);
         glm::vec<TCC, TC> texCoord = glm::vec4(0, 0, 0, 0);
     };
 
@@ -115,6 +116,9 @@ namespace States {
             GLuint64 colorArrayEnabled : 1; // 0-1 (2 possible values)
             GLuint64 colorArrayComponentSize : 2; // 0-3 (4 possible values)
 
+            GLuint64 normalArrayEnabled : 1; // 0-1 (2 possible values)
+            GLuint64 normalArrayComponentSize : 2; // 0-3 (4 possible values)
+
             GLuint64 texCoordArrayEnabled : 1; // 0-1 (2 possible values)
             GLuint64 texCoordArrayComponentSize : 2; // 0-3 (4 possible values)
 
@@ -146,6 +150,10 @@ inline GLbitfield64 getOrBuildState() {
     auto* color = ClientState::Arrays::getArray(GL_COLOR_ARRAY);
     result.fields.colorArrayEnabled = color->enabled;
     result.fields.colorArrayComponentSize = color->parameters.size - 1;
+
+    auto* normal = ClientState::Arrays::getArray(GL_NORMAL_ARRAY);
+    result.fields.normalArrayEnabled = normal->enabled;
+    result.fields.normalArrayComponentSize = normal->parameters.size - 1;
 
     auto* texCoord = ClientState::Arrays::getTexCoordArray(GL_TEXTURE0);
     result.fields.texCoordArrayEnabled = texCoord->enabled;

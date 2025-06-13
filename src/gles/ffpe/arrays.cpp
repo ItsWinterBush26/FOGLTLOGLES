@@ -15,6 +15,7 @@ void FFP::registerArrayFunctions() {
 
     REGISTER(glVertexPointer);
     REGISTER(glColorPointer);
+    REGISTER(glNormalPointer);
     REGISTER(glTexCoordPointer);
 
     FFPE::Rendering::Arrays::init();
@@ -41,6 +42,19 @@ void glColorPointer(GLint size, GLenum type, GLsizei stride, const void* pointer
     
     color->parameters = {
         !stride, size, type, GL_TRUE,
+        stride ? stride : size * ESUtils::TypeTraits::getTypeSize(type),
+        pointer
+    };
+}
+
+void glNormalPointer(GLint size, GLenum type, GLsizei stride, const void* pointer) {
+    // LOGI("glNormalPointer : size=%i mode=%u stride=%i start=%p", size, type, stride, pointer);
+    
+    auto* normal = FFPE::States::ClientState::Arrays::getArray(GL_NORMAL_ARRAY);
+    if (normal->parameters.size != size) FFPE::States::Manager::invalidateCurrentState();
+
+    normal->parameters = {
+        !stride, size, type, GL_FALSE,
         stride ? stride : size * ESUtils::TypeTraits::getTypeSize(type),
         pointer
     };

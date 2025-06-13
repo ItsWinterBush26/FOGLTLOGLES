@@ -17,15 +17,16 @@
 #include <span>
 #include <stdexcept>
 
-template<int PC, typename P, int CC, typename C, int TCC, typename TC>
-using TypedVertexData = FFPE::States::VertexData::VertexRepresentation<PC, P, CC, C, TCC, TC>;
+template<int PC, typename P, int CC, typename C, int NC, typename N, int TCC, typename TC>
+using TypedVertexData = FFPE::States::VertexData::VertexRepresentation<PC, P, CC, C, NC, N, TCC, TC>;
 
 namespace FFPE::Rendering::VAO {
 
 namespace AttributeLocations {
     inline const GLuint POSITION_LOCATION = 0;
     inline const GLuint COLOR_LOCATION = 1;
-    inline const GLuint TEX_COORD_LOCATION = 2;
+    inline const GLuint NORMAL_LOCATION = 2;
+    inline const GLuint TEX_COORD_LOCATION = 3;
 }
 
 inline GLuint vao;
@@ -43,32 +44,34 @@ inline void mapVertexData(
     GLsizei count,
     States::ClientState::Arrays::ArrayState* vertex,
     States::ClientState::Arrays::ArrayState* color,
+    States::ClientState::Arrays::ArrayState* normal,
     States::ClientState::Arrays::ArrayState* texCoord,
     const F&& callback
 ) {
     ESUtils::TypeTraits::dispatchAsType(vertex->parameters.type, [&]<typename POS>() {
         ESUtils::TypeTraits::dispatchAsType(color->parameters.type, [&]<typename COL>() {
-            ESUtils::TypeTraits::dispatchAsType(texCoord->parameters.type, [&]<typename TEX>() {
-        
-            using VertexData = TypedVertexData<4, POS, 4, COL, 4, TEX>;
-            GLsizei newVABSize = count * sizeof(VertexData);
-            
-            OV_glBindBuffer(GL_ARRAY_BUFFER, vab);
-            OV_glBufferData(
-                GL_ARRAY_BUFFER,
-                newVABSize,
-                nullptr,
-                GL_DYNAMIC_DRAW
-            );
-
-            auto* v = static_cast<VertexData*>(glMapBufferRange(
-                GL_ARRAY_BUFFER, 0,
-                newVABSize, GL_MAP_WRITE_BIT
-            ));
-
-            callback(v);
-
-            if (v) glUnmapBuffer(GL_ARRAY_BUFFER);
+            ESUtils::TypeTraits::dispatchAsType(normal->parameters.type, [&]<typename NOR>() {
+                ESUtils::TypeTraits::dispatchAsType(texCoord->parameters.type, [&]<typename TEX>() {
+                    using VertexData = TypedVertexData<4, POS, 4, COL, 3, NOR, 4, TEX>;
+                    GLsizei newVABSize = count * sizeof(VertexData);
+                    
+                    OV_glBindBuffer(GL_ARRAY_BUFFER, vab);
+                    OV_glBufferData(
+                        GL_ARRAY_BUFFER,
+                        newVABSize,
+                        nullptr,
+                        GL_DYNAMIC_DRAW
+                    );
+                    
+                    auto* v = static_cast<VertexData*>(glMapBufferRange(
+                        GL_ARRAY_BUFFER, 0,
+                        newVABSize, GL_MAP_WRITE_BIT
+                    ));
+                    
+                    callback(v);
+                    
+                    if (v) glUnmapBuffer(GL_ARRAY_BUFFER);
+                });
             });
         });
     });
@@ -160,6 +163,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
 
     auto* vertexArray = States::ClientState::Arrays::getArray(GL_VERTEX_ARRAY);
     auto* colorArray = States::ClientState::Arrays::getArray(GL_COLOR_ARRAY);
+    auto* normalArray = States::ClientState::Arrays::getArray(GL_NORMAL_ARRAY);
     auto* texCoordArray = States::ClientState::Arrays::getTexCoordArray(GL_TEXTURE0);
 
     glBindVertexArray(vao);
@@ -178,6 +182,18 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
             AttributeLocations::COLOR_LOCATION,
             glm::value_ptr(
                 States::VertexData::color
+            )
+        );
+    }
+
+    if (normalArray->enabled) {
+        glEnableVertexAttribArray(AttributeLocations::NORMAL_LOCATION);
+    } else {
+        glDisableVertexAttribArray(AttributeLocations::NORMAL_LOCATION);
+        glVertexAttrib4fv(
+            AttributeLocations::NORMAL_LOCATION,
+            glm::value_ptr(
+                States::VertexData::normal
             )
         );
     }
@@ -226,6 +242,15 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                 };
             }
 
+            if (normalArray->enabled) {
+                normalArray->parameters = {
+                    normalArray->parameters.planar,
+                    normalArray->parameters.size, normalArray->parameters.type,
+                    GL_FALSE, normalArray->parameters.stride,
+                    (void*) (reinterpret_cast<uintptr_t>(normalArray->parameters.firstElement) - base)
+                };
+            }
+
             if (texCoordArray->enabled) {
                 texCoordArray->parameters = {
                     texCoordArray->parameters.planar,
@@ -239,7 +264,8 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
         }
 
         mapVertexData(
-            count, vertexArray, colorArray, texCoordArray,
+            count,
+            vertexArray, colorArray, normalArray, texCoordArray,
             [&](auto* vertices) {
                 using VertexData = std::remove_pointer_t<decltype(vertices)>;
                 
@@ -260,6 +286,17 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                         colorArray->parameters.type, GL_TRUE,
                         sizeof(VertexData),
                         (void*) offsetof(VertexData, color)
+                    };
+                }
+
+                if (normalArray->enabled) {
+                    putVertexData(GL_NORMAL_ARRAY, normalArray, vertices, count);
+                    normalArray->parameters = {
+                        normalArray->parameters.planar,
+                        decltype(VertexData::normal)::length(),
+                        normalArray->parameters.type, GL_FALSE,
+                        sizeof(VertexData),
+                        (void*) offsetof(VertexData, normal)
                     };
                 }
 
@@ -293,6 +330,16 @@ buffered:
             colorArray->parameters.normalized,
             colorArray->parameters.stride,
             colorArray->parameters.firstElement
+        );
+    }
+
+    if (normalArray->enabled) {
+        glVertexAttribPointer(
+            AttributeLocations::NORMAL_LOCATION,
+            normalArray->parameters.size, normalArray->parameters.type,
+            normalArray->parameters.normalized,
+            normalArray->parameters.stride,
+            normalArray->parameters.firstElement
         );
     }
 

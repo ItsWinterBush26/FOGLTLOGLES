@@ -13,7 +13,7 @@
 #include <cstddef>
 #include <vector>
 
-using VertexData = FFPE::States::VertexData::VertexRepresentation<4, GLfloat, 4, GLfloat, 4, GLfloat>;
+using VertexData = FFPE::States::VertexData::VertexRepresentation<4, GLfloat, 4, GLfloat, 3, GLfloat, 4, GLfloat>;
 
 namespace FFPE::Rendering::ImmediateMode {
 
@@ -61,6 +61,7 @@ inline void advance() {
     States::vertices.emplace_back(
         FFPE::States::VertexData::position,
         FFPE::States::VertexData::color,
+        FFPE::States::VertexData::normal,
         FFPE::States::VertexData::texCoord
     );
 }
@@ -96,6 +97,7 @@ inline void endInternal(
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
     glVertexPointer(
@@ -118,6 +120,16 @@ inline void endInternal(
         sizeof(VertexData), vertices.data() + offsetof(VertexData, color)
     );
 
+    glNormalPointer(
+        decltype(VertexData::normal)::length(),
+        ESUtils::TypeTraits::GLTypeEnum<
+            decltype(
+                VertexData::normal
+            )::value_type
+        >::value,
+        sizeof(VertexData), vertices.data() + offsetof(VertexData, normal)
+    );
+
     glTexCoordPointer(
         decltype(VertexData::texCoord)::length(),
         ESUtils::TypeTraits::GLTypeEnum<
@@ -133,6 +145,7 @@ inline void endInternal(
 
     glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_COLOR_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 

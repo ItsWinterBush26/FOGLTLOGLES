@@ -24,4 +24,5 @@ namespace FFP {
     void registerArrayFunctions();
     void registerShadingFunction();
     void registerFogFunctions();
+    void registerNormalFunctions();
 }
