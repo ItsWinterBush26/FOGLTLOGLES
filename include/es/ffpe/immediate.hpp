@@ -90,9 +90,9 @@ inline void endInternal(
 
     GLDebugGroup gldg("Immediate mode rendering");
 
-    SaveClientArray sca1(GL_VERTEX_ARRAY);
+    /* SaveClientArray sca1(GL_VERTEX_ARRAY);
     SaveClientArray sca2(GL_COLOR_ARRAY);
-    SaveTexCoordClientArray stcca(GL_TEXTURE0);
+    SaveTexCoordClientArray stcca(GL_TEXTURE0); */
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
@@ -130,6 +130,10 @@ inline void endInternal(
 
     FFPE::List::ignoreNextCall();
     OV_glDrawArrays(primitive, 0, vertices.size());
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 inline void end() {
