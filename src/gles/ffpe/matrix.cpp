@@ -63,11 +63,6 @@ void FFP::registerMatrixFunctions() {
 }
 
 void glMatrixMode(GLenum mode) {
-    if (FFPE::List::isRecording()) {
-        FFPE::List::addCommand<glMatrixMode>(mode);
-        return;
-    }
-    
     switch (mode) {
         case GL_MODELVIEW:
         case GL_PROJECTION:
@@ -76,43 +71,33 @@ void glMatrixMode(GLenum mode) {
         default:
             return;
     }
+
+    if (FFPE::List::addCommand<glMatrixMode>(mode)) return;
     
     FFPE::Rendering::Matrices::setCurrentMatrix(mode);
 }
 
 void glPushMatrix() {
-    if (FFPE::List::isRecording()) {
-        FFPE::List::addCommand<glPushMatrix>();
-        return;
-    }
+    if (FFPE::List::addCommand<glPushMatrix>()) return;
 
     FFPE::Rendering::Matrices::pushCurrentMatrix();
 }
 
 void glPopMatrix() {
-    if (FFPE::List::isRecording()) {
-        FFPE::List::addCommand<glPopMatrix>();
-        return;
-    }
+    if (FFPE::List::addCommand<glPopMatrix>()) return;
 
     FFPE::Rendering::Matrices::popTopMatrix();
 }
 
 void glLoadIdentity() {
-    if (FFPE::List::isRecording()) {
-        FFPE::List::addCommand<glLoadIdentity>();
-        return;
-    }
+    if (FFPE::List::addCommand<glLoadIdentity>()) return;
 
     FFPE::Rendering::Matrices::modifyCurrentMatrix([](glm::mat4) { return glm::mat4(1.0f); });
 }
 
 void glLoadMatrixd(const GLdouble *m) {
-    if (FFPE::List::isRecording()) {
-        FFPE::List::addCommand<glLoadMatrixd>(m);
-        return;
-    }
-    
+    if (FFPE::List::addCommand<glLoadMatrixd>(m)) return;
+
     FFPE::Rendering::Matrices::modifyCurrentMatrix([&](glm::mat4) {
         return glm::mat4(
             m[0], m[1], m[2], m[3],
@@ -125,10 +110,7 @@ void glLoadMatrixd(const GLdouble *m) {
 }
 
 void glLoadMatrixf(const GLfloat *m) {
-    if (FFPE::List::isRecording()) {
-        FFPE::List::addCommand<glLoadMatrixf>(m);
-        return;
-    }
+    if (FFPE::List::addCommand<glLoadMatrixf>(m)) return;
 
     FFPE::Rendering::Matrices::modifyCurrentMatrix([&](glm::mat4) {
         return glm::mat4(
@@ -145,10 +127,7 @@ void glOrtho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdou
 }
 
 void glOrthof(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near_val, GLfloat far_val)  {
-    if (FFPE::List::isRecording()) {
-        FFPE::List::addCommand<glOrthof>(left, right, bottom, top, near_val, far_val);
-        return;
-    }
+    if (FFPE::List::addCommand<glOrthof>(left, right, bottom, top, near_val, far_val)) return;
 
     FFPE::Rendering::Matrices::modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
         return currentMatrix * glm::ortho(
@@ -160,10 +139,7 @@ void glOrthof(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat 
 }
 
 void glFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val) {
-    if (FFPE::List::isRecording()) {
-        FFPE::List::addCommand<glFrustum>(left, right, bottom, top, near_val, far_val);
-        return;
-    }
+    if (FFPE::List::addCommand<glFrustum>(left, right, bottom, top, near_val, far_val)) return;
 
     FFPE::Rendering::Matrices::modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
         return currentMatrix * glm::frustum(
@@ -175,11 +151,8 @@ void glFrustum(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLd
 }
 
 void glMultMatrixd(const GLdouble *m) {
-    if (FFPE::List::isRecording()) {
-        FFPE::List::addCommand<glMultMatrixd>(m);
-        return;
-    }
-    
+    if (FFPE::List::addCommand<glMultMatrixd>(m)) return;
+
     FFPE::Rendering::Matrices::modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
         return currentMatrix * glm::mat4(
             m[0], m[1], m[2], m[3],
@@ -191,10 +164,7 @@ void glMultMatrixd(const GLdouble *m) {
 }
 
 void glMultMatrixf(const GLfloat *m) {
-    if (FFPE::List::isRecording()) {
-        FFPE::List::addCommand<glMultMatrixf>(m);
-        return;
-    }
+    if (FFPE::List::addCommand<glMultMatrixf>(m)) return;
 
     FFPE::Rendering::Matrices::modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
         return currentMatrix * glm::mat4(
@@ -211,10 +181,7 @@ void glRotated(GLdouble angle, GLdouble x, GLdouble y, GLdouble z) {
 }
 
 void glRotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z) {
-    if (FFPE::List::isRecording()) {
-        FFPE::List::addCommand<glRotatef>(angle, x, y, z);
-        return;
-    }
+    if (FFPE::List::addCommand<glRotatef>(angle, x, y, z)) return;
 
     FFPE::Rendering::Matrices::modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
         return glm::rotate(currentMatrix, glm::radians(angle), glm::vec3(x, y, z));
@@ -226,10 +193,7 @@ void glScaled(GLdouble x, GLdouble y, GLdouble z) {
 }
 
 void glScalef(GLfloat x, GLfloat y, GLfloat z) {
-    if (FFPE::List::isRecording()) {
-        FFPE::List::addCommand<glScalef>(x, y, z);
-        return;
-    }
+    if (FFPE::List::addCommand<glScalef>(x, y, z)) return;
 
     FFPE::Rendering::Matrices::modifyCurrentMatrix([&](glm::mat4 currentMatrix) {
         return glm::scale(currentMatrix, glm::vec3(x, y, z));
@@ -241,11 +205,8 @@ void glTranslated(GLdouble x, GLdouble y, GLdouble z) {
 }
 
 void glTranslatef(GLfloat x, GLfloat y, GLfloat z) {
-    if (FFPE::List::isRecording()) {
-        FFPE::List::addCommand<glTranslatef>(x, y, z);
-        return;
-    }
-    
+    if (FFPE::List::addCommand<glTranslatef>(x, y, z)) return;
+
     FFPE::Rendering::Matrices::modifyCurrentMatrix([&](glm::mat4 currentMatrix) { 
         return glm::translate(currentMatrix, glm::vec3(x, y, z));
     });

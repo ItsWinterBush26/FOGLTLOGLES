@@ -230,7 +230,7 @@ inline std::unique_ptr<SaveBoundedBuffer> prepareVAOForRendering(GLsizei count) 
                 texCoordArray->parameters = {
                     texCoordArray->parameters.planar,
                     texCoordArray->parameters.size, texCoordArray->parameters.type,
-                    GL_TRUE, texCoordArray->parameters.stride,
+                    GL_FALSE, texCoordArray->parameters.stride,
                     (void*) (reinterpret_cast<uintptr_t>(texCoordArray->parameters.firstElement) - base)
                 };
             }

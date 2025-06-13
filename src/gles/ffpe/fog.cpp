@@ -1,3 +1,4 @@
+#include "es/ffpe/lists.hpp"
 #include "es/ffpe/states.hpp"
 #include "gles/ffp/enums.hpp"
 #include "gles/ffp/main.hpp"
@@ -19,6 +20,8 @@ void FFP::registerFogFunctions() {
 }
 
 void glFogi(GLenum pname, GLint param) {
+    if (FFPE::List::addCommand<glFogi>(pname, param)) return;
+
     switch (pname) {
         case GL_FOG_MODE:
             FFPE::States::Fog::fogMode = param;
@@ -26,8 +29,9 @@ void glFogi(GLenum pname, GLint param) {
     }
 }
 
-
 void glFogf(GLenum pname, GLfloat param) {
+    if (FFPE::List::addCommand<glFogf>(pname, param)) return;
+
     switch (pname) {
         case GL_FOG_START:
             FFPE::States::Fog::Linear::fogStart = param;
@@ -45,6 +49,8 @@ void glFogf(GLenum pname, GLfloat param) {
 
 
 void glFogfv(GLenum pname, const GLfloat* param) {
+    if (FFPE::List::addCommand<glFogfv>(pname, param)) return;
+
     switch (pname) {
         case GL_FOG_COLOR:
             FFPE::States::Fog::fogColor = glm::make_vec4(param);

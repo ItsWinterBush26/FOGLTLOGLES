@@ -1,3 +1,4 @@
+#include "es/ffpe/lists.hpp"
 #include "es/ffpe/states.hpp"
 #include "gles/ffp/enums.hpp"
 #include "gles/ffp/main.hpp"
@@ -18,6 +19,8 @@ void glShadeModel(GLenum mode) {
             break;
         default: return;
     }
+
+    if (FFPE::List::addCommand<glShadeModel>(mode)) return;
 
     FFPE::States::ShadeModel::type = mode;
     FFPE::States::Manager::invalidateCurrentState();

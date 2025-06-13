@@ -1,3 +1,4 @@
+#include "es/ffpe/lists.hpp"
 #include "es/ffpe/states.hpp"
 #include "es/ffpe/draw.hpp"
 #include "es/utils.hpp"
@@ -59,6 +60,7 @@ void glTexCoordPointer(GLint size, GLenum type, GLsizei stride, const void* poin
 }
 
 void glEnableClientState(GLenum array) {
+    if (FFPE::List::addCommand<glEnableClientState>(array)) return;
     FFPE::States::Manager::invalidateCurrentState();
 
     switch (array) {
@@ -73,6 +75,7 @@ void glEnableClientState(GLenum array) {
 }
 
 void glDisableClientState(GLenum array) {
+    if (FFPE::List::addCommand<glDisableClientState>(array)) return;
     FFPE::States::Manager::invalidateCurrentState();
 
     switch (array) {

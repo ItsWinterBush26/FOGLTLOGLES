@@ -142,13 +142,12 @@ inline bool addCommand(Args&&... args) {
         }
     );
 
-    return true;
+    return !(States::activeDisplayList.getMode() == GL_COMPILE_AND_EXECUTE);
 }
 
 inline void endDisplayList() {
     if (!isRecording() || isExecuting()) return;
-    if (States::activeDisplayList.getMode() == GL_COMPILE_AND_EXECUTE) States::activeDisplayList.execute();
-
+    
     States::displayLists.insert({
         States::activeDisplayListIndex,
         States::activeDisplayList
