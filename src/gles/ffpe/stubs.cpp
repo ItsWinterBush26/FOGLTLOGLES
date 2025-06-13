@@ -108,7 +108,7 @@ STUB_FUNC(glWindowPos3fv, (const GLfloat *v))
 STUB_FUNC(glFogCoordPointer, (GLenum type, GLsizei stride, const void *pointer))
 STUB_FUNC(glIndexPointer, (GLenum type, GLsizei stride, const void *pointer))
 STUB_FUNC(glInterleavedArrays, (GLenum format, GLsizei stride, const void *pointer))
-STUB_FUNC(glNormalPointer, (GLenum type, GLsizei stride, const void *pointer))
+// STUB_FUNC(glNormalPointer, (GLenum type, GLsizei stride, const void *pointer))
 STUB_FUNC(glPopClientAttrib, (void))
 STUB_FUNC(glPushClientAttrib, (GLbitfield mask))
 STUB_FUNC(glSecondaryColorPointer, (GLint size, GLenum type, GLsizei stride, const void *pointer))
@@ -267,7 +267,7 @@ void FFP::registerStubFunctions() {
     REGISTER(glFogCoordPointer);
     REGISTER(glIndexPointer);
     REGISTER(glInterleavedArrays);
-    REGISTER(glNormalPointer);
+    // REGISTER(glNormalPointer);
     REGISTER(glPopClientAttrib);
     REGISTER(glPushClientAttrib);
     REGISTER(glSecondaryColorPointer);
