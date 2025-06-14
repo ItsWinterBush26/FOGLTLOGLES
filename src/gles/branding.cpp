@@ -1,5 +1,6 @@
 #include "build_info.hpp"
 #include "es/ffpe/lists.hpp"
+#include "es/ffpe/states.hpp"
 #include "es/state_tracking.hpp"
 #include "es/utils.hpp"
 #include "gles/ffp/enums.hpp"
@@ -113,9 +114,10 @@ void OV_glEnable(GLenum cap) {
     switch (cap) {
         case GL_ALPHA_TEST:
         case GL_TEXTURE_2D:
-        case GL_COLOR_MATERIAL:
         case GL_FOG:
+            FFPE::States::Manager::invalidateCurrentState();
         case GL_LIGHTING:
+        case GL_COLOR_MATERIAL:
             break;
 
         case GL_DEBUG_OUTPUT:
@@ -137,9 +139,10 @@ void OV_glDisable(GLenum cap) {
     switch (cap) {
         case GL_ALPHA_TEST:
         case GL_TEXTURE_2D:
-        case GL_COLOR_MATERIAL:
         case GL_FOG:
+            FFPE::States::Manager::invalidateCurrentState();
         case GL_LIGHTING:
+        case GL_COLOR_MATERIAL:
             break;
     
         default:

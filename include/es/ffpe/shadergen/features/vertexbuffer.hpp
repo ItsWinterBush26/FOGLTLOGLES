@@ -1,9 +1,10 @@
 #pragma once
 
+#include "es/ffpe/shadergen/features/fog.hpp"
+#include "es/ffpe/shadergen/features/registry.hpp"
 #include "es/ffpe/states.hpp"
 #include "es/ffpe/shadergen/common.hpp"
 #include "es/ffpe/shadergen/features/base.hpp"
-#include "es/state_tracking.hpp"
 #include "fmt/base.h"
 #include "fmt/format.h"
 #include "gles/ffp/enums.hpp"
@@ -19,7 +20,7 @@ struct VertexAttribFeature : public Feature::BaseFeature {
 
 static constexpr std::string_view vertexPositionInputVS = "layout(location = 0) in mediump vec{} iVertexPosition;";
 static constexpr std::string_view vertexColorInputVS = "layout(location = 1) in lowp vec{} iVertexColor;";
-static constexpr std::string_view vertexNormalInputVS = "layout(location = 2) in lowp vec{} iNormalColor;";
+static constexpr std::string_view vertexNormalInputVS = "layout(location = 2) in lowp vec{} iVertexNormal;";
 static constexpr std::string_view vertexTexCoordInputVS = "layout(location = 3) in mediump vec{} iVertexTexCoord;";
 static constexpr std::string_view vertexColorOutputVS = "{} out lowp vec{} vertexColor;";
 static constexpr std::string_view vertexNormalOutputVS = "out lowp vec{} vertexNormal;";
@@ -122,7 +123,7 @@ void buildFS(
     ) << Common::Whitespaces::DOUBLE_NEWLINE_TAB;
 
 
-    if (trackedStates->isCapabilityEnabled(GL_FOG)) {
+    if (Registry::getFeatureInstance<Fog::FogFeature>()->isEnabled()) {
         finalOutputOperations << "// getOutputColorExpression() says 'its up to you Feature::Fog!'";
     } else {
         finalOutputOperations << getOutputColorExpression(
