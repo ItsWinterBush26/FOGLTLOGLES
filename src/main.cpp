@@ -1,6 +1,8 @@
 #include "build_info.hpp"
 #include "main.hpp"
+#include "es/limits.hpp"
 #include "es/utils.hpp"
+#include "gles/ffp/main.hpp"
 #include "gles/main.hpp"
 #include "gles20/main.hpp"
 #include "gles30/main.hpp"
@@ -39,6 +41,7 @@ void FOGLTLOGLES::init() {
     LOGI("Using FOGLTLOGLES %s", RENDERER_VERSION);
 
     ESUtils::init();
+    ESLimits::init();
 
     LOGI("FOGLTLOGLES launched on:");
     if (ESUtils::isAngle)
@@ -55,6 +58,7 @@ void FOGLTLOGLES::init() {
     ShaderConverter::Cache::init();
     
     GLES  ::wrapper->init();
+    FFP   ::wrapper->init();
     GLES20::wrapper->init();
     GLES30::wrapper->init();
     GLES32::wrapper->init();

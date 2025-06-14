@@ -30,7 +30,7 @@ template<DerivedFrom<BaseFeature> F>
 inline F* getFeatureInstance() {
     auto it = Data::registeredFeatures.find(typeid(F));
     if (it != Data::registeredFeatures.end()) {
-        return static_cast<F*>(it->second);
+        return static_cast<F*>(it->second.get());
     }
     return nullptr;
 }

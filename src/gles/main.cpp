@@ -1,6 +1,4 @@
 #include "gles/main.hpp"
-#include "gles/ffp/main.hpp"
-#include "es/limits.hpp"
 #include "utils/log.hpp"
 
 void GLES::GLESWrapper::init() {
@@ -10,7 +8,4 @@ void GLES::GLESWrapper::init() {
     GLES::registerBrandingOverride();
     GLES::registerNoErrorOverride();
     GLES::registerDrawOverride();
-
-    ESLimits::init();
-    FFP::wrapper->init();
 }
