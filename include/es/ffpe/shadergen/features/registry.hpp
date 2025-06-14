@@ -20,10 +20,10 @@ concept DerivedFrom = std::is_base_of<D, O>::value;
 template<DerivedFrom<BaseFeature> F>
 inline void registerFeature() {
     LOGI("Registering feature : %s", typeid(F).name());
-    Data::registeredFeatures.insert(
+    Data::registeredFeatures.insert({
         typeid(F),
         std::make_unique<F>()
-    );
+    });
 }
 
 template<DerivedFrom<BaseFeature> F>
