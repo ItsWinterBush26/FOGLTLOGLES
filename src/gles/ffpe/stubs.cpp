@@ -119,7 +119,6 @@ STUB_FUNC(glSecondaryColorPointer, (GLint size, GLenum type, GLsizei stride, con
 STUB_FUNC(glAccum, (GLenum op, GLfloat value))
 // STUB_FUNC(glAlphaFunc, (GLenum func, GLclampf ref))
 STUB_FUNC(glClearAccum, (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha))
-STUB_FUNC(glColorMaterial, (GLenum face, GLenum mode))
 STUB_FUNC(glEdgeFlag, (GLboolean flag))
 STUB_FUNC(glEdgeFlagPointer, (GLsizei stride, const void *pointer))
 STUB_FUNC(glGetLightfv, (GLenum light, GLenum pname, GLfloat *params))
@@ -133,11 +132,11 @@ STUB_FUNC(glGetTexGenfv, (GLenum coord, GLenum pname, GLfloat *params))
 STUB_FUNC(glGetTexGeniv, (GLenum coord, GLenum pname, GLint *params))
 STUB_FUNC(glIndexMask, (GLuint mask))
 STUB_FUNC(glLightf, (GLenum light, GLenum pname, GLfloat param))
-STUB_FUNC(glLightfv, (GLenum light, GLenum pname, const GLfloat *params))
+// STUB_FUNC(glLightfv, (GLenum light, GLenum pname, const GLfloat *params))
 STUB_FUNC(glLighti, (GLenum light, GLenum pname, GLint param))
 STUB_FUNC(glLightiv, (GLenum light, GLenum pname, const GLint *params))
 STUB_FUNC(glLightModelf, (GLenum pname, GLfloat param))
-STUB_FUNC(glLightModelfv, (GLenum pname, const GLfloat *params))
+// STUB_FUNC(glLightModelfv, (GLenum pname, const GLfloat *params))
 STUB_FUNC(glLightModeli, (GLenum pname, GLint param))
 STUB_FUNC(glLightModeliv, (GLenum pname, const GLint *params))
 STUB_FUNC(glPopAttrib, (void))
@@ -278,7 +277,7 @@ void FFP::registerStubFunctions() {
     REGISTER(glAccum);
     // REGISTER(glAlphaFunc);
     REGISTER(glClearAccum);
-    REGISTER(glColorMaterial);
+    // REGISTER(glColorMaterial);
     REGISTER(glEdgeFlag);
     REGISTER(glEdgeFlagPointer);
     REGISTER(glGetLightfv);
@@ -292,11 +291,11 @@ void FFP::registerStubFunctions() {
     REGISTER(glGetTexGeniv);
     REGISTER(glIndexMask);
     REGISTER(glLightf);
-    REGISTER(glLightfv);
+    // REGISTER(glLightfv);
     REGISTER(glLighti);
     REGISTER(glLightiv);
     REGISTER(glLightModelf);
-    REGISTER(glLightModelfv);
+    // REGISTER(glLightModelfv);
     REGISTER(glLightModeli);
     REGISTER(glLightModeliv);
     REGISTER(glPopAttrib);

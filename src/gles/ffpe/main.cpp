@@ -17,4 +17,5 @@ void FFP::FFPWrapper::init() {
     FFP::registerShadingFunction();
     FFP::registerFogFunctions();
     FFP::registerNormalFunctions();
+    FFP::registerLightFunctions();
 }

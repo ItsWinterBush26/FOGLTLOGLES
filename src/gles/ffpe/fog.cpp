@@ -26,6 +26,12 @@ void glFogi(GLenum pname, GLint param) {
         case GL_FOG_MODE:
             FFPE::States::Fog::fogMode = param;
         break;
+
+        case GL_FOG_START:
+        case GL_FOG_END:
+        case GL_FOG_DENSITY:
+            glFogf(pname, param);
+        return;
     }
 }
 
@@ -44,6 +50,10 @@ void glFogf(GLenum pname, GLfloat param) {
         case GL_FOG_DENSITY:
             FFPE::States::Fog::Exp::fogDensity = param;
         break;
+
+        case GL_FOG_MODE:
+            glFogi(pname, param);
+        return;
     }
 }
 

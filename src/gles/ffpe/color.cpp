@@ -7,11 +7,14 @@
 
 #include <GLES3/gl32.h>
 
-
 void glColor4f(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
+
+void glColorMaterial(GLenum face, GLenum mode);
 
 void FFP::registerColorFunctions() {
     REGISTER(glColor4f);
+
+    REGISTER(glColorMaterial);
 }
 
 void glColor4f(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) {
@@ -26,3 +29,6 @@ void glColor4f(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) {
     );
 }
 
+void glColorMaterial(GLenum face, GLenum mode) {
+
+}
