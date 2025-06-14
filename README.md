@@ -37,6 +37,7 @@ A proof-of-concept project enabling Minecraft built for OpenGL 3.2 (desktop) to 
 # Credits
 - [ShaderC](https://github.com/google/shaderc)
 - [SPIRV-Cross](https://github.com/KhronosGroup/SPIRV-Cross)
+- [fifo_map](https://github.com/nlohmann/fifo_map)
 - TinyWrapper
 - [LTW](https://github.com/artdeell/LTW)
 - [MobileGlues](https://github.com/MobileGL-Dev/MobileGlues)

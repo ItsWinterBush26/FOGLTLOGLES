@@ -1,17 +1,17 @@
 #pragma once
 
 #include "es/ffpe/shadergen/features/base.hpp"
+#include "utils/fifo_map.hpp"
 #include "utils/log.hpp"
 
 #include <memory>
 #include <type_traits>
 #include <typeindex>
-#include <unordered_map>
 
 namespace FFPE::Rendering::ShaderGen::Feature::Registry {
 
 namespace Data {
-    inline std::unordered_map<std::type_index, std::unique_ptr<BaseFeature>> registeredFeatures;
+    inline nlohmann::fifo_map<std::type_index, std::unique_ptr<BaseFeature>> registeredFeatures;
 }
 
 template <typename O, typename D>
