@@ -14,7 +14,7 @@ typedef double GLdouble;
 
 // Immediate Mode
 STUB_FUNC(glArrayElement, (GLint i))
-STUB_FUNC(glColor3f, (GLfloat red, GLfloat green, GLfloat blue))
+// STUB_FUNC(glColor3f, (GLfloat red, GLfloat green, GLfloat blue))
 STUB_FUNC(glColor3fv, (const GLfloat *v))
 // STUB_FUNC(glColor4f, (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha))
 STUB_FUNC(glColor4fv, (const GLfloat *v))
@@ -172,7 +172,7 @@ STUB_FUNC(glPrioritizeTextures, (GLsizei n, const GLuint *textures, const GLclam
 void FFP::registerStubFunctions() {
     // Immediate Mode
     REGISTER(glArrayElement);
-    REGISTER(glColor3f);
+    // REGISTER(glColor3f);
     REGISTER(glColor3fv);
     // REGISTER(glColor4f);
     REGISTER(glColor4fv);
