@@ -5,8 +5,10 @@
 #include "utils/log.hpp"
 
 #include <memory>
+#include <tuple>
 #include <type_traits>
 #include <typeindex>
+#include <utility>
 
 namespace FFPE::Rendering::ShaderGen::Feature::Registry {
 
@@ -20,10 +22,11 @@ concept DerivedFrom = std::is_base_of<D, O>::value;
 template<DerivedFrom<BaseFeature> F>
 inline void registerFeature() {
     LOGI("Registering feature : %s", typeid(F).name());
-    Data::registeredFeatures.insert({
-        typeid(F),
-        std::move(std::make_unique<F>())
-    });
+    Data::registeredFeatures.emplace(
+        std::piecewise_construct,
+        std::forward_as_tuple(typeid(F)),
+        std::forward_as_tuple(std::make_unique<F>())
+    );
 }
 
 template<DerivedFrom<BaseFeature> F>

@@ -86,7 +86,7 @@ inline void endInternal(
 
     if (FFPE::List::addCommand<endInternal>(
         primitive,
-        std::vector<VertexData>(vertices)
+        vertices
     )) return;
 
     GLDebugGroup gldg("Immediate mode rendering");

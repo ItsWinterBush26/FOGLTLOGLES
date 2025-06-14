@@ -7,6 +7,8 @@
 #include <GLES3/gl32.h>
 #include <functional>
 #include <string>
+#include <tuple>
+#include <utility>
 #include <vector>
 
 template<auto Func>
@@ -50,12 +52,9 @@ public:
     DisplayList() { }
     DisplayList(GLenum mode) : mode(mode) { }
     
-    template<typename NameT, typename FuncT>
-    void addCommand(NameT&& name, FuncT&& func) {
-        commands.emplace_back(Command{
-            std::forward<NameT>(name),
-            std::forward<FuncT>(func)
-        });
+    template<typename... Args>
+    void addCommand(Args&&... args) {
+        commands.emplace_back(std::forward<Args>(args)...);
     }
     
     void setMode(GLenum mode) {
@@ -103,7 +102,9 @@ inline GLuint genDisplayLists(GLsizei range) {
 
     for (GLsizei i = 0; i < range; ++i) {
         States::displayLists.emplace(
-            i + States::nextListIndex, DisplayList()
+            std::piecewise_construct,
+            std::forward_as_tuple(i + States::nextListIndex),
+            std::forward_as_tuple(DisplayList())
         );
     }
 
@@ -126,19 +127,21 @@ inline void ignoreNextCall() {
     States::ignoreNextCallFlag = true;
 }
 
-template<auto Func, typename... Args>
-requires std::invocable<decltype(Func), Args...>
+template<auto F, typename... Args>
+requires std::invocable<decltype(F), Args...>
 inline bool addCommand(Args&&... args) {
     if (!isRecording() || isExecuting()) return false;
     if (States::ignoreNextCallFlag) {
         States::ignoreNextCallFlag = false;
         return false;
     }
+
+    using DecayedF = std::decay_t<decltype(F)>;
     
     States::activeDisplayList.addCommand(
-        getTypeNameFromTemplate<Func>(),
-        [...args = std::forward<Args>(args)]() {
-            Func(args...);
+        getTypeNameFromTemplate<DecayedF>(),
+        [a = std::make_tuple(args...)]() mutable {
+            std::apply(DecayedF { }, std::move(a));
         }
     );
 
