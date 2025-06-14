@@ -139,7 +139,7 @@ inline bool addCommand(Args&&... args) {
     using DecayedF = std::decay_t<decltype(F)>;
     
     States::activeDisplayList.addCommand(
-        getTypeNameFromTemplate<DecayedF>(),
+        getTypeNameFromTemplate<F>(),
         [a = std::make_tuple(args...)]() mutable {
             std::apply(DecayedF { }, std::move(a));
         }
