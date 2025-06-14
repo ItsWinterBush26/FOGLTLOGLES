@@ -5,6 +5,7 @@
 #include "gles/ffp/main.hpp"
 #include "gles/main.hpp"
 #include "gles20/main.hpp"
+#include "gles20/ext/main.hpp"
 #include "gles30/main.hpp"
 #include "gles32/main.hpp"
 #include "shader/cache.hpp"
@@ -57,9 +58,10 @@ void FOGLTLOGLES::init() {
 
     ShaderConverter::Cache::init();
     
-    GLES  ::wrapper->init();
-    FFP   ::wrapper->init();
-    GLES20::wrapper->init();
-    GLES30::wrapper->init();
-    GLES32::wrapper->init();
+    GLES     ::wrapper->init();
+    FFP      ::wrapper->init();
+    GLES20   ::wrapper->init();
+    GLES20Ext::wrapper->init();
+    GLES30   ::wrapper->init();
+    GLES32   ::wrapper->init();
 }
