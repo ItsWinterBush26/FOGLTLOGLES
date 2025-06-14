@@ -54,7 +54,7 @@ void glNormalPointer(GLint size, GLenum type, GLsizei stride, const void* pointe
     if (normal->parameters.size != size) FFPE::States::Manager::invalidateCurrentState();
 
     normal->parameters = {
-        !stride, size, type, GL_FALSE,
+        !stride, 3, type, GL_FALSE,
         stride ? stride : size * ESUtils::TypeTraits::getTypeSize(type),
         pointer
     };
