@@ -22,7 +22,7 @@ inline void registerFeature() {
     LOGI("Registering feature : %s", typeid(F).name());
     Data::registeredFeatures.insert({
         typeid(F),
-        std::make_unique<F>()
+        std::move(std::make_unique<F>())
     });
 }
 
