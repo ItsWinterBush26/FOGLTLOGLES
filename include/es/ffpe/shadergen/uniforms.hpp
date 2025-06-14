@@ -12,7 +12,7 @@ inline void setupInputsForRendering(GLuint program) {
     GLDebugGroup gldg("Bind uniforms");
 
     for (const auto& feature : Feature::Registry::Data::registeredFeatures) {
-        if (feature.second->isEnabled()) feature.second->sendData(program);
+        if (feature->isEnabled()) feature->sendData(program);
     }
 
     glUniform1i(
