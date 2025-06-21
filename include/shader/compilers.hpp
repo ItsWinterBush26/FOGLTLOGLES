@@ -10,7 +10,7 @@ inline shaderc::CompileOptions generateGLSL2SPVOptions(int glslVersion) {
     options.SetGenerateDebugInfo();
     options.SetSourceLanguage(shaderc_source_language_glsl);
     options.SetTargetEnvironment(shaderc_target_env_opengl, glslVersion);
-    options.SetOptimizationLevel(shaderc_optimization_level_performance);
+    options.SetOptimizationLevel(shaderc_optimization_level_zero);
     options.SetVulkanRulesRelaxed(true);
 
     options.SetAutoMapLocations(true);

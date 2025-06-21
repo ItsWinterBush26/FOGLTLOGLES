@@ -78,10 +78,17 @@ namespace ShaderConverter::SPVCPostprocessor {
 
     inline bool preprocessedVS, preprocessedFS;
 
-    inline void processSPVBytecode(SPVCExposed_CompilerGLSL &compiler, shaderc_shader_kind kind) {
+    inline void processSPVBytecode(SPVCExposed_CompilerGLSL& compiler, shaderc_shader_kind kind) {
         if (kind == shaderc_glsl_compute_shader) {
             LOGI("Compute shader processing is unimplemented right now...");
             return;
+        }
+
+        if (preprocessedVS && kind == shaderc_vertex_shader) {
+            uniformBuffersBindingIndex.clear();
+            currentBindingIndex = 0;
+
+            preprocessedVS = false;
         }
 
         if (!preprocessedVS && kind == shaderc_vertex_shader) preprocessedVS = true;
@@ -107,7 +114,7 @@ namespace ShaderConverter::SPVCPostprocessor {
         // Process shader inputs and outputs
         removeLocationBindingAndDescriptorSets(compiler, resources.stage_inputs);
         
-        int flags = rDescSet | rBinding | rLocation;
+        int flags = rDefault;
         if (kind == shaderc_fragment_shader
          && resources.stage_outputs.size() > 1) flags = rDescSet | rBinding;
         removeLocationBindingAndDescriptorSets(compiler, resources.stage_outputs, flags);
