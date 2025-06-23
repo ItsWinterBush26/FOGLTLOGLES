@@ -53,7 +53,7 @@ void glCallList(GLuint list) {
 }
 
 void glCallLists(GLsizei n, GLenum type, const void* lists) {
-    ESUtils::TypeTraits::dispatchAsType(type, [&]<typename T>() {
+    ESUtils::TypeTraits::typeToPrimitive(type, [&]<typename T>() {
         FFPE::List::callDisplayLists(
             n, ESUtils::TypeTraits::asTypedArray<T>(lists)
         );

@@ -48,10 +48,10 @@ inline void mapVertexData(
     States::ClientState::Arrays::ArrayState* texCoord,
     const F&& callback
 ) {
-    ESUtils::TypeTraits::dispatchAsType(vertex->parameters.type, [&]<typename POS>() {
-        ESUtils::TypeTraits::dispatchAsType(color->parameters.type, [&]<typename COL>() {
-            ESUtils::TypeTraits::dispatchAsType(normal->parameters.type, [&]<typename NOR>() {
-                ESUtils::TypeTraits::dispatchAsType(texCoord->parameters.type, [&]<typename TEX>() {
+    ESUtils::TypeTraits::typeToPrimitive(vertex->parameters.type, [&]<typename POS>() {
+        ESUtils::TypeTraits::typeToPrimitive(color->parameters.type, [&]<typename COL>() {
+            ESUtils::TypeTraits::typeToPrimitive(normal->parameters.type, [&]<typename NOR>() {
+                ESUtils::TypeTraits::typeToPrimitive(texCoord->parameters.type, [&]<typename TEX>() {
                     using VertexData = TypedVertexData<4, POS, 4, COL, 3, NOR, 4, TEX>;
                     GLsizei newVABSize = count * sizeof(VertexData);
                     
@@ -122,37 +122,15 @@ inline void putVertexDataInternal(GLenum arrayType, GLsizei componentSize, GLuin
 
 template<typename VD>
 inline void putVertexData(GLenum arrayType, FFPE::States::ClientState::Arrays::ArrayState* array, VD* vertices, GLuint verticesCount) {
-    switch (array->parameters.type) {
-        case GL_UNSIGNED_BYTE:
-            putVertexDataInternal(
-                arrayType, array->parameters.size, verticesCount,
-                ESUtils::TypeTraits::asTypedArray<GLubyte>(
-                    array->parameters.firstElement
-                ),
-                vertices
-            );
-        break;
-
-        case GL_SHORT:
-            putVertexDataInternal(
-                arrayType, array->parameters.size, verticesCount,
-                ESUtils::TypeTraits::asTypedArray<GLshort>(
-                    array->parameters.firstElement
-                ),
-                vertices
-            );
-        break;
-    
-        case GL_FLOAT:
-            putVertexDataInternal(
-                arrayType, array->parameters.size, verticesCount,
-                ESUtils::TypeTraits::asTypedArray<GLfloat>(
-                    array->parameters.firstElement
-                ),
-                vertices
-            );
-        break;
-    }
+    ESUtils::TypeTraits::typeToPrimitive(array->parameters.type, [&]<typename T>() {
+        putVertexDataInternal(
+            arrayType, array->parameters.size, verticesCount,
+            ESUtils::TypeTraits::asTypedArray<T>(
+                array->parameters.firstElement
+            ),
+            vertices
+        );
+    });
 }
 
 // TODO: bind gl*Pointer here as VAO's (doing this with no physical keyboard is making me mentally insane, please send help)

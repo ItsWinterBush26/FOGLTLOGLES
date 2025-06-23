@@ -185,12 +185,14 @@ struct GLPrimitive;
 #define GL_PRIMITIVE(glt, podt) template<> struct GLPrimitive<glt> { using type = podt; }
 
 GL_TYPE_ENUM(GLubyte, GL_UNSIGNED_BYTE);
+GL_TYPE_ENUM(GLuint, GL_UNSIGNED_INT);
 GL_TYPE_ENUM(GLshort, GL_SHORT);
 GL_TYPE_ENUM(GLint, GL_INT);
 GL_TYPE_ENUM(GLfloat, GL_FLOAT);
 GL_TYPE_ENUM(GLdouble, GL_DOUBLE);
 
 GL_PRIMITIVE(GL_UNSIGNED_BYTE, GLubyte);
+GL_PRIMITIVE(GL_UNSIGNED_INT, GLuint);
 GL_PRIMITIVE(GL_SHORT, GLshort);
 GL_PRIMITIVE(GL_INT, GLint);
 GL_PRIMITIVE(GL_FLOAT, GLfloat);
@@ -199,6 +201,7 @@ GL_PRIMITIVE(GL_DOUBLE, GLdouble);
 inline GLsizei getTypeSize(GLenum type) {
     switch (type) {
         case GL_UNSIGNED_BYTE: return sizeof(GLubyte);
+        case GL_UNSIGNED_INT: return sizeof(GLuint);
         case GL_SHORT: return sizeof(GLshort);
         case GL_INT: return sizeof(GLint);
         case GL_FLOAT: return sizeof(GLfloat);
@@ -210,10 +213,14 @@ inline GLsizei getTypeSize(GLenum type) {
 }
 
 template<typename Func>
-void dispatchAsType(GLenum type, const Func&& func) {
+void typeToPrimitive(GLenum type, const Func&& func) {
     switch (type) {
         case GL_UNSIGNED_BYTE:
             func.template operator()<GLPrimitive<GL_UNSIGNED_BYTE>::type>();
+            break;
+
+        case GL_UNSIGNED_INT:
+            func.template operator()<GLPrimitive<GL_UNSIGNED_INT>::type>();
             break;
         
         case GL_SHORT:
@@ -234,7 +241,7 @@ void dispatchAsType(GLenum type, const Func&& func) {
             
         default:
             LOGE("Unhandled type! (type=%u)", type);
-            throw std::runtime_error("dispatchAsType : Unsupported GL type");
+            throw std::runtime_error("typeToPrimitive : Unsupported GL type");
     }
 }
 
