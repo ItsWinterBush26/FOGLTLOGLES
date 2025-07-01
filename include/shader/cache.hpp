@@ -45,6 +45,10 @@ namespace ShaderConverter::Cache {
         newFile.close();
 
         shaderCache.insert({ key, filePath });
+
+        if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
+            LOGI("Shader with hash=%zu was saved to cache.", key);
+        }
     }
 
     inline std::string getCachedShaderSource(size_t key) {

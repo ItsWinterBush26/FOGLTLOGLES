@@ -49,11 +49,17 @@ void OV_glShaderSource(GLuint shader, GLsizei count, const GLchar* const* string
             goto convert_and_fix;
         }
 
+        const GLchar* newSource = cachedSource.c_str();
+
         if (getEnvironmentVar("LIBGL_VGPU_DUMP") == "1") {
-            LOGI("Cache hit! Shader %u was found in cache.", shader);
+            LOGI("Cache hit! Shader %u (%zu) was found in cache.", shader, currentKey);
+            LOGI(
+                "Cached source of shader with type '%s':",
+                getKindStringFromKind(getKindFromShader(shader))
+            );
+            LOGI("%s", newSource);
         }
 
-        const GLchar* newSource = cachedSource.c_str();
         glShaderSource(shader, 1, &newSource, nullptr);
 
         return;

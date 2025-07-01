@@ -70,7 +70,7 @@ inline void mapVertexData(
                     
                     callback(v);
                     
-                    if (v) glUnmapBuffer(GL_ARRAY_BUFFER);
+                    glUnmapBuffer(GL_ARRAY_BUFFER);
                 });
             });
         });

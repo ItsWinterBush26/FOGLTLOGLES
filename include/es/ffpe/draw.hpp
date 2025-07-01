@@ -6,6 +6,7 @@
 #include "es/ffpe/states.hpp"
 #include "es/ffpe/vao.hpp"
 #include "gles20/shader_overrides.hpp"
+#include "utils/fast_map.hpp"
 
 #include <GLES3/gl32.h>
 #include <string>
@@ -50,7 +51,7 @@ inline GLuint indicesOutputBuffer;
 inline GLuint numQuadsUniLoc;
 
 // quad amount, indices
-inline std::unordered_map<GLuint, std::vector<GLuint>> cachedIndices;
+inline FastMapBI<GLuint, std::vector<GLuint>> cachedIndices;
 
 inline void init() {
     glGenBuffers(1, &indicesOutputBuffer);
