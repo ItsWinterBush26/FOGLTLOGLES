@@ -67,8 +67,8 @@ namespace ShaderConverter::SPVCPostprocessor {
 
         // Reset state when starting a new shader program (vertex shader first)
         if (kind == shaderc_vertex_shader && !preprocessedVS) {
-            uniformBuffersBindingIndex.clear();
-            currentBindingIndex = 0;
+            /* uniformBuffersBindingIndex.clear();
+            currentBindingIndex = 0; */
             preprocessedVS = true;
             preprocessedFS = false;
         }
@@ -100,8 +100,8 @@ namespace ShaderConverter::SPVCPostprocessor {
 
         // Reset state after processing both shaders
         if (preprocessedVS && preprocessedFS) {
-            uniformBuffersBindingIndex.clear();
-            currentBindingIndex = 0;
+            /* uniformBuffersBindingIndex.clear();
+            currentBindingIndex = 0; */
             preprocessedVS = false;
             preprocessedFS = false;
         }
