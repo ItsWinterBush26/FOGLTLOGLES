@@ -62,6 +62,7 @@ cmake -G Ninja .. \
     -DANDROID_PLATFORM=29 \
     -DANDROID_CCACHE="$NDK_CCACHE" \
     -DCMAKE_BUILD_TYPE=Release
+    -flto
 
 echo "Compiling with $(nproc) core/s"
 ninja -C . -j$(nproc)
