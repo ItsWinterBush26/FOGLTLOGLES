@@ -61,8 +61,7 @@ cmake -G Ninja .. \
     -DANDROID_ABI="$ABI" \
     -DANDROID_PLATFORM=29 \
     -DANDROID_CCACHE="$NDK_CCACHE" \
-    -DCMAKE_BUILD_TYPE=Release\
-    -flto
+    -DCMAKE_BUILD_TYPE=Release
 
 echo "Compiling with $(nproc) core/s"
 ninja -C . -j$(nproc)
